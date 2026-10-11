@@ -1,0 +1,11 @@
+{
+  "name": "Quran Vajeh",
+  "build": { "dockerfile": "Dockerfile" },
+  "remoteUser": "node",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "Quran preview", "onAutoForward": "openBrowser" }
+  },
+  "postCreateCommand": "bun install --frozen-lockfile",
+  "postStartCommand": "bash .devcontainer/start-preview.sh"
+}

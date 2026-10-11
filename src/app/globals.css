@@ -1,0 +1,1023 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Default shadcn tokens — kept for any shadcn/ui component that still references them */
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+}
+
+/* ============ Fonts ============
+   All data assets (fonts, JSON) live under /data/ so code and content
+   stay cleanly separated — see /public/data/ for the full data tree. */
+@font-face {
+  font-family: 'Hafs';
+  src: url('/data/fonts/hafs.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/data/fonts/vazirmatn-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/data/fonts/vazirmatn-500.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/data/fonts/vazirmatn-700.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ============ Quran theme tokens ============ */
+:root {
+  --paper: #f2ecdc;
+  --paper-2: #eae3d1;
+  --paper-3: #d9d2c2;
+  --ink: #0e2a22;
+  --ink-2: #16382e;
+  --ink-soft: rgba(14, 42, 34, 0.66);
+  --ink-faint: rgba(14, 42, 34, 0.38);
+  --line: rgba(14, 42, 34, 0.14);
+  --line-strong: rgba(14, 42, 34, 0.28);
+  --teal: #264653;
+  --sage: #2a9d8f;
+  --gold: #e9c46a;
+  --gold-deep: #a8842f;
+  --gold-faint: rgba(168, 132, 47, 0.16);
+  --sheet: #f6f1e3;
+  --word-hover: rgba(42, 157, 143, 0.14);
+  --word-active: rgba(233, 196, 106, 0.55);
+  --word-root: rgba(42, 157, 143, 0.22);
+  --radius: 12px;
+}
+
+[data-theme='night'] {
+  --paper: #0e2a22;
+  --paper-2: #123128;
+  --paper-3: #1a3c30;
+  --ink: #f2ecdc;
+  --ink-2: #eae3d1;
+  --ink-soft: rgba(242, 236, 220, 0.66);
+  --ink-faint: rgba(242, 236, 220, 0.38);
+  --line: rgba(242, 236, 220, 0.14);
+  --line-strong: rgba(242, 236, 220, 0.3);
+  --gold: #e9c46a;
+  --gold-deep: #e9c46a;
+  --gold-faint: rgba(233, 196, 106, 0.14);
+  --sheet: #123028;
+  --word-hover: rgba(233, 196, 106, 0.12);
+  --word-active: rgba(233, 196, 106, 0.4);
+  --word-root: rgba(233, 196, 106, 0.2);
+}
+
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  transition: background-color 0.35s ease, color 0.35s ease;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-pattern {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.font-quran {
+  font-family: 'Hafs', 'Vazirmatn', serif;
+}
+
+/* ============ Pinch-zoom behaviour ============
+   Per user request: two-finger pinch should ONLY grow/shrink the font
+   (handled by the React touch handler in App.tsx). The browser's
+   default pinch-zoom — which scales the whole page and makes the
+   header/footer scroll out of view — must be disabled.
+
+   `touch-action: pan-y` allows the browser to handle vertical
+   scrolling (for the inner overflow-y-auto containers) but disables
+   pinch-zoom. The React onTouchMove handler still fires for
+   two-finger gestures because pinch-zoom isn't in the allowed
+   touch-action list, so the browser passes those events to JS. */
+.quran-main {
+  touch-action: pan-y;
+}
+
+/* ============ Quranic mark rendering ============ */
+/*
+ * We previously wrapped U+06D6..U+06ED marks in spans with smaller
+ * font-size to make them look like small recitation aids. That broke
+ * Arabic letter-joining (see QuranText.tsx for the full story). The
+ * Hafs font's mark glyphs are already ~35 % the size of regular
+ * letters, so we let the font render them naturally and no longer
+ * use any spans. The .quran-mark class is kept here only as a no-op
+ * placeholder in case any markup still references it.
+ */
+.quran-mark {
+  /* no-op — kept for backward compatibility with any leftover markup */
+}
+
+/* ============ Mushaf page ============ */
+.mushaf-frame {
+  position: relative;
+  background: var(--paper-2);
+  border: 1.5px solid var(--gold-deep);
+  outline: 1px solid var(--gold-faint);
+  outline-offset: 3px;
+  border-radius: 6px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 24px 60px -32px rgba(14, 42, 34, 0.45);
+}
+[data-theme='night'] .mushaf-frame {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 24px 60px -28px rgba(0, 0, 0, 0.6);
+}
+
+.mushaf-line {
+  display: flex;
+  direction: rtl;
+  align-items: baseline;
+  justify-content: space-between;
+  column-gap: 0.1em;
+  min-height: 1.9em;
+}
+
+.quran-word {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0 0.02em;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+  user-select: none;
+}
+@media (hover: hover) {
+  .quran-word:hover { background: var(--word-hover); }
+}
+.quran-word.same-root { background: var(--word-root); border-radius: 4px; }
+.quran-word.selected-word {
+  background: rgba(42, 157, 100, 0.48);
+  box-shadow: inset 0 0 0 1.5px rgba(25, 117, 72, 0.65);
+  animation: none;
+}
+[data-theme='night'] .quran-word.selected-word {
+  background: rgba(61, 190, 128, 0.5);
+  box-shadow: inset 0 0 0 1.5px rgba(105, 220, 152, 0.8);
+}
+.quran-word.flash {
+  animation: wordFlash 2.4s ease-out 1;
+}
+@keyframes wordFlash {
+  0%, 55% { background: var(--word-active); box-shadow: 0 0 0 4px var(--gold-faint); }
+  100% { background: transparent; box-shadow: none; }
+}
+
+/* root map tick on frame edge */
+.root-tick {
+  position: absolute;
+  inset-inline-start: -7px;
+  width: 12px;
+  height: 3.5px;
+  border-radius: 4px;
+  background: var(--gold-deep);
+  box-shadow: 0 0 8px var(--gold);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* ============ Page transition ============ */
+.page-enter {
+  animation: pageIn 0.28s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.995); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ============ Surah band / bismillah ============ */
+.surah-band {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0.35em 0 0.15em;
+}
+.surah-band .band-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to left, transparent, var(--gold-deep) 20%, var(--gold-deep) 80%, transparent);
+}
+.surah-band .band-name {
+  font-family: 'Hafs', serif;
+  color: var(--teal);
+  border: 1px solid var(--gold-deep);
+  background: var(--gold-faint);
+  padding: 0.08em 1.1em 0.22em;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 0 0 3px var(--paper-2), 0 0 0 4px var(--gold-faint);
+}
+[data-theme='night'] .surah-band .band-name { color: var(--gold); }
+
+.bismillah-line {
+  text-align: center;
+  font-family: 'Hafs', serif;
+  color: var(--ink);
+  min-height: 1.9em;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.ayah-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1.35em;
+  height: 1.35em;
+  margin: 0 0.12em;
+  border: 1px solid var(--gold-deep);
+  border-radius: 50%;
+  color: var(--teal);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.42em;
+  font-weight: 500;
+  line-height: 1;
+  transform: translateY(0.28em);
+  background: var(--gold-faint);
+}
+[data-theme='night'] .ayah-marker { color: var(--gold); }
+
+/* ============ Backdrop ============ */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 18, 15, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 40;
+  animation: fadeIn 0.2s ease both;
+}
+.panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 18, 15, 0.3);
+  z-index: 40;
+  animation: fadeIn 0.2s ease both;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ============ Root panel: half-sheet on mobile, side panel on desktop ============ */
+/*
+ * The panel can be dragged down to a very small height (8dvh ≈ just the
+ * handle bar) per user request — they want to keep the panel "open" (so
+ * the root-highlight in the mushaf stays alive) while seeing most of the
+ * Quran. `overflow: hidden` clips the header/content cleanly when the
+ * panel is collapsed to just the handle.
+ */
+.root-panel {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 680px;
+  height: var(--sheet-h, 46dvh);
+  min-height: 0;
+  background: var(--sheet);
+  border: 1px solid var(--line-strong);
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;  /* clip header/content when collapsed to handle-only */
+  animation: sheetUp 0.34s cubic-bezier(0.22, 1.15, 0.32, 1) both;
+  box-shadow: 0 -18px 60px -20px rgba(0, 0, 0, 0.45);
+  /* When collapsed (height ≤ 12dvh), hide the border-radius so the
+     handle sits flush at the bottom edge. */
+  transition: border-radius 0.2s;
+}
+@keyframes sheetUp {
+  from { transform: translate(-50%, 60%); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+.root-panel.dragging { transition: none; animation: none; }
+
+/* Maximized state — full viewport with comfortable max width */
+.root-panel.maximized {
+  height: 100dvh;
+  max-height: 100dvh;
+  max-width: min(96vw, 1100px);
+  border-radius: 0;
+  border: 1px solid var(--line-strong);
+  top: 0;
+  bottom: auto;
+  transform: translateX(-50%);
+  animation: fadeIn 0.22s ease both;
+}
+/* Stacked state — when the surah-index drawer is also open, the panel
+   needs to render ABOVE the drawer (drawer z=45, panel z=46+). */
+.root-panel.stacked {
+  z-index: 46;
+}
+@media (min-width: 1024px) {
+  /* On desktop, the index drawer is 540px wide on the right.
+     When stacked, turn the panel into a fixed side panel that
+     sits to the LEFT of the drawer so both are visible. */
+  .root-panel.stacked:not(.maximized) {
+    position: fixed;
+    top: 50%;
+    bottom: auto;
+    left: auto;
+    right: max(540px, 4vw);   /* sit just to the left of the 540px drawer */
+    transform: translateY(-50%);
+    width: 400px;
+    max-width: 400px;
+    height: min(92dvh, 760px);
+    max-height: min(92dvh, 760px);
+    border-radius: 14px;
+    margin: 0;
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 18px 50px -30px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.22s ease both;
+  }
+}
+.panel-handle { display: none; }   /* hide drag handle when maximized is handled inline */
+
+.panel-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0 4px;
+  cursor: grab;
+  touch-action: none;
+  flex: none;
+}
+.panel-handle::before {
+  content: '';
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+
+@media (min-width: 1024px) {
+  .panel-backdrop { display: none; }
+  .root-panel {
+    position: static;
+    transform: none;
+    width: 400px;
+    max-width: 400px;
+    height: auto;
+    max-height: none;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    margin: 8px 8px 8px 0;
+    animation: fadeIn 0.25s ease both;
+    box-shadow: 0 18px 50px -30px rgba(0, 0, 0, 0.4);
+  }
+  .root-panel.maximized {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: min(96vw, 1100px);
+    max-width: min(96vw, 1100px);
+    height: min(94dvh, 820px);
+    max-height: min(94dvh, 820px);
+    border-radius: 16px;
+    z-index: 50;
+    margin: 0;
+    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.5);
+  }
+  .root-panel.maximized .panel-handle { display: none; }
+}
+
+/* ============ Panel header (single row: word + root inline + chip + actions) ============ */
+/*
+ * Everything on ONE line — `flex-wrap: nowrap` so the word and root
+ * never end up on different rows (user complaint). On narrow viewports
+ * the chip hides (`hidden sm:inline-flex`) and the word + root shrink
+ * via em units, but they always sit side-by-side.
+ */
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  min-width: 0;
+}
+.panel-word {
+  font-size: clamp(20px, 4.5vw, 28px);
+  line-height: 1.4;
+  color: var(--ink);
+  flex: none;
+  white-space: nowrap;
+}
+.panel-chip {
+  flex: none;
+  white-space: nowrap;
+}
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  margin-inline-start: auto;
+}
+/* Root inline next to the word — single row, no wrap */
+.root-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--gold-faint);
+  border: 1px solid var(--line-strong);
+  color: var(--gold-deep);
+  line-height: 1;
+  flex: none;
+  white-space: nowrap;
+}
+.root-inline svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.root-letters {
+  font-size: clamp(15px, 3.2vw, 20px);
+  letter-spacing: 0.12em;
+  color: var(--gold-deep);
+  font-weight: 700;
+}
+@media (max-width: 640px) {
+  .panel-header { padding: 8px 12px; gap: 8px; }
+  .root-inline { padding: 2px 7px; }
+}
+
+/* ============ Panel stat widgets ============ */
+.stat {
+  flex: 1;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px 6px;
+  text-align: center;
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+}
+.stat b {
+  display: block;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+/* Compound stat like "86 / 114" — render the count and the denom as
+   two side-by-side mini-cards (per user request). Layout:
+   - count: small gold-tinted badge with the number prominent
+   - slash: just a separator character between them
+   - denom: smaller, fainter badge with the total
+   Reading order in RTL: count (right) → slash → denom (left). */
+.stat .stat-num {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  font-feature-settings: "tnum";
+  line-height: 1;
+}
+.stat .num-count,
+.stat .num-denom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  padding: 3px 7px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+.stat .num-count {
+  background: var(--gold-faint);
+  border: 1px solid var(--gold-deep);
+  color: var(--gold-deep);
+  font-size: 14px;
+}
+.stat .num-denom {
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  border: 1px solid var(--line-strong);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 500;
+}
+.stat .num-sep {
+  font-weight: 400;
+  color: var(--ink-faint);
+  font-size: 12px;
+  flex: none;
+}
+.stat span {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  line-height: 1.7;
+}
+
+/* ============ Keyword score gauge — progress-bar style ============ */
+/*
+ * Empty track (var(--line)) with a colored fill whose width = score*100%.
+ * In RTL Persian the right end is the "low" side (label "حاشیه‌ای") and
+ * the left end is the "high" side (label "محوری"). The fill is anchored
+ * to the right and grows leftward as the score increases — so at
+ * score=1.0 the entire bar is filled, at score=0.5 only the right half
+ * is filled, at score=0 the bar is empty.
+ *
+ * Fill color: a gradient from a muted gold (right/low) to sage green
+ * (left/high) — visually conveys "the further left the fill reaches,
+ * the more central this keyword is to the surah".
+ */
+.gauge {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+  direction: rtl;  /* ensure the fill anchors to the right in RTL */
+}
+.gauge-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;  /* anchored at the inline-start (right in RTL) */
+  background: linear-gradient(
+    to inline-end,
+    color-mix(in srgb, var(--gold) 75%, var(--paper-3)),
+    var(--gold-deep) 35%,
+    var(--sage) 100%
+  );
+  border-radius: 999px;
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold-deep) 35%, transparent) inset;
+}
+/* Fallback for browsers that don't support `to inline-end` — use
+   explicit physical direction. The body is RTL so this is equivalent. */
+@supports not (background: linear-gradient(to inline-end, red, blue)) {
+  .gauge-fill {
+    background: linear-gradient(to left,
+      color-mix(in srgb, var(--gold) 75%, var(--paper-3)),
+      var(--gold-deep) 35%,
+      var(--sage) 100%
+    );
+  }
+}
+/* Legacy class kept for any code still using it — no-op now */
+.gauge-keyword,
+.gauge-marker { /* no-op */ }
+
+.dist-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 8px;
+  transition: background-color 0.15s;
+}
+@media (hover: hover) { .dist-row:hover { background: var(--word-hover); } }
+.dist-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+}
+.dist-fill { height: 100%; border-radius: 4px; background: var(--sage); }
+.dist-fill.cur { background: var(--gold-deep); }
+
+/* ============ Drawer ============ */
+.drawer {
+  position: fixed;
+  inset-block: 0;
+  right: 0;
+  width: min(88vw, 420px);
+  background: var(--sheet);
+  border-left: 1px solid var(--line-strong);
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  animation: drawerIn 0.3s cubic-bezier(0.22, 1.1, 0.32, 1) both;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@keyframes drawerIn {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+
+/* NavDrawer surah row — base layout + active (current surah) state.
+   Active row gets a sage-tinted background and a stronger border so
+   the user can spot where they are in the 114-row list. */
+.nav-surah-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  text-align: right;
+  transition: background-color 0.15s, border-color 0.15s;
+  border: 1px solid transparent;
+}
+.nav-surah-row[data-active] {
+  border-color: var(--sage) !important;
+  box-shadow: 0 0 0 3px var(--word-root);
+}
+
+/* ============ Scrollbars ============ */
+.nice-scroll::-webkit-scrollbar { width: 8px; }
+.nice-scroll::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 8px; }
+.nice-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* ============ Range slider ============ */
+input[type='range'].page-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to left, var(--sage) var(--fill, 0%), var(--line) var(--fill, 0%));
+  outline: none;
+  direction: rtl;
+}
+input[type='range'].page-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--sage);
+  box-shadow: 0 2px 8px rgba(14, 42, 34, 0.3);
+  cursor: pointer;
+}
+input[type='range'].page-slider::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--sage); cursor: pointer;
+}
+
+/* ============ Buttons & chips ============ */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  color: var(--ink);
+  transition: background-color 0.18s ease, transform 0.12s ease;
+  flex: none;
+}
+.icon-btn:active { transform: scale(0.92); }
+.icon-btn.sm { width: 34px; height: 34px; border-radius: 10px; }
+@media (hover: hover) { .icon-btn:hover { background: var(--word-hover); } }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  border-bottom: 2px solid transparent;
+  transition: color 0.18s, border-color 0.18s;
+}
+.tab-btn.active {
+  color: var(--ink);
+  border-bottom-color: var(--sage);
+}
+
+.occ-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: right;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+  transition: border-color 0.15s, background-color 0.15s;
+}
+@media (hover: hover) { .occ-row:hover { border-color: var(--sage); } }
+
+.hl { background: var(--word-active); border-radius: 4px; padding: 0 1px; }
+
+.seg-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  overflow: hidden;
+  flex: none;
+}
+.seg-toggle button {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.seg-toggle button.active {
+  background: var(--sage);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter, .root-panel, .drawer, .surah-index-panel { animation: none; }
+  .quran-word.flash { animation: none; background: var(--word-active); }
+}
+
+@media (max-width: 640px) {
+  .icon-btn { width: 36px; height: 36px; }
+  .icon-btn.sm { width: 30px; height: 30px; }
+  .seg-toggle button { padding: 3px 7px; font-size: 11px; }
+  .seg-toggle { padding: 2px; }
+}
+
+/* ============ Floating zoom FAB (replaces the bottom bar) ============ */
+/*
+ * Small vertical cluster in the bottom corner of the screen — the spot
+ * reading apps (Kindle, Apple Books) typically use for zoom controls.
+ * Bottom-LEFT because the panel/drawer live on the right edge in RTL.
+ * Stays above page content, below modals.
+ */
+.zoom-fab {
+  position: fixed;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  inset-inline-start: 1rem;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 80%, transparent);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.35);
+  animation: fadeIn 0.22s ease both;
+}
+.zoom-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 60%, transparent);
+  transition: background-color 0.15s, transform 0.1s;
+  flex: none;
+}
+.zoom-btn:active { transform: scale(0.92); }
+@media (hover: hover) { .zoom-btn:hover { background: var(--word-hover); } }
+.zoom-readout {
+  font-size: 10px;
+  color: var(--ink-faint);
+  line-height: 1;
+  padding: 2px 0;
+}
+@media (max-width: 640px) {
+  .zoom-fab { padding: 4px; gap: 2px; }
+  .zoom-btn { width: 34px; height: 34px; }
+  .zoom-readout { font-size: 9px; }
+}
+/* Hide the FAB while the drawer or surah-index modal is open — they
+   cover the reading area anyway, and the FAB shouldn't overlap. */
+.has-overlay .zoom-fab { opacity: 0; pointer-events: none; }
+
+/* ============ Surah Index — right-side drawer ============ */
+/*
+ * Reframed as a right-side drawer (like NavDrawer) rather than a
+ * full-page overlay. This is so the index can STAY OPEN while the
+ * user opens the RootPanel by tapping a root — the panel overlays
+ * the index, and when the user closes the panel the index is still
+ * there at the same scroll position.
+ *
+ * The user's flow is: open index → tap root → RootPanel opens →
+ * read root info → close RootPanel → back to index at same scroll
+ * position → tap another root → ... → close index → back to Quran.
+ */
+.surah-index-drawer {
+  position: fixed;
+  inset-block: 0;
+  right: 0;  /* physical right — matches NavDrawer, the start side in RTL */
+  width: min(96vw, 540px);
+  background: var(--sheet);
+  border-inline-start: 1px solid var(--line-strong);
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  animation: drawerIn 0.3s cubic-bezier(0.22, 1.1, 0.32, 1) both;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@keyframes drawerIn {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+
+.idx-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+  text-align: right;
+  transition: border-color 0.15s, background-color 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+@media (hover: hover) {
+  .idx-row:hover { border-color: var(--sage); background: var(--word-hover); }
+}
+/* Active row — root currently shown in the RootPanel. Stays highlighted
+   after the user closes the panel so they know where they were in the list. */
+.idx-row.active {
+  border-color: var(--gold-deep);
+  background: var(--word-active);
+  box-shadow: 0 0 0 3px var(--gold-faint);
+}
+.idx-row.active::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block: 0;
+  width: 3px;
+  background: var(--gold-deep);
+}
+.idx-row::before {
+  /* faint vertical "score" strip on the right edge */
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 4px;
+  background: linear-gradient(to top, var(--gold-faint), var(--sage));
+  opacity: 0.85;
+}
+.idx-rank {
+  flex: none;
+  width: 28px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+.idx-bar-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+}
+.idx-bar-fill {
+  height: 100%;
+  background: var(--gold-deep);
+  border-radius: 4px;
+}
+.idx-gauge {
+  width: 64px;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--line);
+  overflow: hidden;
+  position: relative;
+  direction: rtl;
+}
+.idx-gauge-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: 4px;
+  background: linear-gradient(to inline-end,
+    color-mix(in srgb, var(--gold) 75%, var(--paper-3)),
+    var(--gold-deep) 35%,
+    var(--sage) 100%
+  );
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@supports not (background: linear-gradient(to inline-end, red, blue)) {
+  .idx-gauge-fill {
+    background: linear-gradient(to left,
+      color-mix(in srgb, var(--gold) 75%, var(--paper-3)),
+      var(--gold-deep) 35%,
+      var(--sage) 100%
+    );
+  }
+}
+
+
