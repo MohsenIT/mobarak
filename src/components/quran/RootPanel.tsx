@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { SurahData, Translations, Meta } from '@/lib/quran'
-import { loadGlobalRoots, loadSurah, loadTrans, keywordScore, keywordTier, spacedRoot, toFa } from '@/lib/quran'
+import { loadGlobalRoots, loadSurah, loadTrans, keywordScore, keywordTier, spacedRoot, toFa, morphologyLabel } from '@/lib/quran'
 import type { Selection } from './MushafPage'
 import QuranText from './QuranText'
 import { IconClose, IconMaximize, IconRestore, IconRoot, IconSortIndex } from './Ornaments'
@@ -86,6 +86,7 @@ export default function RootPanel({
   }, [root, surah, globalRoots, sel.s])
 
   const verseTr = trans?.[String(sel.a)]?.[translator]
+  const selectedForm = surah?.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form
 
   // drag handle (mobile, only when not maximized)
   //
@@ -166,6 +167,13 @@ export default function RootPanel({
         </div>
 
         <div className="overflow-y-auto nice-scroll px-5 py-4 flex-1" style={{ overscrollBehavior: 'contain' }}>
+          {selectedForm && (
+            <div className="rounded-xl border px-3 py-2 mb-4 text-sm" style={{ borderColor: 'var(--line)' }}>
+              <p>باب / ساخت صرفی این واژه: <b>{morphologyLabel(selectedForm)}</b> <span dir="ltr">({selectedForm})</span></p>
+              <a className="text-xs underline" href="https://corpus.quran.com" target="_blank" rel="noreferrer">منبع: Quranic Arabic Corpus</a>
+              {' · '}<a className="text-xs underline" href="/data/morphology-source.txt" target="_blank" rel="noreferrer">مشخصات و حقوق داده</a>
+            </div>
+          )}
           {!root ? (
             <div className="text-center py-6" style={{ color: 'var(--ink-soft)' }}>
               <p className="text-sm leading-8">این واژه حرف یا ضمیر است و ریشهٔ مستقلی ندارد.</p>

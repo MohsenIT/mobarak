@@ -9,6 +9,8 @@ import FlowPage from '@/components/quran/FlowPage'
 import RootPanel from '@/components/quran/RootPanel'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
+import RangeComparison from '@/components/quran/RangeComparison'
+import { GitCompareArrows } from 'lucide-react'
 import {
   PatternBG, IconMenu, IconStar,
   IconTranslate, IconSortIndex, Bismillah,
@@ -49,6 +51,7 @@ export default function Home() {
   const [box, setBox] = useState({ w: 0, h: 0 })
   const [panelMax, setPanelMax] = useState(false)
   const [showIndex, setShowIndex] = useState(false)
+  const [showComparison, setShowComparison] = useState(false)
 
   const frameRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
@@ -262,7 +265,7 @@ export default function Home() {
   // is selected, arrows navigate pages/surahs as before.
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if (drawerOpen || showIndex) return
+      if (drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select'))) return
       if (sel && sel.root) {
         // A word with a root is selected — navigate between roots
         if (e.key === 'ArrowRight') { e.preventDefault(); goToRoot('prev') }
@@ -275,7 +278,7 @@ export default function Home() {
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [page, surah, mode, drawerOpen, showIndex, goPage, goSurah, sel, goToRoot])
+  }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel, goToRoot])
 
   // touch: pinch-zoom + swipe
   const touchDist = (t: React.TouchList) =>
@@ -349,7 +352,7 @@ export default function Home() {
   }
 
   return (
-    <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
+    <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 
       {/* ===== Top bar =====
@@ -377,6 +380,9 @@ export default function Home() {
         {/* surah keyword index — opens the sorted-keywords page */}
         <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
           <IconSortIndex />
+        </button>
+        <button className="icon-btn" onClick={() => setShowComparison(true)} aria-label="ارتباط ریشه‌ای بازه آیات" title="ارتباط ریشه‌ای بازه آیات">
+          <GitCompareArrows size={20} />
         </button>
 
         <button className="icon-btn" onClick={toggleBookmark} aria-label="نشان کردن صفحه"
@@ -504,6 +510,11 @@ export default function Home() {
           Rendered as a right-side drawer that stays open while the
           RootPanel is open. The activeRoot prop highlights the currently
           selected row in the list so the user knows where they are. */}
+      {showComparison && (
+        <RangeComparison key={curSurahN} surahN={curSurahN} meta={meta}
+          onClose={() => setShowComparison(false)}
+          onPickRoot={root => { setShowComparison(false); pickRootFromIndex(root) }} />
+      )}
       {showIndex && (
         <SurahIndex
           surahN={curSurahN}

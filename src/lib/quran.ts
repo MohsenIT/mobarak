@@ -4,6 +4,7 @@ export interface Word {
   t: string // uthmani text
   l: number | null // mushaf line number
   r?: string // arabic root (if any)
+  form?: string // Quranic Arabic Corpus verb form, including derived participles
 }
 
 export interface Verse {
@@ -75,6 +76,61 @@ export function toFa(n: number | string): string {
 
 export function spacedRoot(root: string): string {
   return root.split('').join(' ')
+}
+
+const FORM_LABELS: Record<string, string> = {
+  I: 'ثلاثی مجرد', II: 'تفعیل', III: 'مفاعله', IV: 'افعال',
+  V: 'تفعّل', VI: 'تفاعل', VII: 'انفعال', VIII: 'افتعال',
+  IX: 'افعلال', X: 'استفعال',
+}
+
+export function morphologyLabel(form: string): string {
+  return FORM_LABELS[form] ?? `ساخت ${form}`
+}
+
+export interface SharedRoot {
+  root: string
+  inside: number
+  outside: number
+  insideAyahs: number[]
+  outsideAyahs: number[]
+  keyword: number
+  connection: number
+}
+
+/** Compare a closed verse interval with its complement, never with itself.
+ * Connection = geometric mean of keyword scores in the two sections.
+ * Each section's word count normalizes for its length; roots absent from
+ * either section are excluded. This is lexical overlap, not semantic proof.
+ */
+export function compareRootRange(
+  surah: SurahData, globalRoots: Record<string, Record<string, number>>,
+  from: number, to: number,
+): SharedRoot[] {
+  if (!Number.isInteger(from) || !Number.isInteger(to) || from < 1 || to > surah.vc || from > to) return []
+  const insideWords = surah.v.filter(v => v.n >= from && v.n <= to).reduce((n, v) => n + v.w.length, 0)
+  const totalWords = surah.v.reduce((n, v) => n + v.w.length, 0)
+  const outsideWords = totalWords - insideWords
+  if (!insideWords || !outsideWords) return []
+  const rows: SharedRoot[] = []
+  for (const [root, occurrences] of Object.entries(surah.ri)) {
+    const within = occurrences.filter(([a]) => a >= from && a <= to)
+    const beyond = occurrences.filter(([a]) => a < from || a > to)
+    if (!within.length || !beyond.length) continue
+    const distribution = globalRoots[root]
+    if (!distribution) continue
+    const total = Object.values(distribution).reduce((a, b) => a + b, 0)
+    const df = Object.keys(distribution).length
+    const insideScore = keywordScore({ inSurah: within.length, total, surahWords: insideWords, df })
+    const outsideScore = keywordScore({ inSurah: beyond.length, total, surahWords: outsideWords, df })
+    rows.push({ root, inside: within.length, outside: beyond.length,
+      insideAyahs: [...new Set(within.map(([a]) => a))],
+      outsideAyahs: [...new Set(beyond.map(([a]) => a))],
+      keyword: keywordScore({ inSurah: occurrences.length, total, surahWords: totalWords, df }),
+      connection: Math.sqrt(insideScore * outsideScore),
+    })
+  }
+  return rows.sort((a, b) => b.connection - a.connection || b.keyword - a.keyword || a.root.localeCompare(b.root, 'ar'))
 }
 
 // ----------------------------------------------------------------------------
