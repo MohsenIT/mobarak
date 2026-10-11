@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { Meta, SurahData, Translations } from '@/lib/quran'
 import { loadMeta, loadSurah, loadTrans, toFa } from '@/lib/quran'
 import MushafPage, { type Selection } from '@/components/quran/MushafPage'
@@ -444,8 +445,24 @@ export default function Home() {
           )}
         </main>
 
-        {sel && (
-          <RootPanel
+        {sel && (showIndex
+          ? createPortal(
+              <RootPanel
+            sel={sel}
+            meta={meta}
+            translator={translator}
+            maximized={panelMax}
+            onToggleMax={() => setPanelMax(v => !v)}
+            onOpenIndex={() => { setPanelMax(false); setShowIndex(true) }}
+            onClose={() => setSel(null)}
+            onJump={panelJump}
+            onJumpSurah={jumpSurahRoot}
+            /* When the index drawer is also open, the panel needs to sit
+               on top of it — pass a flag so the panel can bump its z-index. */
+            stackedOverIndex={showIndex}
+          />, document.body)
+          : (
+              <RootPanel
             sel={sel}
             meta={meta}
             translator={translator}
@@ -459,8 +476,7 @@ export default function Home() {
                on top of it — pass a flag so the panel can bump its z-index. */
             stackedOverIndex={showIndex}
           />
-        )}
-      </div>
+            ))}      </div>
 
       {/* ===== Drawer ===== */}
       {drawerOpen && (
