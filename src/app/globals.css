@@ -1021,3 +1021,20 @@ input[type='range'].page-slider::-moz-range-thumb {
 }
 
 
+
+/* Keep index details in a bottom half-sheet directly over the index. */
+.root-panel.stacked:not(.maximized) {
+  position: fixed;
+  top: auto;
+  bottom: 0;
+  left: auto;
+  right: 0;
+  transform: none;
+  width: min(96vw, 540px);
+  max-width: 540px;
+  height: var(--sheet-h, 46dvh);
+  max-height: 88dvh;
+  margin: 0;
+  border-radius: 20px 20px 0 0;
+  animation: fadeIn 0.22s ease both;
+}
