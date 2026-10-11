@@ -43,3 +43,27 @@ The Quran reader loads its text, translations, roots, and fonts from `public/dat
 For optional database development, copy `.env.example` to `.env` and run `bun run db:generate` followed by `bun run db:migrate`. Never upload `.env` or local database files.
 
 `.zscripts/` contains scripts from the project's previous hosting environment. Use the commands above for normal development.
+
+## Morphology and verse-range comparison
+
+Words with morphological annotations include an optional `form` field in
+`public/data/surah/*.json`. Forms are imported by exact surah, verse, and word
+location from Quranic Arabic Corpus 0.4, with word counts and roots checked
+before writing. Unmarked verbs use form I; unmarked nouns are left unset.
+Derived participles retain their annotated form. The word analysis panel shows
+the form and links to the source and copyright notices.
+
+The original, unmodified corpus is in `data/quranic-corpus-morphology-0.4.txt`.
+Source notices are in `public/data/morphology-source.txt`. Regenerate with:
+
+```sh
+python3 scripts/import-morphology.py
+bun test src/lib/quran.test.ts
+```
+
+The comparison button next to the root index compares an inclusive verse range
+with all other verses of the current surah. Only roots found on both sides are
+shown. Connection strength is the geometric mean of the two length-normalized
+keyword scores; shared frequency sorts by the smaller count on either side.
+The existing whole-surah keyword score is shown separately. These are lexical
+measures, not claims of semantic equivalence.

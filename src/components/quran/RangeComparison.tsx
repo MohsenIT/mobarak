@@ -13,8 +13,9 @@ interface Props {
 }
 
 function parseVerse(value: string) {
-  return Number(value.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
-    .replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))))
+  const normalized = value.trim().replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
+    .replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
+  return /^\d+$/.test(normalized) ? Number(normalized) : NaN
 }
 
 export default function RangeComparison({ surahN, meta, onClose, onPickRoot }: Props) {
@@ -42,7 +43,7 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot }: P
   const rows = useMemo(() => {
     if (!surah || !roots || !valid || whole) return []
     const result = compareRootRange(surah, roots, from, to)
-    if (sort === 'frequency') result.sort((a, b) => b.inside + b.outside - a.inside - a.outside || b.connection - a.connection)
+    if (sort === 'frequency') result.sort((a, b) => Math.min(b.inside, b.outside) - Math.min(a.inside, a.outside) || b.connection - a.connection)
     if (sort === 'keyword') result.sort((a, b) => b.keyword - a.keyword || b.connection - a.connection)
     return result
   }, [surah, roots, valid, whole, from, to, sort])
@@ -77,7 +78,7 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot }: P
               : <p aria-live="polite">آیات {toFa(from)} تا {toFa(to)} در برابر {toFa(vc - (to - from + 1))} آیهٔ باقی‌مانده · {toFa(rows.length)} ریشهٔ مشترک</p>}
           <details className="mt-1">
             <summary className="cursor-pointer">رتبه‌ها چطور محاسبه می‌شوند؟</summary>
-            <p>قدرت ارتباط از میانگین هندسی شاخص کلیدواژگی در دو بخش به دست می‌آید؛ طول هر بخش و تکرار ریشه در کل قرآن لحاظ می‌شود. کلیدواژگی سوره همان شاخص فهرست ریشه‌هاست. این مقایسه، اشتراک واژگانی را نشان می‌دهد و اثبات ارتباط معنایی نیست.</p>
+            <p>قدرت ارتباط از میانگین هندسی شاخص کلیدواژگی در دو بخش به دست می‌آید؛ طول هر بخش و تکرار ریشه در کل قرآن لحاظ می‌شود. تکرار مشترک، کمینهٔ تعداد کاربرد در دو بخش است. کلیدواژگی سوره همان شاخص فهرست ریشه‌هاست. این مقایسه، اشتراک واژگانی را نشان می‌دهد و اثبات ارتباط معنایی نیست.</p>
           </details>
         </div>
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
