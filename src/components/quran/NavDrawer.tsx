@@ -47,6 +47,7 @@ export default function NavDrawer(props: Props) {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('surah')
   const [q, setQ] = useState('')
   const [pageInput, setPageInput] = useState('')
+  const [pageError, setPageError] = useState(false)
   // ref to the surah list container — we scrollIntoView the active row
   // when the drawer opens.
   const surahListRef = useRef<HTMLDivElement>(null)
@@ -82,13 +83,14 @@ export default function NavDrawer(props: Props) {
   const submitPage = (e: React.FormEvent) => {
     e.preventDefault()
     const fa = '۰۱۲۳۴۵۶۷۸۹'
-    const norm = pageInput.replace(/[۰-۹]/g, d => String(fa.indexOf(d))).trim()
-    const p = parseInt(norm, 10)
-    if (Number.isFinite(p) && p >= 1 && p <= 604) {
+    const norm = pageInput.replace(/[۰-۹]/g, d => String(fa.indexOf(d)))
+      .replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).trim()
+    const p = /^\d+$/.test(norm) ? Number(norm) : NaN
+    if (Number.isInteger(p) && p >= 1 && p <= 604) {
       onGoPage(p)
       setPageInput('')
       onClose()
-    }
+    } else setPageError(true)
   }
 
   return (
@@ -104,7 +106,10 @@ export default function NavDrawer(props: Props) {
         <form onSubmit={submitPage} className="flex items-center gap-2 px-4 pb-3">
           <input
             value={pageInput}
-            onChange={e => setPageInput(e.target.value)}
+            onChange={e => { setPageInput(e.target.value); setPageError(false) }}
+            aria-label="شماره صفحه"
+            aria-invalid={pageError}
+            aria-describedby={pageError ? 'page-jump-error' : undefined}
             inputMode="numeric"
             placeholder="شماره صفحه (۱ تا ۶۰۴)…"
             className="flex-1 rounded-xl border px-3 py-2.5 text-sm bg-transparent outline-none"
@@ -115,6 +120,7 @@ export default function NavDrawer(props: Props) {
             برو
           </button>
         </form>
+        {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">شمارهٔ صفحه باید عددی بین ۱ و ۶۰۴ باشد.</p>}
 
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.map(t => (

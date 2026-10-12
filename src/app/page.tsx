@@ -141,6 +141,12 @@ export default function Home() {
 
   const goPage = useCallback((p: number) => {
     setPage(clamp(p, 1, 604))
+    setMode('mushaf')
+    setSel(null)
+  }, [])
+
+  const tapWord = useCallback((word: Selection) => {
+    setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos ? null : word)
   }, [])
 
   const goSurah = useCallback((n: number) => {
@@ -421,7 +427,7 @@ export default function Home() {
                       selection={sel}
                       highlightRoot={sel?.root ?? null}
                       flash={flash}
-                      onWordTap={setSel}
+                      onWordTap={tapWord}
                     />
                   )}
                 </div>
@@ -443,7 +449,7 @@ export default function Home() {
                     selection={sel}
                       highlightRoot={sel?.root ?? null}
                     flash={flash}
-                    onWordTap={setSel}
+                    onWordTap={tapWord}
                   />
                 )}
               </div>
