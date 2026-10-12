@@ -8,6 +8,7 @@ import { IconClose } from './Ornaments'
 interface Props {
   surahN: number
   meta: Meta
+  initialRange?: { from: number; to: number } | null
   onRangeChange: (range: { s: number; from: number; to: number } | null) => void
   onClose: () => void
   onPickRoot: (root: string) => void
@@ -19,12 +20,12 @@ function parseVerse(value: string) {
   return /^\d+$/.test(normalized) ? Number(normalized) : NaN
 }
 
-export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onRangeChange }: Props) {
+export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onRangeChange, initialRange }: Props) {
   const [surah, setSurah] = useState<SurahData | null>(null)
   const [roots, setRoots] = useState<Record<string, Record<string, number>> | null>(null)
   const [error, setError] = useState(false)
-  const [fromText, setFromText] = useState('1')
-  const [toText, setToText] = useState(String(Math.min(5, meta.surahs[surahN - 1].vc - 1)))
+  const [fromText, setFromText] = useState(String(initialRange?.from ?? 1))
+  const [toText, setToText] = useState(String(initialRange?.to ?? Math.min(5, meta.surahs[surahN - 1].vc - 1)))
   const [sort, setSort] = useState<'connection' | 'frequency' | 'keyword'>('connection')
 
   useEffect(() => {

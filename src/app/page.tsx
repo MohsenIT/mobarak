@@ -63,6 +63,7 @@ export default function Home() {
   const [showIndex, setShowIndex] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
   const [comparisonSurah, setComparisonSurah] = useState(1)
+  const [comparisonRoot, setComparisonRoot] = useState<string | null>(null)
   const [comparisonRange, setComparisonRange] = useState<{ s: number; from: number; to: number } | null>(null)
 
   const frameRef = useRef<HTMLDivElement>(null)
@@ -156,9 +157,11 @@ export default function Home() {
     setPage(clamp(p, 1, 604))
     setMode('mushaf')
     setSel(null)
+    setComparisonRoot(null)
   }, [])
 
   const tapWord = useCallback((word: Selection) => {
+    setComparisonRoot(null)
     setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos ? null : word)
   }, [])
 
@@ -419,6 +422,14 @@ export default function Home() {
         )}
       </header>
 
+      {!showComparison && comparisonRoot && comparisonRange?.s === curSurahN && (
+        <div className="relative z-10 flex items-center gap-2 px-3 py-2 text-xs" style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
+          <span className="range-inside rounded px-2 py-1">درون بازه {toFa(comparisonRange.from)}–{toFa(comparisonRange.to)}</span>
+          <span className="range-outside rounded px-2 py-1">بیرون بازه</span>
+          <button className="underline mr-auto" onClick={() => setShowComparison(true)}>بازگشت به مقایسه</button>
+          <button aria-label="پاک کردن هایلایت مقایسه" onClick={() => { setComparisonRoot(null); setSel(null) }}>×</button>
+        </div>
+      )}
       {/* ===== Main + side root panel ===== */}
       <div className="relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row lg:items-stretch">
         <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main"
@@ -438,8 +449,8 @@ export default function Home() {
                       pageData={pageData}
                       fontSize={mushafFont}
                       selection={sel}
-                      highlightRoot={sel?.root ?? null}
-                    comparisonRange={showComparison ? comparisonRange : null}
+                      highlightRoot={sel?.root ?? comparisonRoot}
+                      comparisonRange={comparisonRange}
                       flash={flash}
                       onWordTap={tapWord}
                     />
@@ -461,8 +472,8 @@ export default function Home() {
                     translator={translator}
                     fontSize={flowFont}
                     selection={sel}
-                      highlightRoot={sel?.root ?? null}
-                    comparisonRange={showComparison ? comparisonRange : null}
+                    highlightRoot={sel?.root ?? comparisonRoot}
+                    comparisonRange={comparisonRange}
                     flash={flash}
                     onWordTap={tapWord}
                   />
@@ -487,7 +498,7 @@ export default function Home() {
             /* When the index drawer is also open, the panel needs to sit
                on top of it — pass a flag so the panel can bump its z-index. */
             stackedOverIndex={showIndex || showComparison}
-            comparisonRange={showComparison ? comparisonRange : null}
+            comparisonRange={comparisonRange}
           />, document.body)
           : (
               <RootPanel
@@ -503,7 +514,7 @@ export default function Home() {
             /* When the index drawer is also open, the panel needs to sit
                on top of it — pass a flag so the panel can bump its z-index. */
             stackedOverIndex={showIndex || showComparison}
-            comparisonRange={showComparison ? comparisonRange : null}
+            comparisonRange={comparisonRange}
           />
             ))}      </div>
 
@@ -536,8 +547,9 @@ export default function Home() {
       {showComparison && (
         <RangeComparison key={comparisonSurah} surahN={comparisonSurah} meta={meta}
           onRangeChange={setComparisonRange}
-          onClose={() => setShowComparison(false)}
-          onPickRoot={root => { setPanelMax(false); pickRootFromIndex(root, comparisonSurah) }} />
+          initialRange={comparisonRange?.s === comparisonSurah ? comparisonRange : null}
+          onClose={() => { setShowComparison(false); setSel(null) }}
+          onPickRoot={root => { setComparisonRoot(root); setPanelMax(false); pickRootFromIndex(root, comparisonSurah) }} />
       )}
       {showIndex && (
         <SurahIndex
