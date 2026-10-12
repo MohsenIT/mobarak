@@ -7,6 +7,7 @@ export interface ContextRange {
   sourcePage: number
   sourceLabel?: string
   note?: string
+  origin?: string
 }
 interface SurahContexts {
   status: string

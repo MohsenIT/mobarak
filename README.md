@@ -85,9 +85,9 @@ of the verses containing that word instead of inventing a word gloss.
 The user-supplied `public/data/context-source.pdf` (سیاق‌بندی اولیه سوره‌های
 قرآن, مؤسسه گفتمان قرآن و ولایت) is preserved verbatim. `contexts.json` records
 the context-column ranges and source page numbers, excluding the independent
-daily-reading column. It contains 567 units across 88 surahs. The other 26
-surahs have no explicit ranges in the PDF and are marked `unspecified`; the
-application does not invent a partition for them. Shura's aggregate row for
+daily-reading column. It contains 567 PDF units across 88 surahs. Following the user’s clarification,
+each of the remaining 26 short surahs is one whole-surah context, marked
+`whole-surah` with `origin: user-clarification` (593 contexts across all 114 surahs). Shura's aggregate row for
 contexts 5–7 is preserved as one labeled aggregate unit (29–53), because the
 source does not supply the three internal boundaries.
 

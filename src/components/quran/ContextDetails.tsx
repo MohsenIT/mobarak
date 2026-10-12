@@ -23,7 +23,7 @@ export default function ContextDetails({ selection, surah, trans, translator, on
   return (
     <>
       <p className="text-xs leading-6 mb-3" style={{ color: 'var(--ink-soft)' }}>
-        بر اساس «{contextSource.title}» · {contextSource.publisher}
+        {context?.origin === 'user-clarification' ? 'طبق تکمیل شما، کل این سوره یک سیاق است.' : `بر اساس «${contextSource.title}» · ${contextSource.publisher}`}
         <br /><a className="underline" href={`${contextSource.url}#page=${page}`} target="_blank" rel="noreferrer">مشاهدهٔ صفحه {toFa(page)} منبع</a>
       </p>
       {!context ? <p role="status" className="text-sm leading-8">در فایل منبع، محدودهٔ سیاق این سوره مشخص نشده است؛ بازه‌ای به‌صورت حدسی انتخاب نمی‌شود.</p> : (

@@ -71,7 +71,11 @@ for n in range(1,115):
    r['sourceSegments']=[[29,50],[51,53]]
  if rs and last!=meta['surahs'][n-1]['vc']:
   raise ValueError(f'Incomplete verse coverage in surah {n}')
- item['status']='specified' if rs else 'unspecified'
+ if not rs:
+  item['ranges']=[{'id':1,'from':1,'to':meta['surahs'][n-1]['vc'],'sourcePage':item['sourcePage'],'origin':'user-clarification'}]
+  item['status']='whole-surah'
+ else:
+  item['status']='specified'
 result={'source':{'title':'سیاق‌بندی اولیه سوره‌های قرآن','publisher':'مؤسسه گفتمان قرآن و ولایت','url':'/data/context-source.pdf','sha256':expected},'surahs':units}
 (ROOT/'public/data/contexts.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-print(f"Validated {sum(len(x['ranges']) for x in units.values())} contexts in {sum(bool(x['ranges']) for x in units.values())} surahs; no ranges invented for the remaining surahs.")
+print(f"Validated {sum(len(x['ranges']) for x in units.values())} contexts in {sum(bool(x['ranges']) for x in units.values())} surahs; whole-surah contexts added for the remaining surahs as instructed by the user.")

@@ -20,10 +20,9 @@ test('every explicit source partition covers its surah exactly once', () => {
       expect(range.sourcePage).toBeLessThanOrEqual(23)
       last = range.to; count++
     }
-    if (entry!.status === 'specified') expect(last).toBe(s.vc)
-    else expect(entry!.ranges).toEqual([])
+    expect(last).toBe(s.vc)
   }
-  expect(count).toBe(567)
+  expect(count).toBe(593)
 })
 test('context boundaries follow the context column, not daily reading sections', () => {
   expect(getContext(2, 16)).toMatchObject({ from: 1, to: 27 })
@@ -33,9 +32,9 @@ test('context boundaries follow the context column, not daily reading sections',
   expect(getContext(40, 23)).toMatchObject({ from: 23, to: 50 })
   expect(getContext(53, 30)).toMatchObject({ from: 1, to: 30 })
 })
-test('missing and aggregate ranges remain explicitly distinguished', () => {
-  expect(getContext(114, 1)).toBeUndefined()
-  expect(getSurahContexts(114)?.status).toBe('unspecified')
+test('whole-surah clarification and aggregate ranges retain their provenance', () => {
+  expect(getContext(114, 1)).toMatchObject({ from: 1, to: 6, origin: 'user-clarification' })
+  expect(getSurahContexts(114)?.status).toBe('whole-surah')
   expect(getContext(42, 40)).toMatchObject({ from: 29, to: 53, sourceLabel: 'پنجم و ششم و هفتم' })
 })
 test('context navigation and highlighting stay within the provided boundaries', () => {

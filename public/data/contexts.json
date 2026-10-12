@@ -4223,24 +4223,40 @@
       "status": "specified"
     },
     "86": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 17,
+          "sourcePage": 22,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 22,
       "sourceHeading": "سورة الطارق و األلع",
       "group": [
         86,
         87
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "87": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 19,
+          "sourcePage": 22,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 22,
       "sourceHeading": "سورة الطارق و األلع",
       "group": [
         86,
         87
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "88": {
       "ranges": [
@@ -4321,127 +4337,231 @@
       "status": "specified"
     },
     "91": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 15,
+          "sourcePage": 22,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 22,
       "sourceHeading": "سورة الشمس و اللیل",
       "group": [
         91,
         92
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "92": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 21,
+          "sourcePage": 22,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 22,
       "sourceHeading": "سورة الشمس و اللیل",
       "group": [
         91,
         92
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "93": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 11,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة الضحی و الشرح",
       "group": [
         93,
         94
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "94": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 8,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة الضحی و الشرح",
       "group": [
         93,
         94
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "95": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 8,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال تی و العلق",
       "group": [
         95,
         96
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "96": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 19,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال تی و العلق",
       "group": [
         95,
         96
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "97": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 5,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال قدر و ال بیّنة",
       "group": [
         97,
         98
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "98": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 8,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال قدر و ال بیّنة",
       "group": [
         97,
         98
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "99": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 8,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال زلزال و ال عادیات",
       "group": [
         99,
         100
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "100": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 11,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال زلزال و ال عادیات",
       "group": [
         99,
         100
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "101": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 11,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال قارعة و ال تکاثر",
       "group": [
         101,
         102
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "102": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 8,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال قارعة و ال تکاثر",
       "group": [
         101,
         102
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "103": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 3,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال عصر و اهل مزة و الفیل",
       "group": [
@@ -4449,10 +4569,18 @@
         104,
         105
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "104": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 9,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال عصر و اهل مزة و الفیل",
       "group": [
@@ -4460,10 +4588,18 @@
         104,
         105
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "105": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 5,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال عصر و اهل مزة و الفیل",
       "group": [
@@ -4471,10 +4607,18 @@
         104,
         105
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "106": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 4,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال قریش و امل اعون و الکوثر",
       "group": [
@@ -4482,10 +4626,18 @@
         107,
         108
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "107": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 7,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال قریش و امل اعون و الکوثر",
       "group": [
@@ -4493,10 +4645,18 @@
         107,
         108
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "108": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 3,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال قریش و امل اعون و الکوثر",
       "group": [
@@ -4504,10 +4664,18 @@
         107,
         108
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "109": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 6,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال کافرون و ال نصر و املسد",
       "group": [
@@ -4515,10 +4683,18 @@
         110,
         111
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "110": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 3,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال کافرون و ال نصر و املسد",
       "group": [
@@ -4526,10 +4702,18 @@
         110,
         111
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "111": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 5,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة ال کافرون و ال نصر و املسد",
       "group": [
@@ -4537,10 +4721,18 @@
         110,
         111
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "112": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 4,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة اإل خالص و ال فلق و الناس",
       "group": [
@@ -4548,10 +4740,18 @@
         113,
         114
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "113": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 5,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة اإل خالص و ال فلق و الناس",
       "group": [
@@ -4559,10 +4759,18 @@
         113,
         114
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     },
     "114": {
-      "ranges": [],
+      "ranges": [
+        {
+          "id": 1,
+          "from": 1,
+          "to": 6,
+          "sourcePage": 23,
+          "origin": "user-clarification"
+        }
+      ],
       "sourcePage": 23,
       "sourceHeading": "سورة اإل خالص و ال فلق و الناس",
       "group": [
@@ -4570,7 +4778,7 @@
         113,
         114
       ],
-      "status": "unspecified"
+      "status": "whole-surah"
     }
   }
 }
