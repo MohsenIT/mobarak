@@ -1044,3 +1044,5 @@ input[type='range'].page-slider::-moz-range-thumb {
 .range-outside, .quran-word.range-outside { background: #f2d6ae; color: #583710; }
 [data-theme="night"] .range-inside { background: #28543a; color: #e2f4e6; }
 [data-theme="night"] .range-outside { background: #6a4826; color: #ffecd3; }
+
+.quran-word.analysis-selected { background: var(--word-active); border-radius: 4px; box-shadow: inset 0 -2px var(--sage); }

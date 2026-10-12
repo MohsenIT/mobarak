@@ -67,3 +67,15 @@ shown. Connection strength is the geometric mean of the two length-normalized
 keyword scores; shared frequency sorts by the smaller count on either side.
 The existing whole-surah keyword score is shown separately. These are lexical
 measures, not claims of semantic equivalence.
+
+The analysis sheet has four tabs: root, morphology form, word, and verse.
+Each tab preserves its own location while other tabs navigate. Root/form
+navigation moves between distinct roots/forms in order of first appearance;
+word navigation moves one word at a time; verse navigation moves one verse at
+a time. Main-text selection follows the active tab. The context tab is deferred.
+
+`public/data/analysis-index.json` provides exact-written-word and annotated-form
+counts across the Quran. After changing the bundled word data, regenerate it
+with `python3 scripts/build-analysis-index.py`. Word translations are not
+available in the bundled datasets; the word tab labels and displays translations
+of the verses containing that word instead of inventing a word gloss.

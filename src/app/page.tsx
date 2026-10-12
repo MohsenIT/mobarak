@@ -9,6 +9,7 @@ import FlowPage from '@/components/quran/FlowPage'
 import RootPanel from '@/components/quran/RootPanel'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
+import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
 import { GitCompareArrows } from 'lucide-react'
 import {
@@ -53,6 +54,7 @@ export default function Home() {
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [sel, setSel] = useState<Selection | null>(null)
+  const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
   const [flash, setFlash] = useState<{ s: number; a: number; pos: number } | null>(null)
   const [pageData, setPageData] = useState<Map<number, SurahData>>(new Map())
   const [flowSurah, setFlowSurah] = useState<SurahData | null>(null)
@@ -223,84 +225,18 @@ export default function Home() {
     })
   }, [mode, curSurahN, surah])
 
-  // Navigate to the previous/next ROOT in the current surah.
-  //
-  // Per user request: when a word with a root is selected, ArrowRight
-  // jumps to the previous root and ArrowLeft to the next root (RTL
-  // convention: right = backward/previous, left = forward/next).
-  //
-  // Roots are ordered by their first occurrence (ayah, wordPos) so
-  // "previous" = a root that first appeared earlier in the surah.
-  // Words without a root are never destinations — only roots are
-  // navigated to. Navigation wraps around (last → first, first → last).
-  const goToRoot = useCallback((direction: 'prev' | 'next') => {
-    if (!sel) return
-    loadSurah(sel.s).then(d => {
-      // Build a list of all roots in the surah, sorted by first occurrence
-      const rootList = Object.entries(d.ri)
-        .map(([root, occ]) => ({ root, firstOcc: occ[0] }))
-        .filter(r => r.firstOcc)  // skip roots with no occurrences
-        .sort((a, b) => {
-          const [aA, aP] = a.firstOcc
-          const [bA, bP] = b.firstOcc
-          if (aA !== bA) return aA - bA
-          return aP - bP
-        })
-      if (rootList.length === 0) return
-
-      // Find the current root's index in the sorted list
-      let currentIdx = -1
-      if (sel.root) {
-        currentIdx = rootList.findIndex(r => r.root === sel.root)
-      }
-
-      // Compute the new index, wrapping around
-      let newIdx: number
-      if (currentIdx === -1) {
-        // Current word has no root — start from the beginning (next) or end (prev)
-        newIdx = direction === 'prev' ? rootList.length - 1 : 0
-      } else if (direction === 'prev') {
-        newIdx = (currentIdx - 1 + rootList.length) % rootList.length
-      } else {
-        newIdx = (currentIdx + 1) % rootList.length
-      }
-
-      const newRoot = rootList[newIdx]
-      if (!newRoot) return
-      const [a, pos] = newRoot.firstOcc
-      const w = d.v[a - 1]?.w[pos - 1]
-      if (!w) return
-
-      setSel({ s: sel.s, a, pos, text: w.t, root: newRoot.root })
-      const verse = d.v[a - 1]
-      if (verse) {
-        if (mode === 'mushaf') setPage(verse.p)
-        setFlash({ s: sel.s, a, pos })
-      }
-    })
-  }, [sel, mode])
-
-  // keyboard navigation (RTL: ArrowLeft = forward)
-  //
-  // When a word with a root is selected, arrows navigate between roots
-  // (ArrowRight = previous root, ArrowLeft = next root). When no word
-  // is selected, arrows navigate pages/surahs as before.
+  // The sheet handles its active tab's keyboard navigation.
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if (drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select'))) return
-      if (sel && sel.root) {
-        // A word with a root is selected — navigate between roots
-        if (e.key === 'ArrowRight') { e.preventDefault(); goToRoot('prev') }
-        else if (e.key === 'ArrowLeft') { e.preventDefault(); goToRoot('next') }
-      } else {
-        // No root selection — navigate pages/surahs
-        if (e.key === 'ArrowLeft') mode === 'mushaf' ? goPage(page + 1) : goSurah(surah + 1)
-        else if (e.key === 'ArrowRight') mode === 'mushaf' ? goPage(page - 1) : goSurah(surah - 1)
-      }
+      if (sel) return
+      // No sheet is open: navigate pages/surahs.
+      if (e.key === 'ArrowLeft') mode === 'mushaf' ? goPage(page + 1) : goSurah(surah + 1)
+      else if (e.key === 'ArrowRight') mode === 'mushaf' ? goPage(page - 1) : goSurah(surah - 1)
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel, goToRoot])
+  }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel])
 
   // touch: pinch-zoom + swipe
   const touchDist = (t: React.TouchList) =>
@@ -448,8 +384,9 @@ export default function Home() {
                       page={page}
                       pageData={pageData}
                       fontSize={mushafFont}
-                      selection={sel}
-                      highlightRoot={sel?.root ?? comparisonRoot}
+                      selection={sel ? analysisSelection ?? sel : null}
+                      highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
+                      analysisSelection={sel ? analysisSelection : null}
                       comparisonRange={comparisonRange}
                       flash={flash}
                       onWordTap={tapWord}
@@ -471,8 +408,9 @@ export default function Home() {
                     showTrans={showTrans}
                     translator={translator}
                     fontSize={flowFont}
-                    selection={sel}
-                    highlightRoot={sel?.root ?? comparisonRoot}
+                    selection={sel ? analysisSelection ?? sel : null}
+                    highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
+                    analysisSelection={sel ? analysisSelection : null}
                     comparisonRange={comparisonRange}
                     flash={flash}
                     onWordTap={tapWord}
@@ -486,6 +424,8 @@ export default function Home() {
         {sel && (showIndex || showComparison
           ? createPortal(
               <RootPanel
+            key={`${sel.s}:${sel.a}:${sel.pos}`}
+            onSelectionChange={setAnalysisSelection}
             sel={sel}
             meta={meta}
             translator={translator}
@@ -502,6 +442,8 @@ export default function Home() {
           />, document.body)
           : (
               <RootPanel
+            key={`${sel.s}:${sel.a}:${sel.pos}`}
+            onSelectionChange={setAnalysisSelection}
             sel={sel}
             meta={meta}
             translator={translator}

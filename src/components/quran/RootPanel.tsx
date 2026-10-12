@@ -4,11 +4,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { SurahData, Translations, Meta } from '@/lib/quran'
 import { loadGlobalRoots, loadSurah, loadTrans, keywordScore, keywordTier, spacedRoot, toFa, morphologyLabel } from '@/lib/quran'
 import type { Selection } from './MushafPage'
+import { nextAnalysisLocation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
+import SelectionDetails from './SelectionDetails'
 import QuranText from './QuranText'
 import { IconClose, IconMaximize, IconRestore, IconRoot, IconSortIndex } from './Ornaments'
 
 interface Props {
   comparisonRange?: { s: number; from: number; to: number } | null
+  onSelectionChange: (selection: AnalysisSelection) => void
   sel: Selection
   meta: Meta
   translator: 'a' | 'f' | 'm'
@@ -31,9 +34,12 @@ interface Props {
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
 export default function RootPanel({
-  sel, meta, translator, maximized, onToggleMax, onOpenIndex, onClose, onJump, onJumpSurah,
+  sel: anchor, onSelectionChange, meta, translator, maximized, onToggleMax, onOpenIndex, onClose, onJump, onJumpSurah,
   stackedOverIndex = false, comparisonRange,
 }: Props) {
+  const [tab, setTab] = useState<AnalysisTab>('root')
+  const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor })
+  const sel = targets[tab]
   const [surah, setSurah] = useState<SurahData | null>(null)
   const [globalRoots, setGlobalRoots] = useState<Record<string, Record<string, number>> | null>(null)
   const [trans, setTrans] = useState<Translations | null>(null)
@@ -87,7 +93,36 @@ export default function RootPanel({
   }, [root, surah, globalRoots, sel.s])
 
   const verseTr = trans?.[String(sel.a)]?.[translator]
-  const selectedForm = surah?.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form
+  const selectedForm = surah?.n === sel.s ? surah.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form : undefined
+
+  useEffect(() => {
+    onSelectionChange({ ...sel, tab, form: selectedForm })
+  }, [sel, tab, selectedForm, onSelectionChange])
+
+  const selectTarget = (a: number, pos: number) => {
+    if (!surah) return
+    const verse = surah.v.find(v => v.n === a)
+    const word = verse?.w[pos - 1]
+    if (!word || !verse) return
+    setTargets(current => ({ ...current, [tab]: { s: sel.s, a, pos, text: word.t, root: word.r ?? null } }))
+    onJump(sel.s, a, pos, verse.p)
+  }
+
+  const navigate = (direction: number) => {
+    if (!surah) return
+    const location = nextAnalysisLocation(surah, { ...sel, tab, form: selectedForm }, direction)
+    if (location) selectTarget(...location)
+  }
+
+  useEffect(() => {
+    const handle = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLElement && (event.target.matches('input, textarea, select') || event.target.closest('[role="tablist"]'))) return
+      if (event.key === 'ArrowRight') { event.preventDefault(); navigate(-1) }
+      if (event.key === 'ArrowLeft') { event.preventDefault(); navigate(1) }
+    }
+    window.addEventListener('keydown', handle)
+    return () => window.removeEventListener('keydown', handle)
+  }, [tab, sel, surah, selectedForm])
 
   // drag handle (mobile, only when not maximized)
   //
@@ -144,9 +179,9 @@ export default function RootPanel({
             side-by-side (user complained the root was wrapping to a 2nd line). */}
         <div className="panel-header" style={{ borderColor: 'var(--line)' }}>
           <span className="font-quran panel-word" dir="rtl">
-            <QuranText text={sel.text} />
+            {tab === 'verse' ? `آیه ${toFa(sel.a)}` : <QuranText text={sel.text} />}
           </span>
-          {root && (
+          {tab === 'root' && root && (
             <span className="root-inline" dir="rtl">
               <IconRoot />
               <span className="font-quran root-letters">{spacedRoot(root)}</span>
@@ -167,14 +202,19 @@ export default function RootPanel({
           </div>
         </div>
 
-        <div className="overflow-y-auto nice-scroll px-5 py-4 flex-1" style={{ overscrollBehavior: 'contain' }}>
-          {selectedForm && (
-            <div className="rounded-xl border px-3 py-2 mb-4 text-sm" style={{ borderColor: 'var(--line)' }}>
-              <p>باب / ساخت صرفی این واژه: <b>{morphologyLabel(selectedForm)}</b> <span dir="ltr">({selectedForm})</span></p>
-              <a className="text-xs underline" href="https://corpus.quran.com" target="_blank" rel="noreferrer">منبع: Quranic Arabic Corpus</a>
-              {' · '}<a className="text-xs underline" href="/data/morphology-source.txt" target="_blank" rel="noreferrer">مشخصات و حقوق داده</a>
-            </div>
-          )}
+        <div className="flex border-b px-2" role="tablist" aria-label="نوع تحلیل" style={{ borderColor: 'var(--line)' }}>
+          {([['root', 'ریشه'], ['form', 'باب'], ['word', 'واژه'], ['verse', 'آیه']] as const).map(([key, label]) => (
+            <button key={key} role="tab" id={`analysis-tab-${key}`} aria-controls={`analysis-panel-${key}`} aria-selected={tab === key}
+              className={`tab-btn flex-1${tab === key ? ' active' : ''}`} onClick={() => { setTab(key); const target = targets[key]; loadSurah(target.s).then(d => onJump(target.s, target.a, target.pos, d.v[target.a - 1].p)) }}>{label}</button>
+          ))}
+        </div>
+        <div className="flex items-center justify-between px-4 py-2 text-xs border-b" style={{ borderColor: 'var(--line)' }}>
+          <button onClick={() => navigate(-1)} aria-label={tab === 'verse' ? 'آیه قبل' : tab === 'word' ? 'واژه قبل' : tab === 'form' ? 'باب قبل' : 'ریشه قبل'}>→ {tab === 'verse' ? 'آیه قبل' : tab === 'word' ? 'واژه قبل' : tab === 'form' ? 'باب قبل' : 'ریشه قبل'}</button>
+          <span>آیه {toFa(sel.a)} · واژه {toFa(sel.pos)}</span>
+          <button onClick={() => navigate(1)} aria-label={tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'}>{tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'} ←</button>
+        </div>
+        <div role="tabpanel" id={`analysis-panel-${tab}`} aria-labelledby={`analysis-tab-${tab}`} className="overflow-y-auto nice-scroll px-5 py-4 flex-1" style={{ overscrollBehavior: 'contain' }}>
+          {tab !== 'root' ? (surah?.n === sel.s && trans ? <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} onPick={selectTarget} comparisonRange={comparisonRange} /> : <p role="status">در حال بارگیری…</p>) : <>
           {!root ? (
             <div className="text-center py-6" style={{ color: 'var(--ink-soft)' }}>
               <p className="text-sm leading-8">این واژه حرف یا ضمیر است و ریشهٔ مستقلی ندارد.</p>
@@ -246,7 +286,7 @@ export default function RootPanel({
                   </p>
                   <div className="flex flex-col mb-4">
                     {stats.top.map(d => (
-                      <button key={d.s} className="dist-row" onClick={() => onJumpSurah(d.s, root)}>
+                      <button key={d.s} className="dist-row" onClick={() => { loadSurah(d.s).then(data => { const occurrence = data.ri[root]?.[0]; if (!occurrence) return; const [a, pos] = occurrence; const w = data.v[a - 1].w[pos - 1]; setTargets(current => ({ ...current, root: { s: d.s, a, pos, text: w.t, root } })); onJump(d.s, a, pos, data.v[a - 1].p) }) }}>
                         <span className="text-xs w-16 text-right flex-none" style={{ color: d.s === sel.s ? 'var(--ink)' : 'var(--ink-soft)', fontWeight: d.s === sel.s ? 700 : 400 }}>
                           {meta.surahs[d.s - 1]?.fa}
                         </span>
@@ -280,7 +320,7 @@ export default function RootPanel({
                       if (!verse) return null
                       return (
                         <button key={ayah} className="occ-row"
-                          onClick={() => onJump(sel.s, ayah, poses[0], verse.p)}>
+                          onClick={() => selectTarget(ayah, poses[0])}>
                           <span className="chip flex-none mt-1" style={{ borderColor: 'var(--sage)', color: 'var(--ink)' }}>
                             آیه {toFa(ayah)}
                           </span>
@@ -301,6 +341,7 @@ export default function RootPanel({
               )}
             </>
           )}
+          </>}
         </div>
       </div>
     </>

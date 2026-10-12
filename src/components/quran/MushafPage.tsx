@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import type { Meta, SurahData, SurahMeta } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
 import QuranText from './QuranText'
+import { matchesAnalysis, type AnalysisSelection } from '@/lib/analysis'
 
 export interface Selection {
   s: number
@@ -16,7 +17,7 @@ export interface Selection {
 type LineItem =
   | { kind: 'band'; sm: SurahMeta }
   | { kind: 'bism' }
-  | { kind: 'word'; s: number; a: number; pos: number; t: string; r: string | null }
+  | { kind: 'word'; s: number; a: number; pos: number; t: string; r: string | null; form?: string }
   | { kind: 'marker'; n: number }
 
 interface Props {
@@ -26,12 +27,13 @@ interface Props {
   fontSize: number
   selection: Selection | null
   comparisonRange?: { s: number; from: number; to: number } | null
+  analysisSelection?: AnalysisSelection | null
   highlightRoot: string | null
   flash: { s: number; a: number; pos: number } | null
   onWordTap: (sel: Selection) => void
 }
 
-export default function MushafPage({ meta, page, pageData, fontSize, selection, highlightRoot, comparisonRange, flash, onWordTap }: Props) {
+export default function MushafPage({ meta, page, pageData, fontSize, selection, highlightRoot, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
   const lines = useMemo(() => {
     const map = new Map<number, LineItem[]>()
     const push = (ln: number, item: LineItem) => {
@@ -56,7 +58,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
         let lastLn = vLines[vLines.length - 1]
         v.w.forEach((w, i) => {
           const ln = w.l ?? lastLn
-          push(ln, { kind: 'word', s: seg.s, a: v.n, pos: i + 1, t: w.t, r: w.r ?? null })
+          push(ln, { kind: 'word', s: seg.s, a: v.n, pos: i + 1, t: w.t, r: w.r ?? null, form: w.form })
           lastLn = ln
         })
         push(lastLn, { kind: 'marker', n: v.n })
@@ -110,10 +112,11 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
               const isFlash = flash && flash.s === it.s && flash.a === it.a && flash.pos === it.pos
               const isSelected = selection?.s === it.s && selection.a === it.a && selection.pos === it.pos
               const isSameRoot = highlightRoot && it.r === highlightRoot
+              const isAnalysis = analysisSelection?.tab !== 'root' && matchesAnalysis(analysisSelection, it.s, it.a, it.pos, { t: it.t, l: null, r: it.r ?? undefined, form: it.form })
               return (
                 <span
                   key={i}
-                  className={`quran-word${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === it.s ? (it.a >= comparisonRange.from && it.a <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isSelected ? ' selected-word' : ''}`}
+                  className={`quran-word${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === it.s ? (it.a >= comparisonRange.from && it.a <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
                     aria-current={isSelected ? 'true' : undefined}
                   onClick={() => onWordTap({ s: it.s, a: it.a, pos: it.pos, text: it.t, root: it.r })}
                 >
