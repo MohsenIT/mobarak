@@ -42,6 +42,7 @@ export default function RootPanel({
   stackedOverIndex = false, comparisonRange,
 }: Props) {
   const [tab, setTab] = useState<AnalysisTab>('root')
+  const [tabDirection, setTabDirection] = useState<'next' | 'previous' | null>(null)
   const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
   const sel = targets[tab]
   const [surah, setSurah] = useState<SurahData | null>(null)
@@ -73,7 +74,8 @@ export default function RootPanel({
   }, [formTarget])
 
   const switchTab = (key: AnalysisTab) => {
-    if (key === 'form' && !formAvailable) return
+    if (key === tab || (key === 'form' && !formAvailable)) return
+    setTabDirection(TABS.findIndex(([id]) => id === key) > TABS.findIndex(([id]) => id === tab) ? 'next' : 'previous')
     setTab(key)
     const target = targets[key]
     loadSurah(target.s).then(data => onJump(target.s, target.a, target.pos, data.v[target.a - 1].p))
@@ -252,7 +254,7 @@ export default function RootPanel({
           <span>آیه {toFa(sel.a)} · واژه {toFa(sel.pos)}</span>
           <button onClick={() => navigate(1)} aria-label={tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'}>{tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'} ←</button>
         </div>
-        <div role="tabpanel" id={`analysis-panel-${tab}`} aria-labelledby={`analysis-tab-${tab}`} className="overflow-y-auto nice-scroll px-5 py-4 flex-1" style={{ overscrollBehavior: 'contain' }}>
+        <div key={tab} role="tabpanel" id={`analysis-panel-${tab}`} aria-labelledby={`analysis-tab-${tab}`} className={`overflow-y-auto nice-scroll px-5 py-4 flex-1${tabDirection ? ` sheet-tab-${tabDirection}` : ''}`} style={{ overscrollBehavior: 'contain' }}>
           {tab !== 'root' ? (surah?.n === sel.s && trans ? (tab === 'context' ? <ContextDetails selection={sel} surah={surah} trans={trans} translator={translator} onPick={selectTarget} /> : <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} onPick={selectTarget} comparisonRange={comparisonRange} />) : <p role="status">در حال بارگیری…</p>) : <>
           {!root ? (
             <div className="text-center py-6" style={{ color: 'var(--ink-soft)' }}>
