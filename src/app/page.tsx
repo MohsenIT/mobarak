@@ -52,6 +52,7 @@ export default function Home() {
   const [panelMax, setPanelMax] = useState(false)
   const [showIndex, setShowIndex] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
+  const [comparisonSurah, setComparisonSurah] = useState(1)
 
   const frameRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
@@ -193,8 +194,8 @@ export default function Home() {
   // NOTE: the index STAYS OPEN — user wants to return to the same scroll position
   // after closing the panel. The RootPanel renders at a higher z-index than the
   // drawer so it overlays the index.
-  const pickRootFromIndex = useCallback((root: string) => {
-    const targetSurah = mode === 'mushaf' ? curSurahN : surah
+  const pickRootFromIndex = useCallback((root: string, sourceSurah?: number) => {
+    const targetSurah = sourceSurah ?? (mode === 'mushaf' ? curSurahN : surah)
     loadSurah(targetSurah).then(d => {
       const occ = d.ri[root]
       if (!occ || occ.length === 0) return
@@ -387,7 +388,7 @@ export default function Home() {
         <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
           <IconSortIndex />
         </button>
-        <button className="icon-btn" onClick={() => setShowComparison(true)} aria-label="ارتباط ریشه‌ای بازه آیات" title="ارتباط ریشه‌ای بازه آیات">
+        <button className="icon-btn" onClick={() => { setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }} aria-label="ارتباط ریشه‌ای بازه آیات" title="ارتباط ریشه‌ای بازه آیات">
           <GitCompareArrows size={20} />
         </button>
 
@@ -457,7 +458,7 @@ export default function Home() {
           )}
         </main>
 
-        {sel && (showIndex
+        {sel && (showIndex || showComparison
           ? createPortal(
               <RootPanel
             sel={sel}
@@ -471,7 +472,7 @@ export default function Home() {
             onJumpSurah={jumpSurahRoot}
             /* When the index drawer is also open, the panel needs to sit
                on top of it — pass a flag so the panel can bump its z-index. */
-            stackedOverIndex={showIndex}
+            stackedOverIndex={showIndex || showComparison}
           />, document.body)
           : (
               <RootPanel
@@ -486,7 +487,7 @@ export default function Home() {
             onJumpSurah={jumpSurahRoot}
             /* When the index drawer is also open, the panel needs to sit
                on top of it — pass a flag so the panel can bump its z-index. */
-            stackedOverIndex={showIndex}
+            stackedOverIndex={showIndex || showComparison}
           />
             ))}      </div>
 
@@ -517,9 +518,9 @@ export default function Home() {
           RootPanel is open. The activeRoot prop highlights the currently
           selected row in the list so the user knows where they are. */}
       {showComparison && (
-        <RangeComparison key={curSurahN} surahN={curSurahN} meta={meta}
+        <RangeComparison key={comparisonSurah} surahN={comparisonSurah} meta={meta}
           onClose={() => setShowComparison(false)}
-          onPickRoot={root => { setShowComparison(false); pickRootFromIndex(root) }} />
+          onPickRoot={root => { setPanelMax(false); pickRootFromIndex(root, comparisonSurah) }} />
       )}
       {showIndex && (
         <SurahIndex
