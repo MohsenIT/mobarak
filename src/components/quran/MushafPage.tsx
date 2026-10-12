@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
 import type { Meta, SurahData, SurahMeta } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
 import QuranText from './QuranText'
@@ -34,6 +34,7 @@ interface Props {
 }
 
 export default function MushafPage({ meta, page, pageData, fontSize, selection, highlightRoot, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
+  const frameRef = useRef<HTMLDivElement>(null)
   const lines = useMemo(() => {
     const map = new Map<number, LineItem[]>()
     const push = (ln: number, item: LineItem) => {
@@ -83,10 +84,38 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
     return out
   }, [lines, lineNums, highlightRoot])
 
+  useLayoutEffect(() => {
+    const frame = frameRef.current
+    if (!frame) return
+    let live = true
+    const measure = () => {
+      if (!live) return
+      for (const line of frame.querySelectorAll<HTMLElement>('.mushaf-line')) {
+        line.removeAttribute('data-analysis-range')
+        if (analysisSelection?.tab !== 'verse' && analysisSelection?.tab !== 'context') continue
+        const words = [...line.querySelectorAll<HTMLElement>('.analysis-selected')]
+        if (!words.length) continue
+        const bounds = line.getBoundingClientRect()
+        const rects = words.map(word => word.getBoundingClientRect())
+        const left = Math.min(...rects.map(rect => rect.left))
+        const right = Math.max(...rects.map(rect => rect.right))
+        line.style.setProperty('--range-left', `${left - bounds.left}px`)
+        line.style.setProperty('--range-width', `${right - left}px`)
+        line.setAttribute('data-analysis-range', 'true')
+      }
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(frame)
+    document.fonts.ready.then(measure)
+    return () => { live = false; observer.disconnect() }
+  }, [analysisSelection, pageData, fontSize, page])
+
   const n = lineNums.length
 
   return (
     <div
+      ref={frameRef}
       className="font-quran relative h-full w-full flex flex-col justify-between px-3 py-2 sm:px-6 sm:py-3"
       style={{ fontSize, lineHeight: 1.75, color: 'var(--ink)' }}
       dir="rtl"

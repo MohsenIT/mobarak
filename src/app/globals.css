@@ -1048,3 +1048,12 @@ input[type='range'].page-slider::-moz-range-thumb {
 .quran-word.analysis-selected { background: var(--word-active); border-radius: 4px; box-shadow: inset 0 -2px var(--sage); }
 
 .tab-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+
+/* Verse/context selection paints a continuous band, including word spaces. */
+.analysis-range { background: var(--word-active); box-decoration-break: clone; -webkit-box-decoration-break: clone; border-radius: 3px; }
+.analysis-range .quran-word.analysis-selected,
+.mushaf-line[data-analysis-range] .quran-word.analysis-selected { background: transparent; box-shadow: none; border-radius: 0; }
+.analysis-range .quran-word.flash,
+.mushaf-line[data-analysis-range] .quran-word.flash { animation: none; background: transparent; }
+.mushaf-line { position: relative; isolation: isolate; }
+.mushaf-line[data-analysis-range]::before { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: var(--range-left); width: var(--range-width); background: var(--word-active); border-radius: 3px; pointer-events: none; }
