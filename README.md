@@ -125,3 +125,16 @@ applied during import. The original input and its digest remain unchanged.
 Maleki (Payamresan) and Mousavi Hamadani (al-Mizan, Jame'e Modarresin edition)
 remain pending complete, verified verse-aligned source texts. They are not
 registered as selectable translations until their source data is available.
+
+## Search and context comparison
+
+The navigation drawer searches surahs by Persian/Arabic name or number,
+including Persian and Arabic digits. Its destination selector accepts a
+surah, page (1–604), juz (1–30), or verse. Verse references may use the current
+surah's verse number or a named/numbered reference such as `طه:۱۱` or `2:255`.
+Explicit prefixes such as `صفحه ۵۰` also select the destination type.
+
+Root comparison includes a context shortcut that fills the source-defined
+verse range. The context tab can open comparison directly for its active
+context; manual start/end inputs remain editable. A whole-surah context has
+no complement and therefore cannot produce within-surah comparison results.

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Meta, SurahData } from '@/lib/quran'
 import { compareRootRange, loadGlobalRoots, loadSurah, spacedRoot, toFa } from '@/lib/quran'
+import { getSurahContexts } from '@/lib/contexts'
 import { IconClose } from './Ornaments'
 
 interface Props {
@@ -38,6 +39,8 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
 
   const from = parseVerse(fromText)
   const to = parseVerse(toText)
+  const contexts = getSurahContexts(surahN)?.ranges ?? []
+  const selectedContext = contexts.find(range => range.from === from && range.to === to)
   const vc = meta.surahs[surahN - 1].vc
   const valid = fromText.trim() !== '' && toText.trim() !== '' &&
     Number.isInteger(from) && Number.isInteger(to) && from >= 1 && to <= vc && from <= to
@@ -65,6 +68,15 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
           </div>
           <button className="icon-btn" onClick={onClose} aria-label="بستن مقایسه"><IconClose /></button>
         </div>
+        <label className="block px-4 pb-3 text-xs">
+          میانبر سیاق
+          <select aria-label="انتخاب سیاق برای مقایسه" value={selectedContext?.id ?? ''}
+            className="block w-full min-w-0 rounded-lg border p-2 mt-1 text-sm" style={{ background: 'var(--paper)', borderColor: 'var(--line-strong)' }}
+            onChange={e => { const range = contexts.find(r => r.id === Number(e.target.value)); if (range) { setFromText(String(range.from)); setToText(String(range.to)) } }}>
+            <option value="">بازهٔ دلخواه</option>
+            {contexts.map(range => <option key={range.id} value={range.id}>سیاق {toFa(range.id)} · آیات {toFa(range.from)} تا {toFa(range.to)}</option>)}
+          </select>
+        </label>
         <div className="px-4 pb-3 flex gap-3">
           {[
             { label: 'از آیه', value: fromText, change: setFromText },

@@ -11,9 +11,10 @@ interface Props {
   surah: SurahData
   trans: Translations
   translator: Translator
+  onCompare: (s: number, from: number, to: number) => void
   onPick: (a: number, pos: number) => void
 }
-export default function ContextDetails({ selection, surah, trans, translator, onPick }: Props) {
+export default function ContextDetails({ selection, surah, trans, translator, onPick, onCompare }: Props) {
   const source = getSurahContexts(surah.n)
   const context = getContext(surah.n, selection.a)
   const verses = context ? surah.v.filter(v => v.n >= context.from && v.n <= context.to) : []
@@ -35,6 +36,8 @@ export default function ContextDetails({ selection, surah, trans, translator, on
             <div className="stat"><b>{toFa(wordCount)}</b><span>واژه در سیاق</span></div>
             <div className="stat"><b>{toFa(roots.size)}</b><span>ریشهٔ متفاوت</span></div>
           </div>
+          <button className="rounded-xl border px-3 py-2 mb-3 text-sm w-full" style={{ borderColor: 'var(--sage)', color: 'var(--sage)' }}
+            onClick={() => onCompare(surah.n, context.from, context.to)}>مقایسهٔ ریشه‌ای این سیاق با باقی سوره</button>
           <details className="text-xs mb-3">
             <summary className="cursor-pointer">فهرست سیاق‌های این سوره</summary>
             <div className="flex flex-wrap gap-2 mt-2">{source?.ranges.map(range => <button key={range.id} aria-pressed={range.id === context.id} className="chip" onClick={() => onPick(range.from, 1)} style={range.id === context.id ? { background: 'var(--word-active)' } : undefined}>آیات {toFa(range.from)}–{toFa(range.to)}</button>)}</div>

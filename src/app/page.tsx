@@ -70,6 +70,14 @@ export default function Home() {
   const [comparisonRoot, setComparisonRoot] = useState<string | null>(null)
   const [comparisonRange, setComparisonRange] = useState<{ s: number; from: number; to: number } | null>(null)
 
+  const compareContext = useCallback((s: number, from: number, to: number) => {
+    setComparisonSurah(s)
+    setComparisonRange({ s, from, to })
+    setComparisonRoot(null)
+    setShowComparison(true)
+    setSel(null)
+  }, [])
+
   const frameRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
   const touchRef = useRef<{ x: number; y: number } | null>(null)
@@ -453,6 +461,7 @@ export default function Home() {
               <RootPanel
             key={`${sel.s}:${sel.a}:${sel.pos}`}
             onSelectionChange={setAnalysisSelection}
+            onCompareContext={compareContext}
             sel={sel}
             meta={meta}
             translator={translator}
@@ -471,6 +480,7 @@ export default function Home() {
               <RootPanel
             key={`${sel.s}:${sel.a}:${sel.pos}`}
             onSelectionChange={setAnalysisSelection}
+            onCompareContext={compareContext}
             sel={sel}
             meta={meta}
             translator={translator}

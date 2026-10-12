@@ -13,6 +13,7 @@ import { IconClose, IconMaximize, IconRestore, IconRoot, IconSortIndex } from '.
 
 interface Props {
   comparisonRange?: { s: number; from: number; to: number } | null
+  onCompareContext: (s: number, from: number, to: number) => void
   onSelectionChange: (selection: AnalysisSelection) => void
   sel: Selection
   meta: Meta
@@ -38,7 +39,7 @@ const TABS = [['root', 'ریشه'], ['form', 'باب'], ['word', 'واژه'], ['
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
 export default function RootPanel({
-  sel: anchor, onSelectionChange, meta, translator, maximized, onToggleMax, onOpenIndex, onClose, onJump, onJumpSurah,
+  sel: anchor, onSelectionChange, onCompareContext, meta, translator, maximized, onToggleMax, onOpenIndex, onClose, onJump, onJumpSurah,
   stackedOverIndex = false, comparisonRange,
 }: Props) {
   const [tab, setTab] = useState<AnalysisTab>('root')
@@ -256,7 +257,7 @@ export default function RootPanel({
           <button onClick={() => navigate(1)} aria-label={tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'}>{tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'} ←</button>
         </div>
         <div key={tab} role="tabpanel" id={`analysis-panel-${tab}`} aria-labelledby={`analysis-tab-${tab}`} className={`overflow-y-auto nice-scroll px-5 py-4 flex-1${tabDirection ? ` sheet-tab-${tabDirection}` : ''}`} style={{ overscrollBehavior: 'contain' }}>
-          {tab !== 'root' ? (surah?.n === sel.s && trans ? (tab === 'context' ? <ContextDetails selection={sel} surah={surah} trans={trans} translator={translator} onPick={selectTarget} /> : <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} onPick={selectTarget} comparisonRange={comparisonRange} />) : <p role="status">در حال بارگیری…</p>) : <>
+          {tab !== 'root' ? (surah?.n === sel.s && trans ? (tab === 'context' ? <ContextDetails selection={sel} surah={surah} trans={trans} translator={translator} onPick={selectTarget} onCompare={onCompareContext} /> : <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} onPick={selectTarget} comparisonRange={comparisonRange} />) : <p role="status">در حال بارگیری…</p>) : <>
           {!root ? (
             <div className="text-center py-6" style={{ color: 'var(--ink-soft)' }}>
               <p className="text-sm leading-8">این واژه حرف یا ضمیر است و ریشهٔ مستقلی ندارد.</p>

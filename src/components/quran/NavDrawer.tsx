@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
+import { resolveDestination, searchSurahs, type Destination, type JumpKind } from '@/lib/navigation'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate } from './Ornaments'
 
 export type { Translator } from '@/lib/quran'
@@ -48,6 +49,7 @@ export default function NavDrawer(props: Props) {
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('surah')
   const [q, setQ] = useState('')
   const [pageInput, setPageInput] = useState('')
+  const [jumpKind, setJumpKind] = useState<JumpKind>('surah')
   const [pageError, setPageError] = useState(false)
   // ref to the surah list container — we scrollIntoView the active row
   // when the drawer opens.
@@ -67,13 +69,8 @@ export default function NavDrawer(props: Props) {
     return () => clearTimeout(t)
   }, [tab, q])
 
-  const surahs = useMemo(() => {
-    const qq = q.trim()
-    if (!qq) return meta.surahs
-    return meta.surahs.filter(s =>
-      s.fa.replace(/‌/g, ' ').includes(qq) || s.ar.includes(qq) || String(s.n) === qq || toFa(s.n) === qq
-    )
-  }, [q, meta])
+  const surahs = useMemo(() => searchSurahs(meta, q), [q, meta])
+  const suggestions = useMemo(() => jumpKind === 'surah' && pageInput.trim() ? searchSurahs(meta, pageInput.replace(/^سوره\s+/, '')).slice(0, 6) : [], [meta, jumpKind, pageInput])
 
   const juzList = useMemo(() =>
     Object.entries(meta.juz).map(([j, [s, a]]) => ({
@@ -81,17 +78,23 @@ export default function NavDrawer(props: Props) {
       surahFa: meta.surahs[s - 1]?.fa ?? '',
     })), [meta])
 
+  const goTo = (destination: Destination) => {
+    if (destination.kind === 'page') onGoPage(destination.p)
+    else if (destination.kind === 'surah') onGoSurah(destination.s)
+    else onGoVerse(destination.s, destination.a)
+    onClose()
+  }
   const submitPage = (e: React.FormEvent) => {
     e.preventDefault()
-    const fa = '۰۱۲۳۴۵۶۷۸۹'
-    const norm = pageInput.replace(/[۰-۹]/g, d => String(fa.indexOf(d)))
-      .replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).trim()
-    const p = /^\d+$/.test(norm) ? Number(norm) : NaN
-    if (Number.isInteger(p) && p >= 1 && p <= 604) {
-      onGoPage(p)
-      setPageInput('')
-      onClose()
-    } else setPageError(true)
+    const destination = resolveDestination(meta, jumpKind, pageInput, currentSurah)
+    if (destination) goTo(destination)
+    else setPageError(true)
+  }
+  const placeholders: Record<JumpKind, string> = {
+    surah: 'نام یا شمارهٔ سوره؛ مثلاً طه یا ۲۰',
+    page: 'شمارهٔ صفحه؛ ۱ تا ۶۰۴',
+    juz: 'شمارهٔ جزء؛ ۱ تا ۳۰',
+    verse: `آیه در سورهٔ جاری یا طه:۱۱`,
   }
 
   return (
@@ -103,17 +106,24 @@ export default function NavDrawer(props: Props) {
           <button className="icon-btn" onClick={onClose} aria-label="بستن"><IconClose /></button>
         </div>
 
-        {/* quick page jump */}
+        {/* Search by destination type, with direct surah suggestions. */}
+        <label className="px-4 pb-2 flex items-center gap-3 text-xs">
+          برو به
+          <select aria-label="نوع مقصد" className="flex-1 min-w-0 rounded-lg border p-2 text-sm" style={{ background: 'var(--paper)', borderColor: 'var(--line-strong)' }}
+            value={jumpKind} onChange={e => { setJumpKind(e.target.value as JumpKind); setPageInput(''); setPageError(false) }}>
+            <option value="surah">سوره</option><option value="page">صفحه</option><option value="juz">جزء</option><option value="verse">آیه</option>
+          </select>
+        </label>
         <form onSubmit={submitPage} className="flex items-center gap-2 px-4 pb-3">
           <input
             value={pageInput}
             onChange={e => { setPageInput(e.target.value); setPageError(false) }}
-            aria-label="شماره صفحه"
+            aria-label="جستجو و رفتن به مقصد"
             aria-invalid={pageError}
             aria-describedby={pageError ? 'page-jump-error' : undefined}
-            inputMode="numeric"
-            placeholder="شماره صفحه (۱ تا ۶۰۴)…"
-            className="flex-1 rounded-xl border px-3 py-2.5 text-sm bg-transparent outline-none"
+            inputMode={jumpKind === 'page' || jumpKind === 'juz' ? 'numeric' : 'text'}
+            placeholder={placeholders[jumpKind]}
+            className="flex-1 min-w-0 rounded-xl border px-3 py-2.5 text-sm bg-transparent outline-none"
             style={{ borderColor: 'var(--line-strong)', color: 'var(--ink)' }}
           />
           <button type="submit" className="rounded-xl px-4 py-2.5 text-sm font-bold text-white flex-none"
@@ -121,8 +131,11 @@ export default function NavDrawer(props: Props) {
             برو
           </button>
         </form>
-        {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">شمارهٔ صفحه باید عددی بین ۱ و ۶۰۴ باشد.</p>}
+        {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">مقصد معتبر نیست یا نام سوره مبهم است؛ نام کامل یا شماره را وارد کنید. برای آیه می‌توانید «طه:۱۱» بنویسید.</p>}
 
+        {suggestions.length > 0 && <div className="px-4 pb-3 flex flex-wrap gap-2" aria-label="نتایج جستجوی سوره">
+          {suggestions.map(s => <button key={s.n} className="chip" onClick={() => goTo({ kind: 'surah', s: s.n })}>{s.fa} · {toFa(s.n)}</button>)}
+        </div>}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
@@ -140,11 +153,13 @@ export default function NavDrawer(props: Props) {
                 <input
                   value={q}
                   onChange={e => setQ(e.target.value)}
-                  placeholder="جستجوی سوره…"
+                  placeholder="جستجوی سوره با نام یا شماره…"
+                  aria-label="جستجوی سوره"
                   className="bg-transparent outline-none w-full text-sm"
                   style={{ color: 'var(--ink)' }}
                 />
               </label>
+              {surahs.length === 0 && <p role="status" className="text-center py-4 text-sm">سوره‌ای با این نام یا شماره پیدا نشد.</p>}
               <div ref={surahListRef} className="flex flex-col">
                 {surahs.map(s => {
                   const isActive = s.n === currentSurah
