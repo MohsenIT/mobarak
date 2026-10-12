@@ -1,0 +1,17 @@
+{
+  "s": {
+    "name": "سید محمدرضا صفوی (مبتنی بر المیزان)",
+    "source": "https://tanzil.net/trans/fa.safavi",
+    "distribution": "@ghoran/translation@0.0.9/json/fa/tanzil-safavi.json",
+    "package": "https://www.npmjs.com/package/@ghoran/translation/v/0.0.9",
+    "verses": 6236,
+    "translatedVerses": 6235,
+    "missing": [
+      {
+        "surah": 80,
+        "ayah": 39
+      }
+    ],
+    "sha256": "7b8255043f91f15d393349f5856aec61123bdeeb0a0fefafa0a92b86a3decf6a"
+  }
+}

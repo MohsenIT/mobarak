@@ -1,7 +1,7 @@
 'use client'
 
 import type { Selection } from './MushafPage'
-import type { SurahData, Translations } from '@/lib/quran'
+import type { Translator, SurahData, Translations } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { contextSource, getContext, getSurahContexts } from '@/lib/contexts'
 import QuranText from './QuranText'
@@ -10,7 +10,7 @@ interface Props {
   selection: Selection
   surah: SurahData
   trans: Translations
-  translator: 'a' | 'f' | 'm'
+  translator: Translator
   onPick: (a: number, pos: number) => void
 }
 export default function ContextDetails({ selection, surah, trans, translator, onPick }: Props) {

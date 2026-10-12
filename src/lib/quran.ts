@@ -42,7 +42,8 @@ export interface Meta {
   juz: Record<string, [number, number]>
 }
 
-export type Translations = Record<string, { a: string; f: string; m: string }>
+export type Translator = 'a' | 'f' | 'm' | 's'
+export type Translations = Record<string, Record<Translator, string>>
 
 let metaPromise: Promise<Meta> | null = null
 export function loadMeta(): Promise<Meta> {

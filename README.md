@@ -104,3 +104,23 @@ plus the explicit examples إلقاء / تعليم / تعلّم / استعلام
 `python3 scripts/build-form-names.py`. When no verbal-noun name is available,
 the app shows the recorded form name rather than guessing a masdar. Rebuild
 `analysis-index.json` for root-and-form counts with `python3 scripts/build-analysis-index.py`.
+
+## Inline translations
+
+When translation is enabled, each verse is immediately followed by its
+translation in both continuous reading and page-based reading. Page mode
+retains its page number and shows only that page's verses in a scrollable
+verse-and-translation layout.
+
+Safavi (based on al-Mizan) is stored as translation id `s`, imported from
+`@ghoran/translation@0.0.9/json/fa/tanzil-safavi.json`, whose listed source is
+Tanzil. The unmodified input is in `data/translations/fa-safavi.json`; source
+metadata and digest are in `public/data/translation-sources.json`. Run
+`python3 scripts/import-translation.py data/translations/fa-safavi.json s` to
+regenerate the per-surah files. The source has 6236 positions with one empty
+entry at 80:39. That absence is displayed explicitly; no other translator's
+text is silently substituted.
+
+Maleki (Payamresan) and Mousavi Hamadani (al-Mizan, Jame'e Modarresin edition)
+remain pending complete, verified verse-aligned source texts. They are not
+registered as selectable translations until their source data is available.

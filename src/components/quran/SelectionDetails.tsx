@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import type { SurahData, Translations } from '@/lib/quran'
+import type { Translator, SurahData, Translations } from '@/lib/quran'
 import { morphologyLabel, formName, toFa } from '@/lib/quran'
 import { analysisOccurrences, type AnalysisSelection, type AnalysisTab } from '@/lib/analysis'
 import QuranText from './QuranText'
@@ -18,7 +18,7 @@ interface Props {
   selection: AnalysisSelection
   surah: SurahData
   trans: Translations
-  translator: 'a' | 'f' | 'm'
+  translator: Translator
   onPick: (a: number, pos: number) => void
   comparisonRange?: { s: number; from: number; to: number } | null
 }

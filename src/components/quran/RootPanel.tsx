@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { SurahData, Translations, Meta } from '@/lib/quran'
+import type { Translator, SurahData, Translations, Meta } from '@/lib/quran'
 import { loadGlobalRoots, loadSurah, loadTrans, keywordScore, keywordTier, spacedRoot, toFa, morphologyLabel, formName } from '@/lib/quran'
 import type { Selection } from './MushafPage'
 import { nextAnalysisLocation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
@@ -16,7 +16,7 @@ interface Props {
   onSelectionChange: (selection: AnalysisSelection) => void
   sel: Selection
   meta: Meta
-  translator: 'a' | 'f' | 'm'
+  translator: Translator
   /** when true, the panel goes full-screen / wide (mobile + desktop) */
   maximized: boolean
   onToggleMax: () => void

@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { Meta } from '@/lib/quran'
+import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate } from './Ornaments'
 
-export type Translator = 'a' | 'f' | 'm'
+export type { Translator } from '@/lib/quran'
 
 interface Props {
   meta: Meta
@@ -40,6 +40,7 @@ const TRANSLATORS: { id: Translator; name: string }[] = [
   { id: 'f', name: 'محمدمهدی فولادوند' },
   { id: 'a', name: 'حسین انصاریان' },
   { id: 'm', name: 'ناصر مکارم شیرازی' },
+  { id: 's', name: 'سید محمدرضا صفوی (مبتنی بر المیزان)' },
 ]
 
 export default function NavDrawer(props: Props) {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import type { SurahData, SurahMeta, Translations } from '@/lib/quran'
+import type { Translator, SurahData, SurahMeta, Translations } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
 import QuranText from './QuranText'
@@ -13,7 +13,7 @@ interface Props {
   surah: SurahData
   trans: Translations | null
   showTrans: boolean
-  translator: 'a' | 'f' | 'm'
+  translator: Translator
   fontSize: number
   selection: Selection | null
   comparisonRange?: { s: number; from: number; to: number } | null
@@ -25,7 +25,7 @@ interface Props {
 
 /** Continuous, flowing surah view (متن پیوسته) */
 export default function FlowPage({ sm, surah, trans, showTrans, translator, fontSize, selection, highlightRoot, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
-  const textRef = useRef<HTMLParagraphElement>(null)
+  const textRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!flash || flash.s !== surah.n) return
     textRef.current?.querySelector(`[data-ayah="${flash.a}"][data-pos="${flash.pos}"]`)
@@ -37,13 +37,15 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
         <SurahBand ar={sm.ar} />
         {sm.b && <Bismillah size={`${fontSize}px`} />}
       </div>
-      <p ref={textRef} className="font-quran text-justify mt-2" dir="rtl"
+      <div ref={textRef} className="font-quran text-justify mt-2" dir="rtl"
         style={{ fontSize, lineHeight: 2.05, color: 'var(--ink)' }}>
         {surah.v.map(v => {
           const isRange = analysisSelection && (analysisSelection.tab === 'verse' || analysisSelection.tab === 'context') && matchesAnalysis(analysisSelection, surah.n, v.n, 1, v.w[0])
-          const continues = isRange && v.n < surah.vc && matchesAnalysis(analysisSelection, surah.n, v.n + 1, 1, v.w[0])
+          const continues = !showTrans && isRange && v.n < surah.vc && matchesAnalysis(analysisSelection, surah.n, v.n + 1, 1, v.w[0])
+          const VerseContainer = showTrans ? 'section' : 'span'
+          const translation = trans?.[String(v.n)]?.[translator]
           return (
-          <span key={v.n}>
+          <VerseContainer key={v.n} className={showTrans ? 'translated-verse' : undefined} data-verse={v.n}>
           <span className={isRange ? 'analysis-range' : undefined}>
             {v.w.map((w, i) => {
               const isFlash = flash && flash.s === surah.n && flash.a === v.n && flash.pos === i + 1
@@ -63,27 +65,13 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
               )
             })}
             <AyahMarker n={v.n} />{continues ? ' ' : null}
-          </span>{!continues ? ' ' : null}
-          </span>
+          </span>{!continues && !showTrans ? ' ' : null}
+          {showTrans && <p className="verse-translation" data-translation-verse={v.n}>{translation === '' ? 'متن ترجمهٔ این آیه در منبع انتخاب‌شده موجود نیست.' : translation ?? 'در حال بارگیری ترجمه…'}</p>}
+          </VerseContainer>
         )})}
-      </p>
+      </div>
 
-      {showTrans && trans && (
-        <div className="mt-6 flex flex-col" style={{ borderTop: '1px solid var(--line-strong)' }}>
-          <p className="text-xs font-medium py-3" style={{ color: 'var(--ink-faint)' }}>ترجمهٔ آیات</p>
-          {surah.v.map(v => {
-            const t = trans[String(v.n)]?.[translator]
-            if (!t) return null
-            return (
-              <p key={v.n} className="py-2.5 text-justify"
-                style={{ color: 'var(--ink-soft)', fontSize: 14.5, lineHeight: 2, borderBottom: '1px solid var(--line)' }}>
-                <span className="chip ml-2" style={{ verticalAlign: 'middle' }}>{toFa(v.n)}</span>
-                {t}
-              </p>
-            )
-          })}
-        </div>
-      )}
+
     </div>
   )
 }

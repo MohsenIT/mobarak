@@ -56,6 +56,8 @@ export default function Home() {
   const [sel, setSel] = useState<Selection | null>(null)
   const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
   const [flash, setFlash] = useState<{ s: number; a: number; pos: number } | null>(null)
+  const [pageTranslations, setPageTranslations] = useState<Map<number, Translations>>(new Map())
+  const [pageTranslationError, setPageTranslationError] = useState(false)
   const [pageData, setPageData] = useState<Map<number, SurahData>>(new Map())
   const [flowSurah, setFlowSurah] = useState<SurahData | null>(null)
   const [flowTrans, setFlowTrans] = useState<Translations | null>(null)
@@ -91,6 +93,16 @@ export default function Home() {
 
   const segs = useMemo(() => (meta ? meta.pages[page - 1] || [] : []), [meta, page])
   const curSurahN = mode === 'mushaf' ? (segs[0]?.s ?? 1) : surah
+
+  useEffect(() => {
+    if (mode !== 'mushaf' || !showTrans || !meta) return
+    let live = true
+    setPageTranslationError(false)
+    Promise.all(segs.map(async seg => [seg.s, await loadTrans(seg.s)] as const))
+      .then(entries => { if (live) setPageTranslations(new Map(entries)) })
+      .catch(() => { if (live) setPageTranslationError(true) })
+    return () => { live = false }
+  }, [mode, showTrans, meta, segs])
 
   // close panel-max when selection changes / panel closes
   useEffect(() => { if (!sel) setPanelMax(false) }, [sel])
@@ -348,14 +360,13 @@ export default function Home() {
           <IconStar filled={isBookmarked} />
         </button>
 
-        {mode === 'flow' && (
           <button className="icon-btn" aria-label="نمایش ترجمه"
             title="ترجمه"
+            aria-pressed={showTrans}
             style={{ color: showTrans ? 'var(--sage)' : undefined, background: showTrans ? 'var(--word-root)' : undefined }}
             onClick={() => setShowTrans(v => !v)}>
             <IconTranslate />
           </button>
-        )}
       </header>
 
       {!showComparison && comparisonRoot && comparisonRange?.s === curSurahN && (
@@ -373,10 +384,26 @@ export default function Home() {
           {mode === 'mushaf' ? (
             <div className="flex-1 min-h-0 flex items-stretch justify-center px-2 py-2 sm:px-6 sm:py-3">
               <div ref={frameRef} className="w-full max-w-[640px] min-h-0">
-                <div key={page} className="mushaf-frame page-enter h-full overflow-hidden">
+                <div key={page} className={`mushaf-frame page-enter h-full ${showTrans ? 'overflow-y-auto nice-scroll' : 'overflow-hidden'}`}>
                   {loadingPage ? (
                     <div className="h-full flex items-center justify-center">
                       <p className="text-sm animate-pulse" style={{ color: 'var(--ink-faint)' }}>…</p>
+                    </div>
+                  ) : showTrans ? (
+                    <div className="px-3 py-4 min-w-0">
+                      {pageTranslationError && <p role="alert" className="text-sm">ترجمه بارگیری نشد؛ صفحه را دوباره باز کنید.</p>}
+                      {segs.map(seg => {
+                        const data = pageData.get(seg.s)
+                        if (!data) return null
+                        return <FlowPage key={seg.s}
+                          sm={{ ...meta.surahs[seg.s - 1], b: seg.f === 1 && meta.surahs[seg.s - 1].b }}
+                          surah={{ ...data, v: data.v.filter(v => v.n >= seg.f && v.n <= seg.t) }}
+                          trans={pageTranslations.get(seg.s) ?? null} showTrans translator={translator} fontSize={flowFont}
+                          selection={sel ? analysisSelection ?? sel : null}
+                          highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
+                          analysisSelection={sel ? analysisSelection : null} comparisonRange={comparisonRange}
+                          flash={flash} onWordTap={tapWord} />
+                      })}
                     </div>
                   ) : (
                     <MushafPage
