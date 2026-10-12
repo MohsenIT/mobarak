@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import type { SurahData, SurahMeta, Translations } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
@@ -24,13 +25,19 @@ interface Props {
 
 /** Continuous, flowing surah view (متن پیوسته) */
 export default function FlowPage({ sm, surah, trans, showTrans, translator, fontSize, selection, highlightRoot, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
+  const textRef = useRef<HTMLParagraphElement>(null)
+  useEffect(() => {
+    if (!flash || flash.s !== surah.n) return
+    textRef.current?.querySelector(`[data-ayah="${flash.a}"][data-pos="${flash.pos}"]`)
+      ?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  }, [flash, surah.n])
   return (
     <div>
       <div style={{ fontSize: fontSize * 1.12 }}>
         <SurahBand ar={sm.ar} />
         {sm.b && <Bismillah size={`${fontSize}px`} />}
       </div>
-      <p className="font-quran text-justify mt-2" dir="rtl"
+      <p ref={textRef} className="font-quran text-justify mt-2" dir="rtl"
         style={{ fontSize, lineHeight: 2.05, color: 'var(--ink)' }}>
         {surah.v.map(v => (
           <span key={v.n}>
@@ -42,6 +49,8 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
               return (
                 <span key={i}>
                   <span
+                    data-ayah={v.n}
+                    data-pos={i + 1}
                     className={`quran-word${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === surah.n ? (v.n >= comparisonRange.from && v.n <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
                     aria-current={isSelected ? 'true' : undefined}
                     onClick={() => onWordTap({ s: surah.n, a: v.n, pos: i + 1, text: w.t, root: w.r ?? null })}

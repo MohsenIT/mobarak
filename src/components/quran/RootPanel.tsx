@@ -182,7 +182,7 @@ export default function RootPanel({
             Everything on ONE line — no wrapping. Word and root must sit
             side-by-side (user complained the root was wrapping to a 2nd line). */}
         <div className="panel-header" style={{ borderColor: 'var(--line)' }}>
-          <span className="font-quran panel-word" dir="rtl">
+          <span className={`${tab === 'verse' || tab === 'context' ? '' : 'font-quran '}panel-word`} dir="rtl">
             {tab === 'context' ? (selectedContext ? `سیاق ${toFa(selectedContext.id)}` : 'سیاق') : tab === 'verse' ? `آیه ${toFa(sel.a)}` : <QuranText text={sel.text} />}
           </span>
           {tab === 'root' && root && (
