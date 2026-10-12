@@ -68,14 +68,30 @@ keyword scores; shared frequency sorts by the smaller count on either side.
 The existing whole-surah keyword score is shown separately. These are lexical
 measures, not claims of semantic equivalence.
 
-The analysis sheet has four tabs: root, morphology form, word, and verse.
+The analysis sheet has five tabs: root, morphology form, word, verse, and context.
 Each tab preserves its own location while other tabs navigate. Root/form
 navigation moves between distinct roots/forms in order of first appearance;
 word navigation moves one word at a time; verse navigation moves one verse at
-a time. Main-text selection follows the active tab. The context tab is deferred.
+a time. Main-text selection follows the active tab. Context navigation uses the supplied PDF boundaries.
 
 `public/data/analysis-index.json` provides exact-written-word and annotated-form
 counts across the Quran. After changing the bundled word data, regenerate it
 with `python3 scripts/build-analysis-index.py`. Word translations are not
 available in the bundled datasets; the word tab labels and displays translations
 of the verses containing that word instead of inventing a word gloss.
+
+## Context source
+
+The user-supplied `public/data/context-source.pdf` (سیاق‌بندی اولیه سوره‌های
+قرآن, مؤسسه گفتمان قرآن و ولایت) is preserved verbatim. `contexts.json` records
+the context-column ranges and source page numbers, excluding the independent
+daily-reading column. It contains 567 units across 88 surahs. The other 26
+surahs have no explicit ranges in the PDF and are marked `unspecified`; the
+application does not invent a partition for them. Shura's aggregate row for
+contexts 5–7 is preserved as one labeled aggregate unit (29–53), because the
+source does not supply the three internal boundaries.
+
+Regenerate with `python3 scripts/import-contexts.py` (requires PyMuPDF). The
+importer verifies the source digest, handles reviewed compound RTL cells, and
+checks complete nonoverlapping verse coverage for every explicit partition.
+Run `bun test src/lib/contexts.test.ts` to validate boundaries and navigation.

@@ -1,0 +1,4576 @@
+{
+  "source": {
+    "title": "سیاق‌بندی اولیه سوره‌های قرآن",
+    "publisher": "مؤسسه گفتمان قرآن و ولایت",
+    "url": "/data/context-source.pdf",
+    "sha256": "f9876ab9ca8f4fce1b8a04d9e9a6a2367358d15891f6278acff21298ef697a05"
+  },
+  "surahs": {
+    "1": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 7,
+          "sourcePage": 2,
+          "id": 1
+        }
+      ],
+      "sourcePage": 2,
+      "sourceHeading": "سورة فا تحة الکتاب",
+      "group": [
+        1
+      ],
+      "status": "specified"
+    },
+    "2": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 27,
+          "sourcePage": 2,
+          "id": 1
+        },
+        {
+          "from": 28,
+          "to": 39,
+          "sourcePage": 2,
+          "id": 2
+        },
+        {
+          "from": 40,
+          "to": 46,
+          "sourcePage": 2,
+          "id": 3
+        },
+        {
+          "from": 47,
+          "to": 48,
+          "sourcePage": 2,
+          "id": 4
+        },
+        {
+          "from": 49,
+          "to": 62,
+          "sourcePage": 2,
+          "id": 5
+        },
+        {
+          "from": 63,
+          "to": 74,
+          "sourcePage": 2,
+          "id": 6
+        },
+        {
+          "from": 75,
+          "to": 82,
+          "sourcePage": 2,
+          "id": 7
+        },
+        {
+          "from": 83,
+          "to": 86,
+          "sourcePage": 2,
+          "id": 8
+        },
+        {
+          "from": 87,
+          "to": 103,
+          "sourcePage": 2,
+          "id": 9
+        },
+        {
+          "from": 104,
+          "to": 110,
+          "sourcePage": 2,
+          "id": 10
+        },
+        {
+          "from": 111,
+          "to": 118,
+          "sourcePage": 2,
+          "id": 11
+        },
+        {
+          "from": 119,
+          "to": 121,
+          "sourcePage": 2,
+          "id": 12
+        },
+        {
+          "from": 122,
+          "to": 123,
+          "sourcePage": 2,
+          "id": 13
+        },
+        {
+          "from": 124,
+          "to": 129,
+          "sourcePage": 2,
+          "id": 14
+        },
+        {
+          "from": 130,
+          "to": 134,
+          "sourcePage": 2,
+          "id": 15
+        },
+        {
+          "from": 135,
+          "to": 141,
+          "sourcePage": 2,
+          "id": 16
+        },
+        {
+          "from": 142,
+          "to": 152,
+          "sourcePage": 2,
+          "id": 17
+        },
+        {
+          "from": 153,
+          "to": 162,
+          "sourcePage": 2,
+          "id": 18
+        },
+        {
+          "from": 163,
+          "to": 176,
+          "sourcePage": 2,
+          "id": 19
+        },
+        {
+          "from": 177,
+          "to": 177,
+          "sourcePage": 2,
+          "id": 20
+        },
+        {
+          "from": 178,
+          "to": 182,
+          "sourcePage": 2,
+          "id": 21
+        },
+        {
+          "from": 183,
+          "to": 188,
+          "sourcePage": 2,
+          "id": 22
+        },
+        {
+          "from": 189,
+          "to": 196,
+          "sourcePage": 2,
+          "id": 23
+        },
+        {
+          "from": 197,
+          "to": 203,
+          "sourcePage": 2,
+          "id": 24
+        },
+        {
+          "from": 204,
+          "to": 214,
+          "sourcePage": 2,
+          "id": 25
+        },
+        {
+          "from": 215,
+          "to": 222,
+          "sourcePage": 2,
+          "id": 26
+        },
+        {
+          "from": 223,
+          "to": 237,
+          "sourcePage": 2,
+          "id": 27
+        },
+        {
+          "from": 238,
+          "to": 242,
+          "sourcePage": 3,
+          "id": 28
+        },
+        {
+          "from": 243,
+          "to": 245,
+          "sourcePage": 3,
+          "id": 29
+        },
+        {
+          "from": 246,
+          "to": 253,
+          "sourcePage": 3,
+          "id": 30
+        },
+        {
+          "from": 254,
+          "to": 257,
+          "sourcePage": 3,
+          "id": 31
+        },
+        {
+          "from": 258,
+          "to": 260,
+          "sourcePage": 3,
+          "id": 32
+        },
+        {
+          "from": 261,
+          "to": 266,
+          "sourcePage": 3,
+          "id": 33
+        },
+        {
+          "from": 267,
+          "to": 274,
+          "sourcePage": 3,
+          "id": 34
+        },
+        {
+          "from": 275,
+          "to": 281,
+          "sourcePage": 3,
+          "id": 35
+        },
+        {
+          "from": 282,
+          "to": 284,
+          "sourcePage": 3,
+          "id": 36
+        },
+        {
+          "from": 285,
+          "to": 286,
+          "sourcePage": 3,
+          "id": 37
+        }
+      ],
+      "sourcePage": 2,
+      "sourceHeading": "سورة البقرة",
+      "group": [
+        2
+      ],
+      "status": "specified"
+    },
+    "3": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 6,
+          "sourcePage": 3,
+          "id": 1
+        },
+        {
+          "from": 7,
+          "to": 18,
+          "sourcePage": 3,
+          "id": 2
+        },
+        {
+          "from": 19,
+          "to": 27,
+          "sourcePage": 3,
+          "id": 3
+        },
+        {
+          "from": 28,
+          "to": 32,
+          "sourcePage": 3,
+          "id": 4
+        },
+        {
+          "from": 33,
+          "to": 41,
+          "sourcePage": 3,
+          "id": 5
+        },
+        {
+          "from": 42,
+          "to": 63,
+          "sourcePage": 3,
+          "id": 6
+        },
+        {
+          "from": 64,
+          "to": 71,
+          "sourcePage": 3,
+          "id": 7
+        },
+        {
+          "from": 72,
+          "to": 78,
+          "sourcePage": 3,
+          "id": 8
+        },
+        {
+          "from": 79,
+          "to": 85,
+          "sourcePage": 3,
+          "id": 9
+        },
+        {
+          "from": 86,
+          "to": 91,
+          "sourcePage": 3,
+          "id": 10
+        },
+        {
+          "from": 92,
+          "to": 97,
+          "sourcePage": 3,
+          "id": 11
+        },
+        {
+          "from": 98,
+          "to": 109,
+          "sourcePage": 3,
+          "id": 12
+        },
+        {
+          "from": 110,
+          "to": 120,
+          "sourcePage": 3,
+          "id": 13
+        },
+        {
+          "from": 121,
+          "to": 129,
+          "sourcePage": 3,
+          "id": 14
+        },
+        {
+          "from": 130,
+          "to": 138,
+          "sourcePage": 3,
+          "id": 15
+        },
+        {
+          "from": 139,
+          "to": 148,
+          "sourcePage": 3,
+          "id": 16
+        },
+        {
+          "from": 149,
+          "to": 155,
+          "sourcePage": 3,
+          "id": 17
+        },
+        {
+          "from": 156,
+          "to": 164,
+          "sourcePage": 3,
+          "id": 18
+        },
+        {
+          "from": 165,
+          "to": 175,
+          "sourcePage": 3,
+          "id": 19
+        },
+        {
+          "from": 176,
+          "to": 180,
+          "sourcePage": 3,
+          "id": 20
+        },
+        {
+          "from": 181,
+          "to": 189,
+          "sourcePage": 3,
+          "id": 21
+        },
+        {
+          "from": 190,
+          "to": 195,
+          "sourcePage": 3,
+          "id": 22
+        },
+        {
+          "from": 196,
+          "to": 199,
+          "sourcePage": 3,
+          "id": 23
+        },
+        {
+          "from": 200,
+          "to": 200,
+          "sourcePage": 3,
+          "id": 24
+        }
+      ],
+      "sourcePage": 3,
+      "sourceHeading": "سورة آل عمران",
+      "group": [
+        3
+      ],
+      "status": "specified"
+    },
+    "4": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 14,
+          "sourcePage": 4,
+          "id": 1
+        },
+        {
+          "from": 15,
+          "to": 18,
+          "sourcePage": 4,
+          "id": 2
+        },
+        {
+          "from": 19,
+          "to": 28,
+          "sourcePage": 4,
+          "id": 3
+        },
+        {
+          "from": 29,
+          "to": 35,
+          "sourcePage": 4,
+          "id": 4
+        },
+        {
+          "from": 36,
+          "to": 42,
+          "sourcePage": 4,
+          "id": 5
+        },
+        {
+          "from": 43,
+          "to": 43,
+          "sourcePage": 4,
+          "id": 6
+        },
+        {
+          "from": 44,
+          "to": 58,
+          "sourcePage": 4,
+          "id": 7
+        },
+        {
+          "from": 59,
+          "to": 70,
+          "sourcePage": 4,
+          "id": 8
+        },
+        {
+          "from": 71,
+          "to": 87,
+          "sourcePage": 4,
+          "id": 9
+        },
+        {
+          "from": 88,
+          "to": 104,
+          "sourcePage": 4,
+          "id": 10
+        },
+        {
+          "from": 105,
+          "to": 126,
+          "sourcePage": 4,
+          "id": 11
+        },
+        {
+          "from": 127,
+          "to": 134,
+          "sourcePage": 4,
+          "id": 12
+        },
+        {
+          "from": 135,
+          "to": 135,
+          "sourcePage": 4,
+          "id": 13
+        },
+        {
+          "from": 136,
+          "to": 147,
+          "sourcePage": 4,
+          "id": 14
+        },
+        {
+          "from": 148,
+          "to": 149,
+          "sourcePage": 4,
+          "id": 15
+        },
+        {
+          "from": 150,
+          "to": 159,
+          "sourcePage": 4,
+          "id": 16
+        },
+        {
+          "from": 160,
+          "to": 169,
+          "sourcePage": 4,
+          "id": 17
+        },
+        {
+          "from": 170,
+          "to": 175,
+          "sourcePage": 4,
+          "id": 18
+        },
+        {
+          "from": 176,
+          "to": 176,
+          "sourcePage": 4,
+          "id": 19
+        }
+      ],
+      "sourcePage": 4,
+      "sourceHeading": "سورة النساء",
+      "group": [
+        4
+      ],
+      "status": "specified"
+    },
+    "5": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 10,
+          "sourcePage": 5,
+          "id": 1
+        },
+        {
+          "from": 11,
+          "to": 14,
+          "sourcePage": 5,
+          "id": 2
+        },
+        {
+          "from": 15,
+          "to": 19,
+          "sourcePage": 5,
+          "id": 3
+        },
+        {
+          "from": 20,
+          "to": 26,
+          "sourcePage": 5,
+          "id": 4
+        },
+        {
+          "from": 27,
+          "to": 32,
+          "sourcePage": 5,
+          "id": 5
+        },
+        {
+          "from": 33,
+          "to": 37,
+          "sourcePage": 5,
+          "id": 6
+        },
+        {
+          "from": 38,
+          "to": 40,
+          "sourcePage": 5,
+          "id": 7
+        },
+        {
+          "from": 41,
+          "to": 50,
+          "sourcePage": 5,
+          "id": 8
+        },
+        {
+          "from": 51,
+          "to": 58,
+          "sourcePage": 5,
+          "id": 9
+        },
+        {
+          "from": 59,
+          "to": 68,
+          "sourcePage": 5,
+          "id": 10
+        },
+        {
+          "from": 69,
+          "to": 79,
+          "sourcePage": 5,
+          "id": 11
+        },
+        {
+          "from": 80,
+          "to": 86,
+          "sourcePage": 5,
+          "id": 12
+        },
+        {
+          "from": 87,
+          "to": 89,
+          "sourcePage": 5,
+          "id": 13
+        },
+        {
+          "from": 90,
+          "to": 93,
+          "sourcePage": 5,
+          "id": 14
+        },
+        {
+          "from": 94,
+          "to": 100,
+          "sourcePage": 5,
+          "id": 15
+        },
+        {
+          "from": 101,
+          "to": 104,
+          "sourcePage": 5,
+          "id": 16
+        },
+        {
+          "from": 105,
+          "to": 105,
+          "sourcePage": 5,
+          "id": 17
+        },
+        {
+          "from": 106,
+          "to": 108,
+          "sourcePage": 5,
+          "id": 18
+        },
+        {
+          "from": 109,
+          "to": 120,
+          "sourcePage": 5,
+          "id": 19
+        }
+      ],
+      "sourcePage": 5,
+      "sourceHeading": "سورة املائةد",
+      "group": [
+        5
+      ],
+      "status": "specified"
+    },
+    "6": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 3,
+          "sourcePage": 5,
+          "id": 1
+        },
+        {
+          "from": 4,
+          "to": 11,
+          "sourcePage": 5,
+          "id": 2
+        },
+        {
+          "from": 12,
+          "to": 20,
+          "sourcePage": 5,
+          "id": 3
+        },
+        {
+          "from": 21,
+          "to": 32,
+          "sourcePage": 5,
+          "id": 4
+        },
+        {
+          "from": 33,
+          "to": 39,
+          "sourcePage": 5,
+          "id": 5
+        },
+        {
+          "from": 40,
+          "to": 50,
+          "sourcePage": 5,
+          "id": 6
+        },
+        {
+          "from": 51,
+          "to": 55,
+          "sourcePage": 5,
+          "id": 7
+        },
+        {
+          "from": 56,
+          "to": 67,
+          "sourcePage": 5,
+          "id": 8
+        },
+        {
+          "from": 68,
+          "to": 73,
+          "sourcePage": 5,
+          "id": 9
+        },
+        {
+          "from": 74,
+          "to": 90,
+          "sourcePage": 5,
+          "id": 10
+        },
+        {
+          "from": 91,
+          "to": 108,
+          "sourcePage": 6,
+          "id": 11
+        },
+        {
+          "from": 109,
+          "to": 113,
+          "sourcePage": 6,
+          "id": 12
+        },
+        {
+          "from": 114,
+          "to": 127,
+          "sourcePage": 6,
+          "id": 13
+        },
+        {
+          "from": 128,
+          "to": 135,
+          "sourcePage": 6,
+          "id": 14
+        },
+        {
+          "from": 136,
+          "to": 150,
+          "sourcePage": 6,
+          "id": 15
+        },
+        {
+          "from": 151,
+          "to": 165,
+          "sourcePage": 6,
+          "id": 16
+        }
+      ],
+      "sourcePage": 5,
+      "sourceHeading": "سورة األنعام",
+      "group": [
+        6
+      ],
+      "status": "specified"
+    },
+    "7": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 9,
+          "sourcePage": 6,
+          "id": 1
+        },
+        {
+          "from": 10,
+          "to": 25,
+          "sourcePage": 6,
+          "id": 2
+        },
+        {
+          "from": 26,
+          "to": 36,
+          "sourcePage": 6,
+          "id": 3
+        },
+        {
+          "from": 37,
+          "to": 53,
+          "sourcePage": 6,
+          "id": 4
+        },
+        {
+          "from": 54,
+          "to": 58,
+          "sourcePage": 6,
+          "id": 5
+        },
+        {
+          "from": 59,
+          "to": 64,
+          "sourcePage": 6,
+          "id": 6
+        },
+        {
+          "from": 65,
+          "to": 72,
+          "sourcePage": 6,
+          "id": 7
+        },
+        {
+          "from": 73,
+          "to": 79,
+          "sourcePage": 6,
+          "id": 8
+        },
+        {
+          "from": 80,
+          "to": 84,
+          "sourcePage": 6,
+          "id": 9
+        },
+        {
+          "from": 85,
+          "to": 93,
+          "sourcePage": 6,
+          "id": 10
+        },
+        {
+          "from": 94,
+          "to": 102,
+          "sourcePage": 6,
+          "id": 11
+        },
+        {
+          "from": 103,
+          "to": 126,
+          "sourcePage": 6,
+          "id": 12
+        },
+        {
+          "from": 127,
+          "to": 137,
+          "sourcePage": 6,
+          "id": 13
+        },
+        {
+          "from": 138,
+          "to": 154,
+          "sourcePage": 6,
+          "id": 14
+        },
+        {
+          "from": 155,
+          "to": 160,
+          "sourcePage": 6,
+          "id": 15
+        },
+        {
+          "from": 161,
+          "to": 171,
+          "sourcePage": 6,
+          "id": 16
+        },
+        {
+          "from": 172,
+          "to": 174,
+          "sourcePage": 6,
+          "id": 17
+        },
+        {
+          "from": 175,
+          "to": 179,
+          "sourcePage": 6,
+          "id": 18
+        },
+        {
+          "from": 180,
+          "to": 188,
+          "sourcePage": 6,
+          "id": 19
+        },
+        {
+          "from": 189,
+          "to": 198,
+          "sourcePage": 6,
+          "id": 20
+        },
+        {
+          "from": 199,
+          "to": 206,
+          "sourcePage": 6,
+          "id": 21
+        }
+      ],
+      "sourcePage": 6,
+      "sourceHeading": "سورةاألعراف",
+      "group": [
+        7
+      ],
+      "status": "specified"
+    },
+    "8": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 16,
+          "sourcePage": 7,
+          "id": 1
+        },
+        {
+          "from": 17,
+          "to": 29,
+          "sourcePage": 7,
+          "id": 2
+        },
+        {
+          "from": 30,
+          "to": 49,
+          "sourcePage": 7,
+          "id": 3
+        },
+        {
+          "from": 50,
+          "to": 71,
+          "sourcePage": 7,
+          "id": 4
+        },
+        {
+          "from": 72,
+          "to": 75,
+          "sourcePage": 7,
+          "id": 5
+        }
+      ],
+      "sourcePage": 7,
+      "sourceHeading": "سورة اال نفال",
+      "group": [
+        8
+      ],
+      "status": "specified"
+    },
+    "9": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 16,
+          "sourcePage": 7,
+          "id": 1
+        },
+        {
+          "from": 17,
+          "to": 22,
+          "sourcePage": 7,
+          "id": 2
+        },
+        {
+          "from": 23,
+          "to": 28,
+          "sourcePage": 7,
+          "id": 3
+        },
+        {
+          "from": 29,
+          "to": 35,
+          "sourcePage": 7,
+          "id": 4
+        },
+        {
+          "from": 36,
+          "to": 37,
+          "sourcePage": 7,
+          "id": 5
+        },
+        {
+          "from": 38,
+          "to": 41,
+          "sourcePage": 7,
+          "id": 6
+        },
+        {
+          "from": 42,
+          "to": 48,
+          "sourcePage": 7,
+          "id": 7
+        },
+        {
+          "from": 49,
+          "to": 57,
+          "sourcePage": 7,
+          "id": 8
+        },
+        {
+          "from": 58,
+          "to": 60,
+          "sourcePage": 7,
+          "id": 9
+        },
+        {
+          "from": 61,
+          "to": 63,
+          "sourcePage": 7,
+          "id": 10
+        },
+        {
+          "from": 64,
+          "to": 72,
+          "sourcePage": 7,
+          "id": 11
+        },
+        {
+          "from": 73,
+          "to": 80,
+          "sourcePage": 7,
+          "id": 12
+        },
+        {
+          "from": 81,
+          "to": 89,
+          "sourcePage": 7,
+          "id": 13
+        },
+        {
+          "from": 90,
+          "to": 96,
+          "sourcePage": 7,
+          "id": 14
+        },
+        {
+          "from": 97,
+          "to": 99,
+          "sourcePage": 7,
+          "id": 15
+        },
+        {
+          "from": 100,
+          "to": 106,
+          "sourcePage": 7,
+          "id": 16
+        },
+        {
+          "from": 107,
+          "to": 112,
+          "sourcePage": 7,
+          "id": 17
+        },
+        {
+          "from": 113,
+          "to": 119,
+          "sourcePage": 7,
+          "id": 18
+        },
+        {
+          "from": 120,
+          "to": 121,
+          "sourcePage": 7,
+          "id": 19
+        },
+        {
+          "from": 122,
+          "to": 122,
+          "sourcePage": 7,
+          "id": 20
+        },
+        {
+          "from": 123,
+          "to": 129,
+          "sourcePage": 7,
+          "id": 21
+        }
+      ],
+      "sourcePage": 7,
+      "sourceHeading": "سورة ال توبه",
+      "group": [
+        9
+      ],
+      "status": "specified"
+    },
+    "10": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 6,
+          "sourcePage": 8,
+          "id": 1
+        },
+        {
+          "from": 7,
+          "to": 19,
+          "sourcePage": 8,
+          "id": 2
+        },
+        {
+          "from": 20,
+          "to": 25,
+          "sourcePage": 8,
+          "id": 3
+        },
+        {
+          "from": 26,
+          "to": 30,
+          "sourcePage": 8,
+          "id": 4
+        },
+        {
+          "from": 31,
+          "to": 36,
+          "sourcePage": 8,
+          "id": 5
+        },
+        {
+          "from": 37,
+          "to": 45,
+          "sourcePage": 8,
+          "id": 6
+        },
+        {
+          "from": 46,
+          "to": 56,
+          "sourcePage": 8,
+          "id": 7
+        },
+        {
+          "from": 57,
+          "to": 70,
+          "sourcePage": 8,
+          "id": 8
+        },
+        {
+          "from": 71,
+          "to": 74,
+          "sourcePage": 8,
+          "id": 9
+        },
+        {
+          "from": 75,
+          "to": 93,
+          "sourcePage": 8,
+          "id": 10
+        },
+        {
+          "from": 94,
+          "to": 103,
+          "sourcePage": 8,
+          "id": 11
+        },
+        {
+          "from": 104,
+          "to": 109,
+          "sourcePage": 8,
+          "id": 12
+        }
+      ],
+      "sourcePage": 8,
+      "sourceHeading": "سورة وینس",
+      "group": [
+        10
+      ],
+      "status": "specified"
+    },
+    "11": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 4,
+          "sourcePage": 8,
+          "id": 1
+        },
+        {
+          "from": 5,
+          "to": 24,
+          "sourcePage": 8,
+          "id": 2
+        },
+        {
+          "from": 25,
+          "to": 49,
+          "sourcePage": 8,
+          "id": 3
+        },
+        {
+          "from": 50,
+          "to": 60,
+          "sourcePage": 8,
+          "id": 4
+        },
+        {
+          "from": 61,
+          "to": 68,
+          "sourcePage": 8,
+          "id": 5
+        },
+        {
+          "from": 69,
+          "to": 76,
+          "sourcePage": 8,
+          "id": 6
+        },
+        {
+          "from": 77,
+          "to": 83,
+          "sourcePage": 8,
+          "id": 7
+        },
+        {
+          "from": 84,
+          "to": 95,
+          "sourcePage": 8,
+          "id": 8
+        },
+        {
+          "from": 96,
+          "to": 99,
+          "sourcePage": 8,
+          "id": 9
+        },
+        {
+          "from": 100,
+          "to": 108,
+          "sourcePage": 8,
+          "id": 10
+        },
+        {
+          "from": 109,
+          "to": 119,
+          "sourcePage": 8,
+          "id": 11
+        },
+        {
+          "from": 120,
+          "to": 123,
+          "sourcePage": 8,
+          "id": 12
+        }
+      ],
+      "sourcePage": 8,
+      "sourceHeading": "سورة هود",
+      "group": [
+        11
+      ],
+      "status": "specified"
+    },
+    "12": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 3,
+          "sourcePage": 8,
+          "id": 1
+        },
+        {
+          "from": 4,
+          "to": 6,
+          "sourcePage": 8,
+          "id": 2
+        },
+        {
+          "from": 7,
+          "to": 22,
+          "sourcePage": 8,
+          "id": 3
+        },
+        {
+          "from": 23,
+          "to": 35,
+          "sourcePage": 8,
+          "id": 4
+        },
+        {
+          "from": 36,
+          "to": 42,
+          "sourcePage": 8,
+          "id": 5
+        },
+        {
+          "from": 43,
+          "to": 57,
+          "sourcePage": 8,
+          "id": 6
+        },
+        {
+          "from": 58,
+          "to": 102,
+          "sourcePage": 9,
+          "id": 7
+        },
+        {
+          "from": 103,
+          "to": 111,
+          "sourcePage": 9,
+          "id": 8
+        }
+      ],
+      "sourcePage": 8,
+      "sourceHeading": "سورة ویسف",
+      "group": [
+        12
+      ],
+      "status": "specified"
+    },
+    "13": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 4,
+          "sourcePage": 9,
+          "id": 1
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "sourcePage": 9,
+          "id": 2
+        },
+        {
+          "from": 7,
+          "to": 16,
+          "sourcePage": 9,
+          "id": 3
+        },
+        {
+          "from": 17,
+          "to": 26,
+          "sourcePage": 9,
+          "id": 4
+        },
+        {
+          "from": 27,
+          "to": 35,
+          "sourcePage": 9,
+          "id": 5
+        },
+        {
+          "from": 36,
+          "to": 43,
+          "sourcePage": 9,
+          "id": 6
+        }
+      ],
+      "sourcePage": 9,
+      "sourceHeading": "سورة الرعد",
+      "group": [
+        13
+      ],
+      "status": "specified"
+    },
+    "14": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 5,
+          "sourcePage": 9,
+          "id": 1
+        },
+        {
+          "from": 6,
+          "to": 18,
+          "sourcePage": 9,
+          "id": 2
+        },
+        {
+          "from": 19,
+          "to": 34,
+          "sourcePage": 9,
+          "id": 3
+        },
+        {
+          "from": 35,
+          "to": 41,
+          "sourcePage": 9,
+          "id": 4
+        },
+        {
+          "from": 42,
+          "to": 52,
+          "sourcePage": 9,
+          "id": 5
+        }
+      ],
+      "sourcePage": 9,
+      "sourceHeading": "سورة ابراهمی",
+      "group": [
+        14
+      ],
+      "status": "specified"
+    },
+    "15": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 9,
+          "sourcePage": 9,
+          "id": 1
+        },
+        {
+          "from": 10,
+          "to": 15,
+          "sourcePage": 9,
+          "id": 2
+        },
+        {
+          "from": 16,
+          "to": 25,
+          "sourcePage": 9,
+          "id": 3
+        },
+        {
+          "from": 26,
+          "to": 48,
+          "sourcePage": 9,
+          "id": 4
+        },
+        {
+          "from": 49,
+          "to": 84,
+          "sourcePage": 9,
+          "id": 5
+        },
+        {
+          "from": 85,
+          "to": 99,
+          "sourcePage": 9,
+          "id": 6
+        }
+      ],
+      "sourcePage": 9,
+      "sourceHeading": "سورة الحجر",
+      "group": [
+        15
+      ],
+      "status": "specified"
+    },
+    "16": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 23,
+          "sourcePage": 9,
+          "id": 1
+        },
+        {
+          "from": 24,
+          "to": 32,
+          "sourcePage": 9,
+          "id": 2
+        },
+        {
+          "from": 33,
+          "to": 40,
+          "sourcePage": 9,
+          "id": 3
+        },
+        {
+          "from": 41,
+          "to": 42,
+          "sourcePage": 9,
+          "id": 4
+        },
+        {
+          "from": 43,
+          "to": 50,
+          "sourcePage": 9,
+          "id": 5
+        },
+        {
+          "from": 51,
+          "to": 64,
+          "sourcePage": 10,
+          "id": 6
+        },
+        {
+          "from": 65,
+          "to": 77,
+          "sourcePage": 10,
+          "id": 7
+        },
+        {
+          "from": 78,
+          "to": 89,
+          "sourcePage": 10,
+          "id": 8
+        },
+        {
+          "from": 90,
+          "to": 97,
+          "sourcePage": 10,
+          "id": 9
+        },
+        {
+          "from": 98,
+          "to": 105,
+          "sourcePage": 10,
+          "id": 10
+        },
+        {
+          "from": 106,
+          "to": 111,
+          "sourcePage": 10,
+          "id": 11
+        },
+        {
+          "from": 112,
+          "to": 119,
+          "sourcePage": 10,
+          "id": 12
+        },
+        {
+          "from": 120,
+          "to": 128,
+          "sourcePage": 10,
+          "id": 13
+        }
+      ],
+      "sourcePage": 9,
+      "sourceHeading": "سورة النحل",
+      "group": [
+        16
+      ],
+      "status": "specified"
+    },
+    "17": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 1,
+          "sourcePage": 10,
+          "id": 1
+        },
+        {
+          "from": 2,
+          "to": 8,
+          "sourcePage": 10,
+          "id": 2
+        },
+        {
+          "from": 9,
+          "to": 22,
+          "sourcePage": 10,
+          "id": 3
+        },
+        {
+          "from": 23,
+          "to": 44,
+          "sourcePage": 10,
+          "id": 4
+        },
+        {
+          "from": 45,
+          "to": 55,
+          "sourcePage": 10,
+          "id": 5
+        },
+        {
+          "from": 56,
+          "to": 59,
+          "sourcePage": 10,
+          "id": 6
+        },
+        {
+          "from": 60,
+          "to": 65,
+          "sourcePage": 10,
+          "id": 7
+        },
+        {
+          "from": 66,
+          "to": 69,
+          "sourcePage": 10,
+          "id": 8
+        },
+        {
+          "from": 70,
+          "to": 72,
+          "sourcePage": 10,
+          "id": 9
+        },
+        {
+          "from": 73,
+          "to": 81,
+          "sourcePage": 10,
+          "id": 10
+        },
+        {
+          "from": 82,
+          "to": 100,
+          "sourcePage": 10,
+          "id": 11
+        },
+        {
+          "from": 101,
+          "to": 104,
+          "sourcePage": 10,
+          "id": 12
+        },
+        {
+          "from": 105,
+          "to": 111,
+          "sourcePage": 10,
+          "id": 13
+        }
+      ],
+      "sourcePage": 10,
+      "sourceHeading": "سورة اإلسراء",
+      "group": [
+        17
+      ],
+      "status": "specified"
+    },
+    "18": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 8,
+          "sourcePage": 10,
+          "id": 1
+        },
+        {
+          "from": 9,
+          "to": 21,
+          "sourcePage": 10,
+          "id": 2
+        },
+        {
+          "from": 22,
+          "to": 26,
+          "sourcePage": 10,
+          "id": 3
+        },
+        {
+          "from": 27,
+          "to": 31,
+          "sourcePage": 10,
+          "id": 4
+        },
+        {
+          "from": 32,
+          "to": 46,
+          "sourcePage": 10,
+          "id": 5
+        },
+        {
+          "from": 47,
+          "to": 53,
+          "sourcePage": 10,
+          "id": 6
+        },
+        {
+          "from": 54,
+          "to": 59,
+          "sourcePage": 10,
+          "id": 7
+        },
+        {
+          "from": 60,
+          "to": 82,
+          "sourcePage": 10,
+          "id": 8
+        },
+        {
+          "from": 83,
+          "to": 98,
+          "sourcePage": 10,
+          "id": 9
+        },
+        {
+          "from": 99,
+          "to": 110,
+          "sourcePage": 10,
+          "id": 10
+        }
+      ],
+      "sourcePage": 10,
+      "sourceHeading": "سورة الکهف",
+      "group": [
+        18
+      ],
+      "status": "specified"
+    },
+    "19": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 15,
+          "sourcePage": 11,
+          "id": 1
+        },
+        {
+          "from": 16,
+          "to": 40,
+          "sourcePage": 11,
+          "id": 2
+        },
+        {
+          "from": 41,
+          "to": 50,
+          "sourcePage": 11,
+          "id": 3
+        },
+        {
+          "from": 51,
+          "to": 57,
+          "sourcePage": 11,
+          "id": 4
+        },
+        {
+          "from": 58,
+          "to": 63,
+          "sourcePage": 11,
+          "id": 5
+        },
+        {
+          "from": 64,
+          "to": 65,
+          "sourcePage": 11,
+          "id": 6
+        },
+        {
+          "from": 66,
+          "to": 72,
+          "sourcePage": 11,
+          "id": 7
+        },
+        {
+          "from": 73,
+          "to": 80,
+          "sourcePage": 11,
+          "id": 8
+        },
+        {
+          "from": 81,
+          "to": 96,
+          "sourcePage": 11,
+          "id": 9
+        },
+        {
+          "from": 97,
+          "to": 98,
+          "sourcePage": 11,
+          "id": 10
+        }
+      ],
+      "sourcePage": 11,
+      "sourceHeading": "سورة مرمی",
+      "group": [
+        19
+      ],
+      "status": "specified"
+    },
+    "20": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 8,
+          "sourcePage": 11,
+          "id": 1
+        },
+        {
+          "from": 9,
+          "to": 23,
+          "sourcePage": 11,
+          "id": 2
+        },
+        {
+          "from": 24,
+          "to": 48,
+          "sourcePage": 11,
+          "id": 3
+        },
+        {
+          "from": 49,
+          "to": 64,
+          "sourcePage": 11,
+          "id": 4
+        },
+        {
+          "from": 65,
+          "to": 79,
+          "sourcePage": 11,
+          "id": 5
+        },
+        {
+          "from": 80,
+          "to": 98,
+          "sourcePage": 11,
+          "id": 6
+        },
+        {
+          "from": 99,
+          "to": 114,
+          "sourcePage": 11,
+          "id": 7
+        },
+        {
+          "from": 115,
+          "to": 126,
+          "sourcePage": 11,
+          "id": 8
+        },
+        {
+          "from": 127,
+          "to": 135,
+          "sourcePage": 11,
+          "id": 9
+        }
+      ],
+      "sourcePage": 11,
+      "sourceHeading": "سورة طه",
+      "group": [
+        20
+      ],
+      "status": "specified"
+    },
+    "21": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 15,
+          "sourcePage": 11,
+          "id": 1
+        },
+        {
+          "from": 16,
+          "to": 33,
+          "sourcePage": 11,
+          "id": 2
+        },
+        {
+          "from": 34,
+          "to": 47,
+          "sourcePage": 11,
+          "id": 3
+        },
+        {
+          "from": 48,
+          "to": 91,
+          "sourcePage": 11,
+          "id": 4
+        },
+        {
+          "from": 92,
+          "to": 104,
+          "sourcePage": 11,
+          "id": 5
+        },
+        {
+          "from": 105,
+          "to": 112,
+          "sourcePage": 11,
+          "id": 6
+        }
+      ],
+      "sourcePage": 11,
+      "sourceHeading": "سورة االبنیاء",
+      "group": [
+        21
+      ],
+      "status": "specified"
+    },
+    "22": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 2,
+          "sourcePage": 11,
+          "id": 1
+        },
+        {
+          "from": 3,
+          "to": 16,
+          "sourcePage": 11,
+          "id": 2
+        },
+        {
+          "from": 17,
+          "to": 24,
+          "sourcePage": 11,
+          "id": 3
+        },
+        {
+          "from": 25,
+          "to": 37,
+          "sourcePage": 11,
+          "id": 4
+        },
+        {
+          "from": 38,
+          "to": 57,
+          "sourcePage": 11,
+          "id": 5
+        },
+        {
+          "from": 58,
+          "to": 66,
+          "sourcePage": 12,
+          "id": 6
+        },
+        {
+          "from": 67,
+          "to": 78,
+          "sourcePage": 12,
+          "id": 7
+        }
+      ],
+      "sourcePage": 11,
+      "sourceHeading": "سورة الحج",
+      "group": [
+        22
+      ],
+      "status": "specified"
+    },
+    "23": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 11,
+          "sourcePage": 12,
+          "id": 1
+        },
+        {
+          "from": 12,
+          "to": 22,
+          "sourcePage": 12,
+          "id": 2
+        },
+        {
+          "from": 23,
+          "to": 54,
+          "sourcePage": 12,
+          "id": 3
+        },
+        {
+          "from": 55,
+          "to": 77,
+          "sourcePage": 12,
+          "id": 4
+        },
+        {
+          "from": 78,
+          "to": 98,
+          "sourcePage": 12,
+          "id": 5
+        },
+        {
+          "from": 99,
+          "to": 118,
+          "sourcePage": 12,
+          "id": 6
+        }
+      ],
+      "sourcePage": 12,
+      "sourceHeading": "سورة املؤمنون",
+      "group": [
+        23
+      ],
+      "status": "specified"
+    },
+    "24": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 1,
+          "sourcePage": 12,
+          "id": 1
+        },
+        {
+          "from": 2,
+          "to": 10,
+          "sourcePage": 12,
+          "id": 2
+        },
+        {
+          "from": 11,
+          "to": 20,
+          "sourcePage": 12,
+          "id": 3
+        },
+        {
+          "from": 21,
+          "to": 26,
+          "sourcePage": 12,
+          "id": 4
+        },
+        {
+          "from": 27,
+          "to": 33,
+          "sourcePage": 12,
+          "id": 5
+        },
+        {
+          "from": 34,
+          "to": 34,
+          "sourcePage": 12,
+          "id": 6
+        },
+        {
+          "from": 35,
+          "to": 40,
+          "sourcePage": 12,
+          "id": 7
+        },
+        {
+          "from": 41,
+          "to": 46,
+          "sourcePage": 12,
+          "id": 8
+        },
+        {
+          "from": 47,
+          "to": 57,
+          "sourcePage": 12,
+          "id": 9
+        },
+        {
+          "from": 58,
+          "to": 61,
+          "sourcePage": 12,
+          "id": 10
+        },
+        {
+          "from": 62,
+          "to": 64,
+          "sourcePage": 12,
+          "id": 11
+        }
+      ],
+      "sourcePage": 12,
+      "sourceHeading": "سورة النور",
+      "group": [
+        24
+      ],
+      "status": "specified"
+    },
+    "25": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 3,
+          "sourcePage": 12,
+          "id": 1
+        },
+        {
+          "from": 4,
+          "to": 20,
+          "sourcePage": 12,
+          "id": 2
+        },
+        {
+          "from": 21,
+          "to": 31,
+          "sourcePage": 12,
+          "id": 3
+        },
+        {
+          "from": 32,
+          "to": 40,
+          "sourcePage": 12,
+          "id": 4
+        },
+        {
+          "from": 41,
+          "to": 62,
+          "sourcePage": 12,
+          "id": 5
+        },
+        {
+          "from": 63,
+          "to": 76,
+          "sourcePage": 12,
+          "id": 6
+        },
+        {
+          "from": 77,
+          "to": 77,
+          "sourcePage": 12,
+          "id": 7
+        }
+      ],
+      "sourcePage": 12,
+      "sourceHeading": "سورة الفرقان",
+      "group": [
+        25
+      ],
+      "status": "specified"
+    },
+    "26": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 9,
+          "sourcePage": 13,
+          "id": 1
+        },
+        {
+          "from": 10,
+          "to": 68,
+          "sourcePage": 13,
+          "id": 2
+        },
+        {
+          "from": 69,
+          "to": 104,
+          "sourcePage": 13,
+          "id": 3
+        },
+        {
+          "from": 105,
+          "to": 122,
+          "sourcePage": 13,
+          "id": 4
+        },
+        {
+          "from": 123,
+          "to": 140,
+          "sourcePage": 13,
+          "id": 5
+        },
+        {
+          "from": 141,
+          "to": 159,
+          "sourcePage": 13,
+          "id": 6
+        },
+        {
+          "from": 160,
+          "to": 175,
+          "sourcePage": 13,
+          "id": 7
+        },
+        {
+          "from": 176,
+          "to": 191,
+          "sourcePage": 13,
+          "id": 8
+        },
+        {
+          "from": 192,
+          "to": 227,
+          "sourcePage": 13,
+          "id": 9
+        }
+      ],
+      "sourcePage": 13,
+      "sourceHeading": "سورة الشعراء",
+      "group": [
+        26
+      ],
+      "status": "specified"
+    },
+    "27": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 6,
+          "sourcePage": 13,
+          "id": 1
+        },
+        {
+          "from": 7,
+          "to": 14,
+          "sourcePage": 13,
+          "id": 2
+        },
+        {
+          "from": 15,
+          "to": 44,
+          "sourcePage": 13,
+          "id": 3
+        },
+        {
+          "from": 45,
+          "to": 53,
+          "sourcePage": 13,
+          "id": 4
+        },
+        {
+          "from": 54,
+          "to": 58,
+          "sourcePage": 13,
+          "id": 5
+        },
+        {
+          "from": 59,
+          "to": 66,
+          "sourcePage": 13,
+          "id": 6
+        },
+        {
+          "from": 67,
+          "to": 75,
+          "sourcePage": 13,
+          "id": 7
+        },
+        {
+          "from": 76,
+          "to": 81,
+          "sourcePage": 13,
+          "id": 8
+        },
+        {
+          "from": 82,
+          "to": 90,
+          "sourcePage": 13,
+          "id": 9
+        },
+        {
+          "from": 91,
+          "to": 93,
+          "sourcePage": 13,
+          "id": 10
+        }
+      ],
+      "sourcePage": 13,
+      "sourceHeading": "سورة النمل",
+      "group": [
+        27
+      ],
+      "status": "specified"
+    },
+    "28": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 14,
+          "sourcePage": 13,
+          "id": 1
+        },
+        {
+          "from": 15,
+          "to": 21,
+          "sourcePage": 13,
+          "id": 2
+        },
+        {
+          "from": 22,
+          "to": 28,
+          "sourcePage": 13,
+          "id": 3
+        },
+        {
+          "from": 29,
+          "to": 42,
+          "sourcePage": 13,
+          "id": 4
+        },
+        {
+          "from": 43,
+          "to": 56,
+          "sourcePage": 13,
+          "id": 5
+        },
+        {
+          "from": 57,
+          "to": 75,
+          "sourcePage": 13,
+          "id": 6
+        },
+        {
+          "from": 76,
+          "to": 84,
+          "sourcePage": 13,
+          "id": 7
+        },
+        {
+          "from": 85,
+          "to": 88,
+          "sourcePage": 13,
+          "id": 8
+        }
+      ],
+      "sourcePage": 13,
+      "sourceHeading": "سورة القصص",
+      "group": [
+        28
+      ],
+      "status": "specified"
+    },
+    "29": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 13,
+          "sourcePage": 14,
+          "id": 1
+        },
+        {
+          "from": 14,
+          "to": 44,
+          "sourcePage": 14,
+          "id": 2
+        },
+        {
+          "from": 45,
+          "to": 55,
+          "sourcePage": 14,
+          "id": 3
+        },
+        {
+          "from": 56,
+          "to": 60,
+          "sourcePage": 14,
+          "id": 4
+        },
+        {
+          "from": 61,
+          "to": 69,
+          "sourcePage": 14,
+          "id": 5
+        }
+      ],
+      "sourcePage": 14,
+      "sourceHeading": "سورة العنکبوت",
+      "group": [
+        29
+      ],
+      "status": "specified"
+    },
+    "30": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 19,
+          "sourcePage": 14,
+          "id": 1
+        },
+        {
+          "from": 20,
+          "to": 26,
+          "sourcePage": 14,
+          "id": 2
+        },
+        {
+          "from": 27,
+          "to": 39,
+          "sourcePage": 14,
+          "id": 3
+        },
+        {
+          "from": 40,
+          "to": 47,
+          "sourcePage": 14,
+          "id": 4
+        },
+        {
+          "from": 48,
+          "to": 53,
+          "sourcePage": 14,
+          "id": 5
+        },
+        {
+          "from": 54,
+          "to": 57,
+          "sourcePage": 14,
+          "id": 6
+        },
+        {
+          "from": 58,
+          "to": 60,
+          "sourcePage": 14,
+          "id": 7
+        }
+      ],
+      "sourcePage": 14,
+      "sourceHeading": "سورة الرّ وم",
+      "group": [
+        30
+      ],
+      "status": "specified"
+    },
+    "31": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 11,
+          "sourcePage": 14,
+          "id": 1
+        },
+        {
+          "from": 12,
+          "to": 19,
+          "sourcePage": 14,
+          "id": 2
+        },
+        {
+          "from": 20,
+          "to": 34,
+          "sourcePage": 14,
+          "id": 3
+        }
+      ],
+      "sourcePage": 14,
+      "sourceHeading": "سورة لقمان",
+      "group": [
+        31
+      ],
+      "status": "specified"
+    },
+    "32": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 14,
+          "sourcePage": 14,
+          "id": 1
+        },
+        {
+          "from": 15,
+          "to": 30,
+          "sourcePage": 14,
+          "id": 2
+        }
+      ],
+      "sourcePage": 14,
+      "sourceHeading": "سورة السجةد",
+      "group": [
+        32
+      ],
+      "status": "specified"
+    },
+    "33": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 8,
+          "sourcePage": 14,
+          "id": 1
+        },
+        {
+          "from": 9,
+          "to": 27,
+          "sourcePage": 14,
+          "id": 2
+        },
+        {
+          "from": 28,
+          "to": 35,
+          "sourcePage": 14,
+          "id": 3
+        },
+        {
+          "from": 36,
+          "to": 40,
+          "sourcePage": 14,
+          "id": 4
+        },
+        {
+          "from": 41,
+          "to": 44,
+          "sourcePage": 14,
+          "id": 5
+        },
+        {
+          "from": 45,
+          "to": 48,
+          "sourcePage": 14,
+          "id": 6
+        },
+        {
+          "from": 49,
+          "to": 49,
+          "sourcePage": 14,
+          "id": 7
+        },
+        {
+          "from": 50,
+          "to": 52,
+          "sourcePage": 14,
+          "id": 8
+        },
+        {
+          "from": 53,
+          "to": 59,
+          "sourcePage": 14,
+          "id": 9
+        },
+        {
+          "from": 60,
+          "to": 68,
+          "sourcePage": 15,
+          "id": 10
+        },
+        {
+          "from": 69,
+          "to": 73,
+          "sourcePage": 15,
+          "id": 11
+        }
+      ],
+      "sourcePage": 14,
+      "sourceHeading": "سورة األحزاب",
+      "group": [
+        33
+      ],
+      "status": "specified"
+    },
+    "34": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 9,
+          "sourcePage": 15,
+          "id": 1
+        },
+        {
+          "from": 10,
+          "to": 21,
+          "sourcePage": 15,
+          "id": 2
+        },
+        {
+          "from": 22,
+          "to": 30,
+          "sourcePage": 15,
+          "id": 3
+        },
+        {
+          "from": 31,
+          "to": 54,
+          "sourcePage": 15,
+          "id": 4
+        }
+      ],
+      "sourcePage": 15,
+      "sourceHeading": "سورة سبأ",
+      "group": [
+        34
+      ],
+      "status": "specified"
+    },
+    "35": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 1,
+          "sourcePage": 15,
+          "id": 1
+        },
+        {
+          "from": 2,
+          "to": 8,
+          "sourcePage": 15,
+          "id": 2
+        },
+        {
+          "from": 9,
+          "to": 14,
+          "sourcePage": 15,
+          "id": 3
+        },
+        {
+          "from": 15,
+          "to": 26,
+          "sourcePage": 15,
+          "id": 4
+        },
+        {
+          "from": 27,
+          "to": 38,
+          "sourcePage": 15,
+          "id": 5
+        },
+        {
+          "from": 39,
+          "to": 45,
+          "sourcePage": 15,
+          "id": 6
+        }
+      ],
+      "sourcePage": 15,
+      "sourceHeading": "سورة فاطر",
+      "group": [
+        35
+      ],
+      "status": "specified"
+    },
+    "36": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 12,
+          "sourcePage": 15,
+          "id": 1
+        },
+        {
+          "from": 13,
+          "to": 32,
+          "sourcePage": 15,
+          "id": 2
+        },
+        {
+          "from": 33,
+          "to": 47,
+          "sourcePage": 15,
+          "id": 3
+        },
+        {
+          "from": 48,
+          "to": 68,
+          "sourcePage": 15,
+          "id": 4
+        },
+        {
+          "from": 69,
+          "to": 70,
+          "sourcePage": 15,
+          "id": 5
+        },
+        {
+          "from": 71,
+          "to": 76,
+          "sourcePage": 15,
+          "id": 6
+        },
+        {
+          "from": 77,
+          "to": 83,
+          "sourcePage": 15,
+          "id": 7
+        }
+      ],
+      "sourcePage": 15,
+      "sourceHeading": "سورة یس",
+      "group": [
+        36
+      ],
+      "status": "specified"
+    },
+    "37": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 70,
+          "sourcePage": 15,
+          "id": 1
+        },
+        {
+          "from": 71,
+          "to": 148,
+          "sourcePage": 15,
+          "id": 2
+        },
+        {
+          "from": 149,
+          "to": 182,
+          "sourcePage": 15,
+          "id": 3
+        }
+      ],
+      "sourcePage": 15,
+      "sourceHeading": "سورة الصافات",
+      "group": [
+        37
+      ],
+      "status": "specified"
+    },
+    "38": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 16,
+          "sourcePage": 15,
+          "id": 1
+        },
+        {
+          "from": 17,
+          "to": 29,
+          "sourcePage": 15,
+          "id": 2
+        },
+        {
+          "from": 30,
+          "to": 40,
+          "sourcePage": 15,
+          "id": 3
+        },
+        {
+          "from": 41,
+          "to": 48,
+          "sourcePage": 15,
+          "id": 4
+        },
+        {
+          "from": 49,
+          "to": 64,
+          "sourcePage": 15,
+          "id": 5
+        },
+        {
+          "from": 65,
+          "to": 88,
+          "sourcePage": 15,
+          "id": 6
+        }
+      ],
+      "sourcePage": 15,
+      "sourceHeading": "سورة ص",
+      "group": [
+        38
+      ],
+      "status": "specified"
+    },
+    "39": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 20,
+          "sourcePage": 16,
+          "id": 1
+        },
+        {
+          "from": 21,
+          "to": 37,
+          "sourcePage": 16,
+          "id": 2
+        },
+        {
+          "from": 38,
+          "to": 52,
+          "sourcePage": 16,
+          "id": 3
+        },
+        {
+          "from": 53,
+          "to": 66,
+          "sourcePage": 16,
+          "id": 4
+        },
+        {
+          "from": 67,
+          "to": 75,
+          "sourcePage": 16,
+          "id": 5
+        }
+      ],
+      "sourcePage": 16,
+      "sourceHeading": "سورة ال زمر",
+      "group": [
+        39
+      ],
+      "status": "specified"
+    },
+    "40": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 6,
+          "sourcePage": 16,
+          "id": 1
+        },
+        {
+          "from": 7,
+          "to": 12,
+          "sourcePage": 16,
+          "id": 2
+        },
+        {
+          "from": 13,
+          "to": 20,
+          "sourcePage": 16,
+          "id": 3
+        },
+        {
+          "from": 21,
+          "to": 22,
+          "sourcePage": 16,
+          "id": 4
+        },
+        {
+          "from": 23,
+          "to": 50,
+          "sourcePage": 16,
+          "id": 5
+        },
+        {
+          "from": 51,
+          "to": 55,
+          "sourcePage": 16,
+          "id": 6
+        },
+        {
+          "from": 56,
+          "to": 59,
+          "sourcePage": 16,
+          "id": 7
+        },
+        {
+          "from": 60,
+          "to": 68,
+          "sourcePage": 16,
+          "id": 8
+        },
+        {
+          "from": 69,
+          "to": 78,
+          "sourcePage": 16,
+          "id": 9
+        },
+        {
+          "from": 79,
+          "to": 81,
+          "sourcePage": 16,
+          "id": 10
+        },
+        {
+          "from": 82,
+          "to": 85,
+          "sourcePage": 16,
+          "id": 11
+        }
+      ],
+      "sourcePage": 16,
+      "sourceHeading": "سورة غافر",
+      "group": [
+        40
+      ],
+      "status": "specified"
+    },
+    "41": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 25,
+          "sourcePage": 16,
+          "id": 1
+        },
+        {
+          "from": 26,
+          "to": 36,
+          "sourcePage": 16,
+          "id": 2
+        },
+        {
+          "from": 37,
+          "to": 46,
+          "sourcePage": 16,
+          "id": 3
+        },
+        {
+          "from": 47,
+          "to": 54,
+          "sourcePage": 16,
+          "id": 4
+        }
+      ],
+      "sourcePage": 16,
+      "sourceHeading": "سورة فصّ لت",
+      "group": [
+        41
+      ],
+      "status": "specified"
+    },
+    "42": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 6,
+          "sourcePage": 16,
+          "id": 1
+        },
+        {
+          "from": 7,
+          "to": 12,
+          "sourcePage": 16,
+          "id": 2
+        },
+        {
+          "from": 13,
+          "to": 16,
+          "sourcePage": 16,
+          "id": 3
+        },
+        {
+          "from": 17,
+          "to": 28,
+          "sourcePage": 16,
+          "id": 4
+        },
+        {
+          "from": 29,
+          "to": 53,
+          "sourcePage": 16,
+          "id": 5,
+          "sourceLabel": "پنجم و ششم و هفتم",
+          "note": "این ردیف منبع سیاق‌های پنجم تا هفتم را به‌صورت تجمیعی آورده است.",
+          "sourceSegments": [
+            [
+              29,
+              50
+            ],
+            [
+              51,
+              53
+            ]
+          ]
+        }
+      ],
+      "sourcePage": 16,
+      "sourceHeading": "سورة الشّ وری",
+      "group": [
+        42
+      ],
+      "status": "specified"
+    },
+    "43": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 14,
+          "sourcePage": 17,
+          "id": 1
+        },
+        {
+          "from": 15,
+          "to": 25,
+          "sourcePage": 17,
+          "id": 2
+        },
+        {
+          "from": 26,
+          "to": 45,
+          "sourcePage": 17,
+          "id": 3
+        },
+        {
+          "from": 46,
+          "to": 56,
+          "sourcePage": 17,
+          "id": 4
+        },
+        {
+          "from": 57,
+          "to": 65,
+          "sourcePage": 17,
+          "id": 5
+        },
+        {
+          "from": 66,
+          "to": 78,
+          "sourcePage": 17,
+          "id": 6
+        },
+        {
+          "from": 79,
+          "to": 89,
+          "sourcePage": 17,
+          "id": 7
+        }
+      ],
+      "sourcePage": 17,
+      "sourceHeading": "سورة الزخرف",
+      "group": [
+        43
+      ],
+      "status": "specified"
+    },
+    "44": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 8,
+          "sourcePage": 17,
+          "id": 1
+        },
+        {
+          "from": 9,
+          "to": 33,
+          "sourcePage": 17,
+          "id": 2
+        },
+        {
+          "from": 34,
+          "to": 57,
+          "sourcePage": 17,
+          "id": 3
+        },
+        {
+          "from": 58,
+          "to": 59,
+          "sourcePage": 17,
+          "id": 4
+        }
+      ],
+      "sourcePage": 17,
+      "sourceHeading": "سورة الدخان",
+      "group": [
+        44
+      ],
+      "status": "specified"
+    },
+    "45": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 13,
+          "sourcePage": 17,
+          "id": 1
+        },
+        {
+          "from": 14,
+          "to": 20,
+          "sourcePage": 17,
+          "id": 2
+        },
+        {
+          "from": 21,
+          "to": 35,
+          "sourcePage": 17,
+          "id": 3
+        },
+        {
+          "from": 36,
+          "to": 37,
+          "sourcePage": 17,
+          "id": 4
+        }
+      ],
+      "sourcePage": 17,
+      "sourceHeading": "سوره جاثیه",
+      "group": [
+        45
+      ],
+      "status": "specified"
+    },
+    "46": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 14,
+          "sourcePage": 17,
+          "id": 1
+        },
+        {
+          "from": 15,
+          "to": 20,
+          "sourcePage": 17,
+          "id": 2
+        },
+        {
+          "from": 21,
+          "to": 28,
+          "sourcePage": 17,
+          "id": 3
+        },
+        {
+          "from": 29,
+          "to": 32,
+          "sourcePage": 17,
+          "id": 4
+        },
+        {
+          "from": 33,
+          "to": 35,
+          "sourcePage": 17,
+          "id": 5
+        }
+      ],
+      "sourcePage": 17,
+      "sourceHeading": "سورة األحقاف",
+      "group": [
+        46
+      ],
+      "status": "specified"
+    },
+    "47": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 6,
+          "sourcePage": 17,
+          "id": 1
+        },
+        {
+          "from": 7,
+          "to": 15,
+          "sourcePage": 17,
+          "id": 2
+        },
+        {
+          "from": 16,
+          "to": 19,
+          "sourcePage": 17,
+          "id": 3
+        },
+        {
+          "from": 20,
+          "to": 28,
+          "sourcePage": 17,
+          "id": 4
+        },
+        {
+          "from": 29,
+          "to": 38,
+          "sourcePage": 17,
+          "id": 5
+        }
+      ],
+      "sourcePage": 17,
+      "sourceHeading": "سورة محمد",
+      "group": [
+        47
+      ],
+      "status": "specified"
+    },
+    "48": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 7,
+          "sourcePage": 17,
+          "id": 1
+        },
+        {
+          "from": 8,
+          "to": 19,
+          "sourcePage": 17,
+          "id": 2
+        },
+        {
+          "from": 20,
+          "to": 28,
+          "sourcePage": 17,
+          "id": 3
+        },
+        {
+          "from": 29,
+          "to": 29,
+          "sourcePage": 17,
+          "id": 4
+        }
+      ],
+      "sourcePage": 17,
+      "sourceHeading": "سورة الفتح",
+      "group": [
+        48
+      ],
+      "status": "specified"
+    },
+    "49": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 5,
+          "sourcePage": 18,
+          "id": 1
+        },
+        {
+          "from": 6,
+          "to": 12,
+          "sourcePage": 18,
+          "id": 2
+        },
+        {
+          "from": 13,
+          "to": 18,
+          "sourcePage": 18,
+          "id": 3
+        }
+      ],
+      "sourcePage": 18,
+      "sourceHeading": "سورة الحجرات",
+      "group": [
+        49
+      ],
+      "status": "specified"
+    },
+    "50": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 15,
+          "sourcePage": 18,
+          "id": 1
+        },
+        {
+          "from": 16,
+          "to": 35,
+          "sourcePage": 18,
+          "id": 2
+        },
+        {
+          "from": 36,
+          "to": 45,
+          "sourcePage": 18,
+          "id": 3
+        }
+      ],
+      "sourcePage": 18,
+      "sourceHeading": "سورة ق",
+      "group": [
+        50
+      ],
+      "status": "specified"
+    },
+    "51": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 6,
+          "sourcePage": 18,
+          "id": 1
+        },
+        {
+          "from": 7,
+          "to": 9,
+          "sourcePage": 18,
+          "id": 2
+        },
+        {
+          "from": 10,
+          "to": 19,
+          "sourcePage": 18,
+          "id": 3
+        },
+        {
+          "from": 20,
+          "to": 23,
+          "sourcePage": 18,
+          "id": 4
+        },
+        {
+          "from": 24,
+          "to": 46,
+          "sourcePage": 18,
+          "id": 5
+        },
+        {
+          "from": 47,
+          "to": 51,
+          "sourcePage": 18,
+          "id": 6
+        },
+        {
+          "from": 52,
+          "to": 55,
+          "sourcePage": 18,
+          "id": 7
+        },
+        {
+          "from": 56,
+          "to": 60,
+          "sourcePage": 18,
+          "id": 8
+        }
+      ],
+      "sourcePage": 18,
+      "sourceHeading": "سورة الذّ اریات",
+      "group": [
+        51
+      ],
+      "status": "specified"
+    },
+    "52": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 28,
+          "sourcePage": 18,
+          "id": 1
+        },
+        {
+          "from": 29,
+          "to": 49,
+          "sourcePage": 18,
+          "id": 2
+        }
+      ],
+      "sourcePage": 18,
+      "sourceHeading": "سورة الطور",
+      "group": [
+        52
+      ],
+      "status": "specified"
+    },
+    "53": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 30,
+          "sourcePage": 18,
+          "id": 1
+        },
+        {
+          "from": 31,
+          "to": 56,
+          "sourcePage": 18,
+          "id": 2
+        },
+        {
+          "from": 57,
+          "to": 62,
+          "sourcePage": 18,
+          "id": 3
+        }
+      ],
+      "sourcePage": 18,
+      "sourceHeading": "سورة النجم",
+      "group": [
+        53
+      ],
+      "status": "specified"
+    },
+    "54": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 8,
+          "sourcePage": 18,
+          "id": 1
+        },
+        {
+          "from": 9,
+          "to": 46,
+          "sourcePage": 18,
+          "id": 2
+        },
+        {
+          "from": 47,
+          "to": 55,
+          "sourcePage": 18,
+          "id": 3
+        }
+      ],
+      "sourcePage": 18,
+      "sourceHeading": "سورة القمر",
+      "group": [
+        54
+      ],
+      "status": "specified"
+    },
+    "55": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 13,
+          "sourcePage": 18,
+          "id": 1
+        },
+        {
+          "from": 14,
+          "to": 36,
+          "sourcePage": 18,
+          "id": 2
+        },
+        {
+          "from": 37,
+          "to": 78,
+          "sourcePage": 18,
+          "id": 3
+        }
+      ],
+      "sourcePage": 18,
+      "sourceHeading": "سورة الرمحن",
+      "group": [
+        55
+      ],
+      "status": "specified"
+    },
+    "56": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 48,
+          "sourcePage": 18,
+          "id": 1
+        },
+        {
+          "from": 49,
+          "to": 74,
+          "sourcePage": 18,
+          "id": 2
+        },
+        {
+          "from": 75,
+          "to": 96,
+          "sourcePage": 18,
+          "id": 3
+        }
+      ],
+      "sourcePage": 18,
+      "sourceHeading": "سورة الواقعة",
+      "group": [
+        56
+      ],
+      "status": "specified"
+    },
+    "57": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 6,
+          "sourcePage": 19,
+          "id": 1
+        },
+        {
+          "from": 7,
+          "to": 11,
+          "sourcePage": 19,
+          "id": 2
+        },
+        {
+          "from": 12,
+          "to": 15,
+          "sourcePage": 19,
+          "id": 3
+        },
+        {
+          "from": 16,
+          "to": 19,
+          "sourcePage": 19,
+          "id": 4
+        },
+        {
+          "from": 20,
+          "to": 24,
+          "sourcePage": 19,
+          "id": 5
+        },
+        {
+          "from": 25,
+          "to": 29,
+          "sourcePage": 19,
+          "id": 6
+        }
+      ],
+      "sourcePage": 19,
+      "sourceHeading": "سورة الحدید",
+      "group": [
+        57
+      ],
+      "status": "specified"
+    },
+    "58": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 4,
+          "sourcePage": 19,
+          "id": 1
+        },
+        {
+          "from": 5,
+          "to": 6,
+          "sourcePage": 19,
+          "id": 2
+        },
+        {
+          "from": 7,
+          "to": 10,
+          "sourcePage": 19,
+          "id": 3
+        },
+        {
+          "from": 11,
+          "to": 13,
+          "sourcePage": 19,
+          "id": 4
+        },
+        {
+          "from": 14,
+          "to": 22,
+          "sourcePage": 19,
+          "id": 5
+        }
+      ],
+      "sourcePage": 19,
+      "sourceHeading": "سورة ا جملادلة",
+      "group": [
+        58
+      ],
+      "status": "specified"
+    },
+    "59": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 4,
+          "sourcePage": 19,
+          "id": 1
+        },
+        {
+          "from": 5,
+          "to": 10,
+          "sourcePage": 19,
+          "id": 2
+        },
+        {
+          "from": 11,
+          "to": 17,
+          "sourcePage": 19,
+          "id": 3
+        },
+        {
+          "from": 18,
+          "to": 20,
+          "sourcePage": 19,
+          "id": 4
+        },
+        {
+          "from": 21,
+          "to": 21,
+          "sourcePage": 19,
+          "id": 5
+        },
+        {
+          "from": 22,
+          "to": 24,
+          "sourcePage": 19,
+          "id": 6
+        }
+      ],
+      "sourcePage": 19,
+      "sourceHeading": "س ورة لحشر",
+      "group": [
+        59
+      ],
+      "status": "specified"
+    },
+    "60": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 9,
+          "sourcePage": 19,
+          "id": 1
+        },
+        {
+          "from": 10,
+          "to": 13,
+          "sourcePage": 19,
+          "id": 2
+        }
+      ],
+      "sourcePage": 19,
+      "sourceHeading": "سورة ا ملمتحنة",
+      "group": [
+        60
+      ],
+      "status": "specified"
+    },
+    "61": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 1,
+          "sourcePage": 19,
+          "id": 1
+        },
+        {
+          "from": 2,
+          "to": 4,
+          "sourcePage": 19,
+          "id": 2
+        },
+        {
+          "from": 5,
+          "to": 9,
+          "sourcePage": 19,
+          "id": 3
+        },
+        {
+          "from": 10,
+          "to": 13,
+          "sourcePage": 19,
+          "id": 4
+        },
+        {
+          "from": 14,
+          "to": 14,
+          "sourcePage": 19,
+          "id": 5
+        }
+      ],
+      "sourcePage": 19,
+      "sourceHeading": "سورة ا لصف",
+      "group": [
+        61
+      ],
+      "status": "specified"
+    },
+    "62": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 4,
+          "sourcePage": 19,
+          "id": 1
+        },
+        {
+          "from": 5,
+          "to": 8,
+          "sourcePage": 19,
+          "id": 2
+        },
+        {
+          "from": 9,
+          "to": 11,
+          "sourcePage": 19,
+          "id": 3
+        }
+      ],
+      "sourcePage": 19,
+      "sourceHeading": "سورة لجمعة",
+      "group": [
+        62
+      ],
+      "status": "specified"
+    },
+    "63": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 8,
+          "sourcePage": 19,
+          "id": 1
+        },
+        {
+          "from": 9,
+          "to": 11,
+          "sourcePage": 19,
+          "id": 2
+        }
+      ],
+      "sourcePage": 19,
+      "sourceHeading": "سورة ا ملنافقون",
+      "group": [
+        63
+      ],
+      "status": "specified"
+    },
+    "64": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 13,
+          "sourcePage": 20,
+          "id": 1
+        },
+        {
+          "from": 14,
+          "to": 18,
+          "sourcePage": 20,
+          "id": 2
+        }
+      ],
+      "sourcePage": 20,
+      "sourceHeading": "سورة ا لتغابن",
+      "group": [
+        64
+      ],
+      "status": "specified"
+    },
+    "65": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 7,
+          "sourcePage": 20,
+          "id": 1
+        },
+        {
+          "from": 8,
+          "to": 12,
+          "sourcePage": 20,
+          "id": 2
+        }
+      ],
+      "sourcePage": 20,
+      "sourceHeading": "سورة ا لطال ق",
+      "group": [
+        65
+      ],
+      "status": "specified"
+    },
+    "66": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 5,
+          "sourcePage": 20,
+          "id": 1
+        },
+        {
+          "from": 6,
+          "to": 9,
+          "sourcePage": 20,
+          "id": 2
+        },
+        {
+          "from": 10,
+          "to": 12,
+          "sourcePage": 20,
+          "id": 3
+        }
+      ],
+      "sourcePage": 20,
+      "sourceHeading": "سورة ا لتحرمی",
+      "group": [
+        66
+      ],
+      "status": "specified"
+    },
+    "67": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 5,
+          "sourcePage": 20,
+          "id": 1
+        },
+        {
+          "from": 6,
+          "to": 12,
+          "sourcePage": 20,
+          "id": 2
+        },
+        {
+          "from": 13,
+          "to": 30,
+          "sourcePage": 20,
+          "id": 3
+        }
+      ],
+      "sourcePage": 20,
+      "sourceHeading": "سورة ا مللک",
+      "group": [
+        67
+      ],
+      "status": "specified"
+    },
+    "68": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 16,
+          "sourcePage": 20,
+          "id": 1
+        },
+        {
+          "from": 17,
+          "to": 33,
+          "sourcePage": 20,
+          "id": 2
+        },
+        {
+          "from": 34,
+          "to": 50,
+          "sourcePage": 20,
+          "id": 3
+        },
+        {
+          "from": 51,
+          "to": 52,
+          "sourcePage": 20,
+          "id": 4
+        }
+      ],
+      "sourcePage": 20,
+      "sourceHeading": "سورة ا لقل",
+      "group": [
+        68
+      ],
+      "status": "specified"
+    },
+    "69": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 3,
+          "sourcePage": 20,
+          "id": 1
+        },
+        {
+          "from": 4,
+          "to": 12,
+          "sourcePage": 20,
+          "id": 2
+        },
+        {
+          "from": 13,
+          "to": 37,
+          "sourcePage": 20,
+          "id": 3
+        },
+        {
+          "from": 38,
+          "to": 52,
+          "sourcePage": 20,
+          "id": 4
+        }
+      ],
+      "sourcePage": 20,
+      "sourceHeading": "سورة لحاقة",
+      "group": [
+        69
+      ],
+      "status": "specified"
+    },
+    "70": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 18,
+          "sourcePage": 20,
+          "id": 1
+        },
+        {
+          "from": 19,
+          "to": 35,
+          "sourcePage": 20,
+          "id": 2
+        },
+        {
+          "from": 36,
+          "to": 44,
+          "sourcePage": 20,
+          "id": 3
+        }
+      ],
+      "sourcePage": 20,
+      "sourceHeading": "سورة املعارج",
+      "group": [
+        70
+      ],
+      "status": "specified"
+    },
+    "71": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 28,
+          "sourcePage": 20,
+          "id": 1
+        }
+      ],
+      "sourcePage": 20,
+      "sourceHeading": "سورة ونح",
+      "group": [
+        71
+      ],
+      "status": "specified"
+    },
+    "72": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 19,
+          "sourcePage": 20,
+          "id": 1
+        },
+        {
+          "from": 20,
+          "to": 28,
+          "sourcePage": 20,
+          "id": 2
+        }
+      ],
+      "sourcePage": 20,
+      "sourceHeading": "سورة ّجن",
+      "group": [
+        72
+      ],
+      "status": "specified"
+    },
+    "73": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 14,
+          "sourcePage": 21,
+          "id": 1
+        },
+        {
+          "from": 15,
+          "to": 19,
+          "sourcePage": 21,
+          "id": 2
+        },
+        {
+          "from": 20,
+          "to": 20,
+          "sourcePage": 21,
+          "id": 3
+        }
+      ],
+      "sourcePage": 21,
+      "sourceHeading": "سورة امل زّ مّ ل",
+      "group": [
+        73
+      ],
+      "status": "specified"
+    },
+    "74": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 10,
+          "sourcePage": 21,
+          "id": 1
+        },
+        {
+          "from": 11,
+          "to": 37,
+          "sourcePage": 21,
+          "id": 2
+        },
+        {
+          "from": 38,
+          "to": 56,
+          "sourcePage": 21,
+          "id": 3
+        }
+      ],
+      "sourcePage": 21,
+      "sourceHeading": "سورة امل دّ ثّر",
+      "group": [
+        74
+      ],
+      "status": "specified"
+    },
+    "75": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 2,
+          "sourcePage": 21,
+          "id": 1
+        },
+        {
+          "from": 3,
+          "to": 35,
+          "sourcePage": 21,
+          "id": 2
+        },
+        {
+          "from": 36,
+          "to": 40,
+          "sourcePage": 21,
+          "id": 3
+        }
+      ],
+      "sourcePage": 21,
+      "sourceHeading": "سورة ال قیامة",
+      "group": [
+        75
+      ],
+      "status": "specified"
+    },
+    "76": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 4,
+          "sourcePage": 21,
+          "id": 1
+        },
+        {
+          "from": 5,
+          "to": 22,
+          "sourcePage": 21,
+          "id": 2
+        },
+        {
+          "from": 23,
+          "to": 31,
+          "sourcePage": 21,
+          "id": 3
+        }
+      ],
+      "sourcePage": 21,
+      "sourceHeading": "سورة اإل نسان",
+      "group": [
+        76
+      ],
+      "status": "specified"
+    },
+    "77": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 15,
+          "sourcePage": 21,
+          "id": 1
+        },
+        {
+          "from": 16,
+          "to": 28,
+          "sourcePage": 21,
+          "id": 2
+        },
+        {
+          "from": 29,
+          "to": 45,
+          "sourcePage": 21,
+          "id": 3
+        },
+        {
+          "from": 46,
+          "to": 50,
+          "sourcePage": 21,
+          "id": 4
+        }
+      ],
+      "sourcePage": 21,
+      "sourceHeading": "سورة امل رسالت",
+      "group": [
+        77
+      ],
+      "status": "specified"
+    },
+    "78": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 5,
+          "sourcePage": 21,
+          "id": 1
+        },
+        {
+          "from": 6,
+          "to": 16,
+          "sourcePage": 21,
+          "id": 2
+        },
+        {
+          "from": 17,
+          "to": 39,
+          "sourcePage": 21,
+          "id": 3
+        },
+        {
+          "from": 40,
+          "to": 40,
+          "sourcePage": 21,
+          "id": 4
+        }
+      ],
+      "sourcePage": 21,
+      "sourceHeading": "سورة ال نبأ",
+      "group": [
+        78
+      ],
+      "status": "specified"
+    },
+    "79": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 14,
+          "sourcePage": 21,
+          "id": 1
+        },
+        {
+          "from": 15,
+          "to": 26,
+          "sourcePage": 21,
+          "id": 2
+        },
+        {
+          "from": 27,
+          "to": 33,
+          "sourcePage": 21,
+          "id": 3
+        },
+        {
+          "from": 34,
+          "to": 41,
+          "sourcePage": 21,
+          "id": 4
+        },
+        {
+          "from": 42,
+          "to": 46,
+          "sourcePage": 21,
+          "id": 5
+        }
+      ],
+      "sourcePage": 21,
+      "sourceHeading": "سورة ال نازعات",
+      "group": [
+        79
+      ],
+      "status": "specified"
+    },
+    "80": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 16,
+          "sourcePage": 22,
+          "id": 1
+        },
+        {
+          "from": 17,
+          "to": 32,
+          "sourcePage": 22,
+          "id": 2
+        },
+        {
+          "from": 33,
+          "to": 42,
+          "sourcePage": 22,
+          "id": 3
+        }
+      ],
+      "sourcePage": 22,
+      "sourceHeading": "سورة عبس",
+      "group": [
+        80
+      ],
+      "status": "specified"
+    },
+    "81": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 14,
+          "sourcePage": 22,
+          "id": 1
+        },
+        {
+          "from": 15,
+          "to": 29,
+          "sourcePage": 22,
+          "id": 2
+        }
+      ],
+      "sourcePage": 22,
+      "sourceHeading": "سورة التکویر",
+      "group": [
+        81
+      ],
+      "status": "specified"
+    },
+    "82": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 5,
+          "sourcePage": 22,
+          "id": 1
+        },
+        {
+          "from": 6,
+          "to": 12,
+          "sourcePage": 22,
+          "id": 2
+        },
+        {
+          "from": 13,
+          "to": 19,
+          "sourcePage": 22,
+          "id": 3
+        }
+      ],
+      "sourcePage": 22,
+      "sourceHeading": "سورة اإلنفطار",
+      "group": [
+        82
+      ],
+      "status": "specified"
+    },
+    "83": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 28,
+          "sourcePage": 22,
+          "id": 1
+        },
+        {
+          "from": 29,
+          "to": 36,
+          "sourcePage": 22,
+          "id": 2
+        }
+      ],
+      "sourcePage": 22,
+      "sourceHeading": "سورة امل طففی",
+      "group": [
+        83
+      ],
+      "status": "specified"
+    },
+    "84": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 15,
+          "sourcePage": 22,
+          "id": 1
+        },
+        {
+          "from": 16,
+          "to": 25,
+          "sourcePage": 22,
+          "id": 2
+        }
+      ],
+      "sourcePage": 22,
+      "sourceHeading": "سورة اإلنشقاق",
+      "group": [
+        84
+      ],
+      "status": "specified"
+    },
+    "85": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 11,
+          "sourcePage": 22,
+          "id": 1
+        },
+        {
+          "from": 12,
+          "to": 22,
+          "sourcePage": 22,
+          "id": 2
+        }
+      ],
+      "sourcePage": 22,
+      "sourceHeading": "سورة الربوج",
+      "group": [
+        85
+      ],
+      "status": "specified"
+    },
+    "86": {
+      "ranges": [],
+      "sourcePage": 22,
+      "sourceHeading": "سورة الطارق و األلع",
+      "group": [
+        86,
+        87
+      ],
+      "status": "unspecified"
+    },
+    "87": {
+      "ranges": [],
+      "sourcePage": 22,
+      "sourceHeading": "سورة الطارق و األلع",
+      "group": [
+        86,
+        87
+      ],
+      "status": "unspecified"
+    },
+    "88": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 16,
+          "sourcePage": 22,
+          "id": 1
+        },
+        {
+          "from": 17,
+          "to": 26,
+          "sourcePage": 22,
+          "id": 2
+        }
+      ],
+      "sourcePage": 22,
+      "sourceHeading": "سورة الغاشیة",
+      "group": [
+        88
+      ],
+      "status": "specified"
+    },
+    "89": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 5,
+          "sourcePage": 22,
+          "id": 1
+        },
+        {
+          "from": 6,
+          "to": 14,
+          "sourcePage": 22,
+          "id": 2
+        },
+        {
+          "from": 15,
+          "to": 26,
+          "sourcePage": 22,
+          "id": 3
+        },
+        {
+          "from": 27,
+          "to": 30,
+          "sourcePage": 22,
+          "id": 4
+        }
+      ],
+      "sourcePage": 22,
+      "sourceHeading": "سورة الفجر",
+      "group": [
+        89
+      ],
+      "status": "specified"
+    },
+    "90": {
+      "ranges": [
+        {
+          "from": 1,
+          "to": 7,
+          "sourcePage": 22,
+          "id": 1
+        },
+        {
+          "from": 8,
+          "to": 20,
+          "sourcePage": 22,
+          "id": 2
+        }
+      ],
+      "sourcePage": 22,
+      "sourceHeading": "سورة البلد",
+      "group": [
+        90
+      ],
+      "status": "specified"
+    },
+    "91": {
+      "ranges": [],
+      "sourcePage": 22,
+      "sourceHeading": "سورة الشمس و اللیل",
+      "group": [
+        91,
+        92
+      ],
+      "status": "unspecified"
+    },
+    "92": {
+      "ranges": [],
+      "sourcePage": 22,
+      "sourceHeading": "سورة الشمس و اللیل",
+      "group": [
+        91,
+        92
+      ],
+      "status": "unspecified"
+    },
+    "93": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة الضحی و الشرح",
+      "group": [
+        93,
+        94
+      ],
+      "status": "unspecified"
+    },
+    "94": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة الضحی و الشرح",
+      "group": [
+        93,
+        94
+      ],
+      "status": "unspecified"
+    },
+    "95": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال تی و العلق",
+      "group": [
+        95,
+        96
+      ],
+      "status": "unspecified"
+    },
+    "96": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال تی و العلق",
+      "group": [
+        95,
+        96
+      ],
+      "status": "unspecified"
+    },
+    "97": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال قدر و ال بیّنة",
+      "group": [
+        97,
+        98
+      ],
+      "status": "unspecified"
+    },
+    "98": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال قدر و ال بیّنة",
+      "group": [
+        97,
+        98
+      ],
+      "status": "unspecified"
+    },
+    "99": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال زلزال و ال عادیات",
+      "group": [
+        99,
+        100
+      ],
+      "status": "unspecified"
+    },
+    "100": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال زلزال و ال عادیات",
+      "group": [
+        99,
+        100
+      ],
+      "status": "unspecified"
+    },
+    "101": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال قارعة و ال تکاثر",
+      "group": [
+        101,
+        102
+      ],
+      "status": "unspecified"
+    },
+    "102": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال قارعة و ال تکاثر",
+      "group": [
+        101,
+        102
+      ],
+      "status": "unspecified"
+    },
+    "103": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال عصر و اهل مزة و الفیل",
+      "group": [
+        103,
+        104,
+        105
+      ],
+      "status": "unspecified"
+    },
+    "104": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال عصر و اهل مزة و الفیل",
+      "group": [
+        103,
+        104,
+        105
+      ],
+      "status": "unspecified"
+    },
+    "105": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال عصر و اهل مزة و الفیل",
+      "group": [
+        103,
+        104,
+        105
+      ],
+      "status": "unspecified"
+    },
+    "106": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال قریش و امل اعون و الکوثر",
+      "group": [
+        106,
+        107,
+        108
+      ],
+      "status": "unspecified"
+    },
+    "107": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال قریش و امل اعون و الکوثر",
+      "group": [
+        106,
+        107,
+        108
+      ],
+      "status": "unspecified"
+    },
+    "108": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال قریش و امل اعون و الکوثر",
+      "group": [
+        106,
+        107,
+        108
+      ],
+      "status": "unspecified"
+    },
+    "109": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال کافرون و ال نصر و املسد",
+      "group": [
+        109,
+        110,
+        111
+      ],
+      "status": "unspecified"
+    },
+    "110": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال کافرون و ال نصر و املسد",
+      "group": [
+        109,
+        110,
+        111
+      ],
+      "status": "unspecified"
+    },
+    "111": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة ال کافرون و ال نصر و املسد",
+      "group": [
+        109,
+        110,
+        111
+      ],
+      "status": "unspecified"
+    },
+    "112": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة اإل خالص و ال فلق و الناس",
+      "group": [
+        112,
+        113,
+        114
+      ],
+      "status": "unspecified"
+    },
+    "113": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة اإل خالص و ال فلق و الناس",
+      "group": [
+        112,
+        113,
+        114
+      ],
+      "status": "unspecified"
+    },
+    "114": {
+      "ranges": [],
+      "sourcePage": 23,
+      "sourceHeading": "سورة اإل خالص و ال فلق و الناس",
+      "group": [
+        112,
+        113,
+        114
+      ],
+      "status": "unspecified"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import type { SurahData, Word } from './quran'
+import { nextContext } from './contexts'
 
-export type AnalysisTab = 'root' | 'form' | 'word' | 'verse'
+export type AnalysisTab = 'root' | 'form' | 'word' | 'verse' | 'context'
 export interface AnalysisSelection {
   tab: AnalysisTab
   s: number
@@ -20,6 +21,7 @@ export function matchesAnalysis(selection: AnalysisSelection | null | undefined,
     case 'form': return !!selection.form && word.form === selection.form
     case 'word': return selection.a === a && selection.pos === pos
     case 'verse': return selection.a === a
+    case 'context': return selection.from !== undefined && selection.to !== undefined && a >= selection.from && a <= selection.to
   }
 }
 
@@ -36,6 +38,10 @@ export function analysisOccurrences(surah: SurahData, selection: AnalysisSelecti
 
 /** Each tab navigates its own unit, preserving the other tabs' targets. */
 export function nextAnalysisLocation(surah: SurahData, selection: AnalysisSelection, direction: number): [number, number] | null {
+  if (selection.tab === 'context') {
+    const next = nextContext(selection.s, selection.a, direction)
+    return next ? [next.from, 1] : null
+  }
   if (selection.tab === 'verse') return [Math.max(1, Math.min(surah.vc, selection.a + direction)), 1]
   const units: { key: string; location: [number, number] }[] = []
   const seen = new Set<string>()
