@@ -137,7 +137,8 @@ export default function RootPanel({
     const verse = surah.v.find(v => v.n === a)
     const word = verse?.w[pos - 1]
     if (!word || !verse) return
-    setTargets(current => ({ ...current, [tab]: { s: sel.s, a, pos, text: word.t, root: word.r ?? null } }))
+    const target = { s: sel.s, a, pos, text: word.t, root: word.r ?? null }
+    setTargets(current => ({ ...current, [tab]: target, ...(tab === 'root' ? { form: target } : {}) }))
     onJump(sel.s, a, pos, verse.p)
   }
 
@@ -327,7 +328,7 @@ export default function RootPanel({
                   </p>
                   <div className="flex flex-col mb-4">
                     {stats.top.map(d => (
-                      <button key={d.s} className="dist-row" onClick={() => { loadSurah(d.s).then(data => { const occurrence = data.ri[root]?.[0]; if (!occurrence) return; const [a, pos] = occurrence; const w = data.v[a - 1].w[pos - 1]; setTargets(current => ({ ...current, root: { s: d.s, a, pos, text: w.t, root } })); onJump(d.s, a, pos, data.v[a - 1].p) }) }}>
+                      <button key={d.s} className="dist-row" onClick={() => { loadSurah(d.s).then(data => { const occurrence = data.ri[root]?.[0]; if (!occurrence) return; const [a, pos] = occurrence; const w = data.v[a - 1].w[pos - 1]; setTargets(current => { const target = { s: d.s, a, pos, text: w.t, root }; return { ...current, root: target, form: target } }); onJump(d.s, a, pos, data.v[a - 1].p) }) }}>
                         <span className="text-xs w-16 text-right flex-none" style={{ color: d.s === sel.s ? 'var(--ink)' : 'var(--ink-soft)', fontWeight: d.s === sel.s ? 700 : 400 }}>
                           {meta.surahs[d.s - 1]?.fa}
                         </span>
