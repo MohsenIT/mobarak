@@ -5,6 +5,7 @@ import { matchesAnalysis, nextAnalysisLocation, type AnalysisSelection } from '.
 import meta from '../../public/data/meta.json'
 import shura from '../../public/data/surah/42.json'
 import type { SurahData } from './quran'
+const shuraData: SurahData = { ...shura, ri: Object.fromEntries(Object.entries(shura.ri).map(([root, occurrences]) => [root, occurrences.map(([a, pos]) => [a, pos] as [number, number])])) }
 
 test('every explicit source partition covers its surah exactly once', () => {
   let count = 0
@@ -41,7 +42,7 @@ test('context navigation and highlighting stay within the provided boundaries', 
   expect(nextContext(2, 27, 1)).toMatchObject({ from: 28, to: 39 })
   expect(nextContext(2, 1, -1)).toMatchObject({ from: 1, to: 27 })
   const selection: AnalysisSelection = { tab: 'context', s: 42, a: 1, pos: 1, root: null, text: '', from: 1, to: 6 }
-  expect(nextAnalysisLocation(shura as SurahData, selection, 1)).toEqual([7, 1])
+  expect(nextAnalysisLocation(shuraData, selection, 1)).toEqual([7, 1])
   expect(matchesAnalysis(selection, 42, 6, 2, { t: '', l: null })).toBe(true)
   expect(matchesAnalysis(selection, 42, 7, 1, { t: '', l: null })).toBe(false)
   expect(matchesAnalysis({ ...selection, from: undefined, to: undefined }, 42, 1, 1, { t: '', l: null })).toBe(false)

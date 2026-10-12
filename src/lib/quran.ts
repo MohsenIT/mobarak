@@ -1,3 +1,4 @@
+import formNames from '../../public/data/form-names.json'
 // Data layer: lazy-loading + caching for quran datasets
 
 export interface Word {
@@ -16,7 +17,7 @@ export interface Verse {
 
 export interface SurahData {
   n: number
-  ar: string
+  ar: string | null
   fa: string
   vc: number
   v: Verse[]
@@ -86,6 +87,11 @@ const FORM_LABELS: Record<string, string> = {
 
 export function morphologyLabel(form: string): string {
   return FORM_LABELS[form] ?? `ساخت ${form}`
+}
+
+export function formName(root: string | null, form?: string): string | undefined {
+  if (!root || !form) return undefined
+  return (formNames as Record<string, string[]>)[`${root}:${form}`]?.[0]
 }
 
 export interface SharedRoot {

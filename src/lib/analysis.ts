@@ -18,7 +18,7 @@ export function matchesAnalysis(selection: AnalysisSelection | null | undefined,
   if (!selection || selection.s !== s) return false
   switch (selection.tab) {
     case 'root': return !!selection.root && word.r === selection.root
-    case 'form': return !!selection.form && word.form === selection.form
+    case 'form': return !!selection.form && !!selection.root && word.form === selection.form && word.r === selection.root
     case 'word': return selection.a === a && selection.pos === pos
     case 'verse': return selection.a === a
     case 'context': return selection.from !== undefined && selection.to !== undefined && a >= selection.from && a <= selection.to
@@ -46,6 +46,7 @@ export function nextAnalysisLocation(surah: SurahData, selection: AnalysisSelect
   const units: { key: string; location: [number, number] }[] = []
   const seen = new Set<string>()
   for (const verse of surah.v) for (const [i, word] of verse.w.entries()) {
+    if (selection.tab === 'form' && word.r !== selection.root) continue
     const key = selection.tab === 'root' ? word.r : selection.tab === 'form' ? word.form : `${verse.n}:${i + 1}`
     if (!key || seen.has(key)) continue
     seen.add(key)

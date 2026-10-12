@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import type { SurahData, Translations } from '@/lib/quran'
-import { morphologyLabel, toFa } from '@/lib/quran'
+import { morphologyLabel, formName, toFa } from '@/lib/quran'
 import { analysisOccurrences, type AnalysisSelection, type AnalysisTab } from '@/lib/analysis'
 import QuranText from './QuranText'
 
-type Index = { words: Record<string, Record<string, number>>; forms: Record<string, Record<string, number>> }
+type Index = { words: Record<string, Record<string, number>>; forms: Record<string, Record<string, number>>; rootForms: Record<string, Record<string, number>> }
 let indexPromise: Promise<Index> | null = null
 function loadIndex() {
   if (!indexPromise) indexPromise = fetch('/data/analysis-index.json').then(r => { if (!r.ok) throw new Error('analysis index'); return r.json() }).catch(e => { indexPromise = null; throw e })
@@ -38,7 +38,7 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
     return [...result.entries()]
   }, [occurrences])
   const verse = surah.v.find(v => v.n === selection.a)
-  const distribution = tab === 'word' ? index?.words[selection.text] : selection.form ? index?.forms[selection.form] : undefined
+  const distribution = tab === 'word' ? index?.words[selection.text] : selection.form ? index?.rootForms[`${selection.root}:${selection.form}`] : undefined
   const total = distribution ? Object.values(distribution).reduce((a, b) => a + b, 0) : null
   const distinctRoots = new Set(occurrences.map(([a, pos]) => surah.v[a - 1].w[pos - 1].r).filter(Boolean)).size
 
@@ -48,8 +48,8 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
     <>
       {tab === 'form' && (
         <div className="rounded-xl border p-3 mb-3 text-sm" style={{ borderColor: 'var(--line)' }}>
-          <p>باب / ساخت صرفی: <b>{morphologyLabel(selection.form!)}</b> <span dir="ltr">({selection.form})</span></p>
-          <p className="text-xs leading-6 mt-1">واژه‌های دارای همین باب در این سوره، با هر ریشه‌ای، انتخاب شده‌اند.</p>
+          <p>{formName(selection.root, selection.form) && <b>{formName(selection.root, selection.form)} · </b>}باب / ساخت صرفی: <b>{morphologyLabel(selection.form!)}</b> <span dir="ltr">({selection.form})</span></p>
+          <p className="text-xs leading-6 mt-1">واژه‌های همین ریشه در همین باب انتخاب شده‌اند.</p>
           <a className="text-xs underline" href="https://corpus.quran.com" target="_blank" rel="noreferrer">Quranic Arabic Corpus</a>{' · '}
           <a className="text-xs underline" href="/data/morphology-source.txt" target="_blank" rel="noreferrer">حقوق و مشخصات داده</a>
         </div>

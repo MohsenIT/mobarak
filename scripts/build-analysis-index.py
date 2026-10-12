@@ -5,6 +5,7 @@ from collections import defaultdict
 root = Path(__file__).resolve().parents[1]
 words = defaultdict(dict)
 forms = defaultdict(dict)
+root_forms = defaultdict(dict)
 for n in range(1, 115):
     data = json.loads((root / f'public/data/surah/{n}.json').read_text())
     for verse in data['v']:
@@ -13,5 +14,8 @@ for n in range(1, 115):
             if word.get('form'):
                 form = word['form']
                 forms[form][str(n)] = forms[form].get(str(n), 0) + 1
-(root / 'public/data/analysis-index.json').write_text(json.dumps({'words': words, 'forms': forms}, ensure_ascii=False, separators=(',', ':')) + '\n')
+                if word.get('r'):
+                    key = f"{word['r']}:{form}"
+                    root_forms[key][str(n)] = root_forms[key].get(str(n), 0) + 1
+(root / 'public/data/analysis-index.json').write_text(json.dumps({'words': words, 'forms': forms, 'rootForms': root_forms}, ensure_ascii=False, separators=(',', ':')) + '\n')
 print(f'Indexed {len(words)} exact words and {len(forms)} annotated forms.')

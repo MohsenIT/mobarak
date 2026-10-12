@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { SurahData, Translations, Meta } from '@/lib/quran'
-import { loadGlobalRoots, loadSurah, loadTrans, keywordScore, keywordTier, spacedRoot, toFa, morphologyLabel } from '@/lib/quran'
+import { loadGlobalRoots, loadSurah, loadTrans, keywordScore, keywordTier, spacedRoot, toFa, morphologyLabel, formName } from '@/lib/quran'
 import type { Selection } from './MushafPage'
 import { nextAnalysisLocation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
 import SelectionDetails from './SelectionDetails'
@@ -33,6 +33,8 @@ interface Props {
   stackedOverIndex?: boolean
 }
 
+const TABS = [['root', 'ریشه'], ['form', 'باب'], ['word', 'واژه'], ['verse', 'آیه'], ['context', 'سیاق']] as const
+
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
 export default function RootPanel({
@@ -47,6 +49,8 @@ export default function RootPanel({
   const [trans, setTrans] = useState<Translations | null>(null)
   const [sheetH, setSheetH] = useState(46)
   const dragRef = useRef<{ y: number; h: number } | null>(null)
+  const [formAvailable, setFormAvailable] = useState<boolean | null>(null)
+  const swipeStart = useRef<{ x: number; y: number } | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -57,6 +61,29 @@ export default function RootPanel({
     loadGlobalRoots().then(r => live && setGlobalRoots(r))
     return () => { live = false }
   }, [sel.s])
+
+  const formTarget = targets.form
+  useEffect(() => {
+    let live = true
+    setFormAvailable(null)
+    loadSurah(formTarget.s).then(data => {
+      if (live) setFormAvailable(!!data.v[formTarget.a - 1]?.w[formTarget.pos - 1]?.form && !!formTarget.root)
+    }).catch(() => { if (live) setFormAvailable(false) })
+    return () => { live = false }
+  }, [formTarget])
+
+  const switchTab = (key: AnalysisTab) => {
+    if (key === 'form' && !formAvailable) return
+    setTab(key)
+    const target = targets[key]
+    loadSurah(target.s).then(data => onJump(target.s, target.a, target.pos, data.v[target.a - 1].p))
+  }
+  const moveTab = (direction: number) => {
+    const available = TABS.filter(([key]) => key !== 'form' || formAvailable)
+    const index = available.findIndex(([key]) => key === tab)
+    const next = available[index + direction]
+    if (next) switchTab(next[0])
+  }
 
   const root = sel.root
 
@@ -172,9 +199,21 @@ export default function RootPanel({
       <div
         ref={panelRef}
         className={panelClass}
+        onTouchStart={event => {
+          if (event.touches.length !== 1 || (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, .panel-handle'))) { swipeStart.current = null; return }
+          swipeStart.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }
+        }}
+        onTouchEnd={event => {
+          const start = swipeStart.current; swipeStart.current = null
+          if (!start || !event.changedTouches[0]) return
+          const dx = event.changedTouches[0].clientX - start.x
+          const dy = event.changedTouches[0].clientY - start.y
+          if (Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy) * 1.3) { event.preventDefault(); moveTab(dx > 0 ? 1 : -1) }
+        }}
+        onTouchCancel={() => { swipeStart.current = null }}
         role="dialog"
         aria-label="تحلیل ریشه کلمه"
-        style={!maximized ? { ['--sheet-h' as string]: `${sheetH}dvh` } : undefined}
+        style={{ touchAction: 'pan-y', ...(!maximized ? { ['--sheet-h' as string]: `${sheetH}dvh` } : {}) }}
       >
         <div className="panel-handle" onPointerDown={onHandleDown} />
 
@@ -182,15 +221,9 @@ export default function RootPanel({
             Everything on ONE line — no wrapping. Word and root must sit
             side-by-side (user complained the root was wrapping to a 2nd line). */}
         <div className="panel-header" style={{ borderColor: 'var(--line)' }}>
-          <span className={`${tab === 'verse' || tab === 'context' ? '' : 'font-quran '}panel-word`} dir="rtl">
-            {tab === 'context' ? (selectedContext ? `سیاق ${toFa(selectedContext.id)}` : 'سیاق') : tab === 'verse' ? `آیه ${toFa(sel.a)}` : <QuranText text={sel.text} />}
+          <span className={`${tab === 'verse' || tab === 'context' || tab === 'form' ? '' : 'font-quran '}panel-word`} dir="rtl">
+            {tab === 'root' && root ? spacedRoot(root) : tab === 'form' ? `${formName(root, selectedForm) ?? ''} (${selectedForm ? morphologyLabel(selectedForm) : 'باب'})` : tab === 'context' ? (selectedContext ? `سیاق ${toFa(selectedContext.id)}` : 'سیاق') : tab === 'verse' ? `آیه ${toFa(sel.a)}` : <QuranText text={sel.text} />}
           </span>
-          {tab === 'root' && root && (
-            <span className="root-inline" dir="rtl">
-              <IconRoot />
-              <span className="font-quran root-letters">{spacedRoot(root)}</span>
-            </span>
-          )}
           <span className="chip panel-chip hidden sm:inline-flex">سوره {meta.surahs[sel.s - 1]?.fa} · آیه {toFa(sel.a)}</span>
           <div className="panel-actions">
             <button className="icon-btn sm" onClick={onOpenIndex} title="فهرست کلیدواژه‌های سوره" aria-label="فهرست کلیدواژه‌های سوره">
@@ -207,9 +240,11 @@ export default function RootPanel({
         </div>
 
         <div className="flex border-b px-2" role="tablist" aria-label="نوع تحلیل" style={{ borderColor: 'var(--line)' }}>
-          {([['root', 'ریشه'], ['form', 'باب'], ['word', 'واژه'], ['verse', 'آیه'], ['context', 'سیاق']] as const).map(([key, label]) => (
+          {TABS.map(([key, label]) => (
             <button key={key} role="tab" id={`analysis-tab-${key}`} aria-controls={`analysis-panel-${key}`} aria-selected={tab === key}
-              className={`tab-btn flex-1${tab === key ? ' active' : ''}`} onClick={() => { setTab(key); const target = targets[key]; loadSurah(target.s).then(d => onJump(target.s, target.a, target.pos, d.v[target.a - 1].p)) }}>{label}</button>
+              disabled={key === 'form' && !formAvailable}
+              title={key === 'form' && !formAvailable ? (formAvailable === null ? 'در حال بارگیری باب واژه' : 'برای این واژه باب ثبت نشده است') : undefined}
+              className={`tab-btn flex-1${tab === key ? ' active' : ''}`} onClick={() => switchTab(key)}>{label}</button>
           ))}
         </div>
         <div className="flex items-center justify-between px-4 py-2 text-xs border-b" style={{ borderColor: 'var(--line)' }}>

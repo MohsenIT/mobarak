@@ -50,7 +50,9 @@ Words with morphological annotations include an optional `form` field in
 `public/data/surah/*.json`. Forms are imported by exact surah, verse, and word
 location from Quranic Arabic Corpus 0.4, with word counts and roots checked
 before writing. Unmarked verbs use form I; unmarked nouns are left unset.
-Derived participles retain their annotated form. The word analysis panel shows
+Derived participles retain their annotated form. The form tab groups the selected
+root within its form, disables unannotated words, and supports horizontal swipes
+between enabled tabs. The word analysis panel shows
 the form and links to the source and copyright notices.
 
 The original, unmodified corpus is in `data/quranic-corpus-morphology-0.4.txt`.
@@ -70,7 +72,8 @@ measures, not claims of semantic equivalence.
 
 The analysis sheet has five tabs: root, morphology form, word, verse, and context.
 Each tab preserves its own location while other tabs navigate. Root/form
-navigation moves between distinct roots/forms in order of first appearance;
+navigation moves between distinct roots/forms in order of first appearance
+(form navigation stays within the selected root);
 word navigation moves one word at a time; verse navigation moves one verse at
 a time. Main-text selection follows the active tab. Context navigation uses the supplied PDF boundaries.
 
@@ -95,3 +98,9 @@ Regenerate with `python3 scripts/import-contexts.py` (requires PyMuPDF). The
 importer verifies the source digest, handles reviewed compound RTL cells, and
 checks complete nonoverlapping verse coverage for every explicit partition.
 Run `bun test src/lib/contexts.test.ts` to validate boundaries and navigation.
+
+`form-names.json` contains verbal-noun names attested in the morphology source,
+plus the explicit examples إلقاء / تعليم / تعلّم / استعلام. Regenerate it with
+`python3 scripts/build-form-names.py`. When no verbal-noun name is available,
+the app shows the recorded form name rather than guessing a masdar. Rebuild
+`analysis-index.json` for root-and-form counts with `python3 scripts/build-analysis-index.py`.
