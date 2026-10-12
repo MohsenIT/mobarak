@@ -39,8 +39,12 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
       </div>
       <p ref={textRef} className="font-quran text-justify mt-2" dir="rtl"
         style={{ fontSize, lineHeight: 2.05, color: 'var(--ink)' }}>
-        {surah.v.map(v => (
-          <span key={v.n} className={analysisSelection && (analysisSelection.tab === 'verse' || analysisSelection.tab === 'context') && matchesAnalysis(analysisSelection, surah.n, v.n, 1, v.w[0]) ? 'analysis-range' : undefined}>
+        {surah.v.map(v => {
+          const isRange = analysisSelection && (analysisSelection.tab === 'verse' || analysisSelection.tab === 'context') && matchesAnalysis(analysisSelection, surah.n, v.n, 1, v.w[0])
+          const continues = isRange && v.n < surah.vc && matchesAnalysis(analysisSelection, surah.n, v.n + 1, 1, v.w[0])
+          return (
+          <span key={v.n}>
+          <span className={isRange ? 'analysis-range' : undefined}>
             {v.w.map((w, i) => {
               const isFlash = flash && flash.s === surah.n && flash.a === v.n && flash.pos === i + 1
               const isSelected = selection?.s === surah.n && selection.a === v.n && selection.pos === i + 1
@@ -58,9 +62,10 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
                 </span>
               )
             })}
-            <AyahMarker n={v.n} />{' '}
+            <AyahMarker n={v.n} />{continues ? ' ' : null}
+          </span>{!continues ? ' ' : null}
           </span>
-        ))}
+        )})}
       </p>
 
       {showTrans && trans && (
