@@ -118,8 +118,9 @@ Tanzil. The unmodified input is in `data/translations/fa-safavi.json`; source
 metadata and digest are in `public/data/translation-sources.json`. Run
 `python3 scripts/import-translation.py data/translations/fa-safavi.json s` to
 regenerate the per-surah files. The source has 6236 positions with one empty
-entry at 80:39. That absence is displayed explicitly; no other translator's
-text is silently substituted.
+entry at 80:39. The user supplied «خندان و شادمانند» for that verse; the
+correction is recorded separately in `data/translations/corrections.json` and
+applied during import. The original input and its digest remain unchanged.
 
 Maleki (Payamresan) and Mousavi Hamadani (al-Mizan, Jame'e Modarresin edition)
 remain pending complete, verified verse-aligned source texts. They are not
