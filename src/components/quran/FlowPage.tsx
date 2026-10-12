@@ -14,13 +14,14 @@ interface Props {
   translator: 'a' | 'f' | 'm'
   fontSize: number
   selection: Selection | null
+  comparisonRange?: { s: number; from: number; to: number } | null
   highlightRoot: string | null
   flash: { s: number; a: number; pos: number } | null
   onWordTap: (sel: Selection) => void
 }
 
 /** Continuous, flowing surah view (متن پیوسته) */
-export default function FlowPage({ sm, surah, trans, showTrans, translator, fontSize, selection, highlightRoot, flash, onWordTap }: Props) {
+export default function FlowPage({ sm, surah, trans, showTrans, translator, fontSize, selection, highlightRoot, comparisonRange, flash, onWordTap }: Props) {
   return (
     <div>
       <div style={{ fontSize: fontSize * 1.12 }}>
@@ -38,7 +39,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
               return (
                 <span key={i}>
                   <span
-                    className={`quran-word${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSelected ? ' selected-word' : ''}`}
+                    className={`quran-word${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === surah.n ? (v.n >= comparisonRange.from && v.n <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isSelected ? ' selected-word' : ''}`}
                     aria-current={isSelected ? 'true' : undefined}
                     onClick={() => onWordTap({ s: surah.n, a: v.n, pos: i + 1, text: w.t, root: w.r ?? null })}
                   ><QuranText text={w.t} /></span>{' '}

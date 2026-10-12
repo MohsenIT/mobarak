@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  async redirects() {
+    return [{ source: '/s=:surah(\\d+)', destination: '/?s=:surah', permanent: false }]
+  },
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,

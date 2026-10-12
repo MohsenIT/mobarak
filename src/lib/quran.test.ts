@@ -1,3 +1,4 @@
+/// <reference types="bun-types" />
 import { describe, expect, test } from 'bun:test'
 import { compareRootRange, morphologyLabel, type SurahData } from './quran'
 import { readFileSync } from 'node:fs'
@@ -5,9 +6,9 @@ import { readFileSync } from 'node:fs'
 const fixture: SurahData = {
   n: 1, ar: '', fa: '', vc: 3,
   v: [
-    { n: 1, p: 1, j: 1, w: [{ t: 'a' }, { t: 'b' }] },
-    { n: 2, p: 1, j: 1, w: [{ t: 'c' }, { t: 'd' }] },
-    { n: 3, p: 1, j: 1, w: [{ t: 'e' }, { t: 'f' }] },
+    { n: 1, p: 1, j: 1, w: [{ l: null, t: 'a' }, { l: null, t: 'b' }] },
+    { n: 2, p: 1, j: 1, w: [{ l: null, t: 'c' }, { l: null, t: 'd' }] },
+    { n: 3, p: 1, j: 1, w: [{ l: null, t: 'e' }, { l: null, t: 'f' }] },
   ],
   ri: { shared: [[1, 1], [1, 2], [3, 1]], within: [[1, 1]], outside: [[2, 1]] },
 }

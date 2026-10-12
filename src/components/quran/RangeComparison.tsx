@@ -8,6 +8,7 @@ import { IconClose } from './Ornaments'
 interface Props {
   surahN: number
   meta: Meta
+  onRangeChange: (range: { s: number; from: number; to: number } | null) => void
   onClose: () => void
   onPickRoot: (root: string) => void
 }
@@ -18,7 +19,7 @@ function parseVerse(value: string) {
   return /^\d+$/.test(normalized) ? Number(normalized) : NaN
 }
 
-export default function RangeComparison({ surahN, meta, onClose, onPickRoot }: Props) {
+export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onRangeChange }: Props) {
   const [surah, setSurah] = useState<SurahData | null>(null)
   const [roots, setRoots] = useState<Record<string, Record<string, number>> | null>(null)
   const [error, setError] = useState(false)
@@ -40,6 +41,10 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot }: P
   const valid = fromText.trim() !== '' && toText.trim() !== '' &&
     Number.isInteger(from) && Number.isInteger(to) && from >= 1 && to <= vc && from <= to
   const whole = valid && from === 1 && to === vc
+  useEffect(() => {
+    onRangeChange(valid && !whole ? { s: surahN, from, to } : null)
+  }, [valid, whole, surahN, from, to, onRangeChange])
+
   const rows = useMemo(() => {
     if (!surah || !roots || !valid || whole) return []
     const result = compareRootRange(surah, roots, from, to)

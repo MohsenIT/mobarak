@@ -8,6 +8,7 @@ import QuranText from './QuranText'
 import { IconClose, IconMaximize, IconRestore, IconRoot, IconSortIndex } from './Ornaments'
 
 interface Props {
+  comparisonRange?: { s: number; from: number; to: number } | null
   sel: Selection
   meta: Meta
   translator: 'a' | 'f' | 'm'
@@ -31,7 +32,7 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
 export default function RootPanel({
   sel, meta, translator, maximized, onToggleMax, onOpenIndex, onClose, onJump, onJumpSurah,
-  stackedOverIndex = false,
+  stackedOverIndex = false, comparisonRange,
 }: Props) {
   const [surah, setSurah] = useState<SurahData | null>(null)
   const [globalRoots, setGlobalRoots] = useState<Record<string, Record<string, number>> | null>(null)
@@ -267,6 +268,7 @@ export default function RootPanel({
                 </p>
               )}
 
+              {comparisonRange?.s === sel.s && <p className="text-xs mb-3"><span className="range-inside rounded px-2 py-1">درون بازه</span>{' · '}<span className="range-outside rounded px-2 py-1">بیرون بازه</span></p>}
               {surah && (
                 <>
                   <p className="text-xs mb-2 font-medium" style={{ color: 'var(--ink-faint)' }}>
@@ -285,7 +287,7 @@ export default function RootPanel({
                           <span className="font-quran" dir="rtl" style={{ fontSize: 19, lineHeight: 1.9, color: 'var(--ink)' }}>
                             {verse.w.map((w, i) => (
                               <span key={i}>
-                                <span className={poses.includes(i + 1) ? 'hl' : ''}>
+                                <span className={poses.includes(i + 1) ? `hl${comparisonRange?.s === sel.s ? (ayah >= comparisonRange.from && ayah <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}` : ''}>
                                   <QuranText text={w.t} />
                                 </span>{' '}
                               </span>

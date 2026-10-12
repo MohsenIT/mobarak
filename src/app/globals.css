@@ -1038,3 +1038,9 @@ input[type='range'].page-slider::-moz-range-thumb {
   border-radius: 20px 20px 0 0;
   animation: fadeIn 0.22s ease both;
 }
+
+/* Range colors also override selected/flash word backgrounds. */
+.range-inside, .quran-word.range-inside { background: #c9e4cb; color: #173e25; }
+.range-outside, .quran-word.range-outside { background: #f2d6ae; color: #583710; }
+[data-theme="night"] .range-inside { background: #28543a; color: #e2f4e6; }
+[data-theme="night"] .range-outside { background: #6a4826; color: #ffecd3; }

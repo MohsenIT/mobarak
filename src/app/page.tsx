@@ -34,8 +34,18 @@ export default function Home() {
     const fromUrl = q ? parseInt(q, 10) : NaN
     return clamp(Number.isFinite(fromUrl) ? fromUrl : LS.get('mushaf.page', 1), 1, 604)
   })
-  const [mode, setMode] = useState<'mushaf' | 'flow'>(() => LS.get('mushaf.mode', 'flow'))
-  const [surah, setSurah] = useState(() => LS.get('mushaf.surah', 1))
+  const [mode, setMode] = useState<'mushaf' | 'flow'>(() => {
+    if (typeof window !== 'undefined') {
+      const query = new URLSearchParams(window.location.search)
+      if (query.has('s')) return 'flow'
+      if (query.has('p')) return 'mushaf'
+    }
+    return LS.get('mushaf.mode', 'flow')
+  })
+  const [surah, setSurah] = useState(() => {
+    const value = typeof window !== 'undefined' ? Number(new URLSearchParams(window.location.search).get('s')) : NaN
+    return Number.isInteger(value) && value >= 1 && value <= 114 ? value : LS.get('mushaf.surah', 1)
+  })
   const [showTrans, setShowTrans] = useState(() => LS.get('mushaf.showTrans', false))
   const [theme, setTheme] = useState<'paper' | 'night'>(() => LS.get('mushaf.theme', 'paper'))
   const [translator, setTranslator] = useState<Translator>(() => LS.get('mushaf.tr', 'f'))
@@ -53,6 +63,7 @@ export default function Home() {
   const [showIndex, setShowIndex] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
   const [comparisonSurah, setComparisonSurah] = useState(1)
+  const [comparisonRange, setComparisonRange] = useState<{ s: number; from: number; to: number } | null>(null)
 
   const frameRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
@@ -64,9 +75,10 @@ export default function Home() {
   useEffect(() => {
     LS.set('mushaf.page', page)
     const url = new URL(window.location.href)
-    url.searchParams.set('p', String(page))
+    url.searchParams.delete(mode === 'flow' ? 'p' : 's')
+    url.searchParams.set(mode === 'flow' ? 's' : 'p', String(mode === 'flow' ? surah : page))
     window.history.replaceState(null, '', url.toString())
-  }, [page])
+  }, [page, mode, surah])
   useEffect(() => { LS.set('mushaf.mode', mode) }, [mode])
   useEffect(() => { LS.set('mushaf.surah', surah) }, [surah])
   useEffect(() => { LS.set('mushaf.showTrans', showTrans) }, [showTrans])
@@ -427,6 +439,7 @@ export default function Home() {
                       fontSize={mushafFont}
                       selection={sel}
                       highlightRoot={sel?.root ?? null}
+                    comparisonRange={showComparison ? comparisonRange : null}
                       flash={flash}
                       onWordTap={tapWord}
                     />
@@ -449,6 +462,7 @@ export default function Home() {
                     fontSize={flowFont}
                     selection={sel}
                       highlightRoot={sel?.root ?? null}
+                    comparisonRange={showComparison ? comparisonRange : null}
                     flash={flash}
                     onWordTap={tapWord}
                   />
@@ -473,6 +487,7 @@ export default function Home() {
             /* When the index drawer is also open, the panel needs to sit
                on top of it — pass a flag so the panel can bump its z-index. */
             stackedOverIndex={showIndex || showComparison}
+            comparisonRange={showComparison ? comparisonRange : null}
           />, document.body)
           : (
               <RootPanel
@@ -488,6 +503,7 @@ export default function Home() {
             /* When the index drawer is also open, the panel needs to sit
                on top of it — pass a flag so the panel can bump its z-index. */
             stackedOverIndex={showIndex || showComparison}
+            comparisonRange={showComparison ? comparisonRange : null}
           />
             ))}      </div>
 
@@ -519,6 +535,7 @@ export default function Home() {
           selected row in the list so the user knows where they are. */}
       {showComparison && (
         <RangeComparison key={comparisonSurah} surahN={comparisonSurah} meta={meta}
+          onRangeChange={setComparisonRange}
           onClose={() => setShowComparison(false)}
           onPickRoot={root => { setPanelMax(false); pickRootFromIndex(root, comparisonSurah) }} />
       )}
