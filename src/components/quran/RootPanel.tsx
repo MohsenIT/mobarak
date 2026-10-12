@@ -227,7 +227,7 @@ export default function RootPanel({
           <span className={`${tab === 'verse' || tab === 'context' || tab === 'form' ? '' : 'font-quran '}panel-word`} dir="rtl">
             {tab === 'root' && root ? spacedRoot(root) : tab === 'form' ? `${formName(root, selectedForm) ?? ''} (${selectedForm ? morphologyLabel(selectedForm) : 'باب'})` : tab === 'context' ? (selectedContext ? `سیاق ${toFa(selectedContext.id)}` : 'سیاق') : tab === 'verse' ? `آیه ${toFa(sel.a)}` : <QuranText text={sel.text} />}
           </span>
-          <span className="chip panel-chip hidden sm:inline-flex">سوره {meta.surahs[sel.s - 1]?.fa} · آیه {toFa(sel.a)}</span>
+          <span className="chip panel-chip hidden sm:inline-flex">سوره {meta.surahs[sel.s - 1]?.fa} · {tab === 'context' && selectedContext ? `آیات ${toFa(selectedContext.from)} تا ${toFa(selectedContext.to)}` : `آیه ${toFa(sel.a)}`}</span>
           <div className="panel-actions">
             <button className="icon-btn sm" onClick={onOpenIndex} title="فهرست کلیدواژه‌های سوره" aria-label="فهرست کلیدواژه‌های سوره">
               <IconSortIndex />
@@ -252,7 +252,7 @@ export default function RootPanel({
         </div>
         <div className="flex items-center justify-between px-4 py-2 text-xs border-b" style={{ borderColor: 'var(--line)' }}>
           <button onClick={() => navigate(-1)} aria-label={tab === 'context' ? 'سیاق قبل' : tab === 'verse' ? 'آیه قبل' : tab === 'word' ? 'واژه قبل' : tab === 'form' ? 'باب قبل' : 'ریشه قبل'}>→ {tab === 'context' ? 'سیاق قبل' : tab === 'verse' ? 'آیه قبل' : tab === 'word' ? 'واژه قبل' : tab === 'form' ? 'باب قبل' : 'ریشه قبل'}</button>
-          <span>آیه {toFa(sel.a)} · واژه {toFa(sel.pos)}</span>
+          <span>{tab === 'context' && selectedContext ? `آیات ${toFa(selectedContext.from)} تا ${toFa(selectedContext.to)}` : `آیه ${toFa(sel.a)} · واژه ${toFa(sel.pos)}`}</span>
           <button onClick={() => navigate(1)} aria-label={tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'}>{tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'} ←</button>
         </div>
         <div key={tab} role="tabpanel" id={`analysis-panel-${tab}`} aria-labelledby={`analysis-tab-${tab}`} className={`overflow-y-auto nice-scroll px-5 py-4 flex-1${tabDirection ? ` sheet-tab-${tabDirection}` : ''}`} style={{ overscrollBehavior: 'contain' }}>
