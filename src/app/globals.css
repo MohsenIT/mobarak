@@ -381,14 +381,14 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;  /* clip header/content when collapsed to handle-only */
-  animation: sheetUp 0.34s cubic-bezier(0.22, 1.15, 0.32, 1) both;
+  animation: sheetUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
   box-shadow: 0 -18px 60px -20px rgba(0, 0, 0, 0.45);
   /* When collapsed (height ≤ 12dvh), hide the border-radius so the
      handle sits flush at the bottom edge. */
   transition: border-radius 0.2s;
 }
 @keyframes sheetUp {
-  from { transform: translate(-50%, 60%); opacity: 0; }
+  from { transform: translate(-50%, 100%); opacity: 0; }
   to { transform: translate(-50%, 0); opacity: 1; }
 }
 .root-panel.dragging { transition: none; animation: none; }

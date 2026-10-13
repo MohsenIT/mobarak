@@ -103,6 +103,10 @@ export default function Home() {
   useEffect(() => { LS.set('mushaf.marks', bookmarks) }, [bookmarks])
 
   const segs = useMemo(() => (meta ? meta.pages[page - 1] || [] : []), [meta, page])
+  const translatedPageSurahs = useMemo(() => new Map(segs.map(seg => {
+    const data = pageData.get(seg.s)
+    return [seg.s, data ? { ...data, v: data.v.filter(v => v.n >= seg.f && v.n <= seg.t) } : undefined] as const
+  })), [segs, pageData])
   const curSurahN = mode === 'mushaf' ? (segs[0]?.s ?? 1) : surah
 
   useEffect(() => {
@@ -405,11 +409,11 @@ export default function Home() {
                     <div className="px-3 py-4 min-w-0">
                       {pageTranslationError && <p role="alert" className="text-sm">ترجمه بارگیری نشد؛ صفحه را دوباره باز کنید.</p>}
                       {segs.map(seg => {
-                        const data = pageData.get(seg.s)
+                        const data = translatedPageSurahs.get(seg.s)
                         if (!data) return null
                         return <FlowPage key={seg.s}
                           sm={{ ...meta.surahs[seg.s - 1], b: seg.f === 1 && meta.surahs[seg.s - 1].b }}
-                          surah={{ ...data, v: data.v.filter(v => v.n >= seg.f && v.n <= seg.t) }}
+                          surah={data}
                           trans={pageTranslations.get(seg.s) ?? null} showTrans translator={translator} fontSize={flowFont}
                           selection={sel ? analysisSelection ?? sel : null}
                           highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
