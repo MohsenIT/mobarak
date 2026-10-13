@@ -93,11 +93,10 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
             {contexts.map(range => <button key={range.id} type="button"
               aria-pressed={selectedContext?.id === range.id}
               aria-label={`سیاق ${toFa(range.id)} · آیات ${toFa(range.from)} تا ${toFa(range.to)}`}
-              className="flex-none rounded-lg border px-3 py-2 text-xs whitespace-nowrap"
+              className="chip flex-none min-h-[36px]"
               style={{ borderColor: selectedContext?.id === range.id ? 'var(--sage)' : 'var(--line-strong)', background: selectedContext?.id === range.id ? 'var(--word-root)' : 'var(--paper)' }}
               onClick={() => { setFromText(String(range.from)); setToText(String(range.to)) }}>
-              <span className="block font-bold">سیاق {toFa(range.id)}</span>
-              <span className="block mt-1" style={{ color: 'var(--ink-soft)' }}>{toFa(range.from)} تا {toFa(range.to)}</span>
+              سیاق {toFa(range.id)} · آیات {toFa(range.from)} تا {toFa(range.to)}
             </button>)}
           </div>
         </div>
