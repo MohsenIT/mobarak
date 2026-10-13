@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Meta, SurahData } from '@/lib/quran'
 import { compareRootRange, loadGlobalRoots, loadSurah, spacedRoot, toFa } from '@/lib/quran'
+import { rootHue, rootColorStyle } from '@/lib/comparison-colors'
 import { getSurahContexts } from '@/lib/contexts'
 import { IconClose } from './Ornaments'
 
@@ -10,6 +11,7 @@ interface Props {
   surahN: number
   meta: Meta
   initialRange?: { from: number; to: number } | null
+  onRootsChange: (roots: Record<string, number>) => void
   onRangeChange: (range: { s: number; from: number; to: number } | null) => void
   onClose: () => void
   onPickRoot: (root: string) => void
@@ -21,7 +23,7 @@ function parseVerse(value: string) {
   return /^\d+$/.test(normalized) ? Number(normalized) : NaN
 }
 
-export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onRangeChange, initialRange }: Props) {
+export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onRangeChange, onRootsChange, initialRange }: Props) {
   const [surah, setSurah] = useState<SurahData | null>(null)
   const [roots, setRoots] = useState<Record<string, Record<string, number>> | null>(null)
   const [error, setError] = useState(false)
@@ -57,6 +59,10 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
     return result
   }, [surah, roots, valid, whole, from, to, sort])
 
+  useEffect(() => {
+    onRootsChange(Object.fromEntries(rows.map(row => [row.root, rootHue(row.root)])))
+  }, [rows, onRootsChange])
+
   return (
     <>
       <div className="sheet-backdrop" onClick={onClose} />
@@ -64,7 +70,7 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
           <div className="flex-1 min-w-0">
             <h2 className="font-bold text-sm">ارتباط ریشه‌ای · {meta.surahs[surahN - 1].fa}</h2>
-            <p className="text-xs mt-1" style={{ color: 'var(--ink-soft)' }}>مقایسهٔ بازهٔ انتخابی با باقی همین سوره</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--ink-soft)' }}>هر ریشهٔ مشترک با رنگی ثابت در کل سوره؛ زیرخط پیوسته در بازه و خط‌چین بیرون آن</p>
           </div>
           <button className="icon-btn" onClick={onClose} aria-label="بستن مقایسه"><IconClose /></button>
         </div>
@@ -117,7 +123,7 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
                   <button key={row.root} className="w-full text-right rounded-xl border p-3 mb-2"
                     style={{ borderColor: 'var(--line)' }} onClick={() => onPickRoot(row.root)}>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs">{toFa(index + 1)}</span>
+                      <span className="comparison-color-key rounded px-2 py-1 text-xs" style={rootColorStyle(rootHue(row.root))}>{toFa(index + 1)}</span>
                       <b className="font-quran text-xl flex-1">{spacedRoot(row.root)}</b>
                       <span className="text-xs">ارتباط {toFa(Math.round(row.connection * 100))}٪</span>
                     </div>

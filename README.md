@@ -144,3 +144,10 @@ Root comparison includes a context shortcut that fills the source-defined
 verse range. The context tab can open comparison directly for its active
 context; manual start/end inputs remain editable. A whole-surah context has
 no complement and therefore cannot produce within-surah comparison results.
+
+Shared-root comparison colors every occurrence of every shared root throughout
+its surah. Root colors are deterministic and match the comparison list keys;
+sorting and closing the list preserve them. Solid versus dashed underlines
+identify occurrences inside versus outside the range. The comparison banner
+reopens the list or clears all comparison colors. Both reading modes and
+inline translations use the same colors, including the night theme.

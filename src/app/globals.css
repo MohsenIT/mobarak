@@ -1068,3 +1068,9 @@ input[type='range'].page-slider::-moz-range-thumb {
 
 .sheet-size-select { max-width: 65px; min-width: 0; font-size: 11px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 1px; }
 .panel-handle:focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }
+
+.quran-word.comparison-shared, .comparison-color-key { background: hsl(var(--comparison-hue) var(--comparison-saturation) var(--comparison-lightness)); color: #16332b; border-radius: 4px; }
+.quran-word.comparison-shared { text-decoration-line: underline; text-decoration-color: hsl(var(--comparison-hue) 60% 35%); text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.quran-word.comparison-outside { text-decoration-style: dashed; }
+[data-theme="night"] .quran-word.comparison-shared, [data-theme="night"] .comparison-color-key { background: hsl(var(--comparison-hue) var(--comparison-saturation) var(--comparison-darkness)); color: #f5f1e5; }
+[data-theme="night"] .quran-word.comparison-shared { text-decoration-color: hsl(var(--comparison-hue) 65% 70%); }
