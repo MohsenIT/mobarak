@@ -24,8 +24,12 @@ export function useVisibleSelection(main: RefObject<HTMLElement | null>, target:
       const word = reader.querySelector<HTMLElement>(`[data-surah="${target.s}"][data-ayah="${target.a}"][data-pos="${target.pos}"]`)
       if (!word) return
       const rect = word.getBoundingClientRect()
-      if (rect.bottom > bottom - 16) scroll.scrollTop += rect.bottom - bottom + 16
-      else if (rect.top < bounds.top + 12) scroll.scrollTop -= bounds.top + 12 - rect.top
+      const delta = rect.bottom > bottom - 16 ? rect.bottom - bottom + 16
+        : rect.top < bounds.top + 12 ? rect.top - bounds.top - 12 : 0
+      if (Math.abs(delta) > 1) {
+        scroll.scrollTo({ top: scroll.scrollTop + delta,
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+      }
     }
     const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(reveal) }
     const observer = new ResizeObserver(schedule)
