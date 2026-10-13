@@ -1065,3 +1065,6 @@ input[type='range'].page-slider::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) { .sheet-tab-next, .sheet-tab-previous { animation: none; } }
 
 .verse-translation { position: absolute; font-family: 'Vazirmatn', system-ui, sans-serif; font-size: 12px; line-height: 16px; color: var(--ink-soft); text-align: right; white-space: nowrap; min-width: 0; max-width: 100%; }
+
+.sheet-size-select { max-width: 65px; min-width: 0; font-size: 11px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 1px; }
+.panel-handle:focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }

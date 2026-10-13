@@ -159,40 +159,22 @@ export default function RootPanel({
     return () => window.removeEventListener('keydown', handle)
   }, [tab, sel, surah, selectedForm])
 
-  // drag handle (mobile, only when not maximized)
-  //
-  // Behavior change per user request: dragging down should COLLAPSE
-  // the panel to just the handle (so most of the screen shows the
-  // Quran with the highlighted root visible), NOT close it. The user
-  // wants to keep the highlight alive while seeing more of the mushaf.
-  // The panel only closes via the X button or backdrop tap.
-  const onHandleDown = (e: React.PointerEvent) => {
+  // Keep the exact released height; presets are an explicit alternative.
+  const onHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (maximized) return
     dragRef.current = { y: e.clientY, h: sheetH }
+    e.currentTarget.setPointerCapture(e.pointerId)
     panelRef.current?.classList.add('dragging')
-    const move = (ev: PointerEvent) => {
-      if (!dragRef.current) return
-      const dy = dragRef.current.y - ev.clientY
-      const dh = (dy / window.innerHeight) * 100
-      // Allow dragging down to a very small height (just the handle ~8dvh).
-      // The panel stays open at any height — only the X button or backdrop
-      // actually closes it.
-      setSheetH(clamp(dragRef.current.h + dh, 8, 88))
-    }
-    const up = (ev: PointerEvent) => {
-      const dy = dragRef.current ? dragRef.current.y - ev.clientY : 0
-      dragRef.current = null
-      panelRef.current?.classList.remove('dragging')
-      // Snap based on the FINAL height (not the drag delta).
-      // - h > 45 → expand to 80dvh
-      // - h ≤ 45 → collapse to 8dvh (just the handle bar)
-      // Never close on drag.
-      setSheetH(h => h > 45 ? 80 : 8)
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-    }
-    window.addEventListener('pointermove', move)
-    window.addEventListener('pointerup', up)
+  }
+  const onHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const start = dragRef.current
+    if (!start) return
+    const viewport = window.visualViewport?.height ?? window.innerHeight
+    setSheetH(clamp(start.h + (start.y - e.clientY) / viewport * 100, 8, 88))
+  }
+  const onHandleEnd = () => {
+    dragRef.current = null
+    panelRef.current?.classList.remove('dragging')
   }
 
   const panelClass = `root-panel${maximized ? ' maximized' : ''}${stackedOverIndex ? ' stacked' : ''}`
@@ -219,7 +201,15 @@ export default function RootPanel({
         aria-label="تحلیل ریشه کلمه"
         style={{ touchAction: 'pan-y', ...(!maximized ? { ['--sheet-h' as string]: `${sheetH}dvh` } : {}) }}
       >
-        <div className="panel-handle" onPointerDown={onHandleDown} />
+        <div className="panel-handle" role="slider" tabIndex={maximized ? -1 : 0}
+          aria-label="ارتفاع باتم‌شیت" aria-orientation="vertical" aria-valuemin={8} aria-valuemax={88}
+          aria-valuenow={Math.round(sheetH)} aria-valuetext={`${toFa(Math.round(sheetH))} درصد صفحه`}
+          onPointerDown={onHandleDown} onPointerMove={onHandleMove} onPointerUp={onHandleEnd}
+          onPointerCancel={onHandleEnd} onLostPointerCapture={onHandleEnd}
+          onKeyDown={event => {
+            const next = event.key === 'ArrowUp' ? sheetH + 5 : event.key === 'ArrowDown' ? sheetH - 5 : event.key === 'Home' ? 8 : event.key === 'End' ? 88 : null
+            if (next !== null && !maximized) { event.preventDefault(); setSheetH(clamp(next, 8, 88)) }
+          }} />
 
         {/* ===== Single-row header: word + root inline + chip + actions =====
             Everything on ONE line — no wrapping. Word and root must sit
@@ -230,6 +220,14 @@ export default function RootPanel({
           </span>
           <span className="chip panel-chip hidden sm:inline-flex">سوره {meta.surahs[sel.s - 1]?.fa} · {tab === 'context' && selectedContext ? `آیات ${toFa(selectedContext.from)} تا ${toFa(selectedContext.to)}` : `آیه ${toFa(sel.a)}`}</span>
           <div className="panel-actions">
+            {!maximized && <select aria-label="اندازهٔ باتم‌شیت" title="اندازهٔ باتم‌شیت"
+              className={stackedOverIndex ? 'sheet-size-select' : 'sheet-size-select lg:hidden'}
+              value={[8, 30, 46, 70, 88].includes(sheetH) ? sheetH : 'custom'}
+              onChange={event => { if (event.target.value !== 'custom') setSheetH(Number(event.target.value)) }}>
+              <option value="custom" disabled>دلخواه</option>
+              <option value="8">کمینه</option><option value="30">۳۰٪</option><option value="46">نیمه</option>
+              <option value="70">۷۰٪</option><option value="88">بیشینه</option>
+            </select>}
             <button className="icon-btn sm" onClick={onOpenIndex} title="فهرست کلیدواژه‌های سوره" aria-label="فهرست کلیدواژه‌های سوره">
               <IconSortIndex />
             </button>
