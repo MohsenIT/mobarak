@@ -145,6 +145,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
               return (
                 <span
                   key={i}
+                  data-surah={it.s} data-ayah={it.a} data-pos={it.pos}
                   className={`quran-word${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === it.s ? (it.a >= comparisonRange.from && it.a <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
                     aria-current={isSelected ? 'true' : undefined}
                   onClick={() => onWordTap({ s: it.s, a: it.a, pos: it.pos, text: it.t, root: it.r })}

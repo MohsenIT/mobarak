@@ -7,6 +7,7 @@ import { loadMeta, loadSurah, loadTrans, toFa } from '@/lib/quran'
 import MushafPage, { type Selection } from '@/components/quran/MushafPage'
 import FlowPage from '@/components/quran/FlowPage'
 import RootPanel from '@/components/quran/RootPanel'
+import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
@@ -80,6 +81,7 @@ export default function Home() {
 
   const frameRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
+  useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, !!sel && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}`)
   const touchRef = useRef<{ x: number; y: number } | null>(null)
   const pinchRef = useRef<{ d: number; s: number } | null>(null)
 
@@ -183,6 +185,7 @@ export default function Home() {
   }, [])
 
   const tapWord = useCallback((word: Selection) => {
+    setFlash(null)
     setComparisonRoot(null)
     setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos ? null : word)
   }, [])
@@ -392,7 +395,7 @@ export default function Home() {
           {mode === 'mushaf' ? (
             <div className="flex-1 min-h-0 flex items-stretch justify-center px-2 py-2 sm:px-6 sm:py-3">
               <div ref={frameRef} className="w-full max-w-[640px] min-h-0">
-                <div key={page} className={`mushaf-frame page-enter h-full ${showTrans ? 'overflow-y-auto nice-scroll' : 'overflow-hidden'}`}>
+                <div data-reading-scroll key={page} className={`mushaf-frame page-enter h-full ${showTrans || sel ? 'overflow-y-auto nice-scroll' : 'overflow-hidden'}`}>
                   {loadingPage ? (
                     <div className="h-full flex items-center justify-center">
                       <p className="text-sm animate-pulse" style={{ color: 'var(--ink-faint)' }}>…</p>
@@ -431,7 +434,7 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <div key={`f-${surah}`} className="page-enter flex-1 min-h-0 overflow-y-auto nice-scroll">
+            <div data-reading-scroll key={`f-${surah}`} className="page-enter flex-1 min-h-0 overflow-y-auto nice-scroll">
               <div className="max-w-[720px] mx-auto px-4 py-4 pb-24">
                 {loadingPage || !flowSurah ? (
                   <p className="text-sm animate-pulse text-center py-10" style={{ color: 'var(--ink-faint)' }}>…</p>

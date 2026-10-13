@@ -54,6 +54,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
               return (
                 <span key={i}>
                   <span
+                    data-surah={surah.n}
                     data-ayah={v.n}
                     data-pos={i + 1}
                     className={`quran-word${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === surah.n ? (v.n >= comparisonRange.from && v.n <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
