@@ -5,6 +5,7 @@ import type { Translator, SurahData, SurahMeta, Translations } from '@/lib/quran
 import { toFa } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
 import QuranText from './QuranText'
+import FlowTranslations from './FlowTranslations'
 import { matchesAnalysis, type AnalysisSelection } from '@/lib/analysis'
 import type { Selection } from './MushafPage'
 
@@ -37,15 +38,13 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
         <SurahBand ar={sm.ar} />
         {sm.b && <Bismillah size={`${fontSize}px`} />}
       </div>
-      <div ref={textRef} className="font-quran text-justify mt-2" dir="rtl"
+      <div ref={textRef} className="font-quran text-justify mt-2 relative" dir="rtl"
         style={{ fontSize, lineHeight: 2.05, color: 'var(--ink)' }}>
         {surah.v.map(v => {
           const isRange = analysisSelection && (analysisSelection.tab === 'verse' || analysisSelection.tab === 'context') && matchesAnalysis(analysisSelection, surah.n, v.n, 1, v.w[0])
-          const continues = !showTrans && isRange && v.n < surah.vc && matchesAnalysis(analysisSelection, surah.n, v.n + 1, 1, v.w[0])
-          const VerseContainer = showTrans ? 'section' : 'span'
-          const translation = trans?.[String(v.n)]?.[translator]
+          const continues = isRange && v.n < surah.vc && matchesAnalysis(analysisSelection, surah.n, v.n + 1, 1, v.w[0])
           return (
-          <VerseContainer key={v.n} className={showTrans ? 'translated-verse' : undefined} data-verse={v.n}>
+          <span key={v.n} data-verse={v.n}>
           <span className={isRange ? 'analysis-range' : undefined}>
             {v.w.map((w, i) => {
               const isFlash = flash && flash.s === surah.n && flash.a === v.n && flash.pos === i + 1
@@ -65,10 +64,10 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
               )
             })}
             <AyahMarker n={v.n} />{continues ? ' ' : null}
-          </span>{!continues && !showTrans ? ' ' : null}
-          {showTrans && <p className="verse-translation" data-translation-verse={v.n}>{translation === '' ? 'متن ترجمهٔ این آیه در منبع انتخاب‌شده موجود نیست.' : translation ?? 'در حال بارگیری ترجمه…'}</p>}
-          </VerseContainer>
+          </span>{!continues ? ' ' : null}
+          </span>
         )})}
+        {showTrans && <FlowTranslations container={textRef} surah={surah} trans={trans} translator={translator} fontSize={fontSize} />}
       </div>
 
 
