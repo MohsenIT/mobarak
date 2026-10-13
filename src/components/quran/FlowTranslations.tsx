@@ -33,8 +33,6 @@ export default function FlowTranslations({ container, surah, trans, translator, 
         }
         const translation = trans?.[String(verse.n)]?.[translator]
         const words = (translation === '' ? 'متن ترجمهٔ این آیه در منبع انتخاب‌شده موجود نیست.' : translation ?? 'در حال بارگیری ترجمه…').split(/\s+/)
-        const verseFragments: Fragment[] = []
-        let verseFontSize = 12
         let offset = 0
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i]
@@ -44,10 +42,9 @@ export default function FlowTranslations({ container, surah, trans, translator, 
           const text = words.slice(offset, offset + count).join(' ')
           offset += count
           const textWidth = canvas.measureText(text).width
-          if (textWidth > 0) verseFontSize = Math.min(verseFontSize, 12 * Math.max(1, width - 1) / textWidth)
-          verseFragments.push({ verse: verse.n, text, left: line.left - origin.left, top: line.bottom - origin.top + 2, width, fontSize: 12 })
+          const fittedSize = textWidth > 0 ? Math.min(12, 12 * Math.max(1, width - 1) / textWidth) : 12
+          next.push({ verse: verse.n, text, left: line.left - origin.left, top: line.bottom - origin.top + 2, width, fontSize: fittedSize })
         }
-        next.push(...verseFragments.map(fragment => ({ ...fragment, fontSize: verseFontSize })))
       }
       root.style.paddingBottom = '20px'
       const height = `${Math.ceil(fontSize * 2.05 + 20)}px`

@@ -109,7 +109,9 @@ the app shows the recorded form name rather than guessing a masdar. Rebuild
 
 When translation is enabled, Quran words retain their continuous flow. Each
 verse’s translation appears in a smaller font beneath its actual wrapped
-text fragments. Each verse uses a fitted font size so its translation stays
+text fragments. Each wrapped fragment independently uses the largest font size up to 12px
+that fits its Arabic width, so a narrow continuation cannot shrink the
+translation on other lines. Its translation stays
 on one line per fragment; spacing reserves one translation line and a small
 margin. This applies in both
 continuous reading and page-based reading. Page mode
