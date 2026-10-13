@@ -1078,3 +1078,6 @@ input[type='range'].page-slider::-moz-range-thumb {
 .comparison-range-band { background: #ecd99a; box-decoration-break: clone; -webkit-box-decoration-break: clone; border-radius: 3px; }
 .mushaf-line[data-comparison-band]::after { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: var(--comparison-left); width: var(--comparison-width); background: #ecd99a; border-radius: 3px; pointer-events: none; }
 [data-theme="night"] .comparison-range-band, [data-theme="night"] .mushaf-line[data-comparison-band]::after { background: #514523; }
+
+.quran-word[data-comparison-root] { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.quran-word.comparison-shared.comparison-muted { background: transparent; color: var(--ink); text-decoration-color: var(--line-strong); text-decoration-thickness: 1px; box-shadow: none; }

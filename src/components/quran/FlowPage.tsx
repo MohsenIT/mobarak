@@ -18,6 +18,7 @@ interface Props {
   translator: Translator
   fontSize: number
   selection: Selection | null
+  mutedComparisonRoots?: Set<string>
   comparisonRoots?: Record<string, number>
   comparisonRange?: { s: number; from: number; to: number } | null
   analysisSelection?: AnalysisSelection | null
@@ -27,7 +28,7 @@ interface Props {
 }
 
 /** Continuous, flowing surah view (متن پیوسته) */
-export default function FlowPage({ sm, surah, trans, showTrans, translator, fontSize, selection, highlightRoot, comparisonRoots, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
+export default function FlowPage({ sm, surah, trans, showTrans, translator, fontSize, selection, highlightRoot, mutedComparisonRoots, comparisonRoots, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
   const textRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!flash || flash.s !== surah.n) return
@@ -64,7 +65,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
                     data-surah={surah.n}
                     data-ayah={v.n}
                     data-pos={i + 1}
-                    className={`quran-word${hue !== undefined ? ` comparison-shared${v.n >= comparisonRange!.from && v.n <= comparisonRange!.to ? ' comparison-inside' : ' comparison-outside'}` : ''}${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === surah.n ? (v.n >= comparisonRange.from && v.n <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
+                    className={`quran-word${hue !== undefined ? ` comparison-shared${mutedComparisonRoots?.has(w.r!) ? ' comparison-muted' : ''}${v.n >= comparisonRange!.from && v.n <= comparisonRange!.to ? ' comparison-inside' : ' comparison-outside'}` : ''}${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === surah.n ? (v.n >= comparisonRange.from && v.n <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
                     aria-current={isSelected ? 'true' : undefined}
                     onClick={() => onWordTap({ s: surah.n, a: v.n, pos: i + 1, text: w.t, root: w.r ?? null })}
                   ><QuranText text={w.t} /></span>{' '}

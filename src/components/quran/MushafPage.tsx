@@ -27,6 +27,7 @@ interface Props {
   pageData: Map<number, SurahData>
   fontSize: number
   selection: Selection | null
+  mutedComparisonRoots?: Set<string>
   comparisonRoots?: Record<string, number>
   comparisonRange?: { s: number; from: number; to: number } | null
   analysisSelection?: AnalysisSelection | null
@@ -35,7 +36,7 @@ interface Props {
   onWordTap: (sel: Selection) => void
 }
 
-export default function MushafPage({ meta, page, pageData, fontSize, selection, highlightRoot, comparisonRoots, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
+export default function MushafPage({ meta, page, pageData, fontSize, selection, highlightRoot, mutedComparisonRoots, comparisonRoots, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
   const frameRef = useRef<HTMLDivElement>(null)
   const lines = useMemo(() => {
     const map = new Map<number, LineItem[]>()
@@ -167,7 +168,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
                   data-comparison-root={hue !== undefined ? it.r : undefined}
                   data-comparison-range={comparisonRange?.s === it.s && it.a >= comparisonRange.from && it.a <= comparisonRange.to ? 'true' : undefined}
                   data-surah={it.s} data-ayah={it.a} data-pos={it.pos}
-                  className={`quran-word${hue !== undefined ? ` comparison-shared${it.a >= comparisonRange!.from && it.a <= comparisonRange!.to ? ' comparison-inside' : ' comparison-outside'}` : ''}${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === it.s ? (it.a >= comparisonRange.from && it.a <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
+                  className={`quran-word${hue !== undefined ? ` comparison-shared${mutedComparisonRoots?.has(it.r!) ? ' comparison-muted' : ''}${it.a >= comparisonRange!.from && it.a <= comparisonRange!.to ? ' comparison-inside' : ' comparison-outside'}` : ''}${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === it.s ? (it.a >= comparisonRange.from && it.a <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
                     aria-current={isSelected ? 'true' : undefined}
                   onClick={() => onWordTap({ s: it.s, a: it.a, pos: it.pos, text: it.t, root: it.r })}
                 >

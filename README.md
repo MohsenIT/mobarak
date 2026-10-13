@@ -151,3 +151,11 @@ sorting and closing the list preserve them. Solid versus dashed underlines
 identify occurrences inside versus outside the range. The comparison banner
 reopens the list or clears all comparison colors. Both reading modes and
 inline translations use the same colors, including the night theme.
+
+In comparison mode, tap a marked Quran word to toggle highlights for its entire
+root; hidden roots retain a muted underline and can be tapped again. Hold a
+word for 500ms to show only its root. The visible “فقط … ×” chip restores all
+root colors, and a hidden-root count offers the same reset. Movement beyond
+10px or pointer cancellation aborts the hold; releasing a completed hold does
+not trigger a second tap. These controls apply only to shared comparison roots.
+Filters are local to the current comparison range and are not stored.

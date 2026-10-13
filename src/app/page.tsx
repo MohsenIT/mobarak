@@ -7,6 +7,7 @@ import { loadMeta, loadSurah, loadTrans, toFa } from '@/lib/quran'
 import MushafPage, { type Selection } from '@/components/quran/MushafPage'
 import FlowPage from '@/components/quran/FlowPage'
 import RootPanel from '@/components/quran/RootPanel'
+import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
@@ -68,6 +69,8 @@ export default function Home() {
   const [showIndex, setShowIndex] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
   const [comparisonSurah, setComparisonSurah] = useState(1)
+  const [hiddenComparisonRoots, setHiddenComparisonRoots] = useState<Set<string>>(new Set())
+  const [soloComparisonRoot, setSoloComparisonRoot] = useState<string | null>(null)
   const [comparisonRoots, setComparisonRoots] = useState<Record<string, number>>({})
   const [comparisonRoot, setComparisonRoot] = useState<string | null>(null)
   const [comparisonRange, setComparisonRange] = useState<{ s: number; from: number; to: number } | null>(null)
@@ -83,6 +86,10 @@ export default function Home() {
   const frameRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
   useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, !!sel && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}`)
+  const focusComparisonRoot = useCallback((root: string) => { setSoloComparisonRoot(root); setSel(null) }, [])
+  useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
+  useEffect(() => { setHiddenComparisonRoots(new Set()); setSoloComparisonRoot(null) }, [comparisonRange?.s, comparisonRange?.from, comparisonRange?.to])
+  const mutedComparisonRoots = useMemo(() => new Set(Object.keys(comparisonRoots).filter(root => soloComparisonRoot ? root !== soloComparisonRoot : hiddenComparisonRoots.has(root))), [comparisonRoots, hiddenComparisonRoots, soloComparisonRoot])
   const touchRef = useRef<{ x: number; y: number } | null>(null)
   const pinchRef = useRef<{ d: number; s: number } | null>(null)
 
@@ -190,10 +197,22 @@ export default function Home() {
   }, [])
 
   const tapWord = useCallback((word: Selection) => {
+    if (!showComparison && !showIndex && comparisonRange?.s === word.s && word.root && comparisonRoots[word.root] !== undefined) {
+      const root = word.root
+      setHiddenComparisonRoots(current => {
+        const next = new Set(current)
+        if (soloComparisonRoot && root !== soloComparisonRoot || next.has(root)) next.delete(root)
+        else next.add(root)
+        return next
+      })
+      setSoloComparisonRoot(null)
+      setSel(null)
+      return
+    }
     setFlash(null)
     setComparisonRoot(null)
     setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos ? null : word)
-  }, [])
+  }, [comparisonRange, comparisonRoots, soloComparisonRoot, showComparison, showIndex])
 
   const goSurah = useCallback((n: number) => {
     const nn = clamp(n, 1, 114)
@@ -386,9 +405,11 @@ export default function Home() {
       </header>
 
       {!showComparison && Object.keys(comparisonRoots).length > 0 && comparisonRange?.s === curSurahN && (
-        <div className="relative z-10 flex items-center gap-2 px-3 py-2 text-xs" style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
+        <div className="relative z-10 flex flex-wrap items-center gap-2 px-3 py-2 text-xs" style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
           <span className="comparison-range-band rounded px-2 py-1">درون بازه {toFa(comparisonRange.from)}–{toFa(comparisonRange.to)}</span>
-          <span>هر ریشه یک رنگ</span>
+          {soloComparisonRoot ? <button className="chip" aria-label="نمایش همهٔ ریشه‌ها" onClick={() => { setSoloComparisonRoot(null); setHiddenComparisonRoots(new Set()) }}>فقط {soloComparisonRoot.split('').join(' ')} ×</button>
+            : hiddenComparisonRoots.size > 0 ? <button className="chip" aria-label="روشن کردن همهٔ ریشه‌ها" onClick={() => setHiddenComparisonRoots(new Set())}>{toFa(hiddenComparisonRoots.size)} ریشه پنهان · بازنشانی</button> : <span>هر ریشه یک رنگ</span>}
+          <span className="basis-full" style={{ color: 'var(--ink-soft)' }}>تپ: خاموش/روشن · نگه‌داشتن: فقط این ریشه</span>
           <button className="underline mr-auto" onClick={() => setShowComparison(true)}>بازگشت به مقایسه</button>
           <button aria-label="پاک کردن هایلایت مقایسه" onClick={() => { setComparisonRoot(null); setComparisonRoots({}); setComparisonRange(null); setSel(null) }}>×</button>
         </div>
@@ -417,7 +438,7 @@ export default function Home() {
                           trans={pageTranslations.get(seg.s) ?? null} showTrans translator={translator} fontSize={flowFont}
                           selection={sel ? analysisSelection ?? sel : null}
                           highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
-                          analysisSelection={sel ? analysisSelection : null} comparisonRange={comparisonRange} comparisonRoots={comparisonRoots}
+                          analysisSelection={sel ? analysisSelection : null} comparisonRange={comparisonRange} comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots}
                           flash={flash} onWordTap={tapWord} />
                       })}
                     </div>
@@ -431,7 +452,7 @@ export default function Home() {
                       highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
                       analysisSelection={sel ? analysisSelection : null}
                       comparisonRange={comparisonRange}
-                      comparisonRoots={comparisonRoots}
+                      comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots}
                       flash={flash}
                       onWordTap={tapWord}
                     />
@@ -456,7 +477,7 @@ export default function Home() {
                     highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
                     analysisSelection={sel ? analysisSelection : null}
                     comparisonRange={comparisonRange}
-                    comparisonRoots={comparisonRoots}
+                    comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots}
                     flash={flash}
                     onWordTap={tapWord}
                   />
