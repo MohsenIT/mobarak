@@ -44,10 +44,12 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
         style={{ fontSize, lineHeight: 2.05, color: 'var(--ink)' }}>
         {surah.v.map(v => {
           const isRange = analysisSelection && (analysisSelection.tab === 'verse' || analysisSelection.tab === 'context') && matchesAnalysis(analysisSelection, surah.n, v.n, 1, v.w[0])
-          const continues = isRange && v.n < surah.vc && matchesAnalysis(analysisSelection, surah.n, v.n + 1, 1, v.w[0])
+          const isComparisonRange = comparisonRange?.s === surah.n && v.n >= comparisonRange.from && v.n <= comparisonRange.to
+          const continues = isComparisonRange ? v.n < comparisonRange.to
+            : isRange && v.n < surah.vc && matchesAnalysis(analysisSelection, surah.n, v.n + 1, 1, v.w[0])
           return (
           <span key={v.n} data-verse={v.n}>
-          <span className={isRange ? 'analysis-range' : undefined}>
+          <span className={`${isRange ? 'analysis-range' : ''}${isComparisonRange ? ' comparison-range-band' : ''}`} data-comparison-range={isComparisonRange ? 'true' : undefined}>
             {v.w.map((w, i) => {
               const hue = comparisonRange?.s === surah.n && w.r ? comparisonRoots?.[w.r] : undefined
               const isFlash = flash && flash.s === surah.n && flash.a === v.n && flash.pos === i + 1

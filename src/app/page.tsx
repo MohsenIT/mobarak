@@ -383,7 +383,7 @@ export default function Home() {
 
       {!showComparison && Object.keys(comparisonRoots).length > 0 && comparisonRange?.s === curSurahN && (
         <div className="relative z-10 flex items-center gap-2 px-3 py-2 text-xs" style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
-          <span className="rounded px-2 py-1">درون بازه {toFa(comparisonRange.from)}–{toFa(comparisonRange.to)}</span>
+          <span className="comparison-range-band rounded px-2 py-1">درون بازه {toFa(comparisonRange.from)}–{toFa(comparisonRange.to)}</span>
           <span>هر ریشه یک رنگ</span>
           <button className="underline mr-auto" onClick={() => setShowComparison(true)}>بازگشت به مقایسه</button>
           <button aria-label="پاک کردن هایلایت مقایسه" onClick={() => { setComparisonRoot(null); setComparisonRoots({}); setComparisonRange(null); setSel(null) }}>×</button>

@@ -93,6 +93,17 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
     const measure = () => {
       if (!live) return
       for (const line of frame.querySelectorAll<HTMLElement>('.mushaf-line')) {
+        line.removeAttribute('data-comparison-band')
+        const comparisonWords = [...line.querySelectorAll<HTMLElement>('[data-comparison-range="true"]')]
+        if (comparisonWords.length) {
+          const bounds = line.getBoundingClientRect()
+          const rects = comparisonWords.map(word => word.getBoundingClientRect())
+          const left = Math.min(...rects.map(rect => rect.left))
+          const right = Math.max(...rects.map(rect => rect.right))
+          line.style.setProperty('--comparison-left', `${left - bounds.left}px`)
+          line.style.setProperty('--comparison-width', `${right - left}px`)
+          line.setAttribute('data-comparison-band', 'true')
+        }
         line.removeAttribute('data-analysis-range')
         if (analysisSelection?.tab !== 'verse' && analysisSelection?.tab !== 'context') continue
         const words = [...line.querySelectorAll<HTMLElement>('.analysis-selected')]
@@ -111,7 +122,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
     observer.observe(frame)
     document.fonts.ready.then(measure)
     return () => { live = false; observer.disconnect() }
-  }, [analysisSelection, pageData, fontSize, page])
+  }, [analysisSelection, comparisonRange, pageData, fontSize, page])
 
   const n = lineNums.length
 
@@ -138,7 +149,11 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
         return (
           <div key={ln} className="mushaf-line">
             {items.map((it, i) => {
-              if (it.kind === 'marker') return <AyahMarker key={i} n={it.n} />
+              if (it.kind === 'marker') {
+                const preceding = items.slice(0, i).reverse().find(item => item.kind === 'word')
+                const inRange = preceding?.kind === 'word' && comparisonRange?.s === preceding.s && it.n >= comparisonRange.from && it.n <= comparisonRange.to
+                return <span key={i} data-comparison-range={inRange ? 'true' : undefined}><AyahMarker n={it.n} /></span>
+              }
               if (it.kind !== 'word') return null
               const isFlash = flash && flash.s === it.s && flash.a === it.a && flash.pos === it.pos
               const isSelected = selection?.s === it.s && selection.a === it.a && selection.pos === it.pos
@@ -150,6 +165,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
                   key={i}
                   style={hue !== undefined ? rootColorStyle(hue) : undefined}
                   data-comparison-root={hue !== undefined ? it.r : undefined}
+                  data-comparison-range={comparisonRange?.s === it.s && it.a >= comparisonRange.from && it.a <= comparisonRange.to ? 'true' : undefined}
                   data-surah={it.s} data-ayah={it.a} data-pos={it.pos}
                   className={`quran-word${hue !== undefined ? ` comparison-shared${it.a >= comparisonRange!.from && it.a <= comparisonRange!.to ? ' comparison-inside' : ' comparison-outside'}` : ''}${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === it.s ? (it.a >= comparisonRange.from && it.a <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
                     aria-current={isSelected ? 'true' : undefined}
