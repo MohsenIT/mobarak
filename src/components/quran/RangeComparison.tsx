@@ -68,15 +68,6 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
           </div>
           <button className="icon-btn" onClick={onClose} aria-label="بستن مقایسه"><IconClose /></button>
         </div>
-        <label className="block px-4 pb-3 text-xs">
-          میانبر سیاق
-          <select aria-label="انتخاب سیاق برای مقایسه" value={selectedContext?.id ?? ''}
-            className="block w-full min-w-0 rounded-lg border p-2 mt-1 text-sm" style={{ background: 'var(--paper)', borderColor: 'var(--line-strong)' }}
-            onChange={e => { const range = contexts.find(r => r.id === Number(e.target.value)); if (range) { setFromText(String(range.from)); setToText(String(range.to)) } }}>
-            <option value="">بازهٔ دلخواه</option>
-            {contexts.map(range => <option key={range.id} value={range.id}>سیاق {toFa(range.id)} · آیات {toFa(range.from)} تا {toFa(range.to)}</option>)}
-          </select>
-        </label>
         <div className="px-4 pb-3 flex gap-3">
           {[
             { label: 'از آیه', value: fromText, change: setFromText },
@@ -89,6 +80,20 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
                 style={{ borderColor: 'var(--line-strong)' }} aria-invalid={!valid} />
             </label>
           ))}
+        </div>
+        <div className="px-4 pb-3">
+          <p className="text-xs mb-2" style={{ color: 'var(--ink-soft)' }}>پر کردن سریع با سیاق</p>
+          <div role="group" aria-label="سیاق‌های مقایسه" className="flex gap-2 overflow-x-auto nice-scroll pb-1">
+            {contexts.map(range => <button key={range.id} type="button"
+              aria-pressed={selectedContext?.id === range.id}
+              aria-label={`سیاق ${toFa(range.id)} · آیات ${toFa(range.from)} تا ${toFa(range.to)}`}
+              className="flex-none rounded-lg border px-3 py-2 text-xs whitespace-nowrap"
+              style={{ borderColor: selectedContext?.id === range.id ? 'var(--sage)' : 'var(--line-strong)', background: selectedContext?.id === range.id ? 'var(--word-root)' : 'var(--paper)' }}
+              onClick={() => { setFromText(String(range.from)); setToText(String(range.to)) }}>
+              <span className="block font-bold">سیاق {toFa(range.id)}</span>
+              <span className="block mt-1" style={{ color: 'var(--ink-soft)' }}>{toFa(range.from)} تا {toFa(range.to)}</span>
+            </button>)}
+          </div>
         </div>
         <div className="px-4 pb-3 text-xs leading-6" style={{ color: 'var(--ink-soft)' }}>
           {!valid ? <p role="alert">بازه باید بین ۱ و {toFa(vc)} باشد؛ آیهٔ شروع نباید از پایان بزرگ‌تر باشد.</p>
