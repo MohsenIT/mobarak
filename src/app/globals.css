@@ -1064,4 +1064,4 @@ input[type='range'].page-slider::-moz-range-thumb {
 @keyframes sheetTabPrevious { from { transform: translateX(12%); opacity: 0.35; } to { transform: translateX(0); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sheet-tab-next, .sheet-tab-previous { animation: none; } }
 
-.verse-translation { position: absolute; font-family: 'Vazirmatn', system-ui, sans-serif; font-size: 12px; line-height: 20px; color: var(--ink-soft); text-align: right; white-space: normal; overflow-wrap: anywhere; min-width: 0; max-width: 100%; }
+.verse-translation { position: absolute; font-family: 'Vazirmatn', system-ui, sans-serif; font-size: 12px; line-height: 16px; color: var(--ink-soft); text-align: right; white-space: nowrap; min-width: 0; max-width: 100%; }

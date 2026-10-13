@@ -3,7 +3,7 @@
 import { useEffect, useState, type RefObject } from 'react'
 import type { SurahData, Translations, Translator } from '@/lib/quran'
 
-type Fragment = { verse: number; text: string; left: number; top: number; width: number }
+type Fragment = { verse: number; text: string; left: number; top: number; width: number; fontSize: number }
 
 /** Annotate the actual wrapped verse fragments without changing Quran word flow. */
 export default function FlowTranslations({ container, surah, trans, translator, fontSize }: {
@@ -20,7 +20,6 @@ export default function FlowTranslations({ container, surah, trans, translator, 
       const canvas = document.createElement('canvas').getContext('2d')!
       canvas.font = '12px Vazirmatn'
       const next: Fragment[] = []
-      let maxRows = 1
       for (const verse of surah.v) {
         const el = root.querySelector(`[data-verse="${verse.n}"]`)
         if (!el) continue
@@ -34,6 +33,8 @@ export default function FlowTranslations({ container, surah, trans, translator, 
         }
         const translation = trans?.[String(verse.n)]?.[translator]
         const words = (translation === '' ? 'متن ترجمهٔ این آیه در منبع انتخاب‌شده موجود نیست.' : translation ?? 'در حال بارگیری ترجمه…').split(/\s+/)
+        const verseFragments: Fragment[] = []
+        let verseFontSize = 12
         let offset = 0
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i]
@@ -42,19 +43,14 @@ export default function FlowTranslations({ container, surah, trans, translator, 
           const count = i === lines.length - 1 ? words.length - offset : Math.min(words.length - offset, Math.round((words.length - offset) * width / remainingWidth))
           const text = words.slice(offset, offset + count).join(' ')
           offset += count
-          let rows = 1, used = 0
-          for (const word of text.split(' ')) {
-            const length = canvas.measureText(word + ' ').width
-            if (used && used + length > width) { rows++; used = 0 }
-            rows += Math.max(0, Math.ceil(length / width) - 1)
-            used += length
-          }
-          maxRows = Math.max(maxRows, rows)
-          next.push({ verse: verse.n, text, left: line.left - origin.left, top: line.bottom - origin.top + 2, width })
+          const textWidth = canvas.measureText(text).width
+          if (textWidth > 0) verseFontSize = Math.min(verseFontSize, 12 * Math.max(1, width - 1) / textWidth)
+          verseFragments.push({ verse: verse.n, text, left: line.left - origin.left, top: line.bottom - origin.top + 2, width, fontSize: 12 })
         }
+        next.push(...verseFragments.map(fragment => ({ ...fragment, fontSize: verseFontSize })))
       }
-      root.style.paddingBottom = `${maxRows * 20 + 8}px`
-      const height = `${Math.ceil(fontSize * 2.05 + maxRows * 20 + 8)}px`
+      root.style.paddingBottom = '20px'
+      const height = `${Math.ceil(fontSize * 2.05 + 20)}px`
       if (root.style.lineHeight !== height) { root.style.lineHeight = height; frame = requestAnimationFrame(measure); return }
       setFragments(next)
     }
@@ -66,5 +62,5 @@ export default function FlowTranslations({ container, surah, trans, translator, 
     return () => { live = false; observer.disconnect(); cancelAnimationFrame(frame); root.style.lineHeight = '2.05'; root.style.paddingBottom = '' }
   }, [container, surah, trans, translator, fontSize])
   return <>{fragments.map((f, i) => <span key={i} className="verse-translation" data-translation-verse={f.verse}
-    style={{ left: f.left, top: f.top, width: f.width }}>{f.text}</span>)}</>
+    style={{ left: f.left, top: f.top, width: f.width, fontSize: f.fontSize }}>{f.text}</span>)}</>
 }
