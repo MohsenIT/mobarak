@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { toFa } from '@/lib/quran'
+import TahqiqText from './TahqiqText'
 
 type Entry = { word: string; ar: string; fa: string; provenance?: { kind: string; translator: string; volume: number; page: number; pageEnd: number; heading: string }; examples?: { s: number; a: number; text: string; surahName: string }[] }
 type Definition = { root: string; entries: Entry[] }
@@ -40,10 +41,10 @@ export default function RootMeaning({ root }: { root: string }) {
               </p>}
               <p className="text-justify mt-2" dir="rtl">{entry.fa.split(/[.\n]/)[0]}.</p>
               <details className="mt-2"><summary className="cursor-pointer text-xs underline">{entry.provenance ? 'شرح فارسی و نمونه‌های قرآنی (ترجمهٔ خلاصه)' : 'متن کامل شرح فارسی و کاربردهای قرآنی'}</summary>
-                <p className="mt-2 whitespace-pre-wrap text-justify break-words">{entry.fa}</p>
+                <TahqiqText text={entry.fa} />
                 {entry.examples && <div className="mt-3 text-xs leading-7">
                   <p className="font-bold">نمونهٔ کاربرد در قرآن</p>
-                  {entry.examples.map(example => <p key={`${example.s}:${example.a}`}>«{example.text}» · سورهٔ {example.surahName}، آیهٔ {toFa(example.a)}</p>)}
+                  {entry.examples.map(example => <p key={`${example.s}:${example.a}`}><span className="font-quran tahqiq-example" lang="ar">«{example.text}»</span> · سورهٔ {example.surahName}، آیهٔ {toFa(example.a)}</p>)}
                 </div>}
               </details>
               <details className="mt-2"><summary className="cursor-pointer text-xs underline">متن عربی مدخل «{entry.word}»</summary>
