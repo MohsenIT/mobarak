@@ -1,0 +1,34 @@
+{
+  "archiveSha256": "07d08ed1787fef656b4c05f5c86545b28d2d4a37d2fae953de03c06f7761cb26",
+  "state": "reviewed-unresolved",
+  "roots": [
+    {
+      "root": "مجس",
+      "quranTokens": [
+        {
+          "text": "وَٱلْمَجُوسَ",
+          "surah": 22,
+          "ayah": 17,
+          "word": 8
+        }
+      ],
+      "exactSourceTokenSearch": "مجوس",
+      "sourceParagraphHits": [],
+      "finding": "No independent author entry or exact Quran token located in the supplied 2380-page text. Similar roots or general mentions of ساحة are insufficient to invent a match. Remains untranslated and unresolved; this is not a claim that the printed book has no entry."
+    },
+    {
+      "root": "سوح",
+      "quranTokens": [
+        {
+          "text": "بِسَاحَتِهِمْ",
+          "surah": 37,
+          "ayah": 177,
+          "word": 3
+        }
+      ],
+      "exactSourceTokenSearch": "بساحتهم",
+      "sourceParagraphHits": [],
+      "finding": "No independent author entry or exact Quran token located in the supplied 2380-page text. Similar roots or general mentions of ساحة are insufficient to invent a match. Remains untranslated and unresolved; this is not a claim that the printed book has no entry."
+    }
+  ]
+}

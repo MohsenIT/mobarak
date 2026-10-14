@@ -1,0 +1,913 @@
+{
+  "archiveSha256": "07d08ed1787fef656b4c05f5c86545b28d2d4a37d2fae953de03c06f7761cb26",
+  "note": "Reviewed mappings based on actual Quran tokens and complete source author entries; source titles, IDs, Arabic, footnotes and differing root analyses remain unchanged. Not a human scholarly review.",
+  "mappings": [
+    {
+      "root": "صرط",
+      "entryId": "root_0774",
+      "sourceHeading": "(سرط)",
+      "sourceSha256": "a8716ab871b500056b5027083f9fbcfa037c7e739728dcce83751194b4d40ea7",
+      "evidenceQuote": "{اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ} [الفاتحة: ٦]",
+      "references": [
+        {
+          "page_id": 997,
+          "volume": 2,
+          "printed_page": 998,
+          "url": "https://shamela.ws/book/21017/997"
+        },
+        {
+          "page_id": 998,
+          "volume": 2,
+          "printed_page": 999,
+          "url": "https://shamela.ws/book/21017/998"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ٱلصِّرَٰطَ",
+          "surah": 1,
+          "ayah": 6,
+          "word": 2
+        },
+        {
+          "text": "صِرَٰطَ",
+          "surah": 1,
+          "ayah": 7,
+          "word": 1
+        },
+        {
+          "text": "صِرَٰطٍۢ",
+          "surah": 10,
+          "ayah": 25,
+          "word": 10
+        }
+      ],
+      "reason": "Source explicitly explains Quran صراط under سرط and states the Quran spelling is صاد while its lexical origin is سين.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "نوس",
+      "entryId": "root_1756",
+      "sourceHeading": "(أنس)",
+      "sourceSha256": "0cd72fff47ea3d2090fe009cf4594e5b6727c5aefee5565416211b042bfa2094",
+      "evidenceQuote": "و (الناس) والمعتمد أنه اسم جمع للإنسان كقوم ورهط، وأن أصله\n\n(أناس) حذفت همزته بعد دخول (ال) عليها لكثرة الاستعمال، ثم استمر الحذف بعد حذف (ال).",
+      "references": [
+        {
+          "page_id": 2185,
+          "volume": 4,
+          "printed_page": 2186,
+          "url": "https://shamela.ws/book/21017/2185"
+        },
+        {
+          "page_id": 2186,
+          "volume": 4,
+          "printed_page": 2187,
+          "url": "https://shamela.ws/book/21017/2186"
+        },
+        {
+          "page_id": 2187,
+          "volume": 4,
+          "printed_page": 2188,
+          "url": "https://shamela.ws/book/21017/2187"
+        },
+        {
+          "page_id": 2188,
+          "volume": 4,
+          "printed_page": 2189,
+          "url": "https://shamela.ws/book/21017/2188"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "لِلنَّاسِ",
+          "surah": 10,
+          "ayah": 2,
+          "word": 2
+        },
+        {
+          "text": "ٱلنَّاسَ",
+          "surah": 10,
+          "ayah": 2,
+          "word": 11
+        },
+        {
+          "text": "لِلنَّاسِ",
+          "surah": 10,
+          "ayah": 11,
+          "word": 4
+        }
+      ],
+      "reason": "Quran corpus tokens are الناس. Author explicitly discusses الناس in أنس and derives it from أناس; preserve the author's different root analysis.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "زيد",
+      "entryId": "root_0683",
+      "sourceHeading": "(يد)",
+      "sourceSha256": "ca601e6d71546a761d52cba3038460a74e4bb0dd83253c6e7e66602e7fa52077",
+      "evidenceQuote": "{وَالَّذِينَ اهْتَدَوْا زَادَهُمْ هُدًى وَآتَاهُمْ تَقْوَاهُمْ} [محمد: ١٧]",
+      "references": [
+        {
+          "page_id": 885,
+          "volume": 2,
+          "printed_page": 886,
+          "url": "https://shamela.ws/book/21017/885"
+        },
+        {
+          "page_id": 886,
+          "volume": 2,
+          "printed_page": 887,
+          "url": "https://shamela.ws/book/21017/886"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "وَزِيَادَةٌۭ ۖ",
+          "surah": 10,
+          "ayah": 26,
+          "word": 4
+        },
+        {
+          "text": "وَيَزِدْكُمْ",
+          "surah": 11,
+          "ayah": 52,
+          "word": 11
+        },
+        {
+          "text": "تَزِيدُونَنِى",
+          "surah": 11,
+          "ayah": 63,
+          "word": 20
+        }
+      ],
+      "reason": "Source heading يد is inconsistent with the complete زيادة entry, its زاد/يزيد evidence and opening Muhammad 17 citation; title retained.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "صوب",
+      "entryId": "root_0928",
+      "sourceHeading": "(صوب، صيب)",
+      "sourceSha256": "cc132788c26867edf6ab169201a669e30c9945a986dbef2a4b60221f28f1ad3d",
+      "evidenceQuote": "{لَا يَتَكَلَّمُونَ إِلَّا مَنْ أَذِنَ لَهُ الرَّحْمَنُ وَقَالَ صَوَابًا} [النبأ: ٣٨]",
+      "references": [
+        {
+          "page_id": 1185,
+          "volume": 3,
+          "printed_page": 1186,
+          "url": "https://shamela.ws/book/21017/1185"
+        },
+        {
+          "page_id": 1186,
+          "volume": 3,
+          "printed_page": 1187,
+          "url": "https://shamela.ws/book/21017/1186"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "يُصِيبُ",
+          "surah": 10,
+          "ayah": 107,
+          "word": 16
+        },
+        {
+          "text": "مُصِيبُهَا",
+          "surah": 11,
+          "ayah": 81,
+          "word": 21
+        },
+        {
+          "text": "أَصَابَهُمْ ۚ",
+          "surah": 11,
+          "ayah": 81,
+          "word": 23
+        }
+      ],
+      "reason": "Recorded variant صوب، صيب is an unsplit comma-separated pair; author directly discusses أصاب and يصيب.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "ايي",
+      "entryId": "root_1894",
+      "sourceHeading": "(أبي، إي)",
+      "sourceSha256": "8d6ea85fce10dfe2a9d80ecaee804096026527699e6843716a1b1970a14de9a4",
+      "evidenceQuote": "{الر تِلْكَ آيَاتُ الْكِتَابِ الْحَكِيمِ} [يونس: ١] جاء في [ل رنب] \"قال خطام المجاشعي:",
+      "references": [
+        {
+          "page_id": 2330,
+          "volume": 4,
+          "printed_page": 2331,
+          "url": "https://shamela.ws/book/21017/2330"
+        },
+        {
+          "page_id": 2331,
+          "volume": 4,
+          "printed_page": 2332,
+          "url": "https://shamela.ws/book/21017/2331"
+        },
+        {
+          "page_id": 2332,
+          "volume": 4,
+          "printed_page": 2333,
+          "url": "https://shamela.ws/book/21017/2332"
+        },
+        {
+          "page_id": 2333,
+          "volume": 4,
+          "printed_page": 2334,
+          "url": "https://shamela.ws/book/21017/2333"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ءَايَـٰتُ",
+          "surah": 10,
+          "ayah": 1,
+          "word": 3
+        },
+        {
+          "text": "ٱلْـَٔايَـٰتِ",
+          "surah": 10,
+          "ayah": 5,
+          "word": 21
+        },
+        {
+          "text": "لَـَٔايَـٰتٍۢ",
+          "surah": 10,
+          "ayah": 6,
+          "word": 12
+        }
+      ],
+      "reason": "Source heading أبي، إي is inconsistent with the آية author entry; the explanation defines آية الرجل and discusses Quran آيات. Title retained.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "قوي",
+      "entryId": "root_1357",
+      "sourceHeading": "(قوو)",
+      "sourceSha256": "a5c3b827d201dcc257628bc3d4ff7a4a29c3b5e8f7499fd1c47f6256f60afded",
+      "evidenceQuote": "{خُذُوا مَا آتَيْنَاكُمْ بِقُوَّةٍ وَاذْكُرُوا مَا فِيهِ لَعَلَّكُمْ تَتَّقُونَ} [الأعراف: ١٧١]",
+      "references": [
+        {
+          "page_id": 1720,
+          "volume": 4,
+          "printed_page": 1721,
+          "url": "https://shamela.ws/book/21017/1720"
+        },
+        {
+          "page_id": 1721,
+          "volume": 4,
+          "printed_page": 1722,
+          "url": "https://shamela.ws/book/21017/1721"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "قُوَّةً",
+          "surah": 11,
+          "ayah": 52,
+          "word": 12
+        },
+        {
+          "text": "قُوَّتِكُمْ",
+          "surah": 11,
+          "ayah": 52,
+          "word": 14
+        },
+        {
+          "text": "ٱلْقَوِىُّ",
+          "surah": 11,
+          "ayah": 66,
+          "word": 17
+        }
+      ],
+      "reason": "Author treats القوة and القوي under doubled-weak-letter spelling قوو; explicit Quran القوة examples corroborate the corpus قوي analysis.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "هات",
+      "entryId": "root_1850",
+      "sourceHeading": "(هتو)",
+      "sourceSha256": "2009cebfcd6cdefdcc170ec09586c963ac822f0fa2c1cc11930e4c7a0640464e",
+      "evidenceQuote": "{قُلْ هَاتُوا بُرْهَانَكُمْ إِنْ كُنْتُمْ صَادِقِينَ} [البقرة: ١١١]",
+      "references": [
+        {
+          "page_id": 2282,
+          "volume": 4,
+          "printed_page": 2283,
+          "url": "https://shamela.ws/book/21017/2282"
+        },
+        {
+          "page_id": 2283,
+          "volume": 4,
+          "printed_page": 2284,
+          "url": "https://shamela.ws/book/21017/2283"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "هَاتُوا۟",
+          "surah": 2,
+          "ayah": 111,
+          "word": 14
+        },
+        {
+          "text": "هَاتُوا۟",
+          "surah": 21,
+          "ayah": 24,
+          "word": 7
+        },
+        {
+          "text": "هَاتُوا۟",
+          "surah": 27,
+          "ayah": 64,
+          "word": 15
+        }
+      ],
+      "reason": "Author expressly explains هاتوا برهانكم under هتو; these are the actual corpus tokens for هات.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "اخو",
+      "entryId": "root_0372",
+      "sourceHeading": "(أخو: أخي)",
+      "sourceSha256": "365d1601dde3596515732c0f2f34ba419de82a13b915187ad06eeacb70b513f9",
+      "evidenceQuote": "{إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ} [الحجرات: ١٠]",
+      "references": [
+        {
+          "page_id": 516,
+          "volume": 1,
+          "printed_page": 517,
+          "url": "https://shamela.ws/book/21017/516"
+        },
+        {
+          "page_id": 517,
+          "volume": 1,
+          "printed_page": 518,
+          "url": "https://shamela.ws/book/21017/517"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "وَأَخِيهِ",
+          "surah": 10,
+          "ayah": 87,
+          "word": 4
+        },
+        {
+          "text": "أَخَاهُمْ",
+          "surah": 11,
+          "ayah": 50,
+          "word": 3
+        },
+        {
+          "text": "أَخَاهُمْ",
+          "surah": 11,
+          "ayah": 61,
+          "word": 3
+        }
+      ],
+      "reason": "Recorded variant أخو: أخي was not split at colon; author explicitly discusses أخ and أخوة.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "امو",
+      "entryId": "root_1899",
+      "sourceHeading": "(أمر)",
+      "sourceSha256": "b1a517630fe3ee845e8e3ca7e3106d2ce8f2fe1b75546676ede10191793ef1af",
+      "evidenceQuote": "{وَلَأَمَةٌ مُؤْمِنَةٌ خَيرٌ مِنْ مُشْرِكَةٍ وَلَوْ أَعْجَبَتْكُمْ} [البقرة: ٢٢١]",
+      "references": [
+        {
+          "page_id": 2340,
+          "volume": 4,
+          "printed_page": 2341,
+          "url": "https://shamela.ws/book/21017/2340"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "وَلَأَمَةٌۭ",
+          "surah": 2,
+          "ayah": 221,
+          "word": 6
+        },
+        {
+          "text": "وَإِمَآئِكُمْ ۚ",
+          "surah": 24,
+          "ayah": 32,
+          "word": 7
+        }
+      ],
+      "reason": "Source heading أمر conflicts with the complete أمة entry and its sole Quran citations Baqarah 221 and Nur 32. Reassign this entry from امر to امو while preserving source heading and ID.",
+      "excludeFromRoots": [
+        "امر"
+      ]
+    },
+    {
+      "root": "عود",
+      "entryId": "root_1112",
+      "sourceHeading": "(عود عيد)",
+      "sourceSha256": "bcc939c04b91c19139b160608d00cb7f2c20b102ace7f35148e7e86468f9b0b8",
+      "evidenceQuote": "{كَمَا بَدَأَكُمْ تَعُودُونَ} [الأعراف: ٢٩]",
+      "references": [
+        {
+          "page_id": 1417,
+          "volume": 3,
+          "printed_page": 1418,
+          "url": "https://shamela.ws/book/21017/1417"
+        },
+        {
+          "page_id": 1418,
+          "volume": 3,
+          "printed_page": 1419,
+          "url": "https://shamela.ws/book/21017/1418"
+        },
+        {
+          "page_id": 1419,
+          "volume": 3,
+          "printed_page": 1420,
+          "url": "https://shamela.ws/book/21017/1419"
+        },
+        {
+          "page_id": 1420,
+          "volume": 3,
+          "printed_page": 1421,
+          "url": "https://shamela.ws/book/21017/1420"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "يُعِيدُهُۥ",
+          "surah": 10,
+          "ayah": 4,
+          "word": 11
+        },
+        {
+          "text": "يُعِيدُهُۥ ۚ",
+          "surah": 10,
+          "ayah": 34,
+          "word": 9
+        },
+        {
+          "text": "يُعِيدُهُۥ ۖ",
+          "surah": 10,
+          "ayah": 34,
+          "word": 15
+        }
+      ],
+      "reason": "Recorded variant عود عيد was not split at whitespace; author explicitly discusses عاد and Quran تعودون.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "فري",
+      "entryId": "root_1288",
+      "sourceHeading": "(فرئ)",
+      "sourceSha256": "cd97ce7f97dfd8216d2d0eb93bfe2093c4788f3b419bc53650e33622ac5c7e73",
+      "evidenceQuote": "{إِنَّمَا يَفْتَرِي الْكَذِبَ الَّذِينَ لَا يُؤْمِنُونَ بِآيَاتِ اللَّهِ} [النحل: ١٠٥]",
+      "references": [
+        {
+          "page_id": 1647,
+          "volume": 3,
+          "printed_page": 1648,
+          "url": "https://shamela.ws/book/21017/1647"
+        },
+        {
+          "page_id": 1648,
+          "volume": 3,
+          "printed_page": 1649,
+          "url": "https://shamela.ws/book/21017/1648"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ٱفْتَرَىٰ",
+          "surah": 10,
+          "ayah": 17,
+          "word": 4
+        },
+        {
+          "text": "يَفْتَرُونَ",
+          "surah": 10,
+          "ayah": 30,
+          "word": 16
+        },
+        {
+          "text": "يُفْتَرَىٰ",
+          "surah": 10,
+          "ayah": 37,
+          "word": 6
+        }
+      ],
+      "reason": "Source heading فرئ conflicts with the explicit فرى/يفري/افترى discussion and Nahl 105 citation; source heading retained.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "ثبي",
+      "entryId": "root_0148",
+      "sourceHeading": "(ثبو)",
+      "sourceSha256": "d33fb5dc358c7db3909dc2e5932a563db579c2f079c464966109f4dc0dc841f4",
+      "evidenceQuote": "{فَانْفِرُوا ثُبَاتٍ أَوِ انْفِرُوا جَمِيعًا} [النساء: ٧١].",
+      "references": [
+        {
+          "page_id": 226,
+          "volume": 1,
+          "printed_page": 227,
+          "url": "https://shamela.ws/book/21017/226"
+        },
+        {
+          "page_id": 227,
+          "volume": 1,
+          "printed_page": 228,
+          "url": "https://shamela.ws/book/21017/227"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ثُبَاتٍ",
+          "surah": 4,
+          "ayah": 71,
+          "word": 7
+        }
+      ],
+      "reason": "Author analyzes ثبات under ثبو; the actual corpus ثبي token is ثبات in Nisa 71, also the entry's opening citation.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "صغو",
+      "entryId": "root_0966",
+      "sourceHeading": "(صغو صغى)",
+      "sourceSha256": "84dff9b65790eca9afa3ab28aaa5f9ca91eee3a7ceceab5559f11e54be0679fd",
+      "evidenceQuote": "{إِنْ تَتُوبَا إِلَى اللَّهِ فَقَدْ صَغَتْ قُلُوبُكُمَا} [التحريم: ٤]",
+      "references": [
+        {
+          "page_id": 1227,
+          "volume": 3,
+          "printed_page": 1228,
+          "url": "https://shamela.ws/book/21017/1227"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "وَلِتَصْغَىٰٓ",
+          "surah": 6,
+          "ayah": 113,
+          "word": 1
+        },
+        {
+          "text": "صَغَتْ",
+          "surah": 66,
+          "ayah": 4,
+          "word": 6
+        }
+      ],
+      "reason": "Recorded variant صغو صغى was not split at whitespace; explicit Quran صغت and لتصغى support mapping.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "ضحو",
+      "entryId": "root_1001",
+      "sourceHeading": "(ضحو ضحى)",
+      "sourceSha256": "ec9bbb24409841ddb7fe0462754ecff6bfecf4fdd142cd6ada6ca3cb9383f131",
+      "evidenceQuote": "{وَالضُّحَى (١) وَاللَّيْلِ إِذَا سَجَى (٢) مَا وَدَّعَكَ رَبُّكَ وَمَا قَلَى} [الضحى: ١ - ٣]",
+      "references": [
+        {
+          "page_id": 1271,
+          "volume": 3,
+          "printed_page": 1272,
+          "url": "https://shamela.ws/book/21017/1271"
+        },
+        {
+          "page_id": 1272,
+          "volume": 3,
+          "printed_page": 1273,
+          "url": "https://shamela.ws/book/21017/1272"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ضُحًۭى",
+          "surah": 20,
+          "ayah": 59,
+          "word": 8
+        },
+        {
+          "text": "تَضْحَىٰ",
+          "surah": 20,
+          "ayah": 119,
+          "word": 6
+        },
+        {
+          "text": "ضُحًۭى",
+          "surah": 7,
+          "ayah": 98,
+          "word": 7
+        }
+      ],
+      "reason": "Recorded variant ضحو ضحى was not split at whitespace; author explicitly discusses ضحى and تضحي in Taha 119.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "نصي",
+      "entryId": "root_1770",
+      "sourceHeading": "(نصو)",
+      "sourceSha256": "9cc5541300a892baa08261c0643401e91b874959a15b42385dc809af5b441975",
+      "evidenceQuote": "{مَا مِنْ دَابَّةٍ إلا هُوَ آخِذٌ بِنَاصِيَتِهَا} [هود: ٥٦]",
+      "references": [
+        {
+          "page_id": 2202,
+          "volume": 4,
+          "printed_page": 2203,
+          "url": "https://shamela.ws/book/21017/2202"
+        },
+        {
+          "page_id": 2203,
+          "volume": 4,
+          "printed_page": 2204,
+          "url": "https://shamela.ws/book/21017/2203"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "بِنَاصِيَتِهَآ ۚ",
+          "surah": 11,
+          "ayah": 56,
+          "word": 13
+        },
+        {
+          "text": "بِٱلنَّوَٰصِى",
+          "surah": 55,
+          "ayah": 41,
+          "word": 5
+        },
+        {
+          "text": "بِٱلنَّاصِيَةِ",
+          "surah": 96,
+          "ayah": 15,
+          "word": 6
+        }
+      ],
+      "reason": "Author analyzes الناصية and النواصي under نصو; actual Quran corpus نصي tokens match these explicit author examples.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "ضيف",
+      "entryId": "root_1018",
+      "sourceHeading": "(ضوف ضيف)",
+      "sourceSha256": "96c29494175c69601bd85fd052bf0057ef222f7f96ee0153eb3fd3bcd11edf33",
+      "evidenceQuote": "{هَلْ أَتَاكَ حَدِيثُ ضَيْفِ إِبْرَاهِيمَ الْمُكْرَمِينَ} [الذاريات: ٢٤]",
+      "references": [
+        {
+          "page_id": 1292,
+          "volume": 3,
+          "printed_page": 1293,
+          "url": "https://shamela.ws/book/21017/1292"
+        },
+        {
+          "page_id": 1293,
+          "volume": 3,
+          "printed_page": 1294,
+          "url": "https://shamela.ws/book/21017/1293"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ضَيْفِىٓ ۖ",
+          "surah": 11,
+          "ayah": 78,
+          "word": 22
+        },
+        {
+          "text": "ضَيْفِ",
+          "surah": 15,
+          "ayah": 51,
+          "word": 3
+        },
+        {
+          "text": "ضَيْفِى",
+          "surah": 15,
+          "ayah": 68,
+          "word": 4
+        }
+      ],
+      "reason": "Recorded variant ضوف ضيف was not split at whitespace; author explicitly discusses ضيف إبراهيم and تضييف.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "صوع",
+      "entryId": "root_0961",
+      "sourceHeading": "(صوع. صيع)",
+      "sourceSha256": "c0fec845b5a005eb34639602e3bfbe211a532f0adc530b365ee13c7d5a213dbc",
+      "evidenceQuote": "{قَالُوا نَفْقِدُ صُوَاعَ الْمَلِكِ وَلِمَنْ جَاءَ بِهِ حِمْلُ بَعِيرٍ} [يوسف: ٧٢]",
+      "references": [
+        {
+          "page_id": 1222,
+          "volume": 3,
+          "printed_page": 1223,
+          "url": "https://shamela.ws/book/21017/1222"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "صُوَاعَ",
+          "surah": 12,
+          "ayah": 72,
+          "word": 3
+        }
+      ],
+      "reason": "Recorded variant صوع. صيع was not split at period; entry directly quotes صواع الملك.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "محو",
+      "entryId": "root_1631",
+      "sourceHeading": "(محو محى)",
+      "sourceSha256": "786b653d81f7d62538cbf637d04d844e609baa5672770f7f9297fa340dd99085",
+      "evidenceQuote": "{يَمْحُو اللَّهُ مَا يَشَاءُ وَيُثْبِتُ وَعِنْدَهُ أُمُّ الْكِتَابِ (٣٩)} [الرعد: ٣٩]",
+      "references": [
+        {
+          "page_id": 2035,
+          "volume": 4,
+          "printed_page": 2036,
+          "url": "https://shamela.ws/book/21017/2035"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "يَمْحُوا۟",
+          "surah": 13,
+          "ayah": 39,
+          "word": 1
+        },
+        {
+          "text": "فَمَحَوْنَآ",
+          "surah": 17,
+          "ayah": 12,
+          "word": 5
+        },
+        {
+          "text": "وَيَمْحُ",
+          "surah": 42,
+          "ayah": 24,
+          "word": 13
+        }
+      ],
+      "reason": "Recorded variant محو محى was not split at whitespace; explicit يمحو and فمحونا citations corroborate mapping.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "عنكب",
+      "entryId": "root_1198",
+      "sourceHeading": "(عنكبوت)",
+      "sourceSha256": "d4b785cce1c2916e194498770227a6edab5c84fcace7ae963244d3e160e322a4",
+      "evidenceQuote": "{وَإِنَّ أَوْهَنَ الْبُيُوتِ لَبَيْتُ الْعَنْكَبُوتِ} [العنكبوت: ٤١]",
+      "references": [
+        {
+          "page_id": 1541,
+          "volume": 3,
+          "printed_page": 1542,
+          "url": "https://shamela.ws/book/21017/1541"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ٱلْعَنكَبُوتِ",
+          "surah": 29,
+          "ayah": 41,
+          "word": 9
+        },
+        {
+          "text": "ٱلْعَنكَبُوتِ ۖ",
+          "surah": 29,
+          "ayah": 41,
+          "word": 16
+        }
+      ],
+      "reason": "Corpus assigns العنكبوت to عنكب, while supplied dictionary uses full heading عنكبوت; explicit Quran spider citation identifies the exact entry.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "ثيب",
+      "entryId": "root_0149",
+      "sourceHeading": "(ثوب)",
+      "sourceSha256": "8673d186f0d776a8efb6406320f6921f801cfa7f570ce784007d057308104439",
+      "evidenceQuote": "والثيّب من النساء",
+      "references": [
+        {
+          "page_id": 227,
+          "volume": 1,
+          "printed_page": 228,
+          "url": "https://shamela.ws/book/21017/227"
+        },
+        {
+          "page_id": 228,
+          "volume": 1,
+          "printed_page": 229,
+          "url": "https://shamela.ws/book/21017/228"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ثَيِّبَـٰتٍۢ",
+          "surah": 66,
+          "ayah": 5,
+          "word": 16
+        }
+      ],
+      "reason": "Author explicitly discusses ثيب and Quran ثيبات under ثوب; source retains its different morphological analysis.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "ترق",
+      "entryId": "root_0635",
+      "sourceHeading": "(رقو- رقى)",
+      "sourceSha256": "4c2c54f9c4135dcc7c279d60b32fb21f8decad07007ed351b04160fa8698f44d",
+      "evidenceQuote": "التَرْقُوَة",
+      "references": [
+        {
+          "page_id": 835,
+          "volume": 2,
+          "printed_page": 836,
+          "url": "https://shamela.ws/book/21017/835"
+        },
+        {
+          "page_id": 836,
+          "volume": 2,
+          "printed_page": 837,
+          "url": "https://shamela.ws/book/21017/836"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ٱلتَّرَاقِىَ",
+          "surah": 75,
+          "ayah": 26,
+          "word": 4
+        }
+      ],
+      "reason": "Author explicitly discusses ترقوة and Quran التراقي under رقو/رقى; corpus ترق token is التراقي in Qiyama 26.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "زمهر",
+      "entryId": "root_0715",
+      "sourceHeading": "(زمهرير)",
+      "sourceSha256": "6cddfe62c2824064f25cd9d5182f2a2b01cd05e3b6c3b2ee9f0343ebffa0da2d",
+      "evidenceQuote": "{مُتَّكِئِينَ فِيهَا عَلَى الْأَرَائِكِ لَا يَرَوْنَ فِيهَا شَمْسًا وَلَا زَمْهَرِيرًا} [الإنسان: ١٣]",
+      "references": [
+        {
+          "page_id": 920,
+          "volume": 2,
+          "printed_page": 921,
+          "url": "https://shamela.ws/book/21017/920"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "زَمْهَرِيرًۭا",
+          "surah": 76,
+          "ayah": 13,
+          "word": 10
+        }
+      ],
+      "reason": "Corpus assigns زمهريرا to زمهر while the supplied dictionary uses full word زمهرير; same Quran Insan 13 citation.",
+      "excludeFromRoots": []
+    },
+    {
+      "root": "شتو",
+      "entryId": "root_0865",
+      "sourceHeading": "(شتوشتى)",
+      "sourceSha256": "fd35fc0c4095d16aba45d7c1dd5468c28287f767399b930c6c0e4d0c95c9c062",
+      "evidenceQuote": "{رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ} [قريش: ٢]",
+      "references": [
+        {
+          "page_id": 1103,
+          "volume": 2,
+          "printed_page": 1104,
+          "url": "https://shamela.ws/book/21017/1103"
+        },
+        {
+          "page_id": 1104,
+          "volume": 2,
+          "printed_page": 1105,
+          "url": "https://shamela.ws/book/21017/1104"
+        },
+        {
+          "page_id": 1105,
+          "volume": 2,
+          "printed_page": 1106,
+          "url": "https://shamela.ws/book/21017/1105"
+        }
+      ],
+      "quranTokens": [
+        {
+          "text": "ٱلشِّتَآءِ",
+          "surah": 106,
+          "ayah": 2,
+          "word": 3
+        }
+      ],
+      "reason": "Recorded variant شتوشتى joins two weak-final forms; explicit الشتاء entry and Quraysh 2 citation corroborate mapping.",
+      "excludeFromRoots": []
+    }
+  ]
+}
