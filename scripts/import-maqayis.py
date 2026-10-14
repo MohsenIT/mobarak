@@ -53,6 +53,15 @@ for f in sorted(files):
   if current and r['kind']=='p':
    current['footnotes' if r['footnote'] else 'paragraphs'].append({'page':r['page'],'text':body if start else text});current['pageEnd']=r['page']
 for e in entries:e['ar']='\n\n'.join(p['text'] for p in e['paragraphs'])
+reviews_path=ROOT/'data/maqayis/source-reviews.json'
+if reviews_path.exists():
+ for review in json.loads(reviews_path.read_text())['entries']:
+  identity=review['sourceIdentity']
+  source_file=next(f for f in sources if f['volume']==identity['volume'])
+  if source_file['sha256']!=review['sourceFileSha256']:raise ValueError(f'Reviewed source changed: {identity}')
+  matches=[i for i,e in enumerate(entries) if all(e[k]==v for k,v in identity.items())]
+  if len(matches)!=1:raise ValueError(f'Review identity missing or ambiguous: {identity}')
+  entries[matches[0]]=review['entry']
 roots=json.load(open(ROOT/'public/data/roots.json'));by={}
 for e in entries:by.setdefault(e['key'],[]).append(e)
 matched={r:by[norm(r)] for r in roots if norm(r) in by}

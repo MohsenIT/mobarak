@@ -21,7 +21,15 @@ class SourceChecks(unittest.TestCase):
     matches=[e for e in self.source['entries'] if e['key']==root];self.assertEqual(len(matches),1)
     self.assertEqual(published['ar'],matches[0]['ar']);self.assertEqual(published['fa'],translation['fa']);self.assertEqual(published['summary'],translation['summary'])
     self.assertNotEqual(published['fa'],published['summary']);self.assertEqual(published['provenance']['arabicSha256'],hashlib.sha256(published['ar'].encode()).hexdigest())
+    if translation.get('sourceSha256'):self.assertEqual(translation['sourceSha256'],published['provenance']['arabicSha256'])
     self.assertGreater(len(published['fa']),20);self.assertGreaterEqual(published['provenance']['pageEnd'],published['provenance']['page'])
  def test_contradictory_qist_meanings_not_collapsed(self):
   self.assertIn('قِسْط',self.translations['قسط']['fa']);self.assertIn('قَسْط',self.translations['قسط']['fa']);self.assertIn('متضاد',self.translations['قسط']['summary'])
+ def test_reviewed_entry_corrections_are_reproducible(self):
+  reviews=json.loads((ROOT/'data/maqayis/source-reviews.json').read_text())['entries']
+  for review in reviews:
+   with self.subTest(identity=review['sourceIdentity']):
+    matches=[e for e in self.source['entries'] if all(e[k]==v for k,v in review['sourceIdentity'].items())]
+    self.assertEqual(matches,[review['entry']])
+    self.assertEqual(review['sourceFileSha256'],next(f['sha256'] for f in self.source['source']['files'] if f['volume']==review['sourceIdentity']['volume']))
 if __name__=='__main__':unittest.main()
