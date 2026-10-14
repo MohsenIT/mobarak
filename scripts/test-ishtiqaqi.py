@@ -32,8 +32,11 @@ class Checks(unittest.TestCase):
     found=[p for p in page['paragraphs'] if p['source']['paragraph']==ref['paragraph']]
     self.assertEqual(len(found),1);self.assertEqual(found[0]['text'],paragraph['text'])
  def test_full_translation_and_summary_are_separate(self):
-  self.assertEqual(set(self.index['translatedRoots']),{'عرش','بسم','جوع','جدث'})
-  self.assertEqual(len(self.index['summarizedRoots']),10)
+  self.assertTrue({'عرش','بسم','جوع','جدث','لقي','قول','رحم','رحق'} <= set(self.index['translatedRoots']))
+  for root in self.index['translatedRoots']:
+   entries=json.loads((ROOT/f'public/data/ishtiqaqi/{root}.json').read_text())['entries']
+   self.assertTrue(all(e['translation'] and e['translation'].get('faFull') for e in entries))
+  self.assertTrue(set(self.index['translatedRoots']) <= set(self.index['summarizedRoots']))
   translated=json.loads((ROOT/'data/ishtiqaqi/translations.json').read_text())
   for key,t in translated.items():
    self.assertEqual(t['sourceSha256'],hashlib.sha256(self.entries[key]['explanation'].encode()).hexdigest())
