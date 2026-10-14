@@ -169,3 +169,25 @@ Starting root comparison from the context tab keeps its bottom sheet open.
 While context comparison is active, previous/next context navigation updates
 the comparison range and shared-root colors in place. The header comparison
 control still opens the manual-range comparison tool.
+
+## Al-Tahqiq root meanings
+
+The root tab includes the Persian explanation and Quranic usages from the
+user-supplied Android app «التّحقیق (فارسی)», with the Arabic entry available
+separately. This is the app's translated summary of Hasan Mostafavi's
+«التحقیق فی کلمات القرآن الکریم», attributed by `assets/aboutapp.html` to
+Sadeq Abbasi and the University of Tehran Quran and Etrat student schools.
+The app does not supply volume/page references; none are invented.
+
+Run `python3 scripts/import-tahqiq.py /path/to/base.apk` to extract its Android
+resource string arrays without executing the app. `orgwords` contains 1772
+unique entry titles; `mani` contains 3544 strings, paired Arabic then Persian
+for each title. Original extracted texts, attribution and APK/resource hashes
+are retained in `data/tahqiq/source.json`. Per-root JSON files load on demand.
+The import currently matches 1554 of 1642 site roots after spelling and shadda
+normalization. Eight matches retain multiple explicitly named entries rather
+than guessing between homographic words; 88 unmatched roots show an explicit
+missing-entry message. No translations are generated or substituted.
+
+Validate preserved texts, known semantic anchors, coverage and ambiguous
+entries with `python3 scripts/test-tahqiq.py`.

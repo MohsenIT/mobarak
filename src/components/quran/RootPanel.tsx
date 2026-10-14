@@ -7,6 +7,7 @@ import type { Selection } from './MushafPage'
 import { nextAnalysisLocation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
 import SelectionDetails from './SelectionDetails'
 import ContextDetails from './ContextDetails'
+import RootMeaning from './RootMeaning'
 import { getContext } from '@/lib/contexts'
 import QuranText from './QuranText'
 import { IconClose, IconMaximize, IconRestore, IconRoot, IconSortIndex } from './Ornaments'
@@ -268,6 +269,7 @@ export default function RootPanel({
             </div>
           ) : (
             <>
+              <RootMeaning key={root} root={root} />
               {stats && (
                 <>
                   <div className="flex gap-2 mb-4">
