@@ -7,7 +7,7 @@ export default function SourceReference({ text, label = 'منبع' }: { text: st
     <PopoverTrigger asChild>
       <button type="button" className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs leading-5 cursor-pointer" aria-label={`${label}: ${text}`} style={{ borderColor: 'var(--line)', color: 'var(--ink-soft)' }}>{label}</button>
     </PopoverTrigger>
-    <PopoverContent dir="rtl" side="top" className="max-w-[calc(100vw-24px)] text-xs leading-7 whitespace-pre-wrap" style={{ background: 'var(--paper)', color: 'var(--ink)', borderColor: 'var(--line)', zIndex: 100 }}>
+    <PopoverContent dir="rtl" side="top" className="max-w-[calc(100vw-24px)] text-xs leading-7 whitespace-pre-wrap" style={{ background: 'var(--paper)', color: 'var(--ink)', borderColor: 'var(--line)', zIndex: 100, maxHeight: 'min(60dvh, var(--radix-popover-content-available-height, 60dvh))', overflowY: 'auto', overscrollBehavior: 'contain' }}>
       {text}
     </PopoverContent>
   </Popover>

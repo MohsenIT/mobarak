@@ -6,6 +6,7 @@ import TahqiqText from './TahqiqText'
 import SourceReference from './SourceReference'
 import { ChevronDown } from 'lucide-react'
 import MaqayisMeaning from './MaqayisMeaning'
+import IshtiqaqiMeaning from './IshtiqaqiMeaning'
 
 type Entry = { word: string; ar: string; fa: string; provenance?: { kind: string; translator: string; volume: number; page: number; pageEnd: number; heading: string }; examples?: { s: number; a: number; text: string; surahName: string }[] }
 type Definition = { root: string; entries: Entry[] }
@@ -22,7 +23,7 @@ function load(root: string) {
 }
 
 export default function RootMeaning({ root }: { root: string }) {
-  return <><TahqiqMeaning root={root} /><MaqayisMeaning key={root} root={root} /></>
+  return <><TahqiqMeaning root={root} /><MaqayisMeaning key={root} root={root} /><IshtiqaqiMeaning key={`ishtiqaqi:${root}`} root={root} /></>
 }
 
 function TahqiqMeaning({ root }: { root: string }) {
