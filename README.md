@@ -159,3 +159,13 @@ root colors, and a hidden-root count offers the same reset. Movement beyond
 10px or pointer cancellation aborts the hold; releasing a completed hold does
 not trigger a second tap. These controls apply only to shared comparison roots.
 Filters are local to the current comparison range and are not stored.
+
+Selection highlights share a muted sage tone across root, word, verse and
+context views. The selected anchor word has a slightly stronger fill and a
+thin outline than other words of its root; comparison root colors remain
+individually identifiable with softer fills in both themes.
+
+Starting root comparison from the context tab keeps its bottom sheet open.
+While context comparison is active, previous/next context navigation updates
+the comparison range and shared-root colors in place. The header comparison
+control still opens the manual-range comparison tool.

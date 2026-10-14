@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { Meta, SurahData, Translations } from '@/lib/quran'
-import { loadMeta, loadSurah, loadTrans, toFa } from '@/lib/quran'
+import { loadMeta, loadSurah, loadTrans, loadGlobalRoots, compareRootRange, toFa } from '@/lib/quran'
 import MushafPage, { type Selection } from '@/components/quran/MushafPage'
 import FlowPage from '@/components/quran/FlowPage'
 import RootPanel from '@/components/quran/RootPanel'
+import { rootHue } from '@/lib/comparison-colors'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
@@ -68,6 +69,7 @@ export default function Home() {
   const [panelMax, setPanelMax] = useState(false)
   const [showIndex, setShowIndex] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
+  const [contextComparison, setContextComparison] = useState(false)
   const [comparisonSurah, setComparisonSurah] = useState(1)
   const [hiddenComparisonRoots, setHiddenComparisonRoots] = useState<Set<string>>(new Set())
   const [soloComparisonRoot, setSoloComparisonRoot] = useState<string | null>(null)
@@ -79,9 +81,27 @@ export default function Home() {
     setComparisonSurah(s)
     setComparisonRange({ s, from, to })
     setComparisonRoot(null)
-    setShowComparison(true)
-    setSel(null)
+    setShowComparison(false)
+    setContextComparison(true)
   }, [])
+
+  useEffect(() => {
+    if (!contextComparison || !sel || analysisSelection?.tab !== 'context' || !analysisSelection.from || !analysisSelection.to) return
+    const { s, from, to } = analysisSelection
+    setComparisonSurah(s)
+    setComparisonRange(current => current?.s === s && current.from === from && current.to === to ? current : { s, from, to })
+  }, [contextComparison, sel, analysisSelection])
+
+  useEffect(() => {
+    if (!contextComparison || showComparison || !comparisonRange) return
+    let live = true
+    const { s, from, to } = comparisonRange
+    setComparisonRoots({})
+    Promise.all([loadSurah(s), loadGlobalRoots()]).then(([data, roots]) => {
+      if (live) setComparisonRoots(Object.fromEntries(compareRootRange(data, roots, from, to).map(row => [row.root, rootHue(row.root)])))
+    }).catch(() => { if (live) setComparisonRoots({}) })
+    return () => { live = false }
+  }, [contextComparison, showComparison, comparisonRange])
 
   const frameRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
@@ -386,7 +406,7 @@ export default function Home() {
         <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
           <IconSortIndex />
         </button>
-        <button className="icon-btn" onClick={() => { setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }} aria-label="ارتباط ریشه‌ای بازه آیات" title="ارتباط ریشه‌ای بازه آیات">
+        <button className="icon-btn" onClick={() => { setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }} aria-label="ارتباط ریشه‌ای بازه آیات" title="ارتباط ریشه‌ای بازه آیات">
           <GitCompareArrows size={20} />
         </button>
 
@@ -404,14 +424,14 @@ export default function Home() {
           </button>
       </header>
 
-      {!showComparison && Object.keys(comparisonRoots).length > 0 && comparisonRange?.s === curSurahN && (
+      {!showComparison && comparisonRange?.s === curSurahN && (contextComparison || Object.keys(comparisonRoots).length > 0) && (
         <div className="relative z-10 flex flex-wrap items-center gap-2 px-3 py-2 text-xs" style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
           <span className="comparison-range-band rounded px-2 py-1">درون بازه {toFa(comparisonRange.from)}–{toFa(comparisonRange.to)}</span>
           {soloComparisonRoot ? <button className="chip" aria-label="نمایش همهٔ ریشه‌ها" onClick={() => { setSoloComparisonRoot(null); setHiddenComparisonRoots(new Set()) }}>فقط {soloComparisonRoot.split('').join(' ')} ×</button>
             : hiddenComparisonRoots.size > 0 ? <button className="chip" aria-label="روشن کردن همهٔ ریشه‌ها" onClick={() => setHiddenComparisonRoots(new Set())}>{toFa(hiddenComparisonRoots.size)} ریشه پنهان · بازنشانی</button> : <span>هر ریشه یک رنگ</span>}
           <span className="basis-full" style={{ color: 'var(--ink-soft)' }}>تپ: خاموش/روشن · نگه‌داشتن: فقط این ریشه</span>
           <button className="underline mr-auto" onClick={() => setShowComparison(true)}>بازگشت به مقایسه</button>
-          <button aria-label="پاک کردن هایلایت مقایسه" onClick={() => { setComparisonRoot(null); setComparisonRoots({}); setComparisonRange(null); setSel(null) }}>×</button>
+          <button aria-label="پاک کردن هایلایت مقایسه" onClick={() => { setContextComparison(false); setComparisonRoot(null); setComparisonRoots({}); setComparisonRange(null); setSel(null) }}>×</button>
         </div>
       )}
       {/* ===== Main + side root panel ===== */}

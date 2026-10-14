@@ -128,8 +128,9 @@
   --gold-faint: rgba(168, 132, 47, 0.16);
   --sheet: #f6f1e3;
   --word-hover: rgba(42, 157, 143, 0.14);
-  --word-active: rgba(233, 196, 106, 0.55);
-  --word-root: rgba(42, 157, 143, 0.22);
+  --word-active: rgba(95, 145, 131, 0.16);
+  --word-selected: rgba(95, 145, 131, 0.3);
+  --word-root: var(--word-active);
   --radius: 12px;
 }
 
@@ -148,8 +149,9 @@
   --gold-faint: rgba(233, 196, 106, 0.14);
   --sheet: #123028;
   --word-hover: rgba(233, 196, 106, 0.12);
-  --word-active: rgba(233, 196, 106, 0.4);
-  --word-root: rgba(233, 196, 106, 0.2);
+  --word-active: rgba(145, 186, 168, 0.18);
+  --word-selected: rgba(145, 186, 168, 0.32);
+  --word-root: var(--word-active);
 }
 
 html, body {
@@ -246,13 +248,13 @@ body {
 }
 .quran-word.same-root { background: var(--word-root); border-radius: 4px; }
 .quran-word.selected-word {
-  background: rgba(42, 157, 100, 0.48);
-  box-shadow: inset 0 0 0 1.5px rgba(25, 117, 72, 0.65);
+  background: var(--word-selected);
+  box-shadow: inset 0 0 0 1px var(--sage);
   animation: none;
 }
 [data-theme='night'] .quran-word.selected-word {
-  background: rgba(61, 190, 128, 0.5);
-  box-shadow: inset 0 0 0 1.5px rgba(105, 220, 152, 0.8);
+  background: var(--word-selected);
+  box-shadow: inset 0 0 0 1px var(--sage);
 }
 .quran-word.flash {
   animation: wordFlash 2.4s ease-out 1;
@@ -1040,10 +1042,10 @@ input[type='range'].page-slider::-moz-range-thumb {
 }
 
 /* Range colors also override selected/flash word backgrounds. */
-.range-inside, .quran-word.range-inside { background: #c9e4cb; color: #173e25; }
-.range-outside, .quran-word.range-outside { background: #f2d6ae; color: #583710; }
-[data-theme="night"] .range-inside { background: #28543a; color: #e2f4e6; }
-[data-theme="night"] .range-outside { background: #6a4826; color: #ffecd3; }
+.range-inside, .quran-word.range-inside { background: var(--word-active); color: var(--ink); }
+.range-outside, .quran-word.range-outside { background: var(--word-active); color: var(--ink); }
+[data-theme="night"] .range-inside { background: var(--word-active); color: var(--ink); }
+[data-theme="night"] .range-outside { background: var(--word-active); color: var(--ink); }
 
 .quran-word.analysis-selected { background: var(--word-active); border-radius: 4px; box-shadow: inset 0 -2px var(--sage); }
 
@@ -1069,15 +1071,17 @@ input[type='range'].page-slider::-moz-range-thumb {
 .sheet-size-select { max-width: 65px; min-width: 0; font-size: 11px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 5px 1px; }
 .panel-handle:focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }
 
-.quran-word.comparison-shared, .comparison-color-key { background: hsl(var(--comparison-hue) var(--comparison-saturation) var(--comparison-lightness)); color: #16332b; border-radius: 4px; }
+.quran-word.comparison-shared, .analysis-range .quran-word.comparison-shared, .mushaf-line[data-analysis-range] .quran-word.comparison-shared, .comparison-color-key { background: hsl(var(--comparison-hue) var(--comparison-saturation) var(--comparison-lightness) / 0.6); color: #16332b; border-radius: 4px; }
 .quran-word.comparison-shared { text-decoration-line: underline; text-decoration-color: hsl(var(--comparison-hue) 60% 35%); text-decoration-thickness: 2px; text-underline-offset: 5px; }
 .quran-word.comparison-outside { text-decoration-style: dashed; }
-[data-theme="night"] .quran-word.comparison-shared, [data-theme="night"] .comparison-color-key { background: hsl(var(--comparison-hue) var(--comparison-saturation) var(--comparison-darkness)); color: #f5f1e5; }
+[data-theme="night"] .quran-word.comparison-shared, [data-theme="night"] .analysis-range .quran-word.comparison-shared, [data-theme="night"] .mushaf-line[data-analysis-range] .quran-word.comparison-shared, [data-theme="night"] .comparison-color-key { background: hsl(var(--comparison-hue) var(--comparison-saturation) var(--comparison-darkness) / 0.55); color: #f5f1e5; }
 [data-theme="night"] .quran-word.comparison-shared { text-decoration-color: hsl(var(--comparison-hue) 65% 70%); }
 
-.comparison-range-band { background: #ecd99a; box-decoration-break: clone; -webkit-box-decoration-break: clone; border-radius: 3px; }
-.mushaf-line[data-comparison-band]::after { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: var(--comparison-left); width: var(--comparison-width); background: #ecd99a; border-radius: 3px; pointer-events: none; }
-[data-theme="night"] .comparison-range-band, [data-theme="night"] .mushaf-line[data-comparison-band]::after { background: #514523; }
+.comparison-range-band { background: var(--word-active); box-decoration-break: clone; -webkit-box-decoration-break: clone; border-radius: 3px; }
+.mushaf-line[data-comparison-band]::after { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: var(--comparison-left); width: var(--comparison-width); background: var(--word-active); border-radius: 3px; pointer-events: none; }
+[data-theme="night"] .comparison-range-band, [data-theme="night"] .mushaf-line[data-comparison-band]::after { background: var(--word-active); }
 
 .quran-word[data-comparison-root] { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.quran-word.comparison-shared.comparison-muted { background: transparent; color: var(--ink); text-decoration-color: var(--line-strong); text-decoration-thickness: 1px; box-shadow: none; }
+.quran-word.comparison-shared.comparison-muted, .analysis-range .quran-word.comparison-shared.comparison-muted, .mushaf-line[data-analysis-range] .quran-word.comparison-shared.comparison-muted { background: transparent; color: var(--ink); text-decoration-color: var(--line-strong); text-decoration-thickness: 1px; box-shadow: none; }
+
+.quran-word.analysis-selected.selected-word:not(.comparison-shared) { background: var(--word-selected); }
