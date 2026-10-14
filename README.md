@@ -177,17 +177,50 @@ user-supplied Android app «التّحقیق (فارسی)», with the Arabic ent
 separately. This is the app's translated summary of Hasan Mostafavi's
 «التحقیق فی کلمات القرآن الکریم», attributed by `assets/aboutapp.html` to
 Sadeq Abbasi and the University of Tehran Quran and Etrat student schools.
-The app does not supply volume/page references; none are invented.
+The APK entries do not supply volume/page references; none are invented for them.
+The supplemental DOCX entries below retain their actual volume/page references.
 
 Run `python3 scripts/import-tahqiq.py /path/to/base.apk` to extract its Android
 resource string arrays without executing the app. `orgwords` contains 1772
 unique entry titles; `mani` contains 3544 strings, paired Arabic then Persian
 for each title. Original extracted texts, attribution and APK/resource hashes
 are retained in `data/tahqiq/source.json`. Per-root JSON files load on demand.
-The import currently matches 1554 of 1642 site roots after spelling and shadda
+The APK import matches 1554 of 1642 site roots after spelling and shadda
 normalization. Eight matches retain multiple explicitly named entries rather
-than guessing between homographic words; 88 unmatched roots show an explicit
-missing-entry message. No translations are generated or substituted.
+than guessing between homographic words. The supplied DOCX archive provides
+source-linked translated summaries for the remaining 88 roots, bringing final
+coverage to 1642 of 1642. APK translations remain unchanged.
 
 Validate preserved texts, known semantic anchors, coverage and ambiguous
 entries with `python3 scripts/test-tahqiq.py`.
+
+### Arabic-book supplement
+
+`data/tahqiq/supplement-source.json` preserves the Arabic source section,
+selected Arabic excerpt, freshly translated Persian summary, original heading,
+volume/pages, DOCX paragraph boundaries and file/archive SHA-256 hashes for
+each of the 88 supplemented roots. The publication is the supplied third
+edition from Dar al-Kutub al-Ilmiyyah / Mostafavi works publishing center.
+`supplement-map.json` records manually checked heading links;
+`supplement-fa.json` holds the translated summaries. The UI identifies these
+as AI-assisted translated summaries, independently of the APK translation.
+
+Mappings were checked against actual Quran words: `ايي` points to «آية»,
+`هات` to the discussion of «هات» within «ها», `كلو` to «كلا», and `لوت` to
+the negating «لات», not the idol «اللات». Where a word is discussed within
+another heading, such as «قسطاس» under «قسط», its source heading remains
+visible. Selected Arabic excerpts are verbatim paragraph selections.
+Quran examples are taken from the site's verse-aligned word data; printed
+verse numbers in the source text are preserved as source text.
+
+To reproduce the supplement from the supplied archive:
+
+```sh
+python3 scripts/extract-tahqiq-docx.py /path/to/archive.zip /tmp/tahqiq-book.json
+python3 scripts/prepare-tahqiq-supplement.py /path/to/archive.zip /tmp/tahqiq-book.json
+python3 scripts/build-tahqiq-supplement.py
+python3 scripts/test-tahqiq.py
+```
+
+Re-importing the APK automatically reapplies the supplement. There is no
+runtime dependency on the uploaded archive or on an external translation API.

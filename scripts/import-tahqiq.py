@@ -100,3 +100,7 @@ for root in roots:
 index = {'source': source, 'entryCount': len(entries), 'matchedRoots': matched, 'ambiguousRoots': ambiguous, 'missingRoots': missing}
 (ROOT / 'public/data/tahqiq-index.json').write_text(json.dumps(index, ensure_ascii=False, separators=(',', ':')) + '\n')
 print(f'{len(entries)} paired entries; {len(matched)}/{len(roots)} roots matched, {len(ambiguous)} retain multiple explicitly named candidates, {len(missing)} unmatched.')
+
+if (ROOT / 'data/tahqiq/supplement-source.json').exists():
+    import subprocess
+    subprocess.run([sys.executable, str(ROOT / 'scripts/build-tahqiq-supplement.py')], check=True)

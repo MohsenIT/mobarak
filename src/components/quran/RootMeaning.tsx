@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toFa } from '@/lib/quran'
 
-type Entry = { word: string; ar: string; fa: string }
+type Entry = { word: string; ar: string; fa: string; provenance?: { kind: string; translator: string; volume: number; page: number; pageEnd: number; heading: string }; examples?: { s: number; a: number; text: string; surahName: string }[] }
 type Definition = { root: string; entries: Entry[] }
 type Index = { matchedRoots: string[]; source: { title: string; author: string; translator: string } }
 let indexPromise: Promise<Index> | undefined
@@ -33,15 +34,23 @@ export default function RootMeaning({ root }: { root: string }) {
             {state.data.entries.length > 1 && <p className="text-xs" style={{ color: 'var(--ink-soft)' }}>چند مدخل با نوشتار نزدیک وجود دارد؛ عنوان اصلی هر مدخل برای تشخیص معنای مورد نظر حفظ شده است.</p>}
             {state.data.entries.map(entry => <div key={entry.word}>
               {state.data!.entries.length > 1 && <h4 className="font-bold mt-2">مدخل «{entry.word}»</h4>}
+              {entry.provenance && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>
+                ترجمهٔ خلاصه از متن عربی با کمک هوش مصنوعی · جلد {toFa(entry.provenance.volume)}، صفحهٔ {toFa(entry.provenance.page)}{entry.provenance.pageEnd > entry.provenance.page ? ` تا ${toFa(entry.provenance.pageEnd)}` : ''}
+                <span className="block">مدخل مأخذ: «{entry.provenance.heading}»</span>
+              </p>}
               <p className="text-justify mt-2" dir="rtl">{entry.fa.split(/[.\n]/)[0]}.</p>
-              <details className="mt-2"><summary className="cursor-pointer text-xs underline">متن کامل شرح فارسی و کاربردهای قرآنی</summary>
+              <details className="mt-2"><summary className="cursor-pointer text-xs underline">{entry.provenance ? 'شرح فارسی و نمونه‌های قرآنی (ترجمهٔ خلاصه)' : 'متن کامل شرح فارسی و کاربردهای قرآنی'}</summary>
                 <p className="mt-2 whitespace-pre-wrap text-justify break-words">{entry.fa}</p>
+                {entry.examples && <div className="mt-3 text-xs leading-7">
+                  <p className="font-bold">نمونهٔ کاربرد در قرآن</p>
+                  {entry.examples.map(example => <p key={`${example.s}:${example.a}`}>«{example.text}» · سورهٔ {example.surahName}، آیهٔ {toFa(example.a)}</p>)}
+                </div>}
               </details>
               <details className="mt-2"><summary className="cursor-pointer text-xs underline">متن عربی مدخل «{entry.word}»</summary>
                 <p lang="ar" className="mt-2 whitespace-pre-wrap text-justify break-words">{entry.ar}</p>
               </details>
             </div>)}
-            <p className="text-xs mt-3" style={{ color: 'var(--ink-soft)' }}>منبع: خلاصهٔ «التحقیق فی کلمات القرآن الکریم»، حسن مصطفوی؛ ترجمهٔ صادق عباسی و مجموعهٔ مدارس دانشجویی قرآن و عترت دانشگاه تهران، طبق معرفی اپ.</p>
+            <p className="text-xs mt-3" style={{ color: 'var(--ink-soft)' }}>{state.data.entries.some(entry => entry.provenance) ? 'منبع: «التحقیق فی کلمات القرآن الکریم»، حسن مصطفوی؛ متن عربی از مجموعهٔ ۱۴ جلدی ارسالی. این شرح، ترجمه و تلخیص تازه است.' : 'منبع: خلاصهٔ «التحقیق فی کلمات القرآن الکریم»، حسن مصطفوی؛ ترجمهٔ صادق عباسی و مجموعهٔ مدارس دانشجویی قرآن و عترت دانشگاه تهران، طبق معرفی اپ.'}</p>
           </>}
   </section>
 }
