@@ -43,7 +43,7 @@ def finalize(e,key,ledger):
     except Exception as error:
         bulk.save(own/'finalize-v1-error.json',{'errorType':type(error).__name__,'atUtc':bulk.now()})
 
-def run(publish):
+def run(publish,concurrency=8,limit=0):
     with (luna.WORK/'workflow.lock').open('a') as workflow_lock:
         fcntl.flock(workflow_lock,fcntl.LOCK_EX)
         with (luna.JOB/'bulk/run.lock').open('a') as lock:
@@ -53,11 +53,11 @@ def run(publish):
             if not budget.get('additionalBudgetAuthorization'):raise RuntimeError('Additional authorization missing')
             key=os.environ.get('QURAN_TRANSLATION_API_KEY')
             if not key:raise RuntimeError('Credential unavailable')
-            entries=luna.load_queue();ledger=luna.Ledger(luna.JOB)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+            entries=luna.load_queue();entries=entries[:limit] if limit else entries;ledger=luna.Ledger(luna.JOB)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as pool:
                 iterator=iter(entries);active={}
                 while not bulk.STOP.is_set():
-                    while len(active)<8:
+                    while len(active)<concurrency:
                         try:e=next(iterator)
                         except StopIteration:break
                         active[pool.submit(finalize,e,key,ledger)]=e
@@ -70,4 +70,4 @@ def run(publish):
         workflow.integrate_and_publish(publish,True)
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--publish',action='store_true');args=parser.parse_args();run(args.publish)
+    parser=argparse.ArgumentParser();parser.add_argument('--publish',action='store_true');parser.add_argument('--concurrency',type=int,choices=[1,2,4,8],default=8);parser.add_argument('--limit',type=int,default=0);args=parser.parse_args();run(args.publish,args.concurrency,args.limit)
