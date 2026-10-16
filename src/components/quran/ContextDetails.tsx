@@ -5,6 +5,7 @@ import type { Translator, SurahData, Translations } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { contextSource, getContext, getSurahContexts } from '@/lib/contexts'
 import QuranText from './QuranText'
+import SourceReference from './SourceReference'
 
 interface Props {
   selection: Selection
@@ -23,10 +24,15 @@ export default function ContextDetails({ selection, surah, trans, translator, on
   const page = context?.sourcePage ?? source?.sourcePage ?? 1
   return (
     <>
-      <p className="text-xs leading-6 mb-3" style={{ color: 'var(--ink-soft)' }}>
-        {context?.origin === 'user-clarification' ? 'طبق تکمیل شما، کل این سوره یک سیاق است.' : `بر اساس «${contextSource.title}» · ${contextSource.publisher}`}
-        <br /><a className="underline" href={`${contextSource.url}#page=${page}`} target="_blank" rel="noreferrer">مشاهدهٔ صفحه {toFa(page)} منبع</a>
-      </p>
+      <div className="mb-3">
+        <SourceReference label="منبع سیاق‌بندی" source={{
+          title: contextSource.title,
+          description: 'مرجع تعیین مرز سیاق‌ها و پیوند موضوعی آیات در این سایت.',
+          fields: [{ label: 'تهیه‌کننده', value: contextSource.publisher }, { label: 'نسخه', value: 'فایل PDF ارسالی' }, context?.origin === 'user-clarification' ? { label: 'مبنای بازه', value: 'تکمیل کاربر برای سوره‌های کوتاه' } : { label: 'ارجاع', value: `صفحهٔ ${toFa(page)}` }],
+          notes: [context?.origin === 'user-clarification' ? 'بازهٔ این سوره طبق تکمیل کاربر، کل سوره در نظر گرفته شده است؛ این مورد از PDF استخراج نشده است.' : 'بازه‌ها از سیاق‌بندی اولیهٔ منبع گرفته شده‌اند؛ این تقسیم‌بندی یک پیشنهاد تفسیری است.'],
+          links: [{ label: context?.origin === 'user-clarification' ? 'سند سیاق‌بندی' : `صفحهٔ ${toFa(page)} منبع`, href: context?.origin === 'user-clarification' ? contextSource.url : `${contextSource.url}#page=${page}` }],
+        }} />
+      </div>
       {!context ? <p role="status" className="text-sm leading-8">در فایل منبع، محدودهٔ سیاق این سوره مشخص نشده است؛ بازه‌ای به‌صورت حدسی انتخاب نمی‌شود.</p> : (
         <>
           <h3 className="font-bold text-sm mb-2">{context.sourceLabel ? `سیاق‌های ${context.sourceLabel}` : `سیاق ${toFa(context.id)} از ${toFa(source?.ranges.length ?? 0)}`} · آیات {toFa(context.from)} تا {toFa(context.to)}</h3>
