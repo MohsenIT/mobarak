@@ -36,33 +36,63 @@ def full_concordance(text):
     """
     text = unicodedata.normalize('NFKC', text)
     text = text.translate(str.maketrans('۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩یک', '01234567890123456789يك'))
-    text = re.sub(r'\(\s*[0-9]+\s*\)', '', text)
+    # Preserve hamza phoneme while equating conventional final seat spellings.
+    text = text.replace('ىء', 'ئ').replace('يء', 'ئ')
+    text = re.sub(r'\(\s*[0-9]+\s*(?:\)|﴾)', '', text)
     text = re.sub(r'[\u064b-\u065f\u0670ـ]', '', text)
+    # Whole conventional Prophetic blessings differ by publisher's family invocation.
+    # Require complete phrase, retain common blessing; never drop isolated وآله.
+    text = re.sub(r'(?<![ء-ي])صل[ىي]\s+الله\s+عليه\s+(?:و\s*آله\s+)?وسلم(?![ء-ي])', 'صلى الله عليه وسلم', text)
     return re.sub(r'[^\u0621-\u064a0-9]', '', text)
+
+
+def editorial_concordance(text):
+    """Bibliographic volume:page values are RTL-reordered across editions.
+    Only numeric parenthesized citation groups in EDITORIAL notes are reordered.
+    All values and multiplicity are preserved; author text never uses this helper.
+    """
+    text = unicodedata.normalize('NFKC', text).translate(str.maketrans('۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩', '01234567890123456789'))
+    text = re.sub(r'\(\s*([0-9\s:/]+[:/][0-9\s:/]+)\s*\)',
+                  lambda m: '[' + ':'.join(sorted(re.findall(r'[0-9]+', m[1]))) + ']', text)
+    return full_concordance(text)
 
 
 def remove_identical_editorial_lines(text, footnotes):
     """Only delete a dash-labelled entire line exactly composed of known footnotes.
     No prefix match: an appended author sentence prevents deletion.
     """
-    known = [full_concordance(re.sub(r'^\s*[0-9٠-٩۰-۹]+\)\s*', '', f['text'])) for f in footnotes]
+    known = [editorial_concordance(re.sub(r'^\s*[0-9٠-٩۰-۹]+\)\s*', '', f['text'])) for f in footnotes]
     known = [x for x in known if x]
     kept, removed = [], []
-    for line in text.splitlines():
+    lines = text.splitlines()
+    index = 0
+    while index < len(lines):
+        line = lines[index]
         if not re.match(r'^\s*—\s*\([0-9٠-٩۰-۹]+\)', line):
             kept.append(line)
+            index += 1
             continue
-        value = full_concordance(line)
-        reachable = {0}
-        for i in range(len(value)+1):
-            if i in reachable:
-                for item in known:
-                    if value.startswith(item, i):
-                        reachable.add(i + len(item))
-        if value and len(value) in reachable:
-            removed.append({'lineSha256': sha(line), 'normalizedTextSha256': sha(value)})
+        consumed = 0
+        # Exact known editorial material may wrap over multiple physical lines.
+        # No prefix deletion: the entire chosen span must segment into whole notes.
+        for count in range(1, min(20, len(lines)-index)+1):
+            span = '\n'.join(lines[index:index+count])
+            value = editorial_concordance(span)
+            reachable = {0}
+            for i in range(len(value)+1):
+                if i in reachable:
+                    for item in known:
+                        if value.startswith(item, i):
+                            reachable.add(i + len(item))
+            if value and len(value) in reachable:
+                removed.append({'lineSha256': sha(span), 'lineCount': count, 'normalizedTextSha256': sha(value)})
+                consumed = count
+                break
+        if consumed:
+            index += consumed
         else:
             kept.append(line)
+            index += 1
     return '\n'.join(kept), removed
 
 
@@ -191,7 +221,19 @@ def self_test():
     assert clean == 'نص المؤلف' and len(removed) == 1
     clean, removed = remove_identical_editorial_lines('نص المؤلف\n— (١) هذا بيان المحقق. كلام المؤلف المفقود', footnotes)
     assert not removed and 'المفقود' in clean
-    print('9 adversarial boundary/quantity/hamza/footnote tests passed')
+    assert full_concordance('شىء بريء') == full_concordance('شئ برئ')
+    assert editorial_concordance('اللسان (2 : 415)') == editorial_concordance('اللسان (415: 2)')
+    assert editorial_concordance('اللسان (2 : 415)') != editorial_concordance('اللسان (415: 3)')
+    assert full_concordance('اللسان (2 : 415)') != full_concordance('اللسان (415: 2)')
+    assert full_concordance('رسول الله صلى اللّه عليه وآله وسلم قال') == full_concordance('رسول الله صلى الله عليه وسلم قال')
+    assert full_concordance('قال وآله') != full_concordance('قال')
+    assert full_concordance('صلى الله عليه وآله فقط') != full_concordance('صلى الله عليه فقط')
+    assert full_concordance('الآية (١﴾') == full_concordance('الآية (1)')
+    clean, removed = remove_identical_editorial_lines('نص المؤلف\n— (١) هذا بيان\nالمحقق.', footnotes)
+    assert clean == 'نص المؤلف' and removed[0]['lineCount'] == 2
+    clean, removed = remove_identical_editorial_lines('نص المؤلف\n— (١) هذا بيان\nكلام آخر', footnotes)
+    assert not removed
+    print('19 adversarial boundary/quantity/hamza/footnote/honorific tests passed')
 
 
 def main():
@@ -236,9 +278,15 @@ def main():
             commit = None
         independent_evidence = {'fileSha256': hashlib.sha256(independent_raw).hexdigest(), 'repository': 'https://github.com/abuyahyo/mojam', 'commit': commit, 'path': 'data/maqayis.json'}
     exclusions = json.loads((ROOT/'data/maqayis/source-audit-exclusions.json').read_text())['entries']
+    mapping_path = ROOT/'data/maqayis/root-mappings.json'
+    mappings = json.loads(mapping_path.read_text()).get('entries', {}) if mapping_path.exists() else {}
     report = {}
     for root in roots:
-        candidates = entries.get(norm(root), [])
+        mapping = mappings.get(root)
+        source_key = mapping['sourceKey'] if mapping else norm(root)
+        candidates = entries.get(source_key, [])
+        if mapping and (len(candidates) != 1 or sha(candidates[0]['ar']) != mapping['sourceSha256']):
+            candidates = []
         item = {'verdict': 'needs_review', 'reasons': []}
         if len(candidates) != 1:
             item['reasons'] = ['source_entry_missing_or_ambiguous']
@@ -255,7 +303,7 @@ def main():
         # deletion of footnotes or other Arabic words. Only Arabic letters remain;
         # punctuation, whitespace, harakat, numeric reference markers are ignored.
         # This certifies concordance, explicitly NOT replay against original HTML.
-        independent_matches = independent.get(norm(root), [])
+        independent_matches = independent.get(source_key, [])
         if item['verdict'] != 'verified' and len(candidates) == 1 and len(independent_matches) == 1:
             entry, comparison = candidates[0], independent_matches[0]
             independent_body, removed = remove_identical_editorial_lines(comparison['text'], entry.get('footnotes', []))
@@ -269,8 +317,8 @@ def main():
                     'independentTextSha256': sha(comparison['text']),
                     'normalizedFullTextSha256': sha(left),
                     'normalizedLetterCount': len(left),
-                    'normalization': 'NFKC; harakat/tatweel removed; Persian ya/kaf normalized; decimal digits normalized AND retained except parenthesized numeric footnote calls; every Arabic base letter including hamza retained; no Arabic-word deletions',
-                    'originalHtmlReplayed': False, 'exactEditorialFootnoteLinesRemoved': removed})
+                    'normalization': 'NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions',
+                    'originalHtmlReplayed': False, 'rootMapping': mapping, 'exactEditorialFootnoteLinesRemoved': removed, 'editorialCitationNormalization': 'Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered'})
         if len(candidates) == 1:
             entry = candidates[0]
             exclusion = exclusions.get(root)

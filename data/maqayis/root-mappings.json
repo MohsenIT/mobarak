@@ -1,0 +1,979 @@
+{
+  "schemaVersion": 1,
+  "scope": "Only untranslated Quran roots with repeated final radical; unique biliteral book heading; first two author letter names explicitly match; complete independent text concordance retaining hamza and numbers. Not a translation-quality claim.",
+  "entries": {
+    "كلل": {
+      "sourceKey": "كل",
+      "sourceSha256": "0c4a7c7a9b145b06c49ddb8f82582b6126e78c4e63bd1aa745640e6bc93aa922",
+      "sourceWord": "كل",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الكاف واللام أصولٌ ثلاثةٌ صِحاح. فالأول يدلُّ على خلاف. الحِدّة ، والثاني يدلُّ على إطافة شيء بشيء ، والثالث عضوٌ من الأعضاء.",
+        "expectedAuthorLetters": "الكاف واللام",
+        "independentRoot": "كل",
+        "independentTextSha256": "231fdd3073d882cce795b54e65919bc44c36b69f8a7ab0684a1927a8a981a565",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "ddd541931d3837396af7893dbcdaddf0722030349a318a7df43dd0f69aa4cc56",
+        "normalizedLetterCount": 1085,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "a172cf3fddc8678716f37806d974b0ee9eef58bdbcb63165a2ff37b9332f4dba",
+            "lineCount": 1,
+            "normalizedTextSha256": "97162a5e5d6eee4f1f43ff24dd5bb6590f8c6b202ed33c9be2a8934fc924ef3b"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "زلل": {
+      "sourceKey": "زل",
+      "sourceSha256": "44dd6a6490c445ee34b695ac1f3c15ea7ea8c6daa1e057ae54612cb936ca9731",
+      "sourceWord": "زل",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الزاء واللام أصل مطّرد منقاسٌ فى المضاعَف ، وكذلك فى كل زاءٍ بعدها لامٌ فى الثلاثى. وهذا من عجيب هذا الأصل. تقول : زلَ عن مكانه زَليلاً وزَلَّا. والماء الزُّلال : العَذْب ؛ لأنه يَزِلّ عن ظَهر اللِّسان لِرقَّته. والزَّلَّة : الخطأ ؛ لأن المخطئ زلَ عن نَهْج الصَّواب ، وتزلزَلت الأرضُ : اضطرَبت ، وزُلْزِلَتْ زِلْزَالاً. والمِزَلَّة (3): المكان الدَّحْضُ. فأما الذِّئْبُ الأزَلُ ، وهو الأرْسَح ، فقال ابنُ الأعرابىّ : سمِّى بذلك مِن قولهم زَلَ إِذا عدا. وهو القياس الصَّحيح ثم شُبِّهَتْ به المرأة الرَّصْعاء فقيل زَلَّاء. وإِن كان الأَرْسَح كما قيل فهو قياسُ",
+        "expectedAuthorLetters": "الزاء واللام",
+        "independentRoot": "زل",
+        "independentTextSha256": "655e45cb990d6ddde9c5c41a1a48ab7f121b84f04a1c994f33f7655d8ce5d6a2",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "df1cf375248796b3751e8c29ac5e3ca828558f96eb18a6178efe0a27fdd99dbc",
+        "normalizedLetterCount": 483,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "f0ccea983fcbc8cad53348db129f4acecb73e8eb1e4f6cad420282bcf2eb5e77",
+            "lineCount": 1,
+            "normalizedTextSha256": "43f9d4e104e3f9c92172da55a0c14d39c51506616edbe668da31c90a49f24e83"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "قلل": {
+      "sourceKey": "قل",
+      "sourceSha256": "1e82c103873c84f8098992ca95a188e4818bed954d6c3cfc67cf75a20c7d6ad4",
+      "sourceWord": "قل",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "القاف واللام أصلانِ صحيحان ، يدلُّ أحدُهما على نَزَارة الشَّىء ، والآخرُ على خلاف الاستقرارِ ، وهو الانزعاج.",
+        "expectedAuthorLetters": "القاف واللام",
+        "independentRoot": "قل",
+        "independentTextSha256": "4375fcfd43d09e96462f29b9259d5f5c193bfb29b8ca3b3abf78979b61bf2848",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "cbe3f9dcd2571a20eca2680c644fb9e40c98fcc64f041dac4460b3181e671223",
+        "normalizedLetterCount": 550,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "d704ed1ebe082b807d73adcb3d8b97679869f5d8d0b8d3b378ae25cfeddce74f",
+            "lineCount": 1,
+            "normalizedTextSha256": "b9f33350157b951d05a598e71a4d5bbab91939d35ebf8d2e7bff8354e592e5d8"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "غمم": {
+      "sourceKey": "غم",
+      "sourceSha256": "3acd8ee462dda64bcebd793aa283eb05d1ef3f63d6d5b283847d8b41ba17b705",
+      "sourceWord": "غم",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الغين والميم أصلٌ واحد صحيح يدلُّ على تغطية وإطباق. تقول : غَمَمتُ الشَّيْءَ أغُمُّه ، أى غطَّيته. والغَمَمُ : أن يُغطِّى الشَّعر القفا والجبهةَ فى بنائهِ. يقال : رجلٌ أغمُ وجبهةٌ غماء. قال :",
+        "expectedAuthorLetters": "الغين والميم",
+        "independentRoot": "غم",
+        "independentTextSha256": "fd86cb5561b2016d04953321b209bc235352521cf39d9a232c49e2a106fcab5b",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "8a07e0d3eb69c528008d8a6fd7605a957c08d98df62936302669606f93ffd5d0",
+        "normalizedLetterCount": 482,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "8ce3905b2091bd7b0755c3c21e6e43b6b9e039a24305aa47ed27084f152eb2df",
+            "lineCount": 1,
+            "normalizedTextSha256": "eedaf7a9fb79a540733de8bf61e1141c771edb95048b755e16353df58a9518dc"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "ذلل": {
+      "sourceKey": "ذل",
+      "sourceSha256": "6479453e5fe47baa739c7dfb5b70e52c4329bfb68a6f07b3b8a4f02150a60d39",
+      "sourceWord": "ذل",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الذال واللام فى التضعيف والمطابقة أصلٌ واحد يدلُّ على الخُضوع ، والاستكانة ، واللِّين. فالذُّل : ضِدّ العِزّ. وهذه مقابلةٌ فى التضادِّ صحيحة ، تدلُّ على الحكمة التى خُصَّتْ بها العرب دون سائر الأمم ؛ لأنّ العزّ من العَزَازِ ، وهى الأرض الصُّلْبة الشديدة. والذِّلُ خلاف الصُّعوبة. وحُكى عن بعضهم (2)أنَّه قال : «بعضُ الذِّلِ - بكسر الذال - أبْقَى للأهْلِ والمال».",
+        "expectedAuthorLetters": "الذال واللام",
+        "independentRoot": "ذل",
+        "independentTextSha256": "dc70038bfc84fa40ff388d1f1331451489cffa3b372e9440dc1741c37afaaac5",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "c1de7fa97a36959e56ca68a6842aef7683d32a754496dc82928e769a2180639d",
+        "normalizedLetterCount": 498,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "مسس": {
+      "sourceKey": "مس",
+      "sourceSha256": "bd2bc98f319da76447e36f9c4b040cd0781bcf9c42a6123de5bfd7020d48e868",
+      "sourceWord": "مس",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الميم والسين أصلٌ صحيح واحد يدلُّ على جَسِّ الشّيء باليد. ومَسِسْتُه أَمَسُّهُ. وربَّما قالوا : مَسَسْتُ أَمُسُ. والممسُوس : الذي به مَسٌّ. كأنّ الجِنّ مسَّتْه. والمَسُوس من الماء : ما نالته الأيدي. قال :",
+        "expectedAuthorLetters": "الميم والسين",
+        "independentRoot": "مس",
+        "independentTextSha256": "cab431d30d5b506fd1df7b0494e0e1990ec76e779acff1fc93ee1a986604ab0f",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "0295b9196d6650deea76b58048e81fba57fe4aa0121ce2920766c5915828f231",
+        "normalizedLetterCount": 153,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "قصص": {
+      "sourceKey": "قص",
+      "sourceSha256": "244e87f0cd729f9be72c693732598677bb6f5dd86a898ce75b49d0e0bb9c19b1",
+      "sourceWord": "قص",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "القاف والصاد أصلٌ صحيح يدلُّ على تتبُّع الشَّىء. من ذلك قولهم : اقتصَصْتُ الأثَر ، إذا تتبَّعتَه (1). ومن ذلك اشتقاقُ القِصاص فى الجِراح ، وذلك أنَّه يُفعَل بهِ مثلُ فِعلِه بالأوّل ، فكأنَّه اقتصَ أثره. ومن الباب القِصَّة والقَصَص ، كلُّ ذلك يُتَتبَّع فيذكر. وأمَّا الصَّدر فهو القَصُ ، وهو عندنا قياسُ الباب ، لأنَّه متساوى العِظام ، كأنَّ كلَّ عظم منها يُتْبع للآخَر.",
+        "expectedAuthorLetters": "القاف والصاد",
+        "independentRoot": "قص",
+        "independentTextSha256": "3cfea773c06abad45a2bf2d716ab5cfceb008ed43da450c108f3e77116b7ac0f",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "92cedb60b3b0b2a21de1b580ee65bf249adbe6784521cf36780a97d32fdba7d7",
+        "normalizedLetterCount": 623,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "61ea1892ba83b87e080b9a3b7bc41d760242333304034bc64b8b25be353c4f0c",
+            "lineCount": 1,
+            "normalizedTextSha256": "cdb06d16bc0ef3788dc8e254ba0e1bd997f96208f3e518d2c510925b2a6a97d9"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "صدد": {
+      "sourceKey": "صد",
+      "sourceSha256": "bcfce20c5bfae1bbd85883d115eb07837ac9d5a97c1574436e01a12047fa368e",
+      "sourceWord": "صد",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الصاد والدال معظمُ بابِه يَؤُول إلى إعراضٍ وعُدول. ويجىء بعد ذلك كلماتٌ تَشِذّ. فالصَّدُّ : الإعراض : يقال صَدَّ يصُدُّ ، وهو مَيلٌ إلى أحد الجانبين. ثم تقول : صدَدْتُ فلاناً عن الأمر ، إذا عَدَلْتَه عنه. والصُّدَّانِ : جانِبا الوادى ، الواحد صَدٌّ ، وهو القياس ، لأنَّ الجانبَ مائلٌ لا محالة. ويقولون : إنّ الصَّدَدَ ما استَقْبَلَ (2). يقال : هذه الدّارُ على صَدَدِ هذه. ويقولون : الصَّدد : القُرب. والصُّدَّاد (3): الطَّريق إلى الماء. والصُّدُّ : الجبَل. وهذه الكلماتُ التى ذكرتُها فليست عندى أصلاً ؛ لبُعدها عن القياس ، وإنْ صحَّتْ فهى محمولةٌ* على الأصل.",
+        "expectedAuthorLetters": "الصاد والدال",
+        "independentRoot": "صد",
+        "independentTextSha256": "e94bfaac2ca3f37705ee205f4f4bd1a58d5fef7ff4cb5382f43c04127a5412e8",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "d31c5cf4e167491b82b5596010c100b474b18aaab952325a8596f8f1c0245533",
+        "normalizedLetterCount": 459,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "كنن": {
+      "sourceKey": "كن",
+      "sourceSha256": "66322b3708b01e7f1fc7311ca1ea319adcda050f6b9719fd747bac55d29ed70b",
+      "sourceWord": "كن",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الكاف والنون أصلٌ واحدٌ يدلُّ على سَتْرٍ أو صون. يقال كنَنْتُ الشيءَ في كِنِّهِ ، إذا جعلتَه فيه وصُنتَه. وأكننتُ الشّيءَ : أخفيتُه والكِنانة المعروفة ، وهي القياس. ومن الباب الكُنَّة ، كالجناح يُخرِجه الرّجل من حائِطِه ، وهو كالسُّتْرة. ومن الباب الكَانُون ، لأنَّه يستُر ما تحتَه. وربما سمَّوا الرَّجُلَ الثقيلَ كانوناً. قال الحطيئة :",
+        "expectedAuthorLetters": "الكاف والنون",
+        "independentRoot": "كن",
+        "independentTextSha256": "1359b86db4dfeb9df0da80855f01f67203a286fa36562452829fde9f8817848c",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "9f4587c7b8aa3bccc877a079d33f19a2d18ab0a09de77128c5ce52673cf9b797",
+        "normalizedLetterCount": 323,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "طلل": {
+      "sourceKey": "طل",
+      "sourceSha256": "2e88f1d4510c2cd4db17d56e2644cbb65b120c0186b42218655a45714704ba07",
+      "sourceWord": "طل",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الطاء واللام يدل على أصولٍ ثلاثة : أحدها غضاضة الشَّىء وغضارَته ، والآخَر الإشراف ، والثالث إبطال الشَّىء.",
+        "expectedAuthorLetters": "الطاء واللام",
+        "independentRoot": "طل",
+        "independentTextSha256": "0d52fba39a91d81510bfc0b3c530b52c733108f092036cc826d15be0becf229b",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "499393c457d432173b132e07d866f8b0225886fe2be33a61660b3f29aba68343",
+        "normalizedLetterCount": 627,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "6aee03385e4c864ed999c1d05f35f094674c5b2a3267d8649e50158a93f337dd",
+            "lineCount": 1,
+            "normalizedTextSha256": "91d312c64b69681fb34fc02feabdfaac2edbe9faed2c25d6e4742024717e96d8"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "عفف": {
+      "sourceKey": "عف",
+      "sourceSha256": "e6cdcc89aaf7cfa1b8e3c78c9440cd8315fb7d4b1623ed1cc11ac90f591dfc34",
+      "sourceWord": "عف",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "العين والفاء أصلان صحيحان : أحدُهما الكفُّ عن القبيح ، والآخر دالٌّ على قلّة شىء.",
+        "expectedAuthorLetters": "العين والفاء",
+        "independentRoot": "عف",
+        "independentTextSha256": "17e7fc1b4263eb4e614c52086d2d6cd5e24412276015ddd2cc398922cfbd407f",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "2039e3538468f5d4bec901cab56c18dd1d034c85bd388192010973bb75614f1e",
+        "normalizedLetterCount": 359,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "حظظ": {
+      "sourceKey": "حظ",
+      "sourceSha256": "00384f9195681b6d57c04df244a2b01fbfb59e253648a247ab225bdce492a6ee",
+      "sourceWord": "حظ",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الحاء والظاء أصل واحد ، وهو النَّصيب والْجَدّ. يقال فلان. أحظُّ من فلانٍ ، وهو محظُوظٌ. وجمع الحظِّ أحَاظٍ على غير قياس. قال أبو زيد : رجلٌ حَظِيظ جديد ، إذا كان ذا حظّ من الرزق. ويقال حَظِظْتُ فى الأمر أَحَظُّ. قال : وجمع الحَظّ أحُظٌّ (4).",
+        "expectedAuthorLetters": "الحاء والظاء",
+        "independentRoot": "حظ",
+        "independentTextSha256": "03b9014c244e1dd56d12af210b4d2fadd2c4375034ea8383826c85887ec93bf1",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "21ebf090a7e5d834ad97a8089af8f0b21badb471f58884fc52301b66f7b916c1",
+        "normalizedLetterCount": 149,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "سدد": {
+      "sourceKey": "سد",
+      "sourceSha256": "7ffb3494c341b42f3eb34a0e8d812bf5a6d7746a25ac3d5bf2f44ad8134ef4bb",
+      "sourceWord": "سد",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "السين والدال أصل واحد ، وهو يدلُّ على ردم شىء ومُلاءمَته من ذلك سددت الثُّلمة سدًّا. وكلُّ حاجزٍ بين الشيئين سَدٌّ. ومن ذلك السَّديد ، ذُو السَّداد ، أى الاستقامة (1)؛ كأنه لا ثُلْمة فيه والصَّواب أيضاً سَداد. يقال قُلتَ سَدَاداً. وسَدَّدَه اللّه عزَّ وجل ويقال أسَدَّ الرجلُ ، إذا قال السَّداد. ومن الباب : «فيه سِدادٌ من عَوَز» بالكسرة. وكذلك سِداد الثُّلمة والثَّغر قال :",
+        "expectedAuthorLetters": "السين والدال",
+        "independentRoot": "سد",
+        "independentTextSha256": "a9a05331bd47c79bdecab81e1601190bb13c78d4a1e73f1afb9c1175a2be79f2",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "0d44eec9f830b37f37f0d595811b5326ecd48f7e30bc4cf6d7e77181cdc02e6c",
+        "normalizedLetterCount": 511,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "21528ce435d93c26914fd2b335d286a730d808ab585fae4ea207e904b1151e16",
+            "lineCount": 1,
+            "normalizedTextSha256": "97642e1d4dd1006e780821d69ab4798b1a83816bb623c72f5b9955dcdb4cc3a8"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "شكك": {
+      "sourceKey": "شك",
+      "sourceSha256": "44968b7f63decf042ad2c0147804f53b7798d1cefe18f8cc025a66ba79a741b8",
+      "sourceWord": "شك",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الشين والكاف أصل واحدٌ مشتقٌّ بعضُه من بعض ، وهو يدلُّ على التَّداخُل. من ذلك قولهم شكَكْتُه بالرُّمح ، وذلك إذا طعنتَه فداخَل السنانُ جسمَه. قال :",
+        "expectedAuthorLetters": "الشين والكاف",
+        "independentRoot": "شك",
+        "independentTextSha256": "4d98d12b0ee4299eaa87c2507e35c3a2c62b0bf3752347407491cb1d6f5c5c03",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "84f52c25068d54ed662e23658aba69842a04066985e41de2df3d4a5b74cdacb7",
+        "normalizedLetterCount": 682,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "65f276054889d4510f24c4c1686dfc9042a5763d13e4e68392ccf69059e0bb1b",
+            "lineCount": 1,
+            "normalizedTextSha256": "fc71eb9333e6f04e47be9fb2e7d1d4524f80294f720443e7a89f83d0fc114dcf"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "دلل": {
+      "sourceKey": "دل",
+      "sourceSha256": "9f5fb8ec89e9a2fcabf046ac7315ce0052c9ef7f937075a6092b3f4d63895040",
+      "sourceWord": "دل",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الدال واللام أصلان : أحدهما إبانة الشىء بأمارةٍ تتعلّمها ، ولآخَر اضطرابٌ فى الشىء.",
+        "expectedAuthorLetters": "الدال واللام",
+        "independentRoot": "دل",
+        "independentTextSha256": "b4e5bb85b56c711926c6929b2ff5215398bbca96456f31483b32c948dbd9e38a",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "f7be8889fc968f86e7e99cc50264d9dcd0e5e63bff3ebe8dcff9f267dc2d0341",
+        "normalizedLetterCount": 422,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "ستت": {
+      "sourceKey": "ست",
+      "sourceSha256": "82689ec7d769d60a8af70ffae68bb9b1210af842c4e0e68c07e3fafd47d03fab",
+      "sourceWord": "ست",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "السين والتاء ليس فيه إلا ستّة* وأصل التاء دال. وقد ذكر فى بابه.",
+        "expectedAuthorLetters": "السين والتاء",
+        "independentRoot": "ست",
+        "independentTextSha256": "372935599a69f083875b95b9a97b2afaa28a4f4fef0daf666c01c1595ecf8efe",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "10928897872dea868672e73394e817c0da8c5402174c202099e77ca593a63a78",
+        "normalizedLetterCount": 47,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "ذمم": {
+      "sourceKey": "ذم",
+      "sourceSha256": "09475ceffb33c5711c247451a7b1c22101fb9ae8c3d3c45b6688ac7ec8b58537",
+      "sourceWord": "ذم",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الذال والميم فى المضاعف أصلٌ واحد يدلُّ كلُّه على خلافِ الحمد. يقال ذَمَمْتُ فلاناً أذُمُّه ، فهو ذميمٌ ومذموم ، إذا كان غير حميد. ومن هذا الباب الذّمَّة ، وهى البئر القليلةُ الماء. وفى الحديث : «أنّه أتى على بئرٍ ذَمَّةٍ». وجمع الذَّمَّة ذِمام. قال ذو الرُّمّة :",
+        "expectedAuthorLetters": "الذال والميم",
+        "independentRoot": "ذم",
+        "independentTextSha256": "a61d02930aa66ca36554bab9529cfc38e1241f71601385ab3084ece8c992225c",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "7369bf559aeee0a8c7c8e882213e1dbecc6998369c28c722a00ab6bf0fb0d8c0",
+        "normalizedLetterCount": 1378,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "bc658cc9aba37b360c220405de02ee22aa3f2aa37cf00bbe47dbe7a1968483e2",
+            "lineCount": 1,
+            "normalizedTextSha256": "ea993588c47a46fb98afe630f8892b7cdf307937905294c4b47f134da1575f2b"
+          },
+          {
+            "lineSha256": "3ccc5e41b4324ec7ca6865e381bb75067f5d848741319f4d0f0346856ad97fc3",
+            "lineCount": 1,
+            "normalizedTextSha256": "be87095068e62325fc37e77e6ae2d74669a7741162c2f0759e905755f6283204"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "قدد": {
+      "sourceKey": "قد",
+      "sourceSha256": "6c6e76155b5f01cc92492f0ba2b98f5a37e5684668f778136e1671793ca80af7",
+      "sourceWord": "قد",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "القاف والدال أصلٌ صحيح يدلُّ على قَطْعِ الشىء طولاً ، ثم يستعار. يقولون : قَدَدْتُ الشَّىء قدَّا ، إذا قطعتَه طولا أقُدُّه ، ويقولون : هو حسَنُ القَدّ ، أى التقطيع ، فى امتدادِ قامته. والقِدُّ : سيرٌ يقَدُّ من جلدٍ غيرِ مدبوغٍ. واشتقاق القَدِيد منه. والقِدَّة : الطّريقةُ والفِرْقة من الناس ، إذا كان هوَى كلِّ واحدٍ غيرَ هوى صاحِبِه. ثمَّ يستعيرون هذا فيقولون : اقتدَّ فلانٌ الأمورَ ، إذا دَبَّرَها ومَيَّزها. وقَدَّ المسافرُ المَفازةَ. والقَيْدُود : النَّاقة الطَّويلة الظَّهر على الأرض. والقَدُّ : جِلد السَّخلة ، الماعزة ، ويقولون فى المثَل : «ما يَجْعَلُ قَدَّك إلى أديمك». ويقولون القُدَاد : وجَعٌ فى البطن.",
+        "expectedAuthorLetters": "القاف والدال",
+        "independentRoot": "قد",
+        "independentTextSha256": "58ee2803a0ac7718731044d7db863fc6866249ba4c5d8a2a787a217e781a9064",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "5255969c555d11bd999ade4ce4dd1d1f9b09ee04fd36951fcb593fa59ad85901",
+        "normalizedLetterCount": 381,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "دسس": {
+      "sourceKey": "دس",
+      "sourceSha256": "8d069c90dbde85f3b77eb9963996b03847da6630ee4438401f8fa1b34e7a8208",
+      "sourceWord": "دس",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الدال والسين فى المضاعف والمطابق أصلٌ واحد يدلُّ على دُخول الشىء تحت خفاءِ وسِرّ. يقال دَسَسْتُ الشَّىءَ فى التُّراب أدُسُّه دَسًّا. قال اللّه تعالى : ( أَيُمْسِكُهُ عَلى هُونٍ أَمْ يَدُسُّهُ فِي التُّرابِ ) . والدّسّاسة : حيَّة صَمّاء تكون تحت التراب.",
+        "expectedAuthorLetters": "الدال والسين",
+        "independentRoot": "دس",
+        "independentTextSha256": "0dcaf42c33a07222e2834291598e1d69e63b7d0160b710ff770b9abccaf4d4ff",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "4e569784293fb33e8823925ae0a73a54f72c718e1bda1aa1775f62251987d622",
+        "normalizedLetterCount": 349,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "d1b04bd599423f53b2d470b27050f826e07b7f3836631ebbae59dd383e786465",
+            "lineCount": 1,
+            "normalizedTextSha256": "f5eaa4fc121f956268a10b09e6446dc3aa35f5ab5c6ed3b5be21c6c6c3436b27"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "فزز": {
+      "sourceKey": "فز",
+      "sourceSha256": "bac04440698f42d95104d021092f2a6be4320baeba930c4f8f258a09a1e69a4c",
+      "sourceWord": "فز",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الفاء والزاء أُصَيلٌ يدلُّ على خفّةٍ وما قارَبَهَا. تقول : فَزَّهُ واستفزَّه ، إذا استخفَّه. قال اللّه تعالى : ( وَإِنْ كادُوا لَيَسْتَفِزُّونَكَ مِنَ الْأَرْضِ ) أى يحملونك على أن تَخِفَّ عنها. وأفزَّه الخوفُ وأفْزَعَه بمعنًى. وقد استفَزَّ فُلاناً جهْلُه. ورجل فَزٌّ : خفيف. ويقولون : فزَّ عن الشىء : عدل. والفَزُّ : ولَد البقرة. ويُمكن أن يسمَّى بذلك لخفَّة جسمِه. قال :",
+        "expectedAuthorLetters": "الفاء والزاء",
+        "independentRoot": "فز",
+        "independentTextSha256": "8c278419042f0779d5d6d44fda07d4eb0aabb77c11517a24b19bc31ffade1513",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "c4647ae4b76f99f79373a2c1de6f1dd18552a1800fdd21183f70d3a4ac1c8327",
+        "normalizedLetterCount": 261,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "e03610b0e81b461350dc393a2f21ff9ec7f8337ce651a123f84d0a9bcb4d3d32",
+            "lineCount": 1,
+            "normalizedTextSha256": "d5746f720eb9670e9f1de4dd24e4891095f9d8b7feccf334176fa57a7285994f"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "لفف": {
+      "sourceKey": "لف",
+      "sourceSha256": "9ffb12fa8a5e5c452faebb51b73c6f98803de63cc74c58279f1e31dd3ff2fbb2",
+      "sourceWord": "لف",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "اللام والفاء أصلٌ صحيح يدلُّ على تلوِّي شيء على شيء. يقال : لفَفْتُ الشّيءَ بالشيءِ لفًّا. ولففت عِمامَتي على رأسي. ويقال : جاء القومُ ومَن لَفَ لَفَّهم ، أي من تأشَّبَ إليهم ، كأنّه التفَ بهم. قال الأعشى :",
+        "expectedAuthorLetters": "اللام والفاء",
+        "independentRoot": "لف",
+        "independentTextSha256": "07c074cf7e7f4954723af9b18f42c73b5da2e1a052ef480af8c89a551985fbf5",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "881aa47d1070e58f27803a260bae51d8ba1dedaf93e06371028abb09f0341958",
+        "normalizedLetterCount": 488,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "شطط": {
+      "sourceKey": "شط",
+      "sourceSha256": "8e7af29dacf498d207589a6642a673ff30b33869d4d0b72ceb881d5a4583b7a8",
+      "sourceWord": "شط",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الشين والطاء أصلانِ صحيحان : أحدهما البُعد ، والآخر يدلُّ على المَيل.",
+        "expectedAuthorLetters": "الشين والطاء",
+        "independentRoot": "شط",
+        "independentTextSha256": "e2841e83c1de07cf9e5f8615f46d386fbc3f4780e0815f6402a472f9f3d4e1e5",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "7bd6a43c30cbd98d0d35c0e172c80f58653df8ab6b3c3b89262ed402c164b8b5",
+        "normalizedLetterCount": 568,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "4dae2622a2c1707acdffa1514d9d0484e2e8e7beca3df372d9975dbeec077d04",
+            "lineCount": 1,
+            "normalizedTextSha256": "184fb992ef2db87389c72ce103ea2d3f565b9d57c176b347d3921fe93edd20f4"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "فرر": {
+      "sourceKey": "فر",
+      "sourceSha256": "09941ec30bd450ede94724c4198118ca353fe4d58ceb841db5e26629121abe53",
+      "sourceWord": "فر",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الفاء والراء أصول ثلاثة : فالأوّل الانكشاف وما يقاربُهُ من الكَشْف عن الشَّيء ، والثانى جنسٌ من الحيوان ، والثالث دالٌّ على خِفّة وطَيْش.",
+        "expectedAuthorLetters": "الفاء والراء",
+        "independentRoot": "فر",
+        "independentTextSha256": "f175855cfce64ee36b58ec4b50d110baf61bb7128f3682c7a1ca2c6ffe8d86c6",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "bd9aedd84bf91b56eeda8a369dda65e03e628a9d8eca5bf514b88c4d5c675e47",
+        "normalizedLetterCount": 688,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "ec46917363a083881131a37c5356c31ff705df4b9246da2d1fde1d5be069d196",
+            "lineCount": 1,
+            "normalizedTextSha256": "c9cbee4b1a34a71871fe1b92c31d8b93d792b92de4759547c7c51a03ec5bef86"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "هزز": {
+      "sourceKey": "هز",
+      "sourceSha256": "f1f50726cd266b82a34c28fbe133d834ef0bce4b73e3fba504b2749e27c4ade0",
+      "sourceWord": "هز",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الهاء والزاء : أصلٌ يدلُّ على اضطرابٍ فى شىء وحركة. وهَزَزْت القناةَ فاهتزَّتْ. واهتَزَّ النَّباتُ ، وهَزَّتْه الرِّيح. وهزَّ الحادى الإبلَ بحُدائِهِ واهتزَّتْ هى فى سيرها. وهَزِيزُ الرِّيح : حرَكتُها وصوتُها.",
+        "expectedAuthorLetters": "الهاء والزاء",
+        "independentRoot": "هز",
+        "independentTextSha256": "36d32ff104c893df521e6672db8d2863cb3f63e6f45b2a89697c42058c8cac84",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "0c9e88cf75b3f23e08d30c0a8b65db1ffae297a77540a049a1f99acf3bae2e2c",
+        "normalizedLetterCount": 267,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "ضدد": {
+      "sourceKey": "ضد",
+      "sourceSha256": "5d87756398af42b95a26e433aa00fd2143ff8855ea1c597622a7aac9b37c0f90",
+      "sourceWord": "ضد",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الضاد والدال كلمتان متباينتان فى القياس.",
+        "expectedAuthorLetters": "الضاد والدال",
+        "independentRoot": "ضد",
+        "independentTextSha256": "bc7162c3cd0662aa6887981984a91d634cb87607ed019c9c75c2a603d7f7a845",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "de541527409fa17407dc5c9c2453371d9bb92eb4bcd9e328f03ade380162848b",
+        "normalizedLetterCount": 159,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "هدد": {
+      "sourceKey": "هد",
+      "sourceSha256": "0319686ab5c138e570187ffbb532ccd3d5cf496f9b1598e7de07b4aac248a173",
+      "sourceWord": "هد",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الهاء والدال : أصلٌ صحيح يدلُّ على كَسْر وهَضْم وهدم. وهَدَدْتُه هَدَّا : هَدَمتُه. ويرجع الباب كلُّه إلى هذا القياس. فالهَدُّ من الرِّجال : الضَّعيف ، كأنَّه هُدَّ. ورجال هَدُّونَ. وقد خُولف الأصمعىّ (3)فخبّرنى علىُّ ابن إبراهيم القَطّان ، عن ثعلبٍ عن ابن الأعرابى ، وعن عمرو بن أبى عمرٍ وعن أبيه قالا (4): الهَدُّ من الرِّجال : الجواد الكريم ، والجِبانُ هِدٌّ بالكسر (5). وأنشدوا :",
+        "expectedAuthorLetters": "الهاء والدال",
+        "independentRoot": "هد",
+        "independentTextSha256": "fb1bf1d278402a8c2413cdd7814b5408c6ff7f4a28e6561b637f120910ec1498",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "dc27a9aa9185612a871bb1f3b4195f7c9a324ee13b4abe6d4c434c32bec71a96",
+        "normalizedLetterCount": 545,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "a0e323301365e1f03851fd910871ba678289edd7720a6801c601cf6006468379",
+            "lineCount": 1,
+            "normalizedTextSha256": "6113a9817d6a19c3e51c50e5a626de24aefdd0b6fa06076ec0f4d9d160589456"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "هشش": {
+      "sourceKey": "هش",
+      "sourceSha256": "d3f923edf274a69143462b598884a19cce73b4fc862b7f5da2cac09e2318feaa",
+      "sourceWord": "هش",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الهاء والشين : أصلٌ صحيحٌ يدلُّ على رَخاوةٍ وليِن. والرِّخْو اللَّيِّن هَشٌ. ومنه رجل هشٌ : طَلْق المُحيَّا ، وقد هَشِشتَ (2)، وذُو هَشَاش (3). والفرس الهَشُ : الكثير العَرَق. وشَاةٌ هَشُوشٌ : ثَرَّةٌ (4).",
+        "expectedAuthorLetters": "الهاء والشين",
+        "independentRoot": "هش",
+        "independentTextSha256": "ed964149498cee7dd0ddf38ea995c9da302b5a10daa4c50750f7f4ab538f7217",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "a55951c8a137663cfff575bf30e9e4145624ea046b9931fc7c94badabac6e2b8",
+        "normalizedLetterCount": 139,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "fe4cae6ee474e7c8b0c1ebc834547e7965a7c336057d2efae5dcf427b9a26ddd",
+            "lineCount": 1,
+            "normalizedTextSha256": "f9a6f4d1ddb959c4c522564e0724bf804a9782e7ebb0bc916dc2e839760eaef7"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "ضمم": {
+      "sourceKey": "ضم",
+      "sourceSha256": "506d69cf98f47e34658765f41f555dd193481bf6b613f6ab65ec7ca4ed0021d3",
+      "sourceWord": "ضم",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الضاد والميم أصلٌ واحد يدلُّ على مُلاءَمةٍ بين شيئين. يقال ضَمَمت الشّىء إلى الشىء فأنا أضُمُّه ضمًّا. وهذه إضْمامةٌ من خَيل ، أى جماعة. وفرسٌ سَبّاق الأضاميم ، أى الجماعات. وإضمامةٌ من كُتُب مثل إضْبارة.",
+        "expectedAuthorLetters": "الضاد والميم",
+        "independentRoot": "ضم",
+        "independentTextSha256": "2a9222bf736447c8a1f201ad7568995e282da16caa36598858f82703fdf01aad",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "c7e76177ab0f0acd523f686728cfb05984305624e3009bb55c6247e1c428c8b6",
+        "normalizedLetterCount": 165,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "فجج": {
+      "sourceKey": "فج",
+      "sourceSha256": "123012311a8a1849b3b1dedd0920e5e060f955989e906e6a7af47b6ce44a5f02",
+      "sourceWord": "فج",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الفاء والجيم أصلٌ صحيح يدلُّ على تفتُّح وانفراج. من ذلك الفَجُ : الطَّريق الواسع. ويقال : قَوسٌ فَجّاءُ ، إذا بَانَ وترُها عن كَبدِها. والفجَج أقْبَحُ من الفَحَج. ومنه حافرٌ مُفِجٌ ، أى مقبَّب ، وإذا كان كذا كان فى باطنه شِبْه الفَجْوة.",
+        "expectedAuthorLetters": "الفاء والجيم",
+        "independentRoot": "فج",
+        "independentTextSha256": "8ae3a1bab2874f5d83ca7f58a8495745a6b08fcf8d54e334cd571c4db7401579",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "5d51abb70e9007c7d660cd5b3a10227c9a3fceb2936892c324f322f38b1d0c0f",
+        "normalizedLetterCount": 262,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "زجج": {
+      "sourceKey": "زج",
+      "sourceSha256": "f3eaf6f5721c7aa5f7d784ba8e9784d38db7e38f5d21770e08ae892f5bfe564f",
+      "sourceWord": "زج",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الزاء والجيم أصلٌ يدلُّ على رِقّةٍ فى شىء ، من ذلك زُجُ الرُّمْح والسّهمِ ، وجمعه زِجاج بكسر الزاء. يقال زجَّجْتُه : جعلت له زُجًّا. فإذا نزَعْت زُجَّهُ قلت : أزجَجْتُه (1). والزَّجَج دِقَّةُ الحاجبينِ وحُسْنُهما. ويقال أن الأزَجَ من النعام : الذى فوق عينه ريشٌ أبيض.",
+        "expectedAuthorLetters": "الزاء والجيم",
+        "independentRoot": "زج",
+        "independentTextSha256": "2e85de0f53b56c7107828593d24509917b44723e6b5e81a73689c1bf3be280c4",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "31b7192bfb98f22d7ce2857c9ec2df1a5055170a505a5b40ab939506e0229a8c",
+        "normalizedLetterCount": 163,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "خطط": {
+      "sourceKey": "خط",
+      "sourceSha256": "6aee241bd0b1cd1ccefc9d096ac6b19d1ac7f2185a3b4ae43c852876d26dbf52",
+      "sourceWord": "خط",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الخاء والطاء أصلٌ واحد ؛ وهو أثَرٌ يمتدُّ امتداداً. فمن ذلك الخطُّ الذى يخطُّه الكاتب. ومنه الخطّ الذى يخطُّه الزَّاجر. قال اللّه تعالى : ( أَوْ أَثارَةٍ مِنْ عِلْمٍ ) قالوا : هو الخَطُّ. ويُروَى : «إنّ نبيًّا من الأنبياء كان يَخُطّ فمن خَطَّ مِثلَ خَطِّه عَلِمَ مثلَ عِلْمه». ومن الباب الخِطَّة الأرض يختطُّها المرءُ لنفسه ؛ لأنّه يكون هناك أثرٌ ممدود. ومنه خَطُّ اليمامة ، وإليه تُنسَب الرِّماحُ الخَطِّيَّة. ومن الباب الخُطَّة ، وهى الحال ؛ ويقال هو بخُطَّةٍ سَوْء ، وذلك أنّه أمْرٌ قد خُطَّ له وعليه. فأمّا الأرضُ الخطيطة ، وهى التى لم تُمْطَر بينَ أرضينِ ممطورَتَين ، فليس من الباب ، والطاء الثانية زائدة ، لأنَّها مِن أخطأ ، كأنَّ المطر أخْطَأَها. والدّليل على ذلك قولُ ابن عبّاس : «خَطَّأَ اللّهُ نَوْءَها». أى إذا مُطِر غيرُها أخْطَأَ هذه المطرُ فلا يُصيبُها.",
+        "expectedAuthorLetters": "الخاء والطاء",
+        "independentRoot": "خط",
+        "independentTextSha256": "99c656c4640a226c4852ca05473d7e18a5c405258a43571d8df10b46af487915",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "5978edd957926f643ca38d3aa3eb65828f0a37d7fae393c555793f249867a97c",
+        "normalizedLetterCount": 550,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "خدد": {
+      "sourceKey": "خد",
+      "sourceSha256": "7fe7d87f899846d586e0510a47f89704822003c37b936ea397a079869f5d09fc",
+      "sourceWord": "خد",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الخاء والدال أصلٌ واحدٌ ، وهو تأسُّلُ الشَّىءِ وامتدادُه إلى السُّفل. فمن ذلك الخَدّ خدّ الإنسان ، وبه سُمِّيت المِخَدّة. والخَدُّ : الشّقّ. والأخاديد : الشَّقوق فى الأرض. والتخدُّد : تخدُّد اللَّحم من الهُزال. وامرأة متخدِّدة : مهزولة. والخِدَادُ : مِيسمٌ من المياسِم ، ولعلَّه يكون فى الخدّ ؛ يقال منه بعيرٌ مخدود.",
+        "expectedAuthorLetters": "الخاء والدال",
+        "independentRoot": "خد",
+        "independentTextSha256": "4d0664eee4b047167c0fba555fde42c78e3dd60886c808b871f151738b542823",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "64ec738a44e4c3668775682a18906e4a1077738de46070a85f0bca4687ff125e",
+        "normalizedLetterCount": 201,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "كمم": {
+      "sourceKey": "كم",
+      "sourceSha256": "c065e6fba57bdf90d5f4e2d700ca1cfb7e00ee82f8f693824ef262716eb26c1a",
+      "sourceWord": "كم",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الكاف والميم أصلٌ واحدٌ يدلُّ على غِشاء وغِطاء. من ذلك الكُمَّة ، وهي القلنسوة ، ويقال منها : تكمَّمَ الرَّجل ، وتكمكم. ومن ذلك الحديث : «أنَّ عمر رأى جاريةً مُتَكَمْكِمَةً». والكُمّ : كُمّ القميص ، يقال منه كَمَمْتُهُ (3)، أي جعلت له كُمَّيْن. والكِمَ : وِعاء الطَّلع ، والجمع الأَكْمَام. قال اللّه سبحانه : ( وَالنَّخْلُ ذاتُ الْأَكْمامِ ) قال أبو عبيد : وأكِمَّةٌ وأَكامِيم. ويقال : كَمّ الفَسيلَ ، إذا أشفَقَ عليه فَسُتِرَ حتى يَقْوَى. والأَكَامِيم : أغطيةُ النَّور. ومن الباب : الكَمكام : المجتمِع الخَلْق.",
+        "expectedAuthorLetters": "الكاف والميم",
+        "independentRoot": "كم",
+        "independentTextSha256": "630f6546556384b4d602f9b76438ec5de1eee89b31c87de6e455179f47d3ae8e",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "c20d87fa595bafbff963c7c2abe03167c506676ee86dafab939b9d5f939400e1",
+        "normalizedLetterCount": 306,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "fd84626a6b0d042eb509eacf46bea2e51e15ba997582a2bc44734edc727c982c",
+            "lineCount": 1,
+            "normalizedTextSha256": "8ff35c63fe72766a49d507268e3e65faf7f429689a344312b013ec63a2923d9d"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "صكك": {
+      "sourceKey": "صك",
+      "sourceSha256": "f0888c7934b83cb788dbc0dd068a80b63f25a1ff64b79a5a37d54043b655629f",
+      "sourceWord": "صك",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الصاد والكاف أصلٌ يدلُّ على تلاقِى شيئينِ بقوَّة وشِدّة ، حتَّى كأنّ أحدَهما يضرِب الآخر. من ذلك قولهم : صَكَكْتُ الشىءَ صكاًّ. والصَّكَك : أن تَصطَكَ رُكبتا [الرّجُل (2)]. [وصَكَّ البابَ (3)] : أغلقه بعنفٍ وشِدَّة. ويقال بعير مُصَكَّكٌ (4)، إذا كان اللَّحمُ قد صُك فيه صَكاًّ. ورجلٌ مِصكٌ : شديد. ويقال ذلك فى الخَيل والحُمُر وغيرِها.",
+        "expectedAuthorLetters": "الصاد والكاف",
+        "independentRoot": "صك",
+        "independentTextSha256": "2af99aacc61edf9a4f8cce60b5ba0b2aa555b9e93100757b8cddfd7c2b585fea",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "28f31f364a0f7734270217eeaef5bb0ec2ac1ab691d2c40f4fff1a2e61745fad",
+        "normalizedLetterCount": 307,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "دعع": {
+      "sourceKey": "دع",
+      "sourceSha256": "af630a6258686b7b429641fb9da017d7e9affbfe19f9f6a7dd8b4e5d01355694",
+      "sourceWord": "دع",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الدال والعين أصلٌ واحد مُنقاسٌ مطّرد ، وهو يدلُّ على حركةٍ ودَفْع واضطراب. فالدَّعُّ : الدفع ؛ يقال دَعَعْتُه أَدُعُّه دَعًّا. قال اللّه تعالى : ( يَوْمَ يُدَعُّونَ إِلى نارِ جَهَنَّمَ دَعًّا ) . والدَّعْدَعَةُ : تحريك المِكيال ليستوعب الشَّىءَ. والدَّعْدَعةُ : عَدْوٌ فى التِواء. ويقال جَفْنةٌ مدَعدَعة. وأصلُه ذاك ، أى أنَّها دُعدِعَتْ حتّى امتلأتْ.",
+        "expectedAuthorLetters": "الدال والعين",
+        "independentRoot": "دع",
+        "independentTextSha256": "a556474c973995e506dfbc1937fa768473f1295011fd72c6ecdc2c32aa93b4d1",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "586aa3025a451ad27ba8e763bf5f30ed9d7584ec42eb2b10dd84b21a0fec4ff7",
+        "normalizedLetterCount": 365,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "فنن": {
+      "sourceKey": "فن",
+      "sourceSha256": "a72e3dbb03707b73b4d7319bab74cd4547668d24cebcff7c1f8930415c80006f",
+      "sourceWord": "فن",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الفاء والنون أصلانِ صحيحان ، يدلُّ أحدُهما على تعنِيَةٍ ، والآخَر على ضربٍ من الضُّروب فى الأشياء كلِّها.",
+        "expectedAuthorLetters": "الفاء والنون",
+        "independentRoot": "فن",
+        "independentTextSha256": "2d0ca0c7b1dd33902da6a3b44b4b49afce7e7327c50917b22227745c47dd40d9",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "49bf263114d7e329f029bf05775f3028e706e02413d6d8ff7b92c9983f9e55e6",
+        "normalizedLetterCount": 225,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "رصص": {
+      "sourceKey": "رص",
+      "sourceSha256": "96be02a293cb069da6ef38e8bb12a52d152e51fa867253af9d2a0de7822ca1fb",
+      "sourceWord": "رص",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الراء والصاد أصلٌ واحد يدلُّ على انضمامِ الشَّىء إِلى الشىء بقوَّةٍ وتداخُل. تقول : رصَصْتُ البُنيانَ بعصَه إِلَى بَعْضٍ. قال اللّه تعالى : ( كَأَنَّهُمْ بُنْيانٌ مَرْصُوصٌ ) . وهذا كأنّه مشتقٌّ من الرَّصاصِ ، والرَّصاص أصل الباب. ويقال تراصَ القومُ فى الصّفّ. وحُكى عن الخليل : الرَّصراص : الحجارةُ تكون مرصوصةً حول عَين الماء. ومن الباب التَّرصِيص : أن تنتقب المرأةُ فلا يُرَى إلَّا عَيناها. وهو التَّوصِيص أيضا. ويقولون : الرَّصراصة: الأرض الصُّلبة. والبابُ كلُّه منقاسٌ مطَّرد.",
+        "expectedAuthorLetters": "الراء والصاد",
+        "independentRoot": "رص",
+        "independentTextSha256": "62f220a02a2f472663df501353482176595a548417e920d90e75bb637fd5e14d",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "31430ef85adb0250df91ce43d9cc8dc0d243953fcf8a404bbf15b3c09f835902",
+        "normalizedLetterCount": 306,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "غصص": {
+      "sourceKey": "غص",
+      "sourceSha256": "a856a50fbf5bf639420a77eebc4ad8e4cbd170a9d5d2b7532d11cb10814097b4",
+      "sourceWord": "غص",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الغين والصاد ليس فيه إلَّا الغَصَص بالطَّعام ، ويقال رجلٌ غَصَّانُ. قال :",
+        "expectedAuthorLetters": "الغين والصاد",
+        "independentRoot": "غص",
+        "independentTextSha256": "cb21589ceb5ec50903a2f0811e43d65cff5284079cde6578480e94ae0933bce9",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "e8f6db221336a44facf878d2f78d1d51f762220307535ba344b45c3163c862b2",
+        "normalizedLetterCount": 88,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "ثجج": {
+      "sourceKey": "ثج",
+      "sourceSha256": "87a9429ec49f219b6fdf08208a80d0fe6515cb14224497dbc15170a4a7527286",
+      "sourceWord": "ثج",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الثاء والجيم أصلٌ واحد ، وهو صبُّ الشئِ. يقال ثَجَ الماءَ إذا صَبَّه ؛ وماءٌ ثَجّاجٌ أى صَبّابٌ. قال اللّه تعالى : ( وَأَنْزَلْنا مِنَ الْمُعْصِراتِ ماءً ثَجَّاجاً ) ، يقال اكتظَّ الوادِى بثجيج الماء ، إذا بلغ ضَرِيرَيْه (1). قال أبو ذؤيب :",
+        "expectedAuthorLetters": "الثاء والجيم",
+        "independentRoot": "ثج",
+        "independentTextSha256": "09fb3835241e695e1237652f17dd561a6e1d0047dbcbe413594dd4c53d192d57",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "be16ce6a89f34b513dc91ea8b3b0d5c63a86a038ddd300acc3226b206cc6bdea",
+        "normalizedLetterCount": 273,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "طمم": {
+      "sourceKey": "طم",
+      "sourceSha256": "163e618cc1cc1f96f70e318dede28e4c7cf044f11cbf13b3aa94d2bba89eca3a",
+      "sourceWord": "طم",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الطاء والميم أصلٌ صحيح يدلُّ على تغطيه الشَّيء للشَّىء حتى يسوّيه به ، الأرض أو غيرها. من ذلك قولهم طمَ البئر بالتراب : ملأها وسَوَّاها. ثم يحمل على ذلك فيقال للبحر الطِّمُ ، كأنَّه طَمَ الماءُ ذلك القرار. ويقولون : «له الطِّمّ والرِّم» ، فالطِّمّ : البحر ، والرِّمّ الثّرَى. ومن ذلك قولهم : طَمَ الأمر ، إذا علا وغَلَب. ولذلك سمِّيَت القيامة : الطَّامَّة. فأمّا قولهم : طَمَ شَعَرَه ، إذا أَخَذَ منه ،",
+        "expectedAuthorLetters": "الطاء والميم",
+        "independentRoot": "طم",
+        "independentTextSha256": "041c6cb83aed20a2b9dc9f7319f3ccc64398375e45ff849cb733c59ec584b13d",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "63dade613de8c44708b8603c8df70c43aaf7a43e4388d2f665f090a6db620fce",
+        "normalizedLetterCount": 405,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "f04ebecd2ab7c4f8334e780041bcdb993f74de9568b64a39dc836a692e96120b",
+            "lineCount": 1,
+            "normalizedTextSha256": "3cdf941923e133f3ce4a3e175017472e67eec24c4f1c0c45459dc5a8385dbc9c"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    },
+    "ضنن": {
+      "sourceKey": "ضن",
+      "sourceSha256": "9a30806286a3c125fcfb2d4f42c884fca2d92a9bf03d1340e50417952d4596ec",
+      "sourceWord": "ضن",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الضاد والنون أصلٌ صحيح يدلُّ على بُخْلٍ بالشىء. يقال ضَنِنْتُ بالشّىءِ أضَنُ به ضَنًّا وضَنانةً ، ورجلٌ ضَنين. وهذا عِلْقُ مَضَنَّةٍ ومَضِنّة ، إذا كان نفيساً يُضَنُ به. وفلانٌ ضِنِّى مِن بين إخوانى ، إذا كان النّفِيسَ الذى يُضَنُ به. وربما قالوا ضَنَنْت بفتح النون.",
+        "expectedAuthorLetters": "الضاد والنون",
+        "independentRoot": "ضن",
+        "independentTextSha256": "517d82731d1bb78a85ad4ceaa22d2df0ef3a216e180b570163b32eb03eb8d5cd",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "76875670f0838dd9eb5273317c0026628f978ca5f792d6ec4e9e182503fdc683",
+        "normalizedLetterCount": 162,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "طفف": {
+      "sourceKey": "طف",
+      "sourceSha256": "8f9a73b9085305031c8642ab83bc9adc5037b88abe7b62fbd6c1dfc79bdcc2fe",
+      "sourceWord": "طف",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الطاء والفاء يدلُّ على قلّةِ الشىء. يقال : هذا شىءٌ طفيف. ويقال : إناءٌ طَفَّانُ ، أى ملآن. والتَّطفيف : نقص المكيال والميزان. قال بعضُ أهل العلم : إنما سمِّى بذلك لأن الذى ينقصه منه يكون طفيفاً. ويقال لِمَا فوق الإناء الطِفَّاف والطُّفافة. فأمّا قولهم : طففّت بفلانٍ موضعَ كذا ، أى رفعتُه إليه وحاذيته (1)، وفى الحديث : «طَفَّفَ بى الفرسٌ مسجدَ بنى فلان (2)». فإنَّه يريد وثَب حتى كاد يساوى المسجد - فهذا على معنى التشبيه بطَفاف الإناء وطَفافته. والقياس واحد. ومما شذّ عن الباب قولهم : أطفّ فلانٌ بفلان ، إذا طَبَن له وأراد ختله ومنه استطفَ الأمرُ ، إذا أمكن وأُكْمِلَ (3)، وهذا من باب الإبدال ، وقد ذكر فى بابه.",
+        "expectedAuthorLetters": "الطاء والفاء",
+        "independentRoot": "طف",
+        "independentTextSha256": "23676217e05bc6a05c44e2149e699c52c95e5e746ef2f4145b0ea53d202c856a",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "3a484d4fba4770460c84f9ac63d8a9d7e06a2d611a7261fa39e3ae801451c111",
+        "normalizedLetterCount": 411,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [],
+        "originalHtmlReplayed": false
+      }
+    },
+    "فكك": {
+      "sourceKey": "فك",
+      "sourceSha256": "987b72106a4c7feef34ad6f4c0556e9c386bc65f633a355768a40c1c480402c7",
+      "sourceWord": "فك",
+      "kind": "doubled-root-biliteral-heading",
+      "evidence": {
+        "authorLetterHeading": "الفاء والكاف أصلٌ صحيحٌ يدلُّ على تفتُّح وانفراج. من ذلك فَكاك الرَّهْن ، وهو فَتْحُه من الانغلاق. وحكى الكسائىّ : الفِكَاك بالكسر. ويقال : فَكَكْتُ الشَّىءَ أفكُّه فكَّا. وسقط فلانٌ وانفكَّت قدمُه ، أى انفرجت. وقولهم : لا ينفكُ يفعل ذلك ، بمعنى لا يزال. والمعنى هو وذلك الفعلُ لا يفترقان. فالقياس فيه صحيح. والفكُ (2): انفراج المَنْكِبِ عن مَفْصِله ضَعْفا.",
+        "expectedAuthorLetters": "الفاء والكاف",
+        "independentRoot": "فك",
+        "independentTextSha256": "26a5a83c515b736b2995a07fdb9a525e466efcc6e803f646e53dc79498b8ae36",
+        "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+        "independentRepository": "https://github.com/abuyahyo/mojam",
+        "independentPath": "data/maqayis.json",
+        "normalizedFullTextSha256": "04136f7e7141695bbeb3527cbe71cf8c4988e974cb9cdf6f4020204220bfbd0d",
+        "normalizedLetterCount": 282,
+        "method": "complete-independent-author-entry-letter-concordance",
+        "exactEditorialFootnoteLinesRemoved": [
+          {
+            "lineSha256": "3a03944894c12000acd25163ed8e8d0e42128393135a3a950f50e20b0fd55a33",
+            "lineCount": 1,
+            "normalizedTextSha256": "921da0ffb147f1ea4ff85e2d3e9595819fc1fbf480bd8798372f74dd35674836"
+          }
+        ],
+        "originalHtmlReplayed": false
+      }
+    }
+  }
+}

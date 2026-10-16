@@ -134,17 +134,21 @@ def prepare(job=JOB):
  for p in parallel.glob('maqayis_*/blocked.json'):blocked.update(read(p,{}))
  for p in parallel.glob('maqayis_*/output.json'):
   for key,value in read(p,{}).items():verified[key]=value.get('sourceSha256')
+ mappings=read(ROOT/'data/maqayis/root-mappings.json',{'entries':{}})['entries']
  queue=[];issues=[]
  for root,counts in roots.items():
   if translations.get(root,{}).get('fa'):continue
-  matches=grouped.get(norm(root),[])
+  mapping=mappings.get(root)
+  source_key=mapping['sourceKey'] if mapping else norm(root)
+  matches=grouped.get(source_key,[])
+  if mapping and (len(matches)!=1 or sha(matches[0]['ar'])!=mapping['sourceSha256']):raise ValueError('stale_root_mapping')
   reason=None
   if len(matches)!=1:reason='missing_or_ambiguous_source'
   elif root in blocked:reason='known_source_defect'
   elif re.search(r'\?\?|بياض|\.{4,}',matches[0]['ar']):reason='source_lacuna_marker'
   if reason:issues.append({'book':'maqayis','id':root,'reason':reason});continue
   e=matches[0];ar=e['ar']
-  queue.append({'book':'maqayis','id':root,'roots':[root],'heading':e['word'],'ar':ar,'sourceSha256':sha(ar),'sourceVerified':verified.get(root)==sha(ar) or bool(e.get('extractionReview')),'frequency':sum(counts.values()),'provenance':{'volume':e['volume'],'page':e['page'],'pageEnd':e['pageEnd']}})
+  queue.append({'book':'maqayis','id':root,'sourceKey':source_key,'roots':[root],'heading':e['word'],'ar':ar,'sourceSha256':sha(ar),'sourceVerified':bool(mapping) or verified.get(root)==sha(ar) or bool(e.get('extractionReview')),'frequency':sum(counts.values()),'provenance':{'volume':e['volume'],'page':e['page'],'pageEnd':e['pageEnd']}})
  # Use public effective reviewed source/mappings rather than archive's superseded merged entries.
  ishtrans=read(ROOT/'data/ishtiqaqi/translations.json');ish={}
  for root in read(ROOT/'public/data/ishtiqaqi-index.json')['matchedRoots']:
@@ -160,7 +164,7 @@ def prepare(job=JOB):
 def entry_folder(job,e):return job/'bulk/entries'/e['book']/e['id']/e['sourceSha256'][:16]
 def current_source(e):
  if e['book']=='maqayis':
-  matches=[v for v in read(ROOT/'data/maqayis/source.json')['entries'] if v['key']==norm(e['id'])]
+  matches=[v for v in read(ROOT/'data/maqayis/source.json')['entries'] if v['key']==e.get('sourceKey',norm(e['id']))]
   return len(matches)==1 and sha(matches[0]['ar'])==e['sourceSha256']
  for root in e['roots']:
   for v in read(ROOT/f'public/data/ishtiqaqi/{root}.json')['entries']:
