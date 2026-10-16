@@ -1,4 +1,4 @@
-"""Three Maqayis samples only; isolated GapGPT output and shared conservative $8 ledger.
+"""Three Maqayis samples only; isolated GapGPT output and shared conservative $10 ledger.
 No bulk run, no canonical/public writes, no automatic retries of paid requests.
 """
 import argparse,datetime,fcntl,hashlib,json,os,re,urllib.request
@@ -8,7 +8,7 @@ ROOT=Path(__file__).resolve().parents[1]
 JOB=Path('/workspace/.translation-jobs/quran-vajeh/gapgpt')
 URL='https://api.gapgpt.app/v1/chat/completions'
 PRICES={'gemini-3.1-flash-lite':(Decimal('.25'),Decimal('1.50')),'gemini-4-argon':(Decimal('2'),Decimal('10'))}
-CEILING=Decimal('8.00')
+CEILING=Decimal('10.00')
 
 def save(path,data):
  path.parent.mkdir(parents=True,exist_ok=True);tmp=path.with_suffix('.tmp');tmp.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n');tmp.replace(path)
@@ -38,7 +38,7 @@ class Ledger:
    if data.get('halted'):raise ValueError('Budget ledger halted; manual billing review needed')
    if identity in data['requests']:raise ValueError('Already attempted; manual review needed before another paid request')
    spent=sum(Decimal(r.get('chargedUsd',r['reservedUsd'])) for r in data['requests'].values())
-   configured=Decimal(os.environ.get('QURAN_TRANSLATION_BUDGET_USD','8'))
+   configured=Decimal(os.environ.get('QURAN_TRANSLATION_BUDGET_USD','10'))
    ceiling=min(CEILING,configured,Decimal(data['ceilingUsd']))
    if not ceiling.is_finite() or ceiling<=0 or spent+amount>ceiling:raise ValueError('Budget admission refused')
    data['requests'][identity]={'state':'reserved','model':model,'reservedUsd':str(amount),'inputAllowance':input_allowance,'outputAllowance':max_tokens,'atUtc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
@@ -47,13 +47,15 @@ class Ledger:
   def change(data):
    record=data['requests'][identity]
    p=usage.get('prompt_tokens');c=usage.get('completion_tokens')
-   if not isinstance(p,int) or not isinstance(c,int) or p<0 or c<0:
-    record['state']='usage_unknown_reservation_retained';raise ValueError('No trusted token usage; stop requests and inspect billing')
+   if type(p)!=int or type(c)!=int or p<0 or c<0:
+    record['state']='usage_unknown_reservation_retained';data['halted']='Unknown billing; inspect provider before further requests';return None
    a,b=PRICES[record['model']];amount=(p*a+c*b)/Decimal(1000000)
    record.update({'state':'usage_recorded','usage':usage,'chargedUsd':str(amount)})
    if amount>Decimal(record['reservedUsd']):data['halted']='Provider usage exceeded local reservation'
    return amount
-  return self.transaction(change)
+  actual=self.transaction(change)
+  if actual is None:raise ValueError('No trusted token usage; stop requests and inspect billing')
+  return actual
 
 def messages(entry):
  parts=[s for s in re.split(r'\n\s*\n',entry['ar']) if s.strip()]

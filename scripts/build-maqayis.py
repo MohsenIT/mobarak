@@ -13,6 +13,9 @@ for root,translation in translations.items():
  entry=matches[0]
  if translation.get('sourceSha256') and translation['sourceSha256']!=hashlib.sha256(entry['ar'].encode()).hexdigest():raise ValueError(f'Stale translation: {root}')
  record={'root':root,'word':entry['word'],'ar':entry['ar'],**translation,'provenance':{'volume':entry['volume'],'page':entry['page'],'pageEnd':entry['pageEnd'],'pageId':entry['pageId'],'translationKind':'full-author-entry','translationNote':'ترجمهٔ فارسی با کمک هوش مصنوعی از متن کاملِ مدخل نویسنده؛ خلاصه جداست. پاورقی‌های محقق در این ترجمه وارد نشده‌اند.','sourceSha256':next(f['sha256'] for f in source['source']['files'] if f['volume']==entry['volume']),'arabicSha256':hashlib.sha256(entry['ar'].encode()).hexdigest()}}
+ if translation.get('translator')=='gemini-3.1-flash-lite':
+  semantic='این مدخل با Gemini 4 Argon بازبینی شده است.' if translation.get('semanticReview')=='gemini-4-argon:pass' else 'این مدخل در نمونهٔ بازبینی معنایی انتخاب نشده است؛ کنترل پوشش بندها روی آن انجام شده است.'
+  record['provenance']['translationNote']+=' ترجمه با Gemini 3.1 Flash Lite؛ '+semantic+' متن عربیِ مدخل با نسخهٔ متنی مستقل مقابله شده است. این فرایند بازبینی مستقل انسانی نیست.'
  (out/f'{root}.json').write_text(json.dumps(record,ensure_ascii=False,separators=(',',':'))+'\n')
 index={'source':source['source'],'translatedRoots':list(translations),'translatedCount':len(translations),'totalQuranRoots':len(roots),'draftMatchedCount':len(source['matchedRoots']),'pendingRoots':[r for r in roots if r not in translations]}
 (ROOT/'public/data/maqayis-index.json').write_text(json.dumps(index,ensure_ascii=False,separators=(',',':'))+'\n')

@@ -9,12 +9,19 @@ class Checks(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    data=gap.prepare(Path(tmp));self.assertEqual([e['root'] for e in data['entries']],['بسم','قسط','علم']);self.assertFalse(data['bulkAuthorizedAfterSampleReview'])
    entry=dict(data['entries'][0],referenceFa='HIDDEN_BASELINE');self.assertNotIn('HIDDEN_BASELINE',json.dumps(gap.messages(entry)))
- def test_budget_admission_stops_before_8_and_cannot_be_raised_to_10(self):
-  with tempfile.TemporaryDirectory() as tmp,patch.dict(os.environ,{'QURAN_TRANSLATION_BUDGET_USD':'10'}):
+ def test_budget_admission_stops_before_10_and_cannot_be_raised_to_11(self):
+  with tempfile.TemporaryDirectory() as tmp,patch.dict(os.environ,{'QURAN_TRANSLATION_BUDGET_USD':'11'}):
    ledger=gap.Ledger(Path(tmp))
-   ledger.transaction(lambda d:d['requests'].update({'old':{'reservedUsd':'7.9999','chargedUsd':'7.9999'}}))
+   ledger.transaction(lambda d:d['requests'].update({'old':{'reservedUsd':'9.9999','chargedUsd':'9.9999'}}))
    with self.assertRaises(ValueError):ledger.reserve('new','gemini-3.1-flash-lite',[{'role':'user','content':'سلام'}],4096)
    self.assertNotIn('new',json.loads((Path(tmp)/'budget.json').read_text())['requests'])
+ def test_saved_lower_cap_is_still_respected(self):
+  with tempfile.TemporaryDirectory() as tmp,patch.dict(os.environ,{'QURAN_TRANSLATION_BUDGET_USD':'10'}):
+   ledger=gap.Ledger(Path(tmp))
+   def lower(d):
+    d['ceilingUsd']='8';d['requests']['old']={'reservedUsd':'7.9999','chargedUsd':'7.9999'}
+   ledger.transaction(lower)
+   with self.assertRaises(ValueError):ledger.reserve('new','gemini-3.1-flash-lite',[],4096)
  def test_settle_uses_user_rates_and_preserves_unknown_reservations(self):
   with tempfile.TemporaryDirectory() as tmp:
    ledger=gap.Ledger(Path(tmp));ledger.reserve('one','gemini-3.1-flash-lite',[],4096)
