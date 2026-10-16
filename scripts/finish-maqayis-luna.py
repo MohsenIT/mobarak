@@ -28,7 +28,9 @@ class Ledger(bulk.Ledger):
    if extension:
     extra=Decimal(extension['additionalCapUsd']);baseline=Decimal(extension['baselineAccountedUsd'])
     if not extra.is_finite() or not baseline.is_finite() or extra<=0 or extra>3:raise ValueError('invalid_additional_budget')
-    approved=baseline+extra
+    safety=Decimal(extension.get('billingSafetyFactor','1'))
+    if not safety.is_finite() or safety<1:raise ValueError('invalid_billing_safety_factor')
+    approved=baseline+extra/safety
    cap=min(approved,Decimal(data['ceilingUsd']),Decimal(os.environ.get('QURAN_TRANSLATION_BUDGET_USD','10')))
    total=sum(accounted(r) for r in data['requests'].values())
    allocation=sum(accounted(r) for k,r in data['requests'].items() if k.startswith(PREFIX) and r['model']==model)
@@ -222,7 +224,7 @@ def snapshot(entries,state,active=0):
   v=bulk.read(folder(e)/'state.json',{});tag=v.get('state','pending');counts[tag]=counts.get(tag,0)+1
   if tag=='accepted':ready.append({'entry':e,'candidatePath':str(folder(e)/'candidate.json'),'reviewPath':str(folder(e)/'review.json')})
  b=bulk.read(JOB/'budget.json',{'requests':{}});allocation={m:str(sum(accounted(r) for k,r in b['requests'].items() if k.startswith(PREFIX) and r['model']==m)) for m in ALLOCATIONS};total=sum(accounted(r) for r in b['requests'].values())
- status={'state':state,'pid':os.getpid(),'updatedAtUtc':bulk.now(),'activeRequests':active,'counts':counts,'allocationsAccountedUsd':allocation,'allocationCapsUsd':{m:str(v) for m,v in ALLOCATIONS.items()},'totalAccountedUsd':str(total),'totalCapUsd':b.get('ceilingUsd','10'),'additionalBudget':b.get('additionalBudgetAuthorization'),'budgetHalt':b.get('halted'),'translator':MODEL,'reviewer':REVIEWER}
+ status={'state':state,'pid':os.getpid(),'updatedAtUtc':bulk.now(),'activeRequests':active,'counts':counts,'allocationsAccountedUsd':allocation,'allocationCapsUsd':b.get('additionalBudgetAuthorization',{}).get('modelLifetimeCapsUsd',{m:str(v) for m,v in ALLOCATIONS.items()}),'totalAccountedUsd':str(total),'totalCapUsd':b.get('ceilingUsd','10'),'additionalBudget':b.get('additionalBudgetAuthorization'),'budgetHalt':b.get('halted'),'translator':MODEL,'reviewer':REVIEWER}
  bulk.save(WORK/'status.json',status);bulk.save(WORK/'ready.json',ready);return status
 
 def run(limit,concurrency,pilot=False,retry=False,recheck=False):
@@ -278,6 +280,14 @@ def self_test():
     with patch.dict(os.environ,{'QURAN_TRANSLATION_BUDGET_USD':'12'}):
      with self.assertRaises(ValueError):ledger.reserve(PREFIX+'extra',MODEL,[],100)
     self.assertEqual(bulk.read(Path(d)/'budget.json')['additionalBudgetAuthorization'],authorization)
+   bulk.STOP.clear();bulk.STOP_REASON=None
+  def test_billing_safety_margin_survives_higher_environment_ceiling(self):
+   from unittest.mock import patch
+   with tempfile.TemporaryDirectory() as d:
+    ledger=Ledger(Path(d));authorization={'baselineAccountedUsd':'9','additionalCapUsd':'3','billingSafetyFactor':'1.5','modelLifetimeCapsUsd':{MODEL:'20'}}
+    bulk.save(Path(d)/'budget.json',{'ceilingUsd':'12','additionalBudgetAuthorization':authorization,'requests':{'historical':{'model':MODEL,'reservedUsd':'10.999999','chargedUsd':'10.999999'}}})
+    with patch.dict(os.environ,{'QURAN_TRANSLATION_BUDGET_USD':'12'}):
+     with self.assertRaises(ValueError):ledger.reserve(PREFIX+'extra',MODEL,[],100)
    bulk.STOP.clear();bulk.STOP_REASON=None
   def test_no_ishtiqaqi(self):self.assertFalse(source_valid({'book':'ishtiqaqi'}))
   def test_waits_for_inflight_settlement_without_releasing_reservation(self):
