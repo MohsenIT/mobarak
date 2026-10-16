@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('workflow',ROOT/'scripts/run-maqayis-completion.py');workflow=importlib.util.module_from_spec(spec);spec.loader.exec_module(workflow)
 luna=workflow.luna;bulk=luna.bulk
+os.environ['QURAN_TRANSLATION_BUDGET_USD']=workflow.ENV['QURAN_TRANSLATION_BUDGET_USD']
 
 def finalize(e,key,ledger):
     own=luna.folder(e)
