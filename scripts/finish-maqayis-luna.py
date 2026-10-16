@@ -27,7 +27,7 @@ class Ledger(bulk.Ledger):
    approved=Decimal('10')
    if extension:
     extra=Decimal(extension['additionalCapUsd']);baseline=Decimal(extension['baselineAccountedUsd'])
-    if not extra.is_finite() or not baseline.is_finite() or extra<=0 or extra>3:raise ValueError('invalid_additional_budget')
+    if not extra.is_finite() or not baseline.is_finite() or extra<=0 or extra>10:raise ValueError('invalid_additional_budget')
     safety=Decimal(extension.get('billingSafetyFactor','1'))
     if not safety.is_finite() or safety<1:raise ValueError('invalid_billing_safety_factor')
     approved=baseline+extra/safety
@@ -291,6 +291,18 @@ def self_test():
     bulk.save(Path(d)/'budget.json',{'ceilingUsd':'12','additionalBudgetAuthorization':authorization,'requests':{'historical':{'model':MODEL,'reservedUsd':'10.999999','chargedUsd':'10.999999'}}})
     with patch.dict(os.environ,{'QURAN_TRANSLATION_BUDGET_USD':'12'}):
      with self.assertRaises(ValueError):ledger.reserve(PREFIX+'extra',MODEL,[],100)
+   bulk.STOP.clear();bulk.STOP_REASON=None
+  def test_ten_dollar_authorization_keeps_lower_operational_ceiling(self):
+   from unittest.mock import patch
+   with tempfile.TemporaryDirectory() as d:
+    ledger=Ledger(Path(d));authorization={'baselineAccountedUsd':'11','additionalCapUsd':'10','billingSafetyFactor':'1.5','modelLifetimeCapsUsd':{MODEL:'20'}}
+    bulk.save(Path(d)/'budget.json',{'ceilingUsd':'13','additionalBudgetAuthorization':authorization,'requests':{'historical':{'model':MODEL,'reservedUsd':'11','chargedUsd':'11'}}})
+    with patch.dict(os.environ,{'QURAN_TRANSLATION_BUDGET_USD':'21'}):
+     ledger.reserve(PREFIX+'affordable',MODEL,[],100)
+     ledger.transaction(lambda b:b['requests'][PREFIX+'affordable'].update(state='usage_recorded',chargedUsd='0.0005'))
+     ledger.transaction(lambda b:b['requests'].update({'later':{'model':MODEL,'reservedUsd':'1.999999'}}))
+     with self.assertRaises(ValueError):ledger.reserve(PREFIX+'over-operational-cap',MODEL,[],100)
+    self.assertIn('historical',bulk.read(Path(d)/'budget.json')['requests'])
    bulk.STOP.clear();bulk.STOP_REASON=None
   def test_no_ishtiqaqi(self):self.assertFalse(source_valid({'book':'ishtiqaqi'}))
   def test_waits_for_inflight_settlement_without_releasing_reservation(self):
