@@ -17,8 +17,10 @@ for root,translation in translations.items():
   note='ترجمهٔ تمام متنِ موجود در نسخهٔ متنی مستقل، شامل متن مؤلف و حواشیِ درج‌شده در مرجع؛ حواشی ممکن است به صفحه یا مدخل مجاور مربوط باشند. جداسازی کامل متن مؤلف از حواشی یا کامل‌بودن اصل کتاب ادعا نمی‌شود. ترجمه با GPT-6 Luna تهیه شده و بازبینی مستقل انسانی نیست.'
   review_model=translation.get('semanticReview','').removesuffix(':pass')
   note+=f' بازبینی معنایی با {review_model} انجام شده است.' if translation.get('semanticReview','').endswith(':pass') else 'این مدخل در نمونهٔ بازبینی معنایی انتخاب نشده؛ پوشش تمام بندها کنترل شده است.'
+  if translation.get('repairModels'):note+=' اصلاح ترجمه با '+ '، '.join(translation['repairModels'])+' انجام شده است.'
   if partial:note+=' مأخذ این مدخل دارای افتادگی، ابهام یا خرابی ثبت‌شده است؛ متن نامطمئن نباید به‌عنوان قرائت قطعی استفاده شود.'
   record={'root':root,'word':entry['heading'],'ar':entry['ar'],**translation,'provenance':{'sourceKind':'independent-reference','sourceUrl':entry['provenance']['url'],'translationKind':'partial-reference-entry' if partial else 'full-reference-entry-with-editorial','translationScope':'author-and-editorial','translationNote':note,'sourceSha256':entry['provenance']['fileSha256'],'arabicSha256':entry['sourceSha256'],'referenceRoot':entry['referenceRoot'],'referenceIndex':entry['referenceIndex'],'qualityFlags':entry.get('qualityFlags',[])}}
+  if translation.get('repairModels'):record['provenance']['repairModels']=translation['repairModels']
   (out/f'{root}.json').write_text(json.dumps(record,ensure_ascii=False,separators=(',',':'))+'\n')
   continue
  mapping=mappings.get(root)
@@ -36,6 +38,7 @@ for root,translation in translations.items():
  if isinstance(entry.get('extractionReview'),dict) and entry['extractionReview'].get('insertion'):
   record['provenance']['translationNote']+=' یک شاهد شعریِ افتاده از متنِ ارسالی، با نقل دقیق از نسخهٔ متنی مستقل بازیابی شده است؛ متن ارسالی و شواهد بازیابی نگهداری شده‌اند.'
  if translation.get('translator')=='gpt-6-luna':record['provenance']['translationNote']+=' ترجمه با GPT-6 Luna؛ '+(f"بازبینی معنایی با {translation['semanticReview'].removesuffix(':pass')} انجام شده است." if translation.get('semanticReview','').endswith(':pass') else 'پوشش همهٔ بندها کنترل شده؛ در نمونهٔ بازبینی معنایی انتخاب نشده است.')+' این فرایند بازبینی مستقل انسانی نیست.'
+ if translation.get('repairModels'):record['provenance']['repairModels']=translation['repairModels']
  (out/f'{root}.json').write_text(json.dumps(record,ensure_ascii=False,separators=(',',':'))+'\n')
 index={'source':source['source'],'translatedRoots':list(translations),'translatedCount':len(translations),'totalQuranRoots':len(roots),'draftMatchedCount':len(source['matchedRoots']),'pendingRoots':[r for r in roots if r not in translations]}
 index['unavailableRoots']={r:info['reason'] for r,info in reference.get('unresolvedRoots',{}).items() if r not in translations}

@@ -29,6 +29,7 @@ def integrate():
   reviewer=review.get('reviewerModel') or state.get('reviewerModel')
   if reviewer==luna.PREVIOUS_REVIEWER:held[root]='reviewer_recheck_required';continue
   t={'summary':validated['summary'],'fa':formatted,'sourceSha256':e['sourceSha256'],'translator':luna.MODEL,'semanticReview':str(reviewer)+':pass' if review['verdict']=='pass' else 'not-selected-by-sampling-policy','reviewScope':review.get('scope'),'sourceAudit':'exact-indexed-independent-reference-entry' if e.get('referenceSource') else 'strict-source-audit'}
+  if candidate.get('repairModels'):t['repairModels']=candidate['repairModels']
   if e.get('referenceSource'):t.update(sourceKind='independent-reference',referenceIndex=e['sourceValidation']['referenceIndex'],translationScope='author-and-editorial')
   translations[root]=t;added.append(root)
  luna.bulk.save(path,translations)

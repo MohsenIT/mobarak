@@ -38,7 +38,7 @@ def finalize(e,key,ledger):
                 bulk.save(own/'state.json',{'state':'accepted','sourceSha256':e['sourceSha256'],'translatorModel':luna.MODEL,'reviewerModel':luna.REVIEWER,'reviewPolicy':'full-entry-final-flash-audit','updatedAtUtc':bulk.now()})
                 bulk.save(own/'finalize-v1-result.json',{'state':'accepted','round':turn,'atUtc':bulk.now()});return
             if turn<3:
-                candidate,_=luna.repair_issues(e,candidate,review,key,ledger,f'finalize-v1-repair-{turn}')
+                candidate,_=luna.repair_issues(e,candidate,review,key,ledger,f'finalize-v1-repair-{turn}',translation_model=luna.REVIEWER if turn>=1 else luna.MODEL)
         bulk.save(own/'finalize-v1-result.json',{'state':'held_after_three_repairs','atUtc':bulk.now()})
     except Exception as error:
         bulk.save(own/'finalize-v1-error.json',{'errorType':type(error).__name__,'atUtc':bulk.now()})
