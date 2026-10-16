@@ -21,6 +21,8 @@ for root,translation in translations.items():
   record['provenance']['translationNote']+=' ترجمه با Gemini 3.1 Flash Lite؛ '+semantic+' متن عربیِ مدخل با نسخهٔ متنی مستقل مقابله شده است. این فرایند بازبینی مستقل انسانی نیست.'
   if translation.get('correctionModel')=='gemini-4-argon':record['provenance']['translationNote']+=' اصلاح‌های مشخص این مدخل نیز با Gemini 4 Argon انجام شده‌اند.'
   if translation.get('sourceAuditModel')=='gemini-4-argon':record['provenance']['translationNote']+=' تأیید تطابق مأخذ این مدخل بر پایهٔ بررسی معنایی ماشینیِ Gemini 4 Argon است، نه تطبیق حرف‌به‌حرف یا بازبینی انسانی.'
+ if isinstance(entry.get('extractionReview'),dict) and entry['extractionReview'].get('insertion'):
+  record['provenance']['translationNote']+=' یک شاهد شعریِ افتاده از متنِ ارسالی، با نقل دقیق از نسخهٔ متنی مستقل بازیابی شده است؛ متن ارسالی و شواهد بازیابی نگهداری شده‌اند.'
  (out/f'{root}.json').write_text(json.dumps(record,ensure_ascii=False,separators=(',',':'))+'\n')
 index={'source':source['source'],'translatedRoots':list(translations),'translatedCount':len(translations),'totalQuranRoots':len(roots),'draftMatchedCount':len(source['matchedRoots']),'pendingRoots':[r for r in roots if r not in translations]}
 (ROOT/'public/data/maqayis-index.json').write_text(json.dumps(index,ensure_ascii=False,separators=(',',':'))+'\n')

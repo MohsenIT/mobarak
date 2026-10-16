@@ -28,8 +28,8 @@
     }
   },
   "counts": {
-    "needs_review": 951,
-    "verified": 691
+    "needs_review": 941,
+    "verified": 701
   },
   "entries": {
     "سمو": {
@@ -9575,14 +9575,29 @@
       }
     },
     "نخل": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "84aaa86cf84a5a5bb15ed0a6c49b1933f276268f6b62c06f66d2be8934dbe1f6",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "87e1dc3b8be37dc17c6fb8e4a862ab80db0352180a3edaba506fc7680dabecd8",
       "volume": 5,
       "sourceFileSha256": "c9c0b0848d02f25ca8477c62bd4459703317e6f02546659426bc9accc2bc5c60",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "نخل",
+        "independentTextSha256": "1ed749c229ee7c386d6cf33718059057573367a1a0973ae0b869a7280be4c807",
+        "normalizedFullTextSha256": "6b9b8d029f9ae56e4b51a22c9f7a187a01f035f86596ebf43593f8379f535752",
+        "normalizedLetterCount": 207,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "عنب": {
       "verdict": "needs_review",
@@ -14582,14 +14597,29 @@
       }
     },
     "يبس": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "7d3c524e71ec89611829fcfbb2ed3f47ff90f51fe1fcd3e1a729d8ff64af8872",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "a41f3dc196f5fd3b217b0b748976fe6452100518a9ea8a015d5bed87f6a46b87",
       "volume": 6,
       "sourceFileSha256": "ea3fa869041f185e487109511a6384b209ac9ad23e6c082401694be8b4187848",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "يبس",
+        "independentTextSha256": "82c3706c28a9dd75bb3455e06a72ee9cbab321213f3f6551eb63cb099d7b31de",
+        "normalizedFullTextSha256": "ede74e06a6dea3621ec77da61a99d07558d4ace5e15d189bbdda51b4667ed444",
+        "normalizedLetterCount": 276,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "كرب": {
       "verdict": "needs_review",
@@ -14650,14 +14680,29 @@
       "method": "original-html-complete-block-boundary-audit"
     },
     "حير": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "fcefa9d688b246a48221782b72d4388028505722f89ee17be80d7bc40c920007",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "d8e3db23df7e64f084d0ec84e540ad88ec267df51268127cbed03bd82a4fbb0e",
       "volume": 2,
       "sourceFileSha256": "bf49e09878f0bbb28452b6af47a8499a388480667f80fa62acf98e5f48c71149",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "حير",
+        "independentTextSha256": "075fad111d0a89444bf5765a29291d2b26de224d63dad76f5ee3aea07537a1f7",
+        "normalizedFullTextSha256": "767a2ac9933d87e072e23208c98f5178e86bb9228dbd130746635b5b8b81c5ac",
+        "normalizedLetterCount": 263,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "صنم": {
       "verdict": "verified",
@@ -15854,14 +15899,29 @@
       "method": "original-html-complete-block-boundary-audit"
     },
     "ثعب": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "9595968215767969cf9cee02ba3d7186d0cd11dd3e176ef5161a50657f786d47",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "5d312b0b61cc3488c2e865a5e16c54ac8a34ba3fdc1e188315a9d763901a00c2",
       "volume": 1,
       "sourceFileSha256": "468d7c3658cd5c40893843e97d49ec64bc763b0a9cf7ccac1ddf2b804833c77b",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "ثعب",
+        "independentTextSha256": "175c5ea8ff773febffc9d5a24906c0e7591bfd1f493b61d796be7a39da426ce5",
+        "normalizedFullTextSha256": "946c95e9214db91bed57505f4f6b4d13ca7a48c87256aefc3c7ed2fca13dd395",
+        "normalizedLetterCount": 272,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "مدن": {
       "verdict": "verified",
@@ -17230,14 +17290,29 @@
       }
     },
     "هور": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "a42094cfb1c597b7b331ffb23969f25d2d1365456b404c2e9773a4c4fcacc389",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "96e22a29a714ff026d1f1a97818f88e113bb6939d218698102d0af931d909e7e",
       "volume": 6,
       "sourceFileSha256": "ea3fa869041f185e487109511a6384b209ac9ad23e6c082401694be8b4187848",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "هور",
+        "independentTextSha256": "45afb3768121deb677033278bf3d16f19aface5667d4662dce2a8d1d320af0cd",
+        "normalizedFullTextSha256": "88255ba61e3178f7e841ed77f54249026788c6fecbeb209f41feae4b7ce9bbe5",
+        "normalizedLetterCount": 224,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "اوه": {
       "verdict": "needs_review",
@@ -21733,14 +21808,29 @@
       }
     },
     "همس": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "7e3d832957cd70121739cfa9bf1aeed2f5a7c21d8fa10cf52345aad8ae80c90e",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "f3da5fdabcc4c5fb17e0ebc0018ad1c4121f61006af429d75539080650639861",
       "volume": 6,
       "sourceFileSha256": "ea3fa869041f185e487109511a6384b209ac9ad23e6c082401694be8b4187848",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "همس",
+        "independentTextSha256": "3b3aecea23e2496eb10c6b833cd81a144aed0fe13914f427aeb7128fd7d115df",
+        "normalizedFullTextSha256": "0bad804c3723a6a1e7f5fb4391d0a8f984cef35452ef8d4bbcbabf5f749ed826",
+        "normalizedLetterCount": 177,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "عنو": {
       "verdict": "needs_review",
@@ -24193,14 +24283,29 @@
       }
     },
     "نوش": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "4428e1adca96c42b98f774824d172992190da37e4e9228e5d942c78dea6ea783",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "cd7ec5c77547e22e50cd295b7ee649a44e4fdb1800bd45a0edbb2d3d717ae48d",
       "volume": 5,
       "sourceFileSha256": "c9c0b0848d02f25ca8477c62bd4459703317e6f02546659426bc9accc2bc5c60",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "نوش",
+        "independentTextSha256": "d7e0d368f0fa22b271d8868ccedae9095b7b21fac28ae89f8db4951505152dfe",
+        "normalizedFullTextSha256": "a5798c3985a9e6732cb8574fc5612903c1ccad4ddc3610a82dbf211c2422c48a",
+        "normalizedLetterCount": 169,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "قطمر": {
       "verdict": "needs_review",
@@ -24900,14 +25005,29 @@
       }
     },
     "هيج": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "1d45488ef459ce03503ea209f1076e9d69f618dd05da0ac1ed09f3c7d490f8c6",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "7a046f792f00f61bff9d25eb34eb2f74467ba2cd158175572923531a3ed70dd4",
       "volume": 6,
       "sourceFileSha256": "ea3fa869041f185e487109511a6384b209ac9ad23e6c082401694be8b4187848",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "هيج",
+        "independentTextSha256": "77e139117c3f6e8d4b20841a30aba7783a8f39ee73a7f3ae9e943f8e9ee7fb62",
+        "normalizedFullTextSha256": "5f9046e1f4186bca24ee11eaec9c81c85f630ee95d3839f90e79ef45d8eb0ceb",
+        "normalizedLetterCount": 283,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "قشعر": {
       "verdict": "needs_review",
@@ -25244,14 +25364,29 @@
       "method": "original-html-complete-block-boundary-audit"
     },
     "حقف": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "a63ea3b1888531618b8fc9d4949dc1fc9812f410433c31d097ee132086c2fbc8",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "ec757d5b084b520f74c886bf8c9236466a2a542a95c197d637cbe7234aed1d6b",
       "volume": 2,
       "sourceFileSha256": "bf49e09878f0bbb28452b6af47a8499a388480667f80fa62acf98e5f48c71149",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "حقف",
+        "independentTextSha256": "2544c857d8325067bb40b4c591844c72ebc5a46b8591e42c237ad68e80e16752",
+        "normalizedFullTextSha256": "52f3df30801a83ac90dd01999971f2c40bd39943c71b857f688fbeb26e967fd3",
+        "normalizedLetterCount": 256,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "عيي": {
       "verdict": "needs_review",
@@ -26654,14 +26789,29 @@
       }
     },
     "قطف": {
-      "verdict": "needs_review",
-      "reasons": [
-        "original_html_missing"
-      ],
-      "sourceSha256": "8f7c7aa25961c7e20f8fec8ca95060811588abdab6f2561dda7526138a0f8ed2",
+      "verdict": "verified",
+      "reasons": [],
+      "sourceSha256": "5428e54ed94ec71ed4f442f48ce89f16290157c68f996a97207b78e72ab2631c",
       "volume": 5,
       "sourceFileSha256": "c9c0b0848d02f25ca8477c62bd4459703317e6f02546659426bc9accc2bc5c60",
-      "method": "original-html-complete-block-boundary-audit"
+      "method": "complete-independent-author-entry-letter-concordance",
+      "evidence": {
+        "independentSource": {
+          "fileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+          "repository": "https://github.com/abuyahyo/mojam",
+          "commit": "f04ea588df6088c2e05fd49250fd590a6a99e789",
+          "path": "data/maqayis.json"
+        },
+        "independentRoot": "قطف",
+        "independentTextSha256": "119da3ba7c52662f317a5a653a88523d3b3905418da126dc670a2bdf297c6879",
+        "normalizedFullTextSha256": "67fd1932f0178454707256a38a0f319a687fae714ccc9f003f0d61de1e4302e8",
+        "normalizedLetterCount": 255,
+        "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; final ya+hamza spelling equated to seated hamza (hamza retained); entire conventional Prophetic blessing with/without family invocation equated (not isolated words); decimal digits normalized AND retained except parenthesized numeric footnote calls (including malformed closing Quran quote ﴾); every Arabic base letter including hamza retained; no Arabic-word deletions",
+        "originalHtmlReplayed": false,
+        "rootMapping": null,
+        "exactEditorialFootnoteLinesRemoved": [],
+        "editorialCitationNormalization": "Only within removed known editorial notes: parenthesized numeric volume/page citation values compared as sorted multisets, preserving every number and multiplicity; author text digits never reordered"
+      }
     },
     "حضض": {
       "verdict": "needs_review",
