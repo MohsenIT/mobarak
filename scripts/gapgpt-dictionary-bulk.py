@@ -108,11 +108,18 @@ def api(ledger,identity,model,messages,key,folder,max_tokens):
   global STOP_REASON
   STOP_REASON='budget';STOP.set();raise
  save(folder/'request.json',{'identity':identity,'model':model,'messages':messages,'max_tokens':max_tokens,'reservedUsd':str(amount),'atUtc':now()})
- request=urllib.request.Request(samples.URL,data=json.dumps({'model':model,'messages':messages,'max_tokens':max_tokens,'temperature':.2,'response_format':{'type':'json_object'}},ensure_ascii=False).encode(),headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
+ payload={'model':model,'messages':messages,'max_tokens':max_tokens,'temperature':.2,'response_format':{'type':'json_object'}}
+ if model in ('gpt-6-luna','gpt-5-mini'):
+  payload.pop('temperature');payload['reasoning_effort']='low'
+ request=urllib.request.Request(samples.URL,data=json.dumps(payload,ensure_ascii=False).encode(),headers={'Authorization':'Bearer '+key,'Content-Type':'application/json'},method='POST')
  try:
   with urllib.request.urlopen(request,timeout=240) as response:raw=response.read()
  except Exception as error:
-  ledger.failure(identity,type(error).__name__);STOP.set();raise
+  kind=type(error).__name__
+  if isinstance(error,urllib.error.HTTPError):
+   kind+=':'+str(error.code)
+   save(folder/'http-failure.json',{'status':error.code,'atUtc':now()})
+  ledger.failure(identity,kind);STOP.set();raise
  # Retain exact provider body before decoding/validation. Never print it.
  folder.mkdir(parents=True,exist_ok=True);(folder/'response.raw.json').write_bytes(raw)
  try:result=json.loads(raw)
