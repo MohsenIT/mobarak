@@ -28,8 +28,8 @@
     }
   },
   "counts": {
-    "needs_review": 1291,
-    "verified": 351
+    "needs_review": 1292,
+    "verified": 350
   },
   "entries": {
     "سمو": {
@@ -404,8 +404,10 @@
       }
     },
     "فلح": {
-      "verdict": "verified",
-      "reasons": [],
+      "verdict": "needs_review",
+      "reasons": [
+        "explicit_observed_source_defect"
+      ],
       "sourceSha256": "9a3ce8ae4fe8e24ab37c59f5d5c09b9c0fb556325fc13fd5bb8ceda8e36d6d48",
       "volume": 4,
       "sourceFileSha256": "7ad3a0e5fc43249e17ba90779f83f33972fedf0acafd8aa05b54a7250954978c",
@@ -424,6 +426,12 @@
         "normalization": "NFKC; harakat/tatweel removed; Persian ya/kaf normalized; decimal digits normalized AND retained except parenthesized numeric footnote calls; every Arabic base letter including hamza retained; no Arabic-word deletions",
         "originalHtmlReplayed": false,
         "exactEditorialFootnoteLinesRemoved": []
+      },
+      "sourceDefect": {
+        "sourceSha256": "9a3ce8ae4fe8e24ab37c59f5d5c09b9c0fb556325fc13fd5bb8ceda8e36d6d48",
+        "reason": "observed_source_ocr_corruption",
+        "quote": "وعَغْترةُ الفَلحاءُ",
+        "explanation": "نام شاعر در نثر پیشین «عنترة» آمده، اما در شاهد شعری «عغترة» ضبط شده؛ نسخهٔ مستقل همین خرابی را تکرار می‌کند. تا بررسی مأخذ معتبر، تأیید کامل متن متوقف است."
       }
     },
     "كفر": {
@@ -2002,6 +2010,7 @@
     "حين": {
       "verdict": "needs_review",
       "reasons": [
+        "explicit_corrupt_character_marker",
         "original_html_missing"
       ],
       "sourceSha256": "e0c6c7dad8241532d3b0e21484ceebfc35a2a6d93b0a4ff3276832a32949e2e0",
@@ -4892,6 +4901,7 @@
     "انث": {
       "verdict": "needs_review",
       "reasons": [
+        "explicit_corrupt_character_marker",
         "original_html_missing"
       ],
       "sourceSha256": "ce67b19718c16e42cca3aabe1d87cfd44e564063deb7eaf4eaf55a0109b8b75b",
@@ -10894,6 +10904,7 @@
     "ضيق": {
       "verdict": "needs_review",
       "reasons": [
+        "explicit_corrupt_character_marker",
         "original_html_missing"
       ],
       "sourceSha256": "0e7410d0e1c795d545fd049eca343c59fec72f1fef055aa5f39bfa820545e98e",

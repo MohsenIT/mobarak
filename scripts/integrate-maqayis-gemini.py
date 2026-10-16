@@ -62,6 +62,8 @@ def integrate():
             'semanticReview': 'gemini-4-argon:pass' if review else 'not-selected-by-sampling-policy',
             'sourceAudit': check['method'],
         }
+        state.update(state='accepted', sourceVerified=True, sourceAudit=check['method'])
+        bulk.save(state_path, state)
         added.append(root)
     if added:
         temp = path.with_suffix('.tmp')

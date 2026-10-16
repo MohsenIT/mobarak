@@ -235,6 +235,7 @@ def main():
         except subprocess.CalledProcessError:
             commit = None
         independent_evidence = {'fileSha256': hashlib.sha256(independent_raw).hexdigest(), 'repository': 'https://github.com/abuyahyo/mojam', 'commit': commit, 'path': 'data/maqayis.json'}
+    exclusions = json.loads((ROOT/'data/maqayis/source-audit-exclusions.json').read_text())['entries']
     report = {}
     for root in roots:
         candidates = entries.get(norm(root), [])
@@ -270,6 +271,13 @@ def main():
                     'normalizedLetterCount': len(left),
                     'normalization': 'NFKC; harakat/tatweel removed; Persian ya/kaf normalized; decimal digits normalized AND retained except parenthesized numeric footnote calls; every Arabic base letter including hamza retained; no Arabic-word deletions',
                     'originalHtmlReplayed': False, 'exactEditorialFootnoteLinesRemoved': removed})
+        if len(candidates) == 1:
+            entry = candidates[0]
+            exclusion = exclusions.get(root)
+            if exclusion and exclusion['sourceSha256'] == sha(entry['ar']):
+                item.update(verdict='needs_review', reasons=['explicit_observed_source_defect'], sourceDefect=exclusion)
+            if '\ufffd' in entry['ar'] or re.search(r'[?؟]{3,}', entry['ar']):
+                item.update(verdict='needs_review', reasons=sorted(set(item['reasons'] + ['explicit_corrupt_character_marker'])))
         item.setdefault('method', 'original-html-complete-block-boundary-audit')
         report[root] = item
     output = {'schemaVersion': 1, 'method': 'Per-entry methods: original HTML file SHA plus exact complete p/li block sequence and independent boundary prefixes when files available; otherwise complete independent-entry concordance, removing only entire explicitly labelled editorial lines identical to recorded source footnotes. No translation-quality claim.', 'sourceFiles': files, 'counts': dict(Counter(r['verdict'] for r in report.values())), 'entries': report}
