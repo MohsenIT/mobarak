@@ -32,6 +32,7 @@ def validate(entry,result):
  by={p['id']:p.get('fa') for p in parts}
  if not all(isinstance(v,str) and v.strip() for v in by.values()):raise ValueError('empty_paragraph')
  for source in source_units:
+  if source['ar'].strip()=='و' and by[source['id']].strip()=='و':continue
   if len(by[source['id']])<max(2,len(source['ar'])*.40):raise ValueError('suspicious_condensation')
  fa='\n\n'.join(by[i].strip() for i in expected)
  if fa.strip()==result['summary'].strip():raise ValueError('summary_is_full')
@@ -399,6 +400,12 @@ def self_test():
   def test_missing(self):
    self.r['paragraphs'].pop()
    with self.assertRaises(ValueError):validate(self.e,self.r)
+  def test_standalone_conjunction_is_complete(self):
+   e={**self.e,'units':[{'id':'p0001','ar':'و'},{'id':'p0002','ar':'متن عربي طويل'}]}
+   r={'summary':'خلاصه مستقل','paragraphs':[{'id':'p0001','fa':'و'},{'id':'p0002','fa':'متن فارسی کامل'}]}
+   self.assertEqual(validate(e,r)['paragraphs'][0]['fa'],'و')
+   r['paragraphs'][1]['fa']='و'
+   with self.assertRaisesRegex(ValueError,'suspicious_condensation'):validate(e,r)
   def test_reorder(self):self.r['paragraphs'].reverse();self.assertEqual(validate(self.e,self.r)['paragraphs'][0]['id'],'p0001')
   def test_deterministic(self):self.assertEqual(needs_review(self.e),needs_review(dict(self.e)));self.e['ar']='x'*4001;self.assertTrue(needs_review(self.e))
   def test_api_only_repair_and_resume(self):
