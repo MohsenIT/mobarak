@@ -54,10 +54,10 @@ def run(publish):
             key=os.environ.get('QURAN_TRANSLATION_API_KEY')
             if not key:raise RuntimeError('Credential unavailable')
             entries=luna.load_queue();ledger=luna.Ledger(luna.JOB)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
                 iterator=iter(entries);active={}
                 while not bulk.STOP.is_set():
-                    while len(active)<4:
+                    while len(active)<8:
                         try:e=next(iterator)
                         except StopIteration:break
                         active[pool.submit(finalize,e,key,ledger)]=e
