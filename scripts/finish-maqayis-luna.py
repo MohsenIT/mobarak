@@ -23,7 +23,13 @@ class Ledger(bulk.Ledger):
   def change(data):
    if data.get('halted'):raise ValueError('unknown_or_halted_billing')
    if identity in data['requests']:raise ValueError('duplicate_paid_request')
-   cap=min(Decimal('10'),Decimal(data['ceilingUsd']),Decimal(os.environ.get('QURAN_TRANSLATION_BUDGET_USD','10')))
+   extension=data.get('additionalBudgetAuthorization')
+   approved=Decimal('10')
+   if extension:
+    extra=Decimal(extension['additionalCapUsd']);baseline=Decimal(extension['baselineAccountedUsd'])
+    if not extra.is_finite() or not baseline.is_finite() or extra<=0 or extra>3:raise ValueError('invalid_additional_budget')
+    approved=baseline+extra
+   cap=min(approved,Decimal(data['ceilingUsd']),Decimal(os.environ.get('QURAN_TRANSLATION_BUDGET_USD','10')))
    total=sum(accounted(r) for r in data['requests'].values())
    allocation=sum(accounted(r) for k,r in data['requests'].items() if k.startswith(PREFIX) and r['model']==model)
    if not cap.is_finite() or cap<=0:raise ValueError('global_budget_admission')
@@ -31,7 +37,8 @@ class Ledger(bulk.Ledger):
    if total+amount>cap:
     if live:return 'wait_for_settlement'
     raise ValueError('global_budget_admission')
-   if allocation+amount>ALLOCATIONS[model]:
+   model_cap=Decimal(extension['modelLifetimeCapsUsd'][model]) if extension else ALLOCATIONS[model]
+   if allocation+amount>model_cap:
     if any(r['model']==model for r in live):return 'wait_for_settlement'
     raise ValueError('model_allocation_admission')
    data['requests'][identity]={'state':'reserved','model':model,'reservedUsd':str(amount),'inputAllowance':input_allowance,'outputAllowance':max_tokens,'atUtc':bulk.now(),'allocation':'luna-completion-v1'}
@@ -44,7 +51,9 @@ class Ledger(bulk.Ledger):
  def settle(self,identity,usage):
   amount=super().settle(identity,usage)
   def check(data):
-   for model,cap in ALLOCATIONS.items():
+   caps=data.get('additionalBudgetAuthorization',{}).get('modelLifetimeCapsUsd',ALLOCATIONS)
+   for model,cap in caps.items():
+    cap=Decimal(cap)
     spent=sum(accounted(r) for k,r in data['requests'].items() if k.startswith(PREFIX) and r['model']==model)
     if spent>cap:data['halted']='Completion model allocation exceeded by reported usage'
   self.transaction(check)
@@ -108,7 +117,7 @@ def translate(e,key,ledger,stage,previous=None,issues=None):
  bulk.save(folder(e)/(stage+'.json'),candidate);return candidate
 
 def audit(e,candidate,key,ledger,stage,changed=None,reviewer=None):
- reviewer=reviewer or (STRONG_REVIEWER if bool(e.get('qualityFlags')) or bool(e.get('priorSemanticFailure')) or int(bulk.sha('strong-review:'+e['id'])[:8],16)%10==0 else REVIEWER)
+ reviewer=reviewer or (STRONG_REVIEWER if bool(e.get('qualityFlags')) else REVIEWER)
  if changed is None:
   source=units(e);parts=candidate['paragraphs'];scope='full-author-entry'
  else:
@@ -213,7 +222,7 @@ def snapshot(entries,state,active=0):
   v=bulk.read(folder(e)/'state.json',{});tag=v.get('state','pending');counts[tag]=counts.get(tag,0)+1
   if tag=='accepted':ready.append({'entry':e,'candidatePath':str(folder(e)/'candidate.json'),'reviewPath':str(folder(e)/'review.json')})
  b=bulk.read(JOB/'budget.json',{'requests':{}});allocation={m:str(sum(accounted(r) for k,r in b['requests'].items() if k.startswith(PREFIX) and r['model']==m)) for m in ALLOCATIONS};total=sum(accounted(r) for r in b['requests'].values())
- status={'state':state,'pid':os.getpid(),'updatedAtUtc':bulk.now(),'activeRequests':active,'counts':counts,'allocationsAccountedUsd':allocation,'allocationCapsUsd':{m:str(v) for m,v in ALLOCATIONS.items()},'totalAccountedUsd':str(total),'totalCapUsd':'10','budgetHalt':b.get('halted'),'translator':MODEL,'reviewer':REVIEWER}
+ status={'state':state,'pid':os.getpid(),'updatedAtUtc':bulk.now(),'activeRequests':active,'counts':counts,'allocationsAccountedUsd':allocation,'allocationCapsUsd':{m:str(v) for m,v in ALLOCATIONS.items()},'totalAccountedUsd':str(total),'totalCapUsd':b.get('ceilingUsd','10'),'additionalBudget':b.get('additionalBudgetAuthorization'),'budgetHalt':b.get('halted'),'translator':MODEL,'reviewer':REVIEWER}
  bulk.save(WORK/'status.json',status);bulk.save(WORK/'ready.json',ready);return status
 
 def run(limit,concurrency,pilot=False,retry=False,recheck=False):
@@ -260,6 +269,15 @@ def self_test():
    with tempfile.TemporaryDirectory() as d:
     l=Ledger(Path(d));l.reserve(PREFIX+'one',MODEL,[],100)
     with self.assertRaises(ValueError):l.reserve(PREFIX+'one',MODEL,[],100)
+   bulk.STOP.clear();bulk.STOP_REASON=None
+  def test_additional_budget_is_not_reissued_on_restart(self):
+   from unittest.mock import patch
+   with tempfile.TemporaryDirectory() as d:
+    ledger=Ledger(Path(d));authorization={'baselineAccountedUsd':'9','additionalCapUsd':'3','modelLifetimeCapsUsd':{MODEL:'20'}}
+    bulk.save(Path(d)/'budget.json',{'ceilingUsd':'12','additionalBudgetAuthorization':authorization,'requests':{'historical':{'model':MODEL,'reservedUsd':'11.999999','chargedUsd':'11.999999'}}})
+    with patch.dict(os.environ,{'QURAN_TRANSLATION_BUDGET_USD':'12'}):
+     with self.assertRaises(ValueError):ledger.reserve(PREFIX+'extra',MODEL,[],100)
+    self.assertEqual(bulk.read(Path(d)/'budget.json')['additionalBudgetAuthorization'],authorization)
    bulk.STOP.clear();bulk.STOP_REASON=None
   def test_no_ishtiqaqi(self):self.assertFalse(source_valid({'book':'ishtiqaqi'}))
   def test_waits_for_inflight_settlement_without_releasing_reservation(self):

@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('luna',ROOT/'scripts/finish-maqayis-luna.py');luna=importlib.util.module_from_spec(spec);spec.loader.exec_module(luna)
 WORK=luna.WORK
-ENV={**os.environ,'QURAN_TRANSLATION_BUDGET_USD':'10'}
+ENV={**os.environ,'QURAN_TRANSLATION_BUDGET_USD':str(luna.bulk.read(luna.JOB/'budget.json',{}).get('ceilingUsd','10'))}
 
 def command(args):
     subprocess.run(args,cwd=ROOT,env=ENV,check=True)
@@ -19,7 +19,7 @@ def snapshot(stage):
     charged=sum(float(r.get('chargedUsd',0)) for r in budget['requests'].values())
     accounted=sum(float(r.get('chargedUsd',r['reservedUsd'])) for r in budget['requests'].values())
     now=datetime.datetime.now(ZoneInfo('Asia/Tehran')).isoformat(timespec='minutes')
-    data={'stage':stage,'pid':os.getpid(),'updatedAt':now,'publishedCount':index['translatedCount'],'availableReferenceCount':index.get('availableReferenceCount'),'unavailableCount':len(index.get('unavailableRoots',{})),'completionCounts':state.get('counts',{}),'knownUsageUsd':round(charged,8),'accountedUsd':round(accounted,8),'budgetCapUsd':10,'billingHalt':budget.get('halted'),'ishtiqaqiStarted':False}
+    data={'stage':stage,'pid':os.getpid(),'updatedAt':now,'publishedCount':index['translatedCount'],'availableReferenceCount':index.get('availableReferenceCount'),'unavailableCount':len(index.get('unavailableRoots',{})),'completionCounts':state.get('counts',{}),'knownUsageUsd':round(charged,8),'accountedUsd':round(accounted,8),'budgetCapUsd':budget.get('ceilingUsd'),'additionalBudget':budget.get('additionalBudgetAuthorization'),'billingHalt':budget.get('halted'),'ishtiqaqiStarted':False}
     luna.bulk.save(WORK/'workflow-status.json',data)
     text=f'''# پیشرفت مقاییس
 
@@ -29,9 +29,9 @@ def snapshot(stage):
 
 متن قابل تطبیق در نسخه‌های موجود برای **{index.get('availableReferenceCount',0)} ریشه** یافت شده است. برای **{len(index.get('unavailableRoots',{}))} صورت ریشه**، تطبیق مستقل با اطمینان انجام نشد یا فقط حاشیهٔ فاقد متن مؤلف در دسترس بود؛ برای آن‌ها متن ساخته نمی‌شود. آمار مرحلهٔ اجرای جاری: `{json.dumps(state.get('counts',{}),ensure_ascii=False)}`. این آمار با تعداد منتشرشده یکسان نیست.
 
-هزینهٔ گزارش‌شدهٔ پاسخ‌ها: **{charged:.6f} دلار**؛ هزینه با احتساب رزروهای نامشخصِ حفظ‌شده: **{accounted:.6f} دلار**؛ سقف مشترک **۱۰ دلار** است. مبلغ رزروهای نامشخص صفر فرض یا آزاد نشده است. توقف صورتحساب: `{budget.get('halted') or 'ندارد'}`.
+هزینهٔ گزارش‌شدهٔ پاسخ‌ها: **{charged:.6f} دلار**؛ هزینه با احتساب رزروهای نامشخصِ حفظ‌شده: **{accounted:.6f} دلار**؛ اختلاف صورتحساب قبلی هنوز حل نشده؛ سقف مرحلهٔ تازه **۳ دلار اضافه** است، مستقل از هزینهٔ قبلی. مصرف تازه در دفتر محلی: **{max(0,accounted-float(budget.get('additionalBudgetAuthorization',{}).get('baselineAccountedUsd',accounted))):.6f} دلار**. مبلغ رزروهای نامشخص صفر فرض یا آزاد نشده است. توقف صورتحساب: `{budget.get('halted') or 'ندارد'}`.
 
-تنظیمات تکمیل: مترجم `gpt-6-luna` با استدلال کم؛ ناظر اصلی `gemini-3-flash-preview` و Argon برای نمونهٔ تصادفی و ریسک مأخذ. ناظر Mini در آزمون واژگانیِ عربی کلاسیک خطا داشت؛ خروجی‌های آن پیش از انتشار دوباره بررسی می‌شوند. مدل فعال و نوع بازبینی هر مدخل در منبع آن ثبت است.
+تنظیمات تکمیل: مترجم `gpt-6-luna` با استدلال کم؛ ناظر اصلی `gemini-3-flash-preview` و Argon فقط برای ریسک مشخص مأخذ. ناظر Mini در آزمون واژگانیِ عربی کلاسیک خطا داشت؛ خروجی‌های آن پیش از انتشار دوباره بررسی می‌شوند. مدل فعال و نوع بازبینی هر مدخل در منبع آن ثبت است.
 
 نسخهٔ متنی مستقل بدون حذف کلمات بازیابی شده است. بعضی مدخل‌های تازه متن مؤلف و حواشیِ مرجع را با هم دارند؛ حواشی می‌توانند متعلق به صفحه یا مدخل مجاور باشند. این تفاوت و خرابی‌های شناخته‌شدهٔ مأخذ در خود مدخل مشخص‌اند. ترجمهٔ کل متنِ مرجع به معنی تأیید کامل‌بودن اصل کتاب یا بازبینی انسانی نیست. ۷۴۱ ترجمهٔ پذیرفته‌شدهٔ قبلی حفظ شده‌اند.
 
