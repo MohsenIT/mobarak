@@ -7,6 +7,7 @@ import type { Meta, SurahData, Translations } from '@/lib/quran'
 import { loadMeta, loadSurah, loadTrans, loadGlobalRoots, compareRootRange, toFa } from '@/lib/quran'
 import MushafPage, { type Selection } from '@/components/quran/MushafPage'
 import FlowPage from '@/components/quran/FlowPage'
+import SurahPull from '@/components/quran/SurahPull'
 import RootPanel from '@/components/quran/RootPanel'
 import { rootHue } from '@/lib/comparison-colors'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
@@ -66,6 +67,7 @@ export default function Home() {
   const [pageTranslations, setPageTranslations] = useState<Map<number, Translations>>(new Map())
   const [pageTranslationError, setPageTranslationError] = useState(false)
   const [pageData, setPageData] = useState<Map<number, SurahData>>(new Map())
+  const pullArrival = useRef<{ s: number; end: boolean } | null>(null)
   const [flowSurah, setFlowSurah] = useState<SurahData | null>(null)
   const [flowTrans, setFlowTrans] = useState<Translations | null>(null)
   const [loadingPage, setLoadingPage] = useState(true)
@@ -239,6 +241,7 @@ export default function Home() {
   }, [comparisonRange, comparisonRoots, soloComparisonRoot, showComparison, showIndex])
 
   const goSurah = useCallback((n: number) => {
+    pullArrival.current = null
     const nn = clamp(n, 1, 114)
     if (!meta) return
     if (mode === 'mushaf') goPage(meta.surahs[nn - 1].pg)
@@ -246,6 +249,7 @@ export default function Home() {
   }, [meta, mode, goPage])
 
   const goVerse = useCallback((s: number, a: number, pos = 1) => {
+    pullArrival.current = null
     loadSurah(s).then(d => {
       const v = d.v[a - 1]
       if (v) {
@@ -501,7 +505,11 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <div data-reading-scroll key={`f-${surah}`} className="page-enter flex-1 min-h-0 overflow-y-auto nice-scroll">
+            <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs}
+              ready={!loadingPage && flowSurah?.n === surah}
+              enabled={!sel && !drawerOpen && !searchOpen && !showComparison && !showIndex}
+              arriveAtEnd={pullArrival.current?.s === surah && pullArrival.current.end}
+              onNavigate={(n, end) => { pullArrival.current = { s: n, end }; setFlash(null); setSel(null); setSurah(n) }}>
               <div className="max-w-[720px] mx-auto px-4 py-4 pb-24">
                 {loadingPage || !flowSurah ? (
                   <p className="text-sm animate-pulse text-center py-10" style={{ color: 'var(--ink-faint)' }}>…</p>
@@ -523,7 +531,7 @@ export default function Home() {
                   />
                 )}
               </div>
-            </div>
+            </SurahPull>
           )}
         </main>
 

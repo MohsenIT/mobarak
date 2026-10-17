@@ -1090,3 +1090,12 @@ input[type='range'].page-slider::-moz-range-thumb {
 .tahqiq-reference { font-size: 11.5px; color: var(--ink-soft); margin-top: 14px; }
 .tahqiq-verse { font-size: 21px; line-height: 1.9; text-align: right; margin: 5px 0 12px; padding: 4px 10px; border-inline-start: 2px solid var(--sage); overflow-wrap: anywhere; }
 .tahqiq-example { font-size: 19px; line-height: 1.9; }
+
+/* Adjacent-surah preview sits behind the sheet of reading text. */
+.surah-pull-shell { background: var(--paper); }
+.surah-pull-preview { position: absolute; left: 20px; right: 20px; text-align: center; color: var(--ink-soft); pointer-events: none; }
+.surah-pull-previous { top: 8px; }
+.surah-pull-next { bottom: 8px; }
+.surah-pull-scroll { position: relative; }
+.surah-pull-content { position: relative; background: var(--paper); }
+@media (prefers-reduced-motion: reduce) { .surah-pull-content { transition: none !important; } }
