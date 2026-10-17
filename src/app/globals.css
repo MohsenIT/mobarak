@@ -1064,11 +1064,6 @@ input[type='range'].page-slider::-moz-range-thumb {
 .mushaf-line { position: relative; isolation: isolate; }
 .mushaf-line[data-analysis-range]::before { content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: var(--range-left); width: var(--range-width); background: var(--word-active); border-radius: 3px; pointer-events: none; }
 
-.sheet-tab-next { animation: sheetTabNext 220ms cubic-bezier(0.22, 1, 0.36, 1); }
-.sheet-tab-previous { animation: sheetTabPrevious 220ms cubic-bezier(0.22, 1, 0.36, 1); }
-@keyframes sheetTabNext { from { transform: translateX(-12%); opacity: 0.35; } to { transform: translateX(0); opacity: 1; } }
-@keyframes sheetTabPrevious { from { transform: translateX(12%); opacity: 0.35; } to { transform: translateX(0); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .sheet-tab-next, .sheet-tab-previous { animation: none; } }
 
 .verse-translation { position: absolute; font-family: 'Vazirmatn', system-ui, sans-serif; font-size: 12px; line-height: 16px; color: var(--ink-soft); text-align: right; white-space: nowrap; min-width: 0; max-width: 100%; }
 
@@ -1107,3 +1102,5 @@ input[type='range'].page-slider::-moz-range-thumb {
 .surah-pull-scroll { position: relative; }
 .surah-pull-content { position: relative; background: var(--paper); }
 @media (prefers-reduced-motion: reduce) { .surah-pull-content { transition: none !important; } }
+
+@media (prefers-reduced-motion: reduce) { .swipe-tab-page { transition: none !important; } }

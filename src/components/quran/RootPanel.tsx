@@ -1,17 +1,15 @@
 'use client'
 import { wordTarget, type WordPart } from '@/lib/word-parts'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { Translator, SurahData, Translations, Meta } from '@/lib/quran'
-import { loadGlobalRoots, loadSurah, loadTrans, keywordScore, keywordTier, spacedRoot, toFa, morphologyLabel, formName } from '@/lib/quran'
+import { useEffect, useRef, useState } from 'react'
+import type { Translator, SurahData, Meta } from '@/lib/quran'
+import { loadSurah, spacedRoot, toFa, morphologyLabel, formName } from '@/lib/quran'
 import type { Selection } from './MushafPage'
 import { nextAnalysisLocation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
-import SelectionDetails from './SelectionDetails'
-import ContextDetails from './ContextDetails'
-import RootMeaning from './RootMeaning'
+import AnalysisTabContent from './AnalysisTabContent'
+import SwipeTabPages from './SwipeTabPages'
 import { getContext } from '@/lib/contexts'
 import QuranText from './QuranText'
-import { displayWordText } from '@/lib/word-parts'
 import { IconClose, IconMaximize, IconRestore, IconRoot, IconSortIndex } from './Ornaments'
 
 interface Props {
@@ -46,24 +44,18 @@ export default function RootPanel({
   stackedOverIndex = false, comparisonRange,
 }: Props) {
   const [tab, setTab] = useState<AnalysisTab>(anchor.part === 'prefix' ? 'word' : 'root')
-  const [tabDirection, setTabDirection] = useState<'next' | 'previous' | null>(null)
   const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
   const sel = targets[tab]
   const [surah, setSurah] = useState<SurahData | null>(null)
-  const [globalRoots, setGlobalRoots] = useState<Record<string, Record<string, number>> | null>(null)
-  const [trans, setTrans] = useState<Translations | null>(null)
   const [sheetH, setSheetH] = useState(46)
   const dragRef = useRef<{ y: number; h: number } | null>(null)
   const [formAvailable, setFormAvailable] = useState<boolean | null>(null)
-  const swipeStart = useRef<{ x: number; y: number } | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let live = true
-    setSurah(null); setTrans(null)
+    setSurah(null)
     loadSurah(sel.s).then(d => live && setSurah(d))
-    loadTrans(sel.s).then(t => live && setTrans(t))
-    loadGlobalRoots().then(r => live && setGlobalRoots(r))
     return () => { live = false }
   }, [sel.s])
 
@@ -79,55 +71,12 @@ export default function RootPanel({
 
   const switchTab = (key: AnalysisTab) => {
     if (key === tab || (key === 'form' && !formAvailable)) return
-    setTabDirection(TABS.findIndex(([id]) => id === key) > TABS.findIndex(([id]) => id === tab) ? 'next' : 'previous')
     setTab(key)
     const target = targets[key]
     loadSurah(target.s).then(data => onJump(target.s, target.a, target.pos, data.v[target.a - 1].p))
   }
-  const moveTab = (direction: number) => {
-    const available = TABS.filter(([key]) => key !== 'form' || formAvailable)
-    const index = available.findIndex(([key]) => key === tab)
-    const next = available[index + direction]
-    if (next) switchTab(next[0])
-  }
-
   const root = sel.root
 
-  const byAyah = useMemo(() => {
-    if (!root || !surah) return []
-    const groups = new Map<number, number[]>()
-    for (const [a, pos] of surah.ri[root] || []) {
-      if (!groups.has(a)) groups.set(a, [])
-      groups.get(a)!.push(pos)
-    }
-    return Array.from(groups.entries())
-  }, [root, surah])
-
-  const stats = useMemo(() => {
-    if (!root || !surah || !globalRoots) return null
-    const g = globalRoots[root]
-    if (!g) return null
-    const inSurah = (surah.ri[root] || []).length
-    const total = Object.values(g).reduce((a, b) => a + b, 0)
-    const df = Object.keys(g).length
-    const share = total > 0 ? inSurah / total : 0
-    const surahWords = surah.v.reduce((n, v) => n + v.w.length, 0)
-    const surahDensity = surahWords > 0 ? inSurah / surahWords : 0
-    const score = keywordScore({ inSurah, total, surahWords, df })
-    const tier = keywordTier(score)
-    const dist = Object.entries(g)
-      .map(([s, c]) => ({ s: +s, c }))
-      .sort((a, b) => b.c - a.c)
-    const top = dist.slice(0, 5)
-    if (!top.some(d => d.s === sel.s)) {
-      const cur = dist.find(d => d.s === sel.s)
-      if (cur) top.push(cur)
-    }
-    const maxC = top.length ? top[0].c : 1
-    return { inSurah, total, df, share, surahDensity, score, tier, top, maxC }
-  }, [root, surah, globalRoots, sel.s])
-
-  const verseTr = trans?.[String(sel.a)]?.[translator]
   const selectedForm = sel.part !== 'prefix' && surah?.n === sel.s ? surah.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form : undefined
 
   const selectedContext = getContext(sel.s, sel.a)
@@ -136,15 +85,18 @@ export default function RootPanel({
     onSelectionChange({ ...sel, tab, form: selectedForm, from: selectedContext?.from, to: selectedContext?.to })
   }, [sel, tab, selectedForm, selectedContext, onSelectionChange])
 
-  const selectTarget = (a: number, pos: number, part?: WordPart) => {
-    if (!surah) return
+  const selectTargetFor = (key: AnalysisTab, a: number, pos: number, part?: WordPart) => {
+    const currentTarget = targets[key]
+    if (!surah || surah.n !== currentTarget.s) return
     const verse = surah.v.find(v => v.n === a)
     const word = verse?.w[pos - 1]
     if (!word || !verse) return
-    const target = { s: sel.s, a, pos, ...wordTarget(word, part ?? (tab === 'word' ? sel.part : undefined)) }
-    setTargets(current => ({ ...current, [tab]: target, ...(tab === 'root' ? { form: target } : {}) }))
-    onJump(sel.s, a, pos, verse.p)
+    const target = { s: currentTarget.s, a, pos, ...wordTarget(word, part ?? (key === 'word' ? currentTarget.part : undefined)) }
+    setTargets(current => ({ ...current, [key]: target, ...(key === 'root' ? { form: target } : {}) }))
+    onJump(currentTarget.s, a, pos, verse.p)
   }
+
+  const selectTarget = (a: number, pos: number, part?: WordPart) => selectTargetFor(tab, a, pos, part)
 
   const navigate = (direction: number) => {
     if (!surah) return
@@ -188,18 +140,6 @@ export default function RootPanel({
       <div
         ref={panelRef}
         className={panelClass}
-        onTouchStart={event => {
-          if (event.touches.length !== 1 || (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, .panel-handle'))) { swipeStart.current = null; return }
-          swipeStart.current = { x: event.touches[0].clientX, y: event.touches[0].clientY }
-        }}
-        onTouchEnd={event => {
-          const start = swipeStart.current; swipeStart.current = null
-          if (!start || !event.changedTouches[0]) return
-          const dx = event.changedTouches[0].clientX - start.x
-          const dy = event.changedTouches[0].clientY - start.y
-          if (Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy) * 1.3) { event.preventDefault(); moveTab(dx > 0 ? 1 : -1) }
-        }}
-        onTouchCancel={() => { swipeStart.current = null }}
         role="dialog"
         aria-label="تحلیل ریشه کلمه"
         style={{ touchAction: 'pan-y', ...(!maximized ? { ['--sheet-h' as string]: `${sheetH}dvh` } : {}) }}
@@ -257,137 +197,12 @@ export default function RootPanel({
           <span>{tab === 'context' && selectedContext ? `آیات ${toFa(selectedContext.from)} تا ${toFa(selectedContext.to)}` : `آیه ${toFa(sel.a)} · واژه ${toFa(sel.pos)}`}</span>
           <button onClick={() => navigate(1)} aria-label={tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'}>{tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'} ←</button>
         </div>
-        <div key={tab} role="tabpanel" id={`analysis-panel-${tab}`} aria-labelledby={`analysis-tab-${tab}`} className={`overflow-y-auto nice-scroll px-5 py-4 flex-1${tabDirection ? ` sheet-tab-${tabDirection}` : ''}`} style={{ overscrollBehavior: 'contain' }}>
-          {tab !== 'root' ? (surah?.n === sel.s && trans ? (tab === 'context' ? <ContextDetails selection={sel} surah={surah} trans={trans} translator={translator} onPick={selectTarget} onCompare={onCompareContext} /> : <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} onPick={selectTarget} comparisonRange={comparisonRange} />) : <p role="status">در حال بارگیری…</p>) : <>
-          {!root ? (
-            <div className="text-center py-6" style={{ color: 'var(--ink-soft)' }}>
-              <p className="text-sm leading-8">این واژه حرف یا ضمیر است و ریشهٔ مستقلی ندارد.</p>
-              {verseTr && (
-                <p className="mt-4 text-justify rounded-xl px-3 py-2"
-                  style={{ background: 'color-mix(in srgb, var(--paper) 60%, transparent)', border: '1px solid var(--line)', fontSize: 13.5, lineHeight: 2 }}>
-                  {verseTr}
-                </p>
-              )}
-            </div>
-          ) : (
-            <>
-              <RootMeaning key={root} root={root} />
-              {stats && (
-                <>
-                  <div className="flex gap-2 mb-4">
-                    <div className="stat">
-                      <b>{toFa(stats.inSurah)}</b>
-                      <span>بار در این سوره</span>
-                    </div>
-                    <div className="stat">
-                      <b>{toFa(stats.total)}</b>
-                      <span>بار در کل قرآن</span>
-                    </div>
-                    <div className="stat">
-                      {/* Host surahs: "df / 114" where df = number of surahs
-                          containing this root, 114 = total surahs in the Quran.
-                          Styled EXACTLY like the other two stats — plain bold
-                          text, no badge/background/border. Single text node so
-                          the bidi algorithm renders cleanly.
-
-                          Order per user request: total (۱۱۴) on the RIGHT
-                          (first in RTL reading), count on the LEFT (second).
-                          Reading RTL: "۱۱۴ / count" — i.e. "out of 114 surahs,
-                          this many host this root". */}
-                      <b>۱۱۴ / {toFa(stats.df)}</b>
-                      <span>سوره میزبان</span>
-                    </div>
-                  </div>
-
-                  {/* keyword gauge — v3 lift-based score.
-                      Now a proper progress bar: empty track + filled portion
-                      whose width = score*100%. In RTL, fill grows from the
-                      right (low end, "حاشیه‌ای") toward the left (high end,
-                      "محوری"). At score=1.0 the entire bar is filled. */}
-                  <div className="mb-1 flex items-center justify-between text-[11px]" style={{ color: 'var(--ink-faint)' }}>
-                    <span>حاشیه‌ای</span>
-                    <span className="font-medium" style={{ color: 'var(--ink-soft)' }}>شاخص کلیدواژگی در این سوره</span>
-                    <span>محوری</span>
-                  </div>
-                  <div className="gauge gauge-keyword mb-1.5">
-                    <div className="gauge-fill" style={{ width: `${stats.score * 100}%` }} />
-                  </div>
-                  <p className="text-xs mb-4 text-center" style={{ color: 'var(--ink-soft)' }}>{stats.tier.label}</p>
-
-                  {/* share of this surah */}
-                  <div className="rounded-xl border px-3 py-2.5 mb-4" style={{ borderColor: 'var(--line)' }}>
-                    <div className="flex justify-between text-xs mb-2" style={{ color: 'var(--ink-soft)' }}>
-                      <span>سهم این سوره از همهٔ کاربردهای ریشه</span>
-                      <b style={{ color: 'var(--ink)' }}>{toFa(Math.round(stats.share * 100))}٪</b>
-                    </div>
-                    <div className="dist-track">
-                      <div className="dist-fill cur" style={{ width: `${Math.max(2, stats.share * 100)}%` }} />
-                    </div>
-                  </div>
-
-                  {/* distribution across surahs */}
-                  <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--ink-faint)' }}>
-                    پراکندگی ریشه در قرآن — برای پرش لمس کنید
-                  </p>
-                  <div className="flex flex-col mb-4">
-                    {stats.top.map(d => (
-                      <button key={d.s} className="dist-row" onClick={() => { loadSurah(d.s).then(data => { const occurrence = data.ri[root]?.[0]; if (!occurrence) return; const [a, pos] = occurrence; const w = data.v[a - 1].w[pos - 1]; setTargets(current => { const target = { s: d.s, a, pos, text: w.t, root }; return { ...current, root: target, form: target } }); onJump(d.s, a, pos, data.v[a - 1].p) }) }}>
-                        <span className="text-xs w-16 text-right flex-none" style={{ color: d.s === sel.s ? 'var(--ink)' : 'var(--ink-soft)', fontWeight: d.s === sel.s ? 700 : 400 }}>
-                          {meta.surahs[d.s - 1]?.fa}
-                        </span>
-                        <span className="dist-track">
-                          <span className={`dist-fill${d.s === sel.s ? ' cur' : ''}`}
-                            style={{ width: `${(d.c / stats.maxC) * 100}%`, display: 'block' }} />
-                        </span>
-                        <span className="text-xs w-8 flex-none text-left" style={{ color: 'var(--ink-faint)' }}>{toFa(d.c)}</span>
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {verseTr && (
-                <p className="mb-4 text-justify rounded-xl px-3 py-2"
-                  style={{ background: 'color-mix(in srgb, var(--paper) 60%, transparent)', border: '1px solid var(--line)', color: 'var(--ink-soft)', fontSize: 13.5, lineHeight: 2 }}>
-                  {verseTr}
-                </p>
-              )}
-
-              {comparisonRange?.s === sel.s && <p className="text-xs mb-3"><span className="range-inside rounded px-2 py-1">درون بازه</span>{' · '}<span className="range-outside rounded px-2 py-1">بیرون بازه</span></p>}
-              {surah && (
-                <>
-                  <p className="text-xs mb-2 font-medium" style={{ color: 'var(--ink-faint)' }}>
-                    واژه‌های هم‌ریشه در این سوره — برای پرش لمس کنید
-                  </p>
-                  <div className="flex flex-col gap-2 pb-2">
-                    {byAyah.map(([ayah, poses]) => {
-                      const verse = surah.v[ayah - 1]
-                      if (!verse) return null
-                      return (
-                        <button key={ayah} className="occ-row"
-                          onClick={() => selectTarget(ayah, poses[0])}>
-                          <span className="chip flex-none mt-1" style={{ borderColor: 'var(--sage)', color: 'var(--ink)' }}>
-                            آیه {toFa(ayah)}
-                          </span>
-                          <span className="font-quran" dir="rtl" style={{ fontSize: 19, lineHeight: 1.9, color: 'var(--ink)' }}>
-                            {verse.w.map((w, i) => (
-                              <span key={i}>
-                                <span className={poses.includes(i + 1) ? `hl${comparisonRange?.s === sel.s ? (ayah >= comparisonRange.from && ayah <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}` : ''}>
-                                  <QuranText text={displayWordText(w)} />
-                                </span>{' '}
-                              </span>
-                            ))}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </>
-              )}
-            </>
-          )}
-          </>}
-        </div>
+        <SwipeTabPages active={tab} onChange={switchTab} panes={TABS.filter(([key]) => key !== 'form' || formAvailable).map(([key]) => ({
+          key,
+          content: <AnalysisTabContent tab={key} selection={targets[key]} meta={meta} translator={translator} comparisonRange={comparisonRange}
+            onPick={(a, pos, part) => selectTargetFor(key, a, pos, part)} onCompareContext={onCompareContext}
+            onRootTarget={(target, page) => { setTargets(current => ({ ...current, root: target, form: target })); onJump(target.s, target.a, target.pos, page) }} />,
+        }))} />
       </div>
     </>
   )
