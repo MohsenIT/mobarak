@@ -43,7 +43,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
   return (
     <div>
       <div style={{ fontSize: fontSize * 1.12 }}>
-        <SurahBand ar={sm.ar} />
+        <SurahBand sm={sm} />
         {sm.b && <Bismillah size={`${fontSize}px`} />}
       </div>
       <div ref={textRef} className="font-quran text-justify mt-2 relative" dir="rtl"

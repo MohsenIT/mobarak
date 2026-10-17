@@ -1,17 +1,31 @@
-import { toFa } from '@/lib/quran'
+import { toFa, type SurahMeta } from '@/lib/quran'
 
 export function AyahMarker({ n }: { n: number }) {
   return <span className="ayah-marker" aria-hidden>{toFa(n)}</span>
 }
 
-export function SurahBand({ ar }: { ar: string }) {
+function RevelationIcon({ makki }: { makki: boolean }) {
+  return makki ? (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 7 13 3l8 4v13l-10 3-8-4Z" /><path d="m3 7 8 4 10-4M11 11v12M3 11l8 4 10-4" /><path d="M6 15v4l2 1v-4Z" fill="currentColor" stroke="none" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M8 16v-2c0-3 4-4 5-7 1 3 5 4 5 7v2Z" fill="currentColor" fillOpacity=".18" /><path d="M7 16h12v5H7Zm6 1v4M3 21V8l1-4 1 4v13M2 21h20M3 10h2M13 4V3" />
+    </svg>
+  )
+}
+
+export function SurahBand({ sm }: { sm: SurahMeta }) {
+  const revelation = sm.rev === 'makkah' ? 'مکی' : sm.rev === 'madinah' ? 'مدنی' : null
   return (
-    <div className="surah-band" dir="rtl">
-      <span className="band-line" />
-      <span className="band-name" style={{ fontSize: '0.9em' }}>
-        سُورَةُ {ar}
+    <div className="surah-band" dir="rtl" role="group" aria-label={`سورهٔ ${sm.ar}، شمارهٔ ${toFa(sm.n)}، ${toFa(sm.vc)} آیه${revelation ? `، ${revelation}` : ''}`}>
+      <span className="band-meta band-number">سورهٔ {toFa(sm.n)}</span>
+      <span className="band-name">سُورَةُ {sm.ar}</span>
+      <span className="band-meta band-info">
+        <span>{toFa(sm.vc)} آیه</span>
+        {revelation && <span className="band-revelation" title={`سورهٔ ${revelation}`}><RevelationIcon makki={sm.rev === 'makkah'} />{revelation}</span>}
       </span>
-      <span className="band-line" />
     </div>
   )
 }

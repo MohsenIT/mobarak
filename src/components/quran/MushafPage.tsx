@@ -145,7 +145,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
       {lineNums.map(ln => {
         const items = lines.get(ln)!
         if (items.length === 1 && items[0].kind === 'band')
-          return <SurahBand key={ln} ar={items[0].sm.ar} />
+          return <SurahBand key={ln} sm={items[0].sm} />
         if (items.length === 1 && items[0].kind === 'bism')
           return <Bismillah key={ln} />
         return (

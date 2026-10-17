@@ -288,22 +288,23 @@ body {
 
 /* ============ Surah band / bismillah ============ */
 .surah-band {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin: 0.35em 0 0.15em;
 }
-.surah-band .band-line {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(to left, transparent, var(--gold-deep) 20%, var(--gold-deep) 80%, transparent);
-}
+.surah-band .band-meta { font-family: 'Vazirmatn', system-ui, sans-serif; font-size: 11px; line-height: 1.7; color: var(--ink-soft); }
+.surah-band .band-number { text-align: right; white-space: nowrap; }
+.surah-band .band-info { display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap; }
+.surah-band .band-revelation { display: inline-flex; align-items: center; gap: 4px; }
 .surah-band .band-name {
   font-family: 'Hafs', serif;
   color: var(--teal);
   border: 1px solid var(--gold-deep);
   background: var(--gold-faint);
-  padding: 0.08em 1.1em 0.22em;
+  padding: 0.08em 0.65em 0.22em;
+  font-size: clamp(17px, 0.9em, 24px);
   border-radius: 999px;
   white-space: nowrap;
   box-shadow: 0 0 0 3px var(--paper-2), 0 0 0 4px var(--gold-faint);
