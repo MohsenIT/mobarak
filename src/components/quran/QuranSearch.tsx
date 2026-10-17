@@ -41,6 +41,8 @@ const labels = { exact: 'تطبیق دقیق', partial: 'شامل عبارت ش�
 
 export default function QuranSearch({ open, onOpenChange, meta, currentSurah, onPick }: Props) {
   const [query, setQuery] = useState('')
+  const [includePartial, setIncludePartial] = useState(true)
+  const [includeNear, setIncludeNear] = useState(false)
   const [localOnly, setLocalOnly] = useState(false)
   const [results, setResults] = useState<QuranSearchResult[]>([])
   const [busy, setBusy] = useState(false)
@@ -60,7 +62,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   useEffect(() => {
     if (!open) { request.current++; return }
     const id = ++request.current
-    const key = `${query}:${localOnly ? currentSurah : 0}`
+    const key = `${query}:${localOnly ? currentSurah : 0}:${includePartial}:${includeNear}`
     if (!error && completed.current === key) { setBusy(false); return }
     pending.current = key
     setVisible(20); scroll.current = 0; setError(false)
@@ -78,11 +80,11 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           }
           worker.current.onerror = () => { setError(true); setBusy(false); worker.current?.terminate(); worker.current = null }
         }
-        worker.current.postMessage({ id, query, surah: localOnly ? currentSurah : 0 })
+        worker.current.postMessage({ id, query, surah: localOnly ? currentSurah : 0, options: { includePartial, includeNear } })
       } catch { setError(true); setBusy(false) }
     }, 180)
     return () => { clearTimeout(timer); request.current++ }
-  }, [query, localOnly, currentSurah, valid, retry, open])
+  }, [query, localOnly, includePartial, includeNear, currentSurah, valid, retry, open])
 
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent showCloseButton={false} dir="rtl" className="flex flex-col gap-0 p-0 sm:max-w-2xl h-[85dvh] max-h-[50rem] overflow-hidden" style={{ background: 'var(--paper)', color: 'var(--ink)', borderColor: 'var(--line)' }}
@@ -95,13 +97,17 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           <input ref={input} type="search" value={query} maxLength={160} onChange={event => setQuery(event.target.value)} aria-label="عبارت جست‌وجو در متن قرآن" placeholder="مثلاً: ذلک الکتاب لا ریب فیه" className="w-full min-w-0 bg-transparent py-3 text-sm outline-none" autoComplete="off" autoCorrect="off" spellCheck={false} />
         </div>
         <label className="flex items-center gap-2 text-xs mt-3"><input type="checkbox" checked={localOnly} onChange={event => setLocalOnly(event.target.checked)} />فقط سورهٔ {meta.surahs[currentSurah - 1]?.fa}</label>
+        <div className="flex flex-wrap items-center gap-x-4 text-xs mt-1">
+          <label className="inline-flex items-center gap-2 py-2 cursor-pointer"><input type="checkbox" checked={includePartial} onChange={event => setIncludePartial(event.target.checked)} />شامل عبارت</label>
+          <label className="inline-flex items-center gap-2 py-2 cursor-pointer"><input type="checkbox" checked={includeNear} onChange={event => setIncludeNear(event.target.checked)} />نتایج نزدیک / غلط املایی</label>
+        </div>
       </div>
       <div className="shrink-0 px-4 py-2 text-xs" role="status" aria-live="polite" style={{ color: 'var(--ink-soft)' }}>
         {busy ? <span className="inline-flex items-center gap-2"><LoaderCircle size={14} className="animate-spin" />در حال جست‌وجو…</span> : !valid ? 'حداقل دو حرف وارد کنید.' : error ? 'متن جست‌وجو بارگیری نشد.' : `${toFa(results.length)} آیه پیدا شد`}
       </div>
       <div ref={list} onScroll={event => { scroll.current = event.currentTarget.scrollTop }} className="min-h-0 flex-1 overflow-y-auto nice-scroll px-4 pb-4" aria-busy={busy} style={{ overscrollBehavior: 'contain' }}>
         {error && <button className="chip" onClick={() => setRetry(value => value + 1)}>تلاش دوباره</button>}
-        {!busy && !error && valid && results.length === 0 && <p className="text-sm leading-8">نتیجه‌ای پیدا نشد. عبارت کوتاه‌تر یا واژه‌های دیگری را امتحان کنید؛ خطاهای تایپی جزئی هم بررسی شده‌اند.</p>}
+        {!busy && !error && valid && results.length === 0 && <p className="text-sm leading-8">نتیجه‌ای پیدا نشد. {includeNear ? 'عبارت کوتاه‌تر یا واژه‌های دیگری را امتحان کنید؛ خطاهای تایپی جزئی هم بررسی شده‌اند.' : 'برای بررسی اشتباه تایپی، «نتایج نزدیک / غلط املایی» را روشن کنید.'}</p>}
         {!busy && !error && valid && results.slice(0, visible).map((result, index) => <div key={`${result.s}:${result.a}`}>
           {(index === 0 || results[index - 1].kind !== result.kind) && <h3 className="text-xs font-bold pt-3 pb-2" style={{ color: 'var(--ink-soft)' }}>{labels[result.kind]}</h3>}
           <button type="button" className="block w-full text-right rounded-xl border p-3 mb-2 cursor-pointer" style={{ borderColor: 'var(--line)', background: 'var(--sheet)' }} aria-label={`رفتن به ${meta.surahs[result.s - 1]?.fa} آیه ${toFa(result.a)}`} onClick={() => onPick(result.s, result.a, result.positions[0] ?? 1)}>

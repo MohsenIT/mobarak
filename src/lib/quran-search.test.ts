@@ -27,11 +27,12 @@ test('spaces inside and between words can be omitted or added', () => {
   expect(search('بسم الله الرح من الرحیم').some(r => r.s === 1 && r.a === 1 && r.kind === 'exact')).toBe(true)
 })
 test('small typos and transpositions return nearby original verses with an explicit kind', () => {
+  const withTypos = (query: string) => search(query, 0, { includeNear: true })
   expect(typoDistance('الرحمن', 'الرحنم', 2)).toBe(1)
-  expect(search('ذلک الکتاب لا ریب فیخ').some(r => r.s === 2 && r.a === 2 && r.kind === 'near')).toBe(true)
-  expect(search('المتسقم').some(r => r.s === 1 && r.a === 6 && r.kind === 'near')).toBe(true)
-  expect(search('ذلن الکتاب لا ریب فیخ').some(r => r.s === 2 && r.a === 2 && r.kind === 'near')).toBe(true)
-  expect(search('المتسقیم').some(r => r.s === 1 && r.a === 6 && r.kind === 'near')).toBe(true)
+  expect(withTypos('ذلک الکتاب لا ریب فیخ').some(r => r.s === 2 && r.a === 2 && r.kind === 'near')).toBe(true)
+  expect(withTypos('المتسقم').some(r => r.s === 1 && r.a === 6 && r.kind === 'near')).toBe(true)
+  expect(withTypos('ذلن الکتاب لا ریب فیخ').some(r => r.s === 2 && r.a === 2 && r.kind === 'near')).toBe(true)
+  expect(withTypos('المتسقیم').some(r => r.s === 1 && r.a === 6 && r.kind === 'near')).toBe(true)
   expect(search('الله')[0].kind).toBe('exact')
   expect(search('الله', 2).find(r => r.a === 20)?.positions.length).toBe(2)
 })
@@ -109,4 +110,22 @@ test('exact occurrences do not hide other literal occurrences within the same ve
   const local = createQuranSearch([[1, 1, ['زَبَدٌ', 'الزَّبَدُ', 'زَبَدًا', 'زَادَ']]])('زبد')[0]
   expect(local.positions).toEqual([1, 2, 3])
   expect(local.score).toBe(0)
+})
+
+test('partial matches and spelling tolerance can be controlled independently', () => {
+  const options = { includePartial: true, includeNear: false }
+  expect(search('ذلک الکتاب لا ریب فیخ', 2, options).some(r => r.a === 2)).toBe(false)
+  expect(search('ذلک الکتاب لا ریب فیخ', 2, { ...options, includeNear: true }).some(r => r.a === 2 && r.kind === 'near')).toBe(true)
+  const local = createQuranSearch([[1, 1, ['الزَّبَدُ']], [1, 2, ['زَبَدٌ', 'الزَّبَدُ']]])
+  expect(local('زبد', 0, options).map(r => r.a)).toEqual([2, 1])
+  const strict = local('زبد', 0, { includePartial: false, includeNear: false })
+  expect(strict.map(r => r.a)).toEqual([2])
+  expect(strict[0].positions).toEqual([1])
+  expect(search('لاتخف', 20, { includePartial: false, includeNear: false }).find(r => r.a === 21)?.kind).toBe('exact')
+  expect(search('ذلک الکتاب لا ریب فیه', 2, options)[0].kind).toBe('exact')
+})
+
+test('default search includes literal partials but excludes spelling suggestions', () => {
+  expect(search('ذلک الکتاب لا ریب فیخ').some(r => r.kind === 'near')).toBe(false)
+  expect(search('زبد').find(r => r.s === 13 && r.a === 17)?.positions.length).toBe(3)
 })

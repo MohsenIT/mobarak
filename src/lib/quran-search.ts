@@ -28,6 +28,7 @@ export function typoDistance(a: string, b: string, max: number): number {
   return previous[b.length]
 }
 
+export type QuranSearchOptions = { includePartial?: boolean; includeNear?: boolean }
 export type SearchVerse = [s: number, a: number, words: string[]]
 export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; kind: 'exact' | 'partial' | 'near'; score: number }
 type IndexedVerse = { verse: SearchVerse; keys: string[][]; compact: { text: string; ranges: [number, number][]; boundaries: Set<number> }[] }
@@ -54,14 +55,14 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
     })
     return { verse, keys, compact }
   })
-  return (input: string, surah = 0): QuranSearchResult[] => {
+  return (input: string, surah = 0, { includePartial = true, includeNear = false }: QuranSearchOptions = {}): QuranSearchResult[] => {
     const query = normalizeQuranSearch(input)
     if (query.replace(/\s/g, '').length < 2) return []
     const terms = query.split(' ')
     const compactQuery = terms.join('')
     const budget = terms.length === 1 ? (terms[0].length >= 6 ? 2 : 1) : Math.min(3, Math.max(1, Math.ceil(compactQuery.length / 12)))
     const distances = terms.map(term => {
-      const max = term.length < 3 ? 0 : term.length < 6 ? 1 : 2
+      const max = !includeNear || term.length < 3 ? 0 : term.length < 6 ? 1 : 2
       const matches = new Map<string, number>()
       if (max === 0) { if (vocabulary.has(term)) matches.set(term, 0); return matches }
       for (const word of vocabulary) {
@@ -104,6 +105,7 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
           const end = start + compactQuery.length
           const matched = item.ranges.flatMap(([from, to], i) => from < end && to > start ? [i + 1] : [])
           const whole = item.boundaries.has(start) && item.boundaries.has(end)
+          if (!whole && !includePartial) continue
           const value = whole ? 0 : 0.5
           literalScore = Math.min(literalScore, value)
           for (const pos of matched) {
