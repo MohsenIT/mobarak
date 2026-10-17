@@ -93,6 +93,11 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
           kind = cost === 0 ? 'exact' : 'near'
         }
       }
+      // Rank by the best literal occurrence, but highlight every literal occurrence.
+      // A whole-word hit must not hide an occurrence inside another word in the verse.
+      let literalScore = score === 0 ? 0 : Infinity
+      const literalPositions = new Set<number>(score === 0 ? positions : [])
+      const literalParts: Record<number, number> = score === 0 ? { ...parts } : {}
       // Ignore accidental spaces inside words, and also accept incomplete words.
       for (const item of compact) {
         for (let start = item.text.indexOf(compactQuery); start >= 0; start = item.text.indexOf(compactQuery, start + 1)) {
@@ -100,19 +105,21 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
           const matched = item.ranges.flatMap(([from, to], i) => from < end && to > start ? [i + 1] : [])
           const whole = item.boundaries.has(start) && item.boundaries.has(end)
           const value = whole ? 0 : 0.5
-          if (value <= score) {
-            const masks: Record<number, number> = {}
-            for (const pos of matched) {
-              const [from, to] = item.ranges[pos - 1]
-              // Bit 1 selects the independent waw; bit 2 selects the stem.
-              masks[pos] = prefixed.has(pos)
-                ? (start < from + 1 && end > from ? 1 : 0) | (start < to && end > from + 1 ? 2 : 0)
-                : 2
-            }
-            record(value, matched, masks)
-            kind = whole ? 'exact' : 'partial'
+          literalScore = Math.min(literalScore, value)
+          for (const pos of matched) {
+            const [from, to] = item.ranges[pos - 1]
+            // Bit 1 selects the independent waw; bit 2 selects the stem.
+            const mask = prefixed.has(pos)
+              ? (start < from + 1 && end > from ? 1 : 0) | (start < to && end > from + 1 ? 2 : 0)
+              : 2
+            literalPositions.add(pos)
+            literalParts[pos] = (literalParts[pos] ?? 0) | mask
           }
         }
+      }
+      if (literalPositions.size) {
+        positions = [...literalPositions]; parts = literalParts; score = literalScore
+        kind = literalScore === 0 ? 'exact' : 'partial'
       }
       if (Number.isFinite(score)) results.push({ s, a, words, parts, waw: waw[`${s}:${a}`] ?? [], positions: positions.sort((a, b) => a - b), kind, score })
     }

@@ -98,3 +98,15 @@ test('highlights select the matched stem and include waw only when it was querie
   const repeated = createQuranSearch([[1, 1, ['وَلَا', 'تَخَفْ', 'قَالَ', 'لَا', 'تَخَفْ']]], { '1:1': [1] })('لا تخف')[0]
   expect(repeated.parts).toEqual({ 1: 2, 2: 2, 4: 2, 5: 2 })
 })
+
+test('exact occurrences do not hide other literal occurrences within the same verse', () => {
+  const result = search('زبد').find(result => result.s === 13 && result.a === 17)!
+  const expected = result.words.flatMap((word, i) => normalizeQuranSearch(word).includes('زبد') ? [i + 1] : [])
+  expect(expected.length).toBe(3)
+  expect(result.positions).toEqual(expected)
+  expect(result.kind).toBe('exact')
+  for (const pos of expected) expect(result.parts[pos]).toBe(2)
+  const local = createQuranSearch([[1, 1, ['زَبَدٌ', 'الزَّبَدُ', 'زَبَدًا', 'زَادَ']]])('زبد')[0]
+  expect(local.positions).toEqual([1, 2, 3])
+  expect(local.score).toBe(0)
+})
