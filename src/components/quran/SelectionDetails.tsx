@@ -5,6 +5,7 @@ import type { Translator, SurahData, Translations } from '@/lib/quran'
 import { morphologyLabel, formName, toFa } from '@/lib/quran'
 import { analysisOccurrences, type AnalysisSelection, type AnalysisTab } from '@/lib/analysis'
 import QuranText from './QuranText'
+import SourceReference from './SourceReference'
 
 type Index = { words: Record<string, Record<string, number>>; forms: Record<string, Record<string, number>>; rootForms: Record<string, Record<string, number>> }
 let indexPromise: Promise<Index> | null = null
@@ -50,8 +51,13 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
         <div className="rounded-xl border p-3 mb-3 text-sm" style={{ borderColor: 'var(--line)' }}>
           <p>{formName(selection.root, selection.form) && <b>{formName(selection.root, selection.form)} · </b>}باب / ساخت صرفی: <b>{morphologyLabel(selection.form!)}</b> <span dir="ltr">({selection.form})</span></p>
           <p className="text-xs leading-6 mt-1">واژه‌های همین ریشه در همین باب انتخاب شده‌اند.</p>
-          <a className="text-xs underline" href="https://corpus.quran.com" target="_blank" rel="noreferrer">Quranic Arabic Corpus</a>{' · '}
-          <a className="text-xs underline" href="/data/morphology-source.txt" target="_blank" rel="noreferrer">حقوق و مشخصات داده</a>
+          <div className="mt-2"><SourceReference label="منبع صرف و باب" source={{
+            title: 'Quranic Arabic Corpus',
+            description: 'پیکرهٔ برچسب‌گذاری صرفی و نحوی قرآن؛ مأخذ باب و ساخت صرفی واژه‌ها در این سایت.',
+            fields: [{ label: 'پدیدآورنده', value: 'Kais Dukes' }, { label: 'نسخه', value: 'داده‌های صرفی ۰٫۴ · ۲۰۱۱ میلادی' }, { label: 'متن پایه', value: 'متن عثمانی تنزیل، نسخهٔ ۱٫۰٫۲' }, { label: 'مجوز', value: 'داده‌های پیکره: GNU GPL؛ متن تنزیل: CC BY-ND 3.0' }],
+            notes: ['باب برای موارد ثبت‌شده در داده نمایش داده می‌شود و از روی ریشه حدس زده نمی‌شود.'],
+            links: [{ label: 'وبگاه پیکره', href: 'https://corpus.quran.com' }, { label: 'حقوق و مشخصات داده', href: '/data/morphology-source.txt' }, { label: 'تنزیل', href: 'https://tanzil.net' }],
+          }} /></div>
         </div>
       )}
       {tab === 'word' && <p className="text-xs leading-6 mb-3">انتخاب این تب فقط همین واژه است. آمار و فهرست زیر برای تکرارهای دقیق همین صورت نوشتاری است.</p>}

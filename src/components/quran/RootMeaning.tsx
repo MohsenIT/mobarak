@@ -53,14 +53,28 @@ function TahqiqMeaning({ root }: { root: string }) {
 
 function MeaningEntry({ entry, ambiguous }: { entry: Entry; ambiguous: boolean }) {
   const [arabic, setArabic] = useState(false)
-  const source = entry.provenance
-    ? `«التحقیق فی کلمات القرآن الکریم»\nنویسنده: علامه حسن مصطفوی\nنسخهٔ عربی: چاپ سوم، دار الکتب العلمیة ـ مرکز نشر آثار علامه مصطفوی، مجموعهٔ ۱۴ جلدی ارسالی.\nاین شرح فارسی، ترجمه و تلخیص تازه از متن عربی با کمک هوش مصنوعی است.\nجلد ${toFa(entry.provenance.volume)}، صفحهٔ ${toFa(entry.provenance.page)}${entry.provenance.pageEnd > entry.provenance.page ? ` تا ${toFa(entry.provenance.pageEnd)}` : ''}\nمدخل مأخذ: «${entry.provenance.heading}»`
-    : '«التحقیق فی کلمات القرآن الکریم»\nنویسنده: علامه حسن مصطفوی\nشرح فارسی: ترجمهٔ خلاصه توسط صادق عباسی و مجموعهٔ مدارس دانشجویی قرآن و عترت دانشگاه تهران، طبق معرفی اپ التّحقیق (فارسی).\nشمارهٔ جلد، صفحه و تاریخ انتشار در دادهٔ این نسخهٔ اپ موجود نیست.'
+  const source = {
+    title: 'التحقیق فی کلمات القرآن الکریم',
+    description: 'واژه‌پژوهی قرآن با تمرکز بر معنای محوری ریشه‌ها و کاربردهای قرآنی آن‌ها.',
+    fields: [
+      { label: 'نویسنده', value: 'علامه حسن مصطفوی' },
+      ...(entry.provenance ? [
+        { label: 'نسخهٔ عربی', value: 'چاپ سوم؛ دار الکتب العلمیة ـ مرکز نشر آثار علامه مصطفوی؛ مجموعهٔ ۱۴ جلدی ارسالی' },
+        { label: 'ارجاع', value: `جلد ${toFa(entry.provenance.volume)}، صفحهٔ ${toFa(entry.provenance.page)}${entry.provenance.pageEnd > entry.provenance.page ? ` تا ${toFa(entry.provenance.pageEnd)}` : ''}` },
+        { label: 'مدخل مأخذ', value: entry.provenance.heading },
+      ] : [
+        { label: 'شرح فارسی', value: 'صادق عباسی و مجموعهٔ مدارس دانشجویی قرآن و عترت دانشگاه تهران' },
+        { label: 'مأخذ دیجیتال', value: 'اپ التّحقیق (فارسی)، فایل ارسالی' },
+      ]),
+    ],
+    notes: [entry.provenance ? 'شرح فارسی این مدخل، ترجمه و تلخیص با کمک هوش مصنوعی از متن عربی است؛ ترجمهٔ چاپی کتاب نیست.' : 'انتساب ترجمه طبق معرفی اپ است؛ شمارهٔ جلد، صفحه و تاریخ انتشار در دادهٔ اپ موجود نیست.'],
+  }
+
   return <div>
     {ambiguous && <h4 className="font-bold mt-2">مدخل «{entry.word}»</h4>}
     {entry.provenance && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>ترجمهٔ خلاصه با کمک هوش مصنوعی</p>}
     <div className="flex items-center justify-between gap-2 mt-2">
-      <SourceReference text={source} />
+      <SourceReference source={source} />
 
     </div>
     <div>

@@ -1,0 +1,11 @@
+{
+  "note": "Explicit observed source defects override independent concordance; shared OCR corruption is not evidence of textual integrity. No conjectural corrections applied.",
+  "entries": {
+    "فلح": {
+      "sourceSha256": "9a3ce8ae4fe8e24ab37c59f5d5c09b9c0fb556325fc13fd5bb8ceda8e36d6d48",
+      "reason": "observed_source_ocr_corruption",
+      "quote": "وعَغْترةُ الفَلحاءُ",
+      "explanation": "نام شاعر در نثر پیشین «عنترة» آمده، اما در شاهد شعری «عغترة» ضبط شده؛ نسخهٔ مستقل همین خرابی را تکرار می‌کند. تا بررسی مأخذ معتبر، تأیید کامل متن متوقف است."
+    }
+  }
+}

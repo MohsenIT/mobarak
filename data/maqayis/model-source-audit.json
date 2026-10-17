@@ -1,0 +1,1688 @@
+{
+  "schemaVersion": 1,
+  "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+  "model": "gemini-4-argon",
+  "localCeilingUsd": "1.25",
+  "entries": {
+    "جفن": {
+      "sourceSha256": "ce1b2f6dff3f785bf07158afca88b5dc3d7b21bc3d4f6b93203c49e8ce01893f",
+      "referenceSha256": "791ec763b165308ba3bfb1571a5592da49a5391603845f5102f911cd85197fc7",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:05.795414+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "وجَفْن : مكان (5)",
+            "referenceQuote": "وجَفْن: مكان (٥) .\nوسمِّى الكَرْم جَفْناً لأنه يَدُورُ على ما يَعْلَق به، وذلك مُشاهَدٌ.",
+            "category": "missing_author",
+            "explanationFa": "جمله پایانی متن مؤلف درباره نام‌گذاری کَرم به جَفن در متن منبع افتاده است."
+          },
+          {
+            "sourceQuote": "طربت وهاجتك المنازل من حفن *** ألا ربما؟ الشوق بالحزن",
+            "referenceQuote": "وجَفْن: مكان (٥) .",
+            "category": "extra_author",
+            "explanationFa": "بیت شعر در انتهای متن منبع (که احتمالاً متعلق به پاورقی شماره ۵ بوده و دچار تحریف هم شده است) در متن مرجع وجود ندارد و به اشتباه وارد متن اصلی شده است."
+          }
+        ]
+      }
+    },
+    "قثا": {
+      "sourceSha256": "337e60a8fdfffc55a415b72959eaded16f402394ea72f0635b2bef830b65d7ee",
+      "referenceSha256": "8d521e0be965fa8dc7ce0c1cfecf0367303cecd15fd3d1132e67e448bb5e1ec6",
+      "sourceFootnotesSha256": "a022f448c709bd4ba65e0c5ee3213d7bebaf83aa0f362707e9979a8cf0ec45f6",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:01:05.924348+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "1) التكملة من المجمل والجمهرة (1 : 196).",
+            "referenceQuote": "— (١) التكملة من المجمل والجمهرة (١٩٦: ١).",
+            "category": "editorial",
+            "explanationFa": "متن اصلی مؤلف کاملاً یکسان و کامل است؛ این بخش مربوط به حاشیه تحقیقی است که در مرجع در ادامه آمده است."
+          },
+          {
+            "sourceQuote": "3) أنشده فى المجمل ، وأنشده فى اللسان (قثم) ، وقبله :",
+            "referenceQuote": "(٣) أنشده فى المجمل، وأنشده فى اللسان (قثم)، وقبله: لأصبح بطن مكة مقشعرا … كأن الأرض ليس بها هشام يظل كأنه سرط … وفوق جفانه شحم ركام والشعر للحارث بن خالد بن العاص كما فى الاشتقاق ١٠١ والأغانى (١٨: ١٥).",
+            "category": "editorial",
+            "explanationFa": "ادامه حاشیه سوم (مربوط به ریشه‌های دیگر صفحه) در مرجع آمده است ولی متن مؤلف در این مدخل کامل است."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "1) التكملة من المجمل والجمهرة (1 : 196).",
+          "referenceQuote": "— (١) التكملة من المجمل والجمهرة (١٩٦: ١).",
+          "category": "editorial",
+          "explanationFa": "متن اصلی مؤلف کاملاً یکسان و کامل است؛ این بخش مربوط به حاشیه تحقیقی است که در مرجع در ادامه آمده است."
+        },
+        {
+          "sourceQuote": "3) أنشده فى المجمل ، وأنشده فى اللسان (قثم) ، وقبله :",
+          "referenceQuote": "(٣) أنشده فى المجمل، وأنشده فى اللسان (قثم)، وقبله: لأصبح بطن مكة مقشعرا … كأن الأرض ليس بها هشام يظل كأنه سرط … وفوق جفانه شحم ركام والشعر للحارث بن خالد بن العاص كما فى الاشتقاق ١٠١ والأغانى (١٨: ١٥).",
+          "category": "editorial",
+          "explanationFa": "ادامه حاشیه سوم (مربوط به ریشه‌های دیگر صفحه) در مرجع آمده است ولی متن مؤلف در این مدخل کامل است."
+        }
+      ]
+    },
+    "كسد": {
+      "sourceSha256": "1723bdf01ea68522ffd2de2eb203868c6c4c4a746de44cee6ad7ed80792a6f58",
+      "referenceSha256": "de0986e0bdbb6459d2a772ed6a76911e9a6faaa5cd6be024877f61a13f1b3f1a",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:06.026892+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "إذ كل حي نابت بأرومه *** نبت العضاء فاجد وكيد",
+            "referenceQuote": "* فماجدٌ وكسيدُ (٢) *",
+            "category": "extra_author",
+            "explanationFa": "در متن منبع کل بیت آورده شده (که احتمالاً تکمیل حاشیه‌ای است که وارد متن شده)، در حالی که در مرجع تنها پارهٔ شاهد «فماجدٌ وكسيدُ» آمده است."
+          },
+          {
+            "sourceQuote": "فاجد وكيد",
+            "referenceQuote": "فماجدٌ وكسيدُ",
+            "category": "missing_author",
+            "explanationFa": "در متن منبع تصحیف و افتادگی حروف در واژه‌های شاهد رخ داده است («فاجد وكيد» به جای «فماجدٌ وكسيدُ»)."
+          }
+        ]
+      }
+    },
+    "مشج": {
+      "sourceSha256": "3a412699543ca01e3a93e98851354bd6fd596c9d939659f8256f810697c5d2de",
+      "referenceSha256": "1652744a24d9454727e30e065f7673e0e7b8aba90d3e4177a9a6098a25958891",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:11.372844+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "كأنَّ النَّصلَ والفُوقَينِ منه *** خلافَ الصَّدر سِيطَ به مشيجُ (3)\n\nكأن الريش والفولين منه *** خلاف النصل سبط به مشيح",
+            "referenceQuote": "كأنَّ النَّصلَ والفُوقَينِ منه … خلافَ الصَّدر سِيطَ به مشيجُ (٣)",
+            "category": "extra_author",
+            "explanationFa": "در متن منبع، پس از بیت شعر، روایت مصحف دیگری از همان بیت (احتمالاً بازمانده از حاشیه یا OCR) به متن اصلی افزوده شده است که در مرجع وجود ندارد."
+          }
+        ]
+      }
+    },
+    "نكد": {
+      "sourceSha256": "fab56bfaa31ec7e46a4031e35610681bc6f56febeecf57a0a0424534a9168966",
+      "referenceSha256": "54a9cf5c401081902c1b34eeb2336f3dfe01626fd314d4a19ffeab6ebdf54a6e",
+      "sourceFootnotesSha256": "a89ec12860cb175a62cbf82bb24b64733cc1d04fad67727d46856b38ffc50f61",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:01:18.111326+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "1) من معلقة طرفه. وصدره :",
+            "referenceQuote": "— (١) من معلقة طرفه. وصدره: * وقربت بالقربى وجدك إنه *.",
+            "category": "editorial",
+            "explanationFa": "حاشیه محقق (مربوط به مدخل قبلی) در متن مرجع در میانه متن اصلی درج شده ولی در منبع در بخش حاشیه است و متن مؤلف کامل است."
+          },
+          {
+            "sourceQuote": "ورجلٌ نَكِدٌ ونَكَدٌ (1). ويقال : نَكَدَ الغُرابُ (2):",
+            "referenceQuote": "ورجلٌ نَكِدٌ ونَكَدٌ (١) . ويقال: نَكَدَ الغُرابُ (٢) :",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در نگارش اعداد ارجاع و فاصله‌گذاری علامت‌های سجاوندی."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "1) من معلقة طرفه. وصدره :",
+          "referenceQuote": "— (١) من معلقة طرفه. وصدره: * وقربت بالقربى وجدك إنه *.",
+          "category": "editorial",
+          "explanationFa": "حاشیه محقق (مربوط به مدخل قبلی) در متن مرجع در میانه متن اصلی درج شده ولی در منبع در بخش حاشیه است و متن مؤلف کامل است."
+        },
+        {
+          "sourceQuote": "ورجلٌ نَكِدٌ ونَكَدٌ (1). ويقال : نَكَدَ الغُرابُ (2):",
+          "referenceQuote": "ورجلٌ نَكِدٌ ونَكَدٌ (١) . ويقال: نَكَدَ الغُرابُ (٢) :",
+          "category": "orthographic",
+          "explanationFa": "تفاوت در نگارش اعداد ارجاع و فاصله‌گذاری علامت‌های سجاوندی."
+        }
+      ]
+    },
+    "تعس": {
+      "sourceSha256": "03b358feaa502235e7774b8671da274931d7fb3d473d533c18b387a248741a43",
+      "referenceSha256": "1228f812fe94247dcc8aa97888d1deca3dd8fcd4f3652649aeafbd6a6a5b2843",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:01:18.264272+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "وأتَعسَه",
+            "referenceQuote": "وأتعسَه",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در جایگاه فتحه در واژه أتعسه (در متن منبع فتحه اشتباهاً روی تاء قرار گرفته است ولی حروف یکسان است)."
+          },
+          {
+            "sourceQuote": "طائرِ",
+            "referenceQuote": "طائرِ البيت لذي الرمة، وقد سبق الكلام عليه في حواشي ( تم ) ص٣٤٠. وقافيته في الديوان وفيما سبق: \" المتتمم \". لـكن كذا وردت روايته في المقاييس والمجمل: \" المتهشم \"",
+            "category": "editorial",
+            "explanationFa": "در متن مرجع، پاورقی مصحح به اشتباه در ادامهٔ متن اصلی ادغام شده است (توضیح این پاورقی نیز مربوط به مدخل قبلی یعنی تهم بوده که در مرجع جا به جا شده است)."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "وأتَعسَه",
+          "referenceQuote": "وأتعسَه",
+          "category": "orthographic",
+          "explanationFa": "تفاوت در جایگاه فتحه در واژه أتعسه (در متن منبع فتحه اشتباهاً روی تاء قرار گرفته است ولی حروف یکسان است)."
+        },
+        {
+          "sourceQuote": "طائرِ",
+          "referenceQuote": "طائرِ البيت لذي الرمة، وقد سبق الكلام عليه في حواشي ( تم ) ص٣٤٠. وقافيته في الديوان وفيما سبق: \" المتتمم \". لـكن كذا وردت روايته في المقاييس والمجمل: \" المتهشم \"",
+          "category": "editorial",
+          "explanationFa": "در متن مرجع، پاورقی مصحح به اشتباه در ادامهٔ متن اصلی ادغام شده است (توضیح این پاورقی نیز مربوط به مدخل قبلی یعنی تهم بوده که در مرجع جا به جا شده است)."
+        }
+      ]
+    },
+    "تفث": {
+      "sourceSha256": "9d326d186326c93dddf10e630f831e7c34aed03fe89ecc5a27baea759f2e34f3",
+      "referenceSha256": "306cc59379952938f129700fe1def827fa143c917efc53fb0dded824f01cc5be",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:24.055651+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "قال : ولم يجئ فيه شِعْرٌ يُحْتَجُّ به (1)\n\nشاحين آباطهم لم ينزعوا؟ *** ولم يسلوا لهم قلا وصئبانا",
+            "referenceQuote": "قال: ولم يجئ فيه شِعْرٌ يُحْتَجُّ به (١) .",
+            "category": "extra_author",
+            "explanationFa": "در متن منبع، یک بیت شعر ناقص و مغشوش (احتمالاً بازمانده از پاورقی محقق) در انتهای متن اصلی افزوده شده است که در متن مرجع وجود ندارد."
+          }
+        ]
+      }
+    },
+    "همد": {
+      "sourceSha256": "e28838bdf9dc49fa79613b12b290da415b248c7e44d3eae21cb60a5d91da9594",
+      "referenceSha256": "e78df5d67ec2588e234189ae81b626d18bed99e8d588c0db36b4d41ce219a547",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:24.589077+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "قال :",
+            "referenceQuote": "قال:\n* ما كانَ إلاَّ طَلَقُ الإهمادِ (٢) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعریِ پایانِ مدخل در متن منبع افتاده است."
+          },
+          {
+            "sourceQuote": "الإفامة بالمكان",
+            "referenceQuote": "الإفامة بالمكان",
+            "category": "uncertain",
+            "explanationFa": "تصحیفِ مشترک در هر دو متن («الإفامة» به جای «الإقامة»)."
+          }
+        ]
+      }
+    },
+    "جيد": {
+      "sourceSha256": "5fb27f92e71c1671540cc85c2ad57be391996834bbb701ecc42dbe3f034e33df",
+      "referenceSha256": "4ddf4f6b6f3082e922c6643ae99d41217afa618bce65bcd26f5c8b5c5feaad41",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:29.066461+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "وأما قول الأعشى :\n\nويروى : بأجلادها وبأجادها.",
+            "referenceQuote": "وأما قول الأعشى:\n* رجالَ إيادٍ بأجْيَادِها (٢) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری اعشی در متن منبع افتاده و به جای آن یک عبارت مربوط به اختلاف نسخه یا حاشیه وارد متن اصلی شده است."
+          },
+          {
+            "sourceQuote": "ويروى : بأجلادها وبأجادها.",
+            "referenceQuote": "* رجالَ إيادٍ بأجْيَادِها (٢) *",
+            "category": "extra_author",
+            "explanationFa": "عبارت «ويروى : بأجلادها وبأجادها.» که احتمالاً حاشیه محقق بوده به اشتباه به جای مصراع شعر در متن منبع قرار گرفته است."
+          }
+        ]
+      }
+    },
+    "نوش": {
+      "sourceSha256": "4428e1adca96c42b98f774824d172992190da37e4e9228e5d942c78dea6ea783",
+      "referenceSha256": "d7e0d368f0fa22b271d8868ccedae9095b7b21fac28ae89f8db4951505152dfe",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:29.444234+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "وقول القائل (2):",
+            "referenceQuote": "وقول القائل (٢) :\n* باتت تَنُوش العَنَق انتياشا (٣) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری پایانی و احتمالاً ادامه مدخل در متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "غيض": {
+      "sourceSha256": "46bdd3d14c2d529ece2a4c6d0bbb979c29a2bef2b1cdbc4cdff2227aeb1d3fa3",
+      "referenceSha256": "e936efa6d78266dbd4bbf62e5a8fda05bad607a015cd4a6f6dbe6a7b9b962123",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:01:35.573366+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "فى شىء",
+            "referenceQuote": "في شيء",
+            "category": "orthographic",
+            "explanationFa": "تفاوت املایی در نقطه گذاری یاء آخر در متن منبع و مرجع."
+          },
+          {
+            "sourceQuote": "قال اللّه تعالى : ( وَغِيضَ الْماءُ ) .",
+            "referenceQuote": "قال اللّٰه تعالى: { وَغِيضَ الماءُ } [ هود ٤٤ ].",
+            "category": "editorial",
+            "explanationFa": "افزوده شدن آدرس سوره و آیه در مرجع که جنبه ویرایشی دارد."
+          },
+          {
+            "sourceQuote": "وأمَّا الغُموضُ فالغَيْضَة : الأجَمة ، سمِّيت لغُموضِها ، ولأنَّ السَّائرَ فيها لا يكاد يُرَى.",
+            "referenceQuote": "فالغَيْضَة: الأَجَمة، سمِّيت لغُموضِها، ولأنّ السّ ائرَ فيها لا يكاد يُرَى. وأمّ ا الغُموضُ",
+            "category": "editorial",
+            "explanationFa": "به‌هم‌ریختگی ترتیب عبارت «وأما الغموض» و فاصله افتادن در کلمات در متن مرجع بر اثر خطای استخراج؛ متن منبع کامل و صحیح است."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "فى شىء",
+          "referenceQuote": "في شيء",
+          "category": "orthographic",
+          "explanationFa": "تفاوت املایی در نقطه گذاری یاء آخر در متن منبع و مرجع."
+        },
+        {
+          "sourceQuote": "قال اللّه تعالى : ( وَغِيضَ الْماءُ ) .",
+          "referenceQuote": "قال اللّٰه تعالى: { وَغِيضَ الماءُ } [ هود ٤٤ ].",
+          "category": "editorial",
+          "explanationFa": "افزوده شدن آدرس سوره و آیه در مرجع که جنبه ویرایشی دارد."
+        },
+        {
+          "sourceQuote": "وأمَّا الغُموضُ فالغَيْضَة : الأجَمة ، سمِّيت لغُموضِها ، ولأنَّ السَّائرَ فيها لا يكاد يُرَى.",
+          "referenceQuote": "فالغَيْضَة: الأَجَمة، سمِّيت لغُموضِها، ولأنّ السّ ائرَ فيها لا يكاد يُرَى. وأمّ ا الغُموضُ",
+          "category": "editorial",
+          "explanationFa": "به‌هم‌ریختگی ترتیب عبارت «وأما الغموض» و فاصله افتادن در کلمات در متن مرجع بر اثر خطای استخراج؛ متن منبع کامل و صحیح است."
+        }
+      ]
+    },
+    "هيت": {
+      "sourceSha256": "5aa3779899ac63f13df7066f0a8fe7d4bcdd2c2629c7ba8ac2da81870aed6017",
+      "referenceSha256": "53946887d0a0cd34ebd1f53e83dad0c9fd363a10fe1e28c84c4549fb2fe0538d",
+      "sourceFootnotesSha256": "9e85f9deab495d30aa2e6320bf5abbd73e3c171e890d2500e40e729e15b0b329",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:35.740251+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "قال:\n\nإذا تجاوبتالأصداء بالسحر\n\nويقولون",
+            "referenceQuote": "* لو كانَ مَعْنِيًّا بِها لَهَيَّتا (١) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری مؤلف «لو كان معنياً بها لهيتا» از متن منبع افتاده است."
+          },
+          {
+            "sourceQuote": "إذا تجاوبتالأصداء بالسحر",
+            "referenceQuote": "وعجزه: * إذا تجاوبت الأصداء بالسحر *.",
+            "category": "extra_author",
+            "explanationFa": "عبارت «إذا تجاوبت الأصداء بالسحر» که در مرجع بخشی از پاورقی شماره ۳ است، در منبع به اشتباه به جای بیت اصلی وارد متن مؤلف شده است."
+          }
+        ]
+      }
+    },
+    "زرع": {
+      "sourceSha256": "92139403d805a0c69dc64658c1a3d6cee7fa93649f1296b46f42be8eba86bc84",
+      "referenceSha256": "764c5bfd9f0ce6c85c8e9ca86b69585d2802d0a062502b31f866de381485030a",
+      "sourceFootnotesSha256": "e36d87f0b1577eb024eff00d7e426e9fc24f6344c92b8bc90a40e59eea284733",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:01:38.098932+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "الشىء",
+            "referenceQuote": "الشئ",
+            "category": "orthographic",
+            "explanationFa": "تفاوت املایی در نگارش «الشيء»."
+          },
+          {
+            "sourceQuote": "1) قله فى اللسان (زخر) :",
+            "referenceQuote": "— (١) قله فى اللسان (زخر): ويرتعيان ليلهما قرارا … سقته كل مدجنة هموع.",
+            "category": "editorial",
+            "explanationFa": "حاشیه محقق (مربوط به مادّه قبلی) در مرجع میان متن اصلی قرار گرفته است."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "الشىء",
+          "referenceQuote": "الشئ",
+          "category": "orthographic",
+          "explanationFa": "تفاوت املایی در نگارش «الشيء»."
+        },
+        {
+          "sourceQuote": "1) قله فى اللسان (زخر) :",
+          "referenceQuote": "— (١) قله فى اللسان (زخر): ويرتعيان ليلهما قرارا … سقته كل مدجنة هموع.",
+          "category": "editorial",
+          "explanationFa": "حاشیه محقق (مربوط به مادّه قبلی) در مرجع میان متن اصلی قرار گرفته است."
+        }
+      ]
+    },
+    "نضخ": {
+      "sourceSha256": "67b087595bf358ae16b8d535e8de1bbd9fa285b186dccb2cd926be2e2167db90",
+      "referenceSha256": "319c47628811f1509c63bdff831fd19bd4ac2abb01cbe9012c3d64d89b903b95",
+      "sourceFootnotesSha256": "fd7799af3c7464c428a47100eb639dab71bdf1969bfa393022bc553e93d06d0d",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:01:41.385691+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "إلّا أنّه أكثر منه (3).",
+            "referenceQuote": "إلاّ أنّه أكثر منه (٣) .",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در جایگاه تشدید روی الف و نوع نگارش عدد ارجاع (۳ در برابر 3)."
+          },
+          {
+            "sourceQuote": "3) فى الأصل : «من الذى».",
+            "referenceQuote": "— (١) للراعى كما فى اللسان (نضج)، وأنشده فى المجمل. (٢) ديوان أبى طالب ٧ مخطوطة الشنقيطى واللسان (نضج). وروى القصيدة مرفوع، وضبط فى اللسان بالكسر حطأ. (٣) فى الأصل: «من الذى».",
+            "category": "editorial",
+            "explanationFa": "حاشیه انتقادی مصحح در مرجع در انتهای متن آمده است ولی در منبع در بخش حاشیه جدا شده است."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "إلّا أنّه أكثر منه (3).",
+          "referenceQuote": "إلاّ أنّه أكثر منه (٣) .",
+          "category": "orthographic",
+          "explanationFa": "تفاوت در جایگاه تشدید روی الف و نوع نگارش عدد ارجاع (۳ در برابر 3)."
+        },
+        {
+          "sourceQuote": "3) فى الأصل : «من الذى».",
+          "referenceQuote": "— (١) للراعى كما فى اللسان (نضج)، وأنشده فى المجمل. (٢) ديوان أبى طالب ٧ مخطوطة الشنقيطى واللسان (نضج). وروى القصيدة مرفوع، وضبط فى اللسان بالكسر حطأ. (٣) فى الأصل: «من الذى».",
+          "category": "editorial",
+          "explanationFa": "حاشیه انتقادی مصحح در مرجع در انتهای متن آمده است ولی در منبع در بخش حاشیه جدا شده است."
+        }
+      ]
+    },
+    "نفث": {
+      "sourceSha256": "343561223034be08c12e98ced6b3d44b9ea52d2c3046e8e9fc5dd896a850f22d",
+      "referenceSha256": "5ab4cf3dbcb0296ce8326cf07df4ddb80a845b784ca3f5950733d385900ddbb6",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:42.838423+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "و «لا بدَّ للمصدور أن يَنْفُث (2)\n\nلابد المصدور في ينفثا *** والذي في الصدر أن يبعثا",
+            "referenceQuote": "و\n«لا بدَّ للمصدور أن يَنْفُث (٢) »\nمثَل. و «لو سألني نُفَاثَةَ سِوَاكٍ ما أعطيته» ، وهو ما بقي في أسنانه فنفَثَه. ودمٌ نفيثٌ: نَفَثَهُ الجُرحُ، أي أظهَرَه.",
+            "category": "missing_author",
+            "explanationFa": "در متن منبع دنبالهٔ اصل پس از مثل «لا بد للمصدور أن ينفث» افتاده است (از جمله «مثل» و «لو سألني نفاثة سواك...» و «ودم نفيث...») و به‌جای آن بیت مربوط به پاورقی (و با تحریف) وارد متن مؤلف شده است."
+          }
+        ]
+      }
+    },
+    "همس": {
+      "sourceSha256": "7e3d832957cd70121739cfa9bf1aeed2f5a7c21d8fa10cf52345aad8ae80c90e",
+      "referenceSha256": "3b3aecea23e2496eb10c6b833cd81a144aed0fe13914f427aeb7128fd7d115df",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:43.076206+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "قال :",
+            "referenceQuote": "قال:\n* عادتُه خَبْطٌ وعضٌّ هَمّاسْ (٣) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری پایانی مدخل (عادتُه خَبْطٌ وعضٌّ هَمّاسْ) در متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "وسل": {
+      "sourceSha256": "f96d9e622fac9ecd2d56bc9b01d549c3cfe64971aa36aaeed1d8924892421c8b",
+      "referenceSha256": "121be059f3dff4f87d15aa8d238a7377ab43abaf81be6dc114392c5c25303201",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:47.026653+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "قول لبيد :\n\nوفى الديوان : بلى كل ذى لب. وفي اللسان : بلى كل ذى رأى\n\nومن ذلك",
+            "referenceQuote": "قول لبيد:\n* بلى كلُّ ذى دينٍ إلى اللّهِ وَاسِلُ (٢) *\nومن ذلك",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری لبید («بلى كلُّ ذى دينٍ إلى اللّهِ وَاسِلُ») از متن اصلی افتاده و به جای آن بخشی از تعلیقات محشی («وفى الديوان...») وارد متن شده است."
+          }
+        ]
+      }
+    },
+    "جثم": {
+      "sourceSha256": "9fd4b15db04cb99eb348c29826957f6b6151fad4d0e4e614a38ba47766f0529f",
+      "referenceSha256": "01138ab220ea39837e3777aeab007a47caeb1f37fbfa3b58d96af08ea4dec002",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:49.563247+00:00",
+      "review": {
+        "verdict": "uncertain",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "وهى المصبورة على الموت.",
+            "referenceQuote": "وهى المصبورة على الموت.\nوذلك على أضرب:\nفمنه ما نُحِت من كلمتين صحيحتى المعنى، مطّردتَىِ القياس. ومنه ما أصله كلمةٌ واحدة وقد أُلحِق بالرُّباعى والخماسى بزيادةٍ تدخله. ومنه ما يوضع كذا وَضْعا.\nوسنفسر ذلك إن شاء اللّه تعالى.",
+            "category": "uncertain",
+            "explanationFa": "در متن مرجع، پاراگراف انتهایی که مقدمه باب ما فوق الثلاثی از حرف جیم است، در ذیل ریشه «جثم» آمده اما در متن منبع موجود نیست (احتمالاً مرز ریشه‌ها و سرفصل باب در منبع متفاوت است)."
+          }
+        ]
+      }
+    },
+    "عيل": {
+      "sourceSha256": "886fd5ecd2e9fb1075c68bfa5520cf224c1f232febc008a815bd85856570be6c",
+      "referenceSha256": "fd0da00150a75a1a18dc2e814fe41c93e3c87fac2779afe97b58479f5680f491",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:49.799539+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "العين واللام والياء",
+            "referenceQuote": "العين والياء واللام",
+            "category": "uncertain",
+            "explanationFa": "ترتیب حروف ریشه در متن منبع برعکس ذکر شده است (لام و یاء به جای یاء و لام)."
+          },
+          {
+            "sourceQuote": "مَن عال مِنَّا بَعدها فَلَا انْجَبَر (2)\n\nولا سقى الماء ولا راء الشجر\n\nوعَيْلان",
+            "referenceQuote": "مَن عال مِنَّا بَعدها فَلاَانْ جـَبَر ( ) * وعَيْلان",
+            "category": "extra_author",
+            "explanationFa": "شطر دوم رجز (ولا سقى الماء ولا راء الشجر) در متن منبع وجود دارد اما در مرجع مستقل نیامده است و احتمالاً از حاشیه وارد متن شده است."
+          },
+          {
+            "sourceQuote": "( وَإِنْ خِفْتُمْ عَيْلَةً ) .",
+            "referenceQuote": "{ وَإِ نْ خِفْتُمْ عَيْلَة } [ التوبة ٢٨ ]،",
+            "category": "editorial",
+            "explanationFa": "افزودن آدرس آیه در مرجع مستقل و تفاوت در علائم نگارشی."
+          }
+        ]
+      }
+    },
+    "لجا": {
+      "sourceSha256": "584c44de443d000c9c5dcd488c056f1845f0a428c91971f5372892f6f9767aa0",
+      "referenceSha256": "f541eac5573b1a32ff6d9091dbe469ea6e251ddd4f6249b6c17402b5bd0cb1aa",
+      "sourceFootnotesSha256": "10bb52e7a74ca80aba620128f958b0e7e261b51358c9796a27a36306655f692f",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:52.541261+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "فاست الطبيب فذاها كالمغاريد",
+            "referenceQuote": "حيث ذكر فى الحواشى نسبة البيت وتخريجه وعجزه: * فاست الطبيب قذاها كالمغاريد *.",
+            "category": "extra_author",
+            "explanationFa": "عبارت «فاست الطبيب قذاها كالمغاريد» که دنباله پاورقی شماره ۱ از صفحه قبل بوده، به اشتباه و با تصحیف «فذاها» وارد متن اصلی مؤلف در منبع شده است."
+          }
+        ]
+      }
+    },
+    "نخل": {
+      "sourceSha256": "84aaa86cf84a5a5bb15ed0a6c49b1933f276268f6b62c06f66d2be8934dbe1f6",
+      "referenceSha256": "1ed749c229ee7c386d6cf33718059057573367a1a0973ae0b869a7280be4c807",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:01:55.358121+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "قال :",
+            "referenceQuote": "قال:\n* قد اكتَسَتْ من أرنَبٍ ونَخْلِ (٣) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری پایانی مدخل پس از «قال :» در متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "سجو": {
+      "sourceSha256": "65771bbe7ab07fa2e4da46384f40269c395be5ecc859196814b6e3371efafad3",
+      "referenceSha256": "5aaef8ed046e0a5fe653def9e2dea51b1e355c8b78c42c28a87008c8285813bc",
+      "sourceFootnotesSha256": "429af7e3d6783c8a4b5a397c759b6c735c11ecf63164b937ee8bc4b8a949d5a7",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:02:00.646521+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "يا حبَّذَا القَمراءُ واللَّيْلُ السّاجْ *** وطُرقٌ مثلُ مُلاءِ النُّسَّاجْ (3)",
+            "referenceQuote": "يا حبَّذَا القَمراءُ واللَّيْلُ السّاجْ … وطُرقٌ مثلُ مُلاءِ النُّسَّاجْ (٣)",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در علامت جداساز مصراع‌ها (*** در برابر …) و رسم‌الخط شماره ارجاع (3 در برابر ٣)."
+          },
+          {
+            "sourceQuote": "1) قرأ بالفتح عثمان ومولاه طارق ، وزيد بن على ، والزهرى ، وابن أبى إسحاق ، وابن هرمز ، ويعقوب. تفسير ابن حيان (5 : 306).",
+            "referenceQuote": "— (١) قرأ بالفتح عثمان ومولاه طارق، وزيد بن على، والزهرى، وابن أبى إسحاق، وابن هرمز، ويعقوب. تفسير ابن حيان (٣٠٦: ٥).",
+            "category": "editorial",
+            "explanationFa": "این عبارت از حاشیه منبع است که در مرجع در انتهای متن ادغام شده است."
+          },
+          {
+            "sourceQuote": "2) فى اللسان «تواصت به». وصدره :",
+            "referenceQuote": "(٢) فى اللسان «تواصت به». وصدره: ورجلة يضربون الهام عن عرض.",
+            "category": "editorial",
+            "explanationFa": "این عبارت از حاشیه منبع است که در مرجع همراه با ادامه آن آمده است."
+          },
+          {
+            "sourceQuote": "3) الرجز لأحد الحارثيين ، كما فى اللسان (سجا).",
+            "referenceQuote": "(٣) الرجز لأحد الحارثيين، كما فى اللسان (سجا).",
+            "category": "editorial",
+            "explanationFa": "این توضیح مربوط به حاشیه منبع است که در مرجع نیز در بخش پاورقی آمده است."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "يا حبَّذَا القَمراءُ واللَّيْلُ السّاجْ *** وطُرقٌ مثلُ مُلاءِ النُّسَّاجْ (3)",
+          "referenceQuote": "يا حبَّذَا القَمراءُ واللَّيْلُ السّاجْ … وطُرقٌ مثلُ مُلاءِ النُّسَّاجْ (٣)",
+          "category": "orthographic",
+          "explanationFa": "تفاوت در علامت جداساز مصراع‌ها (*** در برابر …) و رسم‌الخط شماره ارجاع (3 در برابر ٣)."
+        },
+        {
+          "sourceQuote": "1) قرأ بالفتح عثمان ومولاه طارق ، وزيد بن على ، والزهرى ، وابن أبى إسحاق ، وابن هرمز ، ويعقوب. تفسير ابن حيان (5 : 306).",
+          "referenceQuote": "— (١) قرأ بالفتح عثمان ومولاه طارق، وزيد بن على، والزهرى، وابن أبى إسحاق، وابن هرمز، ويعقوب. تفسير ابن حيان (٣٠٦: ٥).",
+          "category": "editorial",
+          "explanationFa": "این عبارت از حاشیه منبع است که در مرجع در انتهای متن ادغام شده است."
+        },
+        {
+          "sourceQuote": "2) فى اللسان «تواصت به». وصدره :",
+          "referenceQuote": "(٢) فى اللسان «تواصت به». وصدره: ورجلة يضربون الهام عن عرض.",
+          "category": "editorial",
+          "explanationFa": "این عبارت از حاشیه منبع است که در مرجع همراه با ادامه آن آمده است."
+        },
+        {
+          "sourceQuote": "3) الرجز لأحد الحارثيين ، كما فى اللسان (سجا).",
+          "referenceQuote": "(٣) الرجز لأحد الحارثيين، كما فى اللسان (سجا).",
+          "category": "editorial",
+          "explanationFa": "این توضیح مربوط به حاشیه منبع است که در مرجع نیز در بخش پاورقی آمده است."
+        }
+      ]
+    },
+    "غرف": {
+      "sourceSha256": "d338a9824b9d6f138be5ad6672d893d629ed1e755adf85e4f4251c543e0a6468",
+      "referenceSha256": "0378cf7b026a10c7c21c80226798d7275064daabd21c293a3240e1dcb720bffe",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:01.501601+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "كما رَزَمَ العَيّار فى الغُرُفِ (1)\n\nلما رأيت أبا عمرو رزمت له *** منى كما وزم العيار بالغرف\n\nوالغُرْفة",
+            "referenceQuote": "كما رَزَمَ العَيّار فى الغُرُفِ (١)\nوالغُرْفة",
+            "category": "extra_author",
+            "explanationFa": "در متن منبع یک بیت کامل («لما رأيت أبا عمرو...») که در اصل بخشی از پاورقی محقق برای تکمیل شاهد شعری بوده، به اشتباه وارد متن اصلی مؤلف شده است."
+          }
+        ]
+      }
+    },
+    "سفح": {
+      "sourceSha256": "0618708ad940ab0e7510bcdc4bc86545110355f3ed1b6305941c6b4d2884d16e",
+      "referenceSha256": "fc6227791567966258990d01d02409f346d61491bc55934188e3e2a1c1e39e09",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:02.504432+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "رجلٌ من رؤساء العرب (3)\n\nوأخوها السفاح ظمأ خيله *** حتى وردن جيا الكلاب نهالا",
+            "referenceQuote": "رجلٌ من رؤساء العرب (٣) ، سَفح الماءَ فى غزوةٍ غزاها فسُمّى سفَّاحا. وأمّا سَفْح الجبل فهو من باب الإِبدال، والأصل فيه صَفح، وقد ذُكر فى بابه. والسَّفيح: أحد السِّهام الثلاثة التى لا أنصباءَ لها، وهو شاذٌّ عن الأصل الذى ذكرناه.",
+            "category": "missing_author",
+            "explanationFa": "بخش پایانی متن مؤلف در منبع افتاده و به جای آن بیتی (که احتمالاً متعلق به حاشیه بوده) وارد متن اصلی شده است."
+          },
+          {
+            "sourceQuote": "وأخوها السفاح ظمأ خيله *** حتى وردن جيا الكلاب نهالا",
+            "referenceQuote": "رجلٌ من رؤساء العرب (٣)",
+            "category": "extra_author",
+            "explanationFa": "این بیت شعر در متن مرجع به عنوان سخن مؤلف وجود ندارد و به اشتباه از حاشیه شماره ۳ وارد متن اصلی منبع شده است."
+          }
+        ]
+      }
+    },
+    "هور": {
+      "sourceSha256": "a42094cfb1c597b7b331ffb23969f25d2d1365456b404c2e9773a4c4fcacc389",
+      "referenceSha256": "45afb3768121deb677033278bf3d16f19aface5667d4662dce2a8d1d320af0cd",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:06.340837+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "أزْنَنْتُه به قال :",
+            "referenceQuote": "أزْنَنْتُه به قال:\n* رأى أنَّنى لا بالكثير أَهُورُه (٢) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری پایانی پس از «قال :» در متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "لمز": {
+      "sourceSha256": "873d086dc290dc65e2af9e65bab20f9f80b2d4f000b3964cfc4513130db6d696",
+      "referenceSha256": "2614857a82fcc4053e815e22abb3c8e94c5cd7a79ceca787023bdb81e9f172aa",
+      "sourceFootnotesSha256": "e5e8a7192caf3d63e13c429675e58efe1ef663caf49d799de74a6fa51aaab5b3",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:10.024587+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "يلمح البارض لجا في الندى *** من مرابيع رياض ورجل",
+            "referenceQuote": "يلمج البارض لمجا فى الندى … من مرابيع رياض ورجل",
+            "category": "extra_author",
+            "explanationFa": "این بیت که مربوط به پاورقی کلمه دیگری (لمج) است، در متن اصلی به اشتباه وارد متن مؤلف شده و دارای تصحیف نیز هست."
+          },
+          {
+            "sourceQuote": "1) البيت بتمامه كما فى الديوان 15 طبع 1881 واللسان (لمج ، برض ، رجل) :",
+            "referenceQuote": "— (١) البيت بتمامه كما فى الديوان ١٥ طبع ١٨٨١ واللسان (لمج، برض، رجل): يلمج البارض لمجا فى الندى … من مرابيع رياض ورجل.",
+            "category": "editorial",
+            "explanationFa": "در حاشیه منبع، ادامه پاورقی اول (شاهد شعری) جدا شده و به اشتباه به انتهای متن مؤلف منتقل گردیده است."
+          }
+        ]
+      }
+    },
+    "ذهل": {
+      "sourceSha256": "d9b04c15f8906d4b3b64a0de33382b2160b0b3fced741d62af5187e473e265f9",
+      "referenceSha256": "51025f821702e925a0991fd03ac676110810bbf0dc803e2b7fb1a4de07dd918a",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:02:13.562356+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "عن الشّى أَذْهَل",
+            "referenceQuote": "عن الشّيء أَذْهَل",
+            "category": "orthographic",
+            "explanationFa": "اختلاف در رسم‌الخط و تایپ واژه «الشيء» («الشّى» در متن منبع بدون همزه پایانی و بدون نقطه یاء)."
+          },
+          {
+            "sourceQuote": "إذا نسيتَه أو شُغِلْت. وأذْهَلَنِى",
+            "referenceQuote": "إذا نسيتَه أو شُغِلْت.( وأذْهَلَنِي",
+            "category": "editorial",
+            "explanationFa": "وجود یک پرانتز باز اضافی و ویرایشی در متن مرجع و تفاوت در نقطه‌گذاری یاء."
+          },
+          {
+            "sourceQuote": "[جاء بَعْدَ (1)]",
+            "referenceQuote": "[ جاء بَعْدَ ]",
+            "category": "editorial",
+            "explanationFa": "وجود شماره ارجاع پاورقی «(1)» در متن منبع."
+          },
+          {
+            "sourceQuote": "مرَّ هُدْءُ من اللّيل",
+            "referenceQuote": "مرّ هُدْءٌ من اللّيل",
+            "category": "orthographic",
+            "explanationFa": "تفاوت جزئی در حرکت‌گذاری (ضمّه در منبع در برابر تنوین ضمّ در مرجع)."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "عن الشّى أَذْهَل",
+          "referenceQuote": "عن الشّيء أَذْهَل",
+          "category": "orthographic",
+          "explanationFa": "اختلاف در رسم‌الخط و تایپ واژه «الشيء» («الشّى» در متن منبع بدون همزه پایانی و بدون نقطه یاء)."
+        },
+        {
+          "sourceQuote": "إذا نسيتَه أو شُغِلْت. وأذْهَلَنِى",
+          "referenceQuote": "إذا نسيتَه أو شُغِلْت.( وأذْهَلَنِي",
+          "category": "editorial",
+          "explanationFa": "وجود یک پرانتز باز اضافی و ویرایشی در متن مرجع و تفاوت در نقطه‌گذاری یاء."
+        },
+        {
+          "sourceQuote": "[جاء بَعْدَ (1)]",
+          "referenceQuote": "[ جاء بَعْدَ ]",
+          "category": "editorial",
+          "explanationFa": "وجود شماره ارجاع پاورقی «(1)» در متن منبع."
+        },
+        {
+          "sourceQuote": "مرَّ هُدْءُ من اللّيل",
+          "referenceQuote": "مرّ هُدْءٌ من اللّيل",
+          "category": "orthographic",
+          "explanationFa": "تفاوت جزئی در حرکت‌گذاری (ضمّه در منبع در برابر تنوین ضمّ در مرجع)."
+        }
+      ]
+    },
+    "سرج": {
+      "sourceSha256": "fed64ce56ff093ad5b4df3a8316841268cf2a28fcb094bab3464827a2c037b3b",
+      "referenceSha256": "27829419df93a030667297aece7a5d6c8c08cf59c682f6752f3025e6b392fd80",
+      "sourceFootnotesSha256": "765d4c89cb26153fbcf0bd2eee134e8cca4d999589e71d23333a9a77f497d7a2",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:02:16.867005+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "وفَاحِماً ومِرْسَنِاً مُسَرَّجا (2)",
+            "referenceQuote": "وفَاحِماً ومِرْسَنِاً مُسَرَّجا (٢)",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در نگارش شماره ارجاع (۲ به جای 2) و فاصله‌گذاری علائم نگارشی در متن اصلی."
+          },
+          {
+            "sourceQuote": "2) للعجاج فى ديوانه 8 واللسان (رسن ، سرج). والمرسن ، كمجلس ومنبر ، أصله موضع الرسن من أنف الفرز. ثم كثر حتى قيل مرسن الإنسان ، أى أنفه.",
+            "referenceQuote": "(٢) للعجاج فى ديوانه ٨ واللسان (رسن، سرج). والمرسن، كمجلس ومنبر، أصله موضع الرسن من أنف الفرس، ثم كثر حتى قيل مرسن الإنسان، أى أنفه.",
+            "category": "editorial",
+            "explanationFa": "این بخش مربوط به حاشیه ویراستار است که در منبع در بخش حاشیه جدا شده است (با تفاوت چاپی «الفرز» در حاشیه منبع و «الفرس» در مرجع)."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "وفَاحِماً ومِرْسَنِاً مُسَرَّجا (2)",
+          "referenceQuote": "وفَاحِماً ومِرْسَنِاً مُسَرَّجا (٢)",
+          "category": "orthographic",
+          "explanationFa": "تفاوت در نگارش شماره ارجاع (۲ به جای 2) و فاصله‌گذاری علائم نگارشی در متن اصلی."
+        },
+        {
+          "sourceQuote": "2) للعجاج فى ديوانه 8 واللسان (رسن ، سرج). والمرسن ، كمجلس ومنبر ، أصله موضع الرسن من أنف الفرز. ثم كثر حتى قيل مرسن الإنسان ، أى أنفه.",
+          "referenceQuote": "(٢) للعجاج فى ديوانه ٨ واللسان (رسن، سرج). والمرسن، كمجلس ومنبر، أصله موضع الرسن من أنف الفرس، ثم كثر حتى قيل مرسن الإنسان، أى أنفه.",
+          "category": "editorial",
+          "explanationFa": "این بخش مربوط به حاشیه ویراستار است که در منبع در بخش حاشیه جدا شده است (با تفاوت چاپی «الفرز» در حاشیه منبع و «الفرس» در مرجع)."
+        }
+      ]
+    },
+    "حير": {
+      "sourceSha256": "fcefa9d688b246a48221782b72d4388028505722f89ee17be80d7bc40c920007",
+      "referenceSha256": "075fad111d0a89444bf5765a29291d2b26de224d63dad76f5ee3aea07537a1f7",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:18.005309+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "قال أبو ذؤيب :",
+            "referenceQuote": "قال أبو ذؤيب:\n* واستحارَ شَبابُها (٣) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری ابوذؤیب («واستحار شبابها») در پایان متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "ثعب": {
+      "sourceSha256": "9595968215767969cf9cee02ba3d7186d0cd11dd3e176ef5161a50657f786d47",
+      "referenceSha256": "175c5ea8ff773febffc9d5a24906c0e7591bfd1f493b61d796be7a39da426ce5",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:23.875876+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "قال :\n\nوربّما قيل",
+            "referenceQuote": "قال:\n* على نَهْجٍ كثُعبانِ العَرينِ *\nوربّما قيل",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری «على نَهْجٍ كثُعبانِ العَرينِ» پس از «قال:» در متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "مكن": {
+      "sourceSha256": "56b41f245155919bd1cb914cb4e7221ffa7dbf12902989b9dcac6cdae888da2c",
+      "referenceSha256": "0c843848ae6ce703917b215efcec8925a43458eeb9f44f8972df074f77225b41",
+      "sourceFootnotesSha256": "2f83327ccdc9e21a02eacdeef5c2bce3491af93c4718f90a0dd28fe8967ca83d",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:30.507170+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "مرحت يداها للنجاة كأنما *** تكرو ويكفى ماقط في ضاع",
+            "referenceQuote": "وهو بتمامه فيها: مرحت يداها للنجاء كأنما … تكرو بكفى ماقط فى صاع.",
+            "category": "extra_author",
+            "explanationFa": "این بیت در منبع مستقل بخشی از پاورقی شماره ۱ (مربوط به مدخل قبلی) است که در متن منبع به اشتباه و با تصحیف وارد متن اصلی مؤلف شده است."
+          }
+        ]
+      }
+    },
+    "حقف": {
+      "sourceSha256": "a63ea3b1888531618b8fc9d4949dc1fc9812f410433c31d097ee132086c2fbc8",
+      "referenceSha256": "2544c857d8325067bb40b4c591844c72ebc5a46b8591e42c237ad68e80e16752",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:35.526902+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "وقال آخر :",
+            "referenceQuote": "وقال آخر:\n* سَمَاوةَ الهِلالِ حَتى احقوقَفا (٣) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری پایانی (سَمَاوةَ الهِلالِ حَتى احقوقَفا) پس از عبارت «وقال آخر :» از متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "قطف": {
+      "sourceSha256": "8f7c7aa25961c7e20f8fec8ca95060811588abdab6f2561dda7526138a0f8ed2",
+      "referenceSha256": "119da3ba7c52662f317a5a653a88523d3b3905418da126dc670a2bdf297c6879",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:37.719463+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "[قال] :",
+            "referenceQuote": "[قال] :\n* ولكن وجْهَ مولاك تقطِفُ (٢) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری پایانی مدخل (ولكن وجه مولاك تقطف) در متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "دخر": {
+      "sourceSha256": "6ce6d82fcd5c05259e8095a602f7233227093784d89a248340d1b4ed15b9c0e6",
+      "referenceSha256": "6bd04411d2c37174d0472f11700819d3b59bbc4555b16b5828220b84602bd980",
+      "sourceFootnotesSha256": "96972ac8e4870e91550aa1d36a360f6cba072ffb32043ac32a69a8942cb88f0e",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:02:51.023859+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "تلوح مشرفيه في ذراء",
+            "referenceQuote": "* ويَجْلُو صَفْحَ دَخْدارٍ قَشِيبِ (٢) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد اصلی مؤلف «ويجلو صفح دخدار قشيب» در متن منبع افتاده و به جای آن مصرع اول بیت (که متعلق به حاشیه محقق است) با تصحیف «تلوح مشرفيه في ذراء» وارد متن مؤلف شده است."
+          },
+          {
+            "sourceQuote": "1) فى الأصل : «الدخل» ، صوابه ما أثبت.",
+            "referenceQuote": "(١) فى الأصل: «الدخل»، صوابه ما أثبت.",
+            "category": "editorial",
+            "explanationFa": "این عبارت در منبع در بخش حاشیه آمده است."
+          },
+          {
+            "sourceQuote": "2) نسب فى المجمل إلى أبى دواد ، والصواب نسبته إلى عدى بن زيد ، من قصيدة له فى الأغانى (2 : 23 - 34). وصدره كما فى الأغانى والعرب للجواليقى 141 :",
+            "referenceQuote": "(٢) نسب فى المجمل إلى أبى دواد، والصواب نسبته إلى عدى بن زيد، من قصيدة له فى الأغانى (٢٣: ٢ - ٣٤). وصدره كما فى الأغانى والعرب للجواليقى ١٤١: * تلوح المشرفية فى ذراه *.",
+            "category": "editorial",
+            "explanationFa": "توضیحات شاعر در منبع در بخش حاشیه قرار دارد و ادامه آن (صدر بیت) به اشتباه وارد متن اصلی شده است."
+          }
+        ]
+      }
+    },
+    "زيغ": {
+      "sourceSha256": "34fe0b80387cf9b6c4382a7f18948838b8c1d31d8e97de0de785ab96b0361d85",
+      "referenceSha256": "77ce8aca30502830ec8ed9fbfb1b1ef64e3a2f463abc2a7b6cbf8e371f5c57a0",
+      "sourceFootnotesSha256": "6c1f08dd60f4e2e0d7ea20b1aa6e7874892c16dbffda9433822798ba7b935350",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:02:57.941994+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "الشىء",
+            "referenceQuote": "الشئ",
+            "category": "orthographic",
+            "explanationFa": "تفاوت املایی در نگارش «الشىء» و «الشئ»."
+          },
+          {
+            "sourceQuote": "1) البيت لذى الإصبع العدوانى من قصيدة له فى المفضليات (1 : 158).",
+            "referenceQuote": "— (١) البيت لذى الإصبع العدوانى من قصيدة له فى المفضليات (١٥٨: ١). (٢) التكملة من المجمل واللسان. وصدره فى اللسان: إذا أنت فاكهت الرجال فلا تلع. (٣) أنشده فى اللسان (سود). والسواد، بالكسر: المسارة.",
+            "category": "editorial",
+            "explanationFa": "در مرجع مستقل، متن حاشیه های صفحه قبل در میان متن اصلی درج شده است."
+          },
+          {
+            "sourceQuote": "الفىء",
+            "referenceQuote": "الفئ",
+            "category": "orthographic",
+            "explanationFa": "تفاوت املایی در نگارش «الفىء» و «الفئ»."
+          },
+          {
+            "sourceQuote": "( فَلَمَّا زاغُوا أَزاغَ اللّهُ قُلُوبَهُمْ )",
+            "referenceQuote": "﴿فَلَمّا زاغُوا أَزاغَ اَللّهُ قُلُوبَهُمْ﴾",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در علامت‌گذاری و حرکات آیه قرآن."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "الشىء",
+          "referenceQuote": "الشئ",
+          "category": "orthographic",
+          "explanationFa": "تفاوت املایی در نگارش «الشىء» و «الشئ»."
+        },
+        {
+          "sourceQuote": "1) البيت لذى الإصبع العدوانى من قصيدة له فى المفضليات (1 : 158).",
+          "referenceQuote": "— (١) البيت لذى الإصبع العدوانى من قصيدة له فى المفضليات (١٥٨: ١). (٢) التكملة من المجمل واللسان. وصدره فى اللسان: إذا أنت فاكهت الرجال فلا تلع. (٣) أنشده فى اللسان (سود). والسواد، بالكسر: المسارة.",
+          "category": "editorial",
+          "explanationFa": "در مرجع مستقل، متن حاشیه های صفحه قبل در میان متن اصلی درج شده است."
+        },
+        {
+          "sourceQuote": "الفىء",
+          "referenceQuote": "الفئ",
+          "category": "orthographic",
+          "explanationFa": "تفاوت املایی در نگارش «الفىء» و «الفئ»."
+        },
+        {
+          "sourceQuote": "( فَلَمَّا زاغُوا أَزاغَ اللّهُ قُلُوبَهُمْ )",
+          "referenceQuote": "﴿فَلَمّا زاغُوا أَزاغَ اَللّهُ قُلُوبَهُمْ﴾",
+          "category": "orthographic",
+          "explanationFa": "تفاوت در علامت‌گذاری و حرکات آیه قرآن."
+        }
+      ]
+    },
+    "شخص": {
+      "sourceSha256": "1ef0db92ed1a680db52af688e58ca113caefc83048240c528225482649160534",
+      "referenceSha256": "d730b0fcb09e9852834c7011293e7d532be99cdc04891f739e504c677f3fbf75",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:03:07.723677+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "فى شىء",
+            "referenceQuote": "في شيء",
+            "category": "orthographic",
+            "explanationFa": "تفاوت رسم‌الخط در نقطه‌گذاری یاء (ى در برابر ي)."
+          },
+          {
+            "sourceQuote": "مِن بُعد. ثم يحمل على ذلك فيقال شَخَص من بلدٍ إلى بلد. وذلك قياسُه. ومنه أيضا شُخُوص البَصَر. ويقال رجلٌ شَخِيصٌ وامرأةٌ شَخيصة ، أى جَسيمة. ومن الباب : أشْخَصَ الرّامى ، إذا جاز سَهْمُه الغرضَ من أعلاه ، وهو سهمٌ شَاخص. ويقال ، إذا ورد عليه أمر أقلقه : شُخِص به (2)، وذلك أنّه إذا",
+            "referenceQuote": "مِن بُعد.( وامرأةٌ شَخِيصة، أي من بلدٍ إلى بلد. وذلك قياسُهُ. ومنه أيضاً شُخُوص البَصَر. ويقال رجلٌ شَخِيصٌ ثم يحمل على ذلك فيقال شَخَصَ من أعلاه، وهو سهمٌ شَاخِص. ويقال، إذا ورد عليه أمر أقلقه: شُخِص جَسيمة. ومن الباب: أَشْ خَصَ الرّامي، إذا جاز سَهْمُه الغرضَ به، وذلك أنَّه إِ ذا",
+            "category": "editorial",
+            "explanationFa": "در متن مرجع به دلیل خطای OCR، جابه‌جایی سطرها و تکه‌تکه شدن کلمات (مانند أَشْ خَصَ و إِ ذا) رخ داده است، در حالی که متن منبع کامل و دارای ترتیب صحیح است؛ همچنین شماره ارجاع (2) در منبع ویرایشی است."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "فى شىء",
+          "referenceQuote": "في شيء",
+          "category": "orthographic",
+          "explanationFa": "تفاوت رسم‌الخط در نقطه‌گذاری یاء (ى در برابر ي)."
+        },
+        {
+          "sourceQuote": "مِن بُعد. ثم يحمل على ذلك فيقال شَخَص من بلدٍ إلى بلد. وذلك قياسُه. ومنه أيضا شُخُوص البَصَر. ويقال رجلٌ شَخِيصٌ وامرأةٌ شَخيصة ، أى جَسيمة. ومن الباب : أشْخَصَ الرّامى ، إذا جاز سَهْمُه الغرضَ من أعلاه ، وهو سهمٌ شَاخص. ويقال ، إذا ورد عليه أمر أقلقه : شُخِص به (2)، وذلك أنّه إذا",
+          "referenceQuote": "مِن بُعد.( وامرأةٌ شَخِيصة، أي من بلدٍ إلى بلد. وذلك قياسُهُ. ومنه أيضاً شُخُوص البَصَر. ويقال رجلٌ شَخِيصٌ ثم يحمل على ذلك فيقال شَخَصَ من أعلاه، وهو سهمٌ شَاخِص. ويقال، إذا ورد عليه أمر أقلقه: شُخِص جَسيمة. ومن الباب: أَشْ خَصَ الرّامي، إذا جاز سَهْمُه الغرضَ به، وذلك أنَّه إِ ذا",
+          "category": "editorial",
+          "explanationFa": "در متن مرجع به دلیل خطای OCR، جابه‌جایی سطرها و تکه‌تکه شدن کلمات (مانند أَشْ خَصَ و إِ ذا) رخ داده است، در حالی که متن منبع کامل و دارای ترتیب صحیح است؛ همچنین شماره ارجاع (2) در منبع ویرایشی است."
+        }
+      ]
+    },
+    "غدو": {
+      "sourceSha256": "c44ae98c67b0ddcc19760d13def9c41f4e9841c1f17a6c3f128f695ca4ebd303",
+      "referenceSha256": "ad64e28a16108f91d5681cfa0b021f65deae3f949792d3e0c24540f7bd6c2d9d",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:12.934280+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "بها حيث حَلُّوها وغَدْواً بَلاقِعُ (2)\n\nوما الناس إلا كالديار وأهلها",
+            "referenceQuote": "بها حيث حَلُّوها وغَدْواً بَلاقِعُ (٢)",
+            "category": "extra_author",
+            "explanationFa": "مصراع اول بیت («وما الناس إلا كالديار وأهلها») که متعلق به حاشیه محقق است، در متن اصلی به صورت پس‌وپیش وارد متن مؤلف شده است و در متن مرجع وجود ندارد."
+          }
+        ]
+      }
+    },
+    "وطا": {
+      "sourceSha256": "b466a4cef58f6c97e4a29bc644295f36d1d645ef25765297b508d9b5843b53e4",
+      "referenceSha256": "153188f591b4cee1557c95a04dc30e117849bc2407dcf334353a6c0ce520abcd",
+      "sourceFootnotesSha256": "d22903f077c2dd84163b1b7e8eb99dfffeb00b43121b6f014cdc6adeb8ebad35",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:17.295844+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "سيفنى أبا الهندي عن وطب سالم",
+            "referenceQuote": "وصدره: * سيغنى أبا الهندى عن وطب سالم *.",
+            "category": "extra_author",
+            "explanationFa": "این مصرع شعر متعلق به پاورقی صفحه است (مربوط به ریشه دیگر) که به اشتباه و با تصحیف «سيفنى» در میان متن اصلی مؤلف قرار گرفته است."
+          },
+          {
+            "sourceQuote": "2) لأبى الهندى ، واسمه عبد المؤمن بن عبد القدوس ، فى اللسان (وضر) والشعر والشعراء 242 و 664 والأغانى (21 : 178). وصدره :",
+            "referenceQuote": "(٢) لأبى الهندى، واسمه عبد المؤمن بن عبد القدوس، فى اللسان (وضر) والشعر والشعراء ٢٤٢ و ٦٦٤ والأغانى (١٧٨: ٢١). وصدره: * سيغنى أبا الهندى عن وطب سالم *.",
+            "category": "editorial",
+            "explanationFa": "در حاشیه منبع، ادامه پاورقی شماره ۲ (مصرع شعر) افتاده و به اشتباه وارد متن اصلی شده است."
+          },
+          {
+            "sourceQuote": "1) تكملة يحتاج إليها الكلام. وانظر التنبيه السابق.",
+            "referenceQuote": "(١) تكملة يحتاج إليها الكلام. وانظر التنبيه السابق.",
+            "category": "editorial",
+            "explanationFa": "پاورقی‌های ویراستار در مرجع در میانه متن درج شده‌اند اما در منبع در بخش حاشیه قرار دارند."
+          }
+        ]
+      }
+    },
+    "بخس": {
+      "sourceSha256": "2b3375df2ce91fed08ebfcdecffcbf55a944cacb93a5ab2c145516dbda045aee",
+      "referenceSha256": "878dbd8e2f74fc452f830ccd8820e5ce408e5039b8faaf4a8b5c349712a212a8",
+      "sourceFootnotesSha256": "71185f2a3ed678857b7db2b651059825b18151184dcc0f166005691a5f081710",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:19.535671+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "وقال شاعر (1)\n\nبنات وطاء على خد الليل\n\nوهذا ما يسمى فى علم العروض بالإجازة فى تسمية الخليل ، وبالإلفاء فى قول أبى زيد. انظر اللسان (7 : 195).\n\nلا يَشْتَكِين",
+            "referenceQuote": "وقال شاعر (١) :\nلا يَشْتَكِين",
+            "category": "extra_author",
+            "explanationFa": "در متن منبع، یک شطر شعر دیگر و توضیحات ویرایشی/حاشیه مربوط به صفحه قبل به اشتباه وارد متن اصلی مؤلف شده است که در مرجع وجود ندارد."
+          }
+        ]
+      }
+    },
+    "زحف": {
+      "sourceSha256": "4abff1b59c45a011ac3f36a201831fe257e84656a63e803f7e7670524d59a01c",
+      "referenceSha256": "ce62a405c02926577167a77eaaca55a24ffb33a85898ed8cd81bcbb632605f8a",
+      "sourceFootnotesSha256": "b96576fe1362abe2c9444f2c799f17288050be54842f8084c1d04b5ee94dd09f",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:25.724426+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "على زوَاحف نُزْجِيَهَا مَحَاسِيرِ (1)\n\nعلى عمائمنا تلقى وأرحلنا",
+            "referenceQuote": "— (١) للفرزدق فى ديوانه ٢٦٣ واللسان (زحف) وصدره: على عمائمنا تلقى وأرحلنا.",
+            "category": "extra_author",
+            "explanationFa": "صدر بیت («على عمائمنا تلقى وأرحلنا») که بخشی از توضیح حاشیه محقق است، به اشتباه از حاشیه جدا شده و وارد متن اصلی مؤلف گردیده است."
+          },
+          {
+            "sourceQuote": "1) للفرزدق فى ديوانه 263 واللسان (زحف) وصدره :",
+            "referenceQuote": "— (١) للفرزدق فى ديوانه ٢٦٣ واللسان (زحف) وصدره: على عمائمنا تلقى وأرحلنا.",
+            "category": "editorial",
+            "explanationFa": "در حاشیه منبع، ادامه عبارت (صدر بیت) افتاده و به متن اصلی منتقل شده است."
+          }
+        ]
+      }
+    },
+    "سقف": {
+      "sourceSha256": "b17d8149d46141ef6cf919561ecad5b3df0a6ff03cc253b45cad0702c4a2f111",
+      "referenceSha256": "ec5bd7b4beb27b70d876593bfd8016e3554ee1ca50f108bd560886a8cbb152a2",
+      "sourceFootnotesSha256": "e9548fe76caa655375a2e06c0fab8a1dd81160759aa50cea99aed1a18c88cb98",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:03:27.712427+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "( وَجَعَلْنَا السَّماءَ سَقْفاً مَحْفُوظاً )",
+            "referenceQuote": "﴿وَجَعَلْنَا اَلسَّماءَ سَقْفاً مَحْفُوظاً﴾",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در علامت‌گذاری آیه (پرانتز در برابر گیومه قرآنی) و رسم‌الخط همزه وصل در السماء."
+          },
+          {
+            "sourceQuote": "1) البيت لثعلبة بن صعير المازنى فى المفضليات (1 : 127). وصدره :",
+            "referenceQuote": "— (١) البيت لثعلبة بن صعير المازنى فى المفضليات (١٢٧: ١). وصدره: وكأن عيبتها وفضل فتانها.",
+            "category": "editorial",
+            "explanationFa": "این عبارت مربوط به حاشیه است و در متن اصلی مؤلف نیامده است."
+          },
+          {
+            "sourceQuote": "2) البيت للراعى كما فى اللسان (9 : 192).",
+            "referenceQuote": "(٢) البيت للراعى كما فى اللسان (١٩٢: ٩).",
+            "category": "editorial",
+            "explanationFa": "این عبارت مربوط به حاشیه است و خارج از متن مؤلف قرار دارد."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "( وَجَعَلْنَا السَّماءَ سَقْفاً مَحْفُوظاً )",
+          "referenceQuote": "﴿وَجَعَلْنَا اَلسَّماءَ سَقْفاً مَحْفُوظاً﴾",
+          "category": "orthographic",
+          "explanationFa": "تفاوت در علامت‌گذاری آیه (پرانتز در برابر گیومه قرآنی) و رسم‌الخط همزه وصل در السماء."
+        },
+        {
+          "sourceQuote": "1) البيت لثعلبة بن صعير المازنى فى المفضليات (1 : 127). وصدره :",
+          "referenceQuote": "— (١) البيت لثعلبة بن صعير المازنى فى المفضليات (١٢٧: ١). وصدره: وكأن عيبتها وفضل فتانها.",
+          "category": "editorial",
+          "explanationFa": "این عبارت مربوط به حاشیه است و در متن اصلی مؤلف نیامده است."
+        },
+        {
+          "sourceQuote": "2) البيت للراعى كما فى اللسان (9 : 192).",
+          "referenceQuote": "(٢) البيت للراعى كما فى اللسان (١٩٢: ٩).",
+          "category": "editorial",
+          "explanationFa": "این عبارت مربوط به حاشیه است و خارج از متن مؤلف قرار دارد."
+        }
+      ]
+    },
+    "جمد": {
+      "sourceSha256": "eafd0a71e710f7e65c803596c4fbbe8c1ec36a6d4a4d91d83f6c3e19ad6562c6",
+      "referenceSha256": "7009fe027d7912daaef7acf81705326cb8efb8a854851ecbb5617d0a4a72a9f7",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:32.478682+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "لها أبداً إذا ذُكِرتْ حَمَادِ (1)\n\nحاد لها حماد ولا؟ *** سوال الدهر ما ذكرت جماد\n\n(2) يقفلهم : برجعهم. وفى الأصل : «يقلفهم» ، تحريف.",
+            "referenceQuote": "لها أبداً إذا ذُكِرتْ حَمَادِ (١)",
+            "category": "extra_author",
+            "explanationFa": "در متن منبع، پاورقی‌های چاپی به همراه مصراع تحریف‌شده‌ای از حاشیه به اشتباه وارد متن اصلی مؤلف شده‌اند."
+          }
+        ]
+      }
+    },
+    "يبس": {
+      "sourceSha256": "7d3c524e71ec89611829fcfbb2ed3f47ff90f51fe1fcd3e1a729d8ff64af8872",
+      "referenceSha256": "82c3706c28a9dd75bb3455e06a72ee9cbab321213f3f6551eb63cb099d7b31de",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:37.565920+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "الشّىءُ",
+            "referenceQuote": "الشّئُ",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در رسم‌الخط واژه «الشيء»."
+          },
+          {
+            "sourceQuote": "قال :\n\nويَبِيس الماء",
+            "referenceQuote": "قال:\n* إلى عجوزٍ شَنَّة الوجهِ يَبَسْ (٢) *\nويَبِيس الماء",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری پس از «قال:» در متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "بكم": {
+      "sourceSha256": "4e21053dc724c535e6f60a3a9b8ce498a5cfa1f378bae7065ea1472efc44df5a",
+      "referenceSha256": "1076e1e3cdb1fdcd9810bb556e67efb78df18e512df6789f930623ff82da77c4",
+      "sourceFootnotesSha256": "d4e4b6f9aad75d74e39a05f107b8d56ce59a0b20ce20e8d16988f470f6113d0e",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:38.258810+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "قال الدُّرَيْدِىّ : يقال بَكِيمٌ فى معنى أبكم (2)",
+            "referenceQuote": "قال الدُّرَيْدِىّ: يقال بَكِيمٌ فى معنى أبكم (٢) ، وجَمَعُوهُ على أبكامٍ، كشَرِيفٍ وأشراف.",
+            "category": "missing_author",
+            "explanationFa": "عبارت پایانی متن مؤلف درباره جمع «بكيم» (وجَمَعُوهُ على أبكامٍ، كشَرِيفٍ وأشراف) در متن منبع افتاده است."
+          },
+          {
+            "sourceQuote": "فليت لساني كان تصغين منهما *** بكيم ونصف عند مجرى الكواكب",
+            "referenceQuote": "يقال بَكِيمٌ فى معنى أبكم (٢) ، وجَمَعُوهُ على أبكامٍ، كشَرِيفٍ وأشراف.",
+            "category": "extra_author",
+            "explanationFa": "بیت شعر در انتهای متن منبع آمده (با تصحیف «تصغين» به جای «نصفين» که در حاشیه نسخه چاپی بوده) ولی در متن مرجع مستقل وجود ندارد."
+          },
+          {
+            "sourceQuote": "1) البيت من مسدس الرجز جاء على التمام ، كما ذكر ابن برى. انظر اللسان (13 : 67). وجعله ثعلب فى أماليه 541 صدر بيت وبيتا.",
+            "referenceQuote": "— (١) البيت من مسدس الرجز جاء على التمام، كما ذكر ابن برى. انظر اللسان (٦٧: ١٣). وجعله ثعلب فى أماليه ٥٤١ صدر بيت وبيتا.",
+            "category": "editorial",
+            "explanationFa": "این عبارت در بخش حاشیه منبع قرار دارد ولی در مرجع مستقل در میان متن درج شده است."
+          },
+          {
+            "sourceQuote": "2) ديوان أوس 21 واللسان (بكل). وهو فى صفة قوس.",
+            "referenceQuote": "(٢) ديوان أوس ٢١ واللسان (بكل). وهو فى صفة قوس.",
+            "category": "editorial",
+            "explanationFa": "این توضیح در حاشیه منبع آمده و در مرجع مستقل در میان متن قرار گرفته است."
+          }
+        ]
+      }
+    },
+    "حوج": {
+      "sourceSha256": "a95b2d32448988f4f883fd923638c1ff25483cbc3d042d1d07ae5f332cba8fb8",
+      "referenceSha256": "cd29ad2d9c36b54336e63aeaa5463c6f0283e3a2f70e6b0acf0b1dcd6c25bfe5",
+      "sourceFootnotesSha256": "d8f9e393c9d473a6ef8b89e257b4b3e851a4c9c66c8feb8fd9625748ec07eb46",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:43.631862+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "الشىء.",
+            "referenceQuote": "الشئ.",
+            "category": "orthographic",
+            "explanationFa": "تفاوت رسم‌الخط در نگارش کلمه «الشيء»."
+          },
+          {
+            "sourceQuote": "؟وحصنا خمها طربا",
+            "referenceQuote": "* لما وحسنا خمها طربا *",
+            "category": "extra_author",
+            "explanationFa": "بخشی از حاشیه مربوط به مدخل قبلی (حوت) به صورت تحریف‌شده و به اشتباه در انتهای متن اصلی مؤلف وارد شده است."
+          }
+        ]
+      }
+    },
+    "نكث": {
+      "sourceSha256": "86536e3a878a24e8cb7ad88e514ee4caa04b4f6c721f9c78e6b36801812faba2",
+      "referenceSha256": "7c34fbde0e2d802861485ff5862fba5ea3e4604285aeebc3985f104a68f60304",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:46.118290+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": true,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "مَتَى يَكُ أمرٌ للنَّكيثةِ أَشْهَدِ (1)\n\nوقربت بالقربى وجدك إنه",
+            "referenceQuote": "مَتَى يَكُ أمرٌ للنَّكيثةِ أَشْهَدِ (١)",
+            "category": "extra_author",
+            "explanationFa": "در انتهای متن منبع، صدر بیت «وقربت بالقربى وجدك إنه» به صورت اضافه آمده است که در منبع مستقل وجود ندارد و ظاهراً از حاشیه محشّی برای تکمیل بیت طرفه وارد متن اصلی شده است."
+          }
+        ]
+      }
+    },
+    "هيج": {
+      "sourceSha256": "1d45488ef459ce03503ea209f1076e9d69f618dd05da0ac1ed09f3c7d490f8c6",
+      "referenceSha256": "77e139117c3f6e8d4b20841a30aba7783a8f39ee73a7f3ae9e943f8e9ee7fb62",
+      "sourceFootnotesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:48.221292+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "قال رؤبة :",
+            "referenceQuote": "قال رؤبة:\n* وَأَهْيَجَ الخَلصَاءَ من ذات البُرَقْ (٣) *",
+            "category": "missing_author",
+            "explanationFa": "شاهد شعری رؤبه در انتهای متن منبع افتاده است."
+          }
+        ]
+      }
+    },
+    "خذل": {
+      "sourceSha256": "bf27aae642a986e1e911304fda15f068855f3bc7ac14d23d2e058eb9f6b0926a",
+      "referenceSha256": "caade45771164f186eda049303b1833b70f2b8cd705176b94f0f7221e07d5244",
+      "sourceFootnotesSha256": "8bd2643da0b9d0720b6d2ba5ba101535d7bf08a517a20ec4025b094671620ea2",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:48.600777+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "الشَّىء",
+            "referenceQuote": "الشَّئ",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در رسم‌الخط واژه «الشيء»."
+          },
+          {
+            "sourceQuote": "ومن الباب تخاذَلَتْ رِجلاه : ضَعُفَتَا. من قوله :\n\nوقال آخر (2):",
+            "referenceQuote": "* وخَذُولِ الرِّجْل من غير كَسَحْ (١) *",
+            "category": "missing_author",
+            "explanationFa": "شطر شعر پس از عبارت «من قوله:» در متن منبع افتاده است."
+          },
+          {
+            "sourceQuote": "وقال آخر (2):\n\nورجلٌ خُذَلة ، للَّذى لا يزال يَخذُلُ :",
+            "referenceQuote": "* صَرْعى نوؤُها متخاذِلُ *",
+            "category": "missing_author",
+            "explanationFa": "شطر شعر پس از عبارت «وقال آخر:» در متن منبع افتاده است و همچنین در پایان مدخل پس از «يَخذُلُ:» نیز به نظر می‌رسد شاهد دیگری در هر دو نسخه ساقط شده باشد."
+          }
+        ]
+      }
+    },
+    "خنق": {
+      "sourceSha256": "7bd236c102ae4ae1ef30d9e5fdafcf24ba2b7c58d73c593f2c2bca7a78dbd37d",
+      "referenceSha256": "4e3db9080dd0327347df0716d725ff767bc26411c22ada66367d3d01a0c23beb",
+      "sourceFootnotesSha256": "515f50f87a944d2ea9e7cd2321394074e95ada3a1a639674286256caceb3c5df",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "pass",
+      "atUtc": "2026-10-16T02:03:54.731727+00:00",
+      "review": {
+        "verdict": "pass",
+        "sourceComplete": true,
+        "authorTextAdded": false,
+        "differences": [
+          {
+            "sourceQuote": "يخنِقُه خَنِقاً (3).",
+            "referenceQuote": "يخنِقُه خَنِقاً (٣) .",
+            "category": "orthographic",
+            "explanationFa": "تفاوت در رسم‌الخط ارقام ارجاع به پاورقی (۳ به جای 3) و فاصله‌گذاری پیش از نقطه."
+          },
+          {
+            "sourceQuote": "3) كذا ضبط فى الأصل بكسر النون من «الخنق» و «خنقا» على اللغة الصحيحة ، وهى التى ذكرها صاحب القاموس ، قال «خنقه خنقا ككتف». وأما صاحب اللسان فذكر اللغتين ، قال : «الخنق ، بكسر لنون مصدر قولك : خنقه يخنقه خنقا وخنقا».",
+            "referenceQuote": "— (١) ديوان الأعشى ١٠٢ واللسان (خنف) برواية «أجدت برجليها نجاء» فى الديوان، و «النجاء» فى اللسان. (٢) عفى: جمع عاف، كغار وغزى. والأجون، بالضم: جمع أجين. وفى اللسان (خنف): «له قلب عادية وصحون». (٣) كذا ضبط فى الأصل بكسر النون من «الخنق» و «خنقا» على اللغة الصحيحة، وهى التى ذكرها صاحب القاموس، قال «خنقه خنقا ككتف». وأما صاحب اللسان فذكر اللغتين، قال: «الخنق، بكسر لنون مصدر قولك: خنقه يخنقه خنقا وخنقا».",
+            "category": "editorial",
+            "explanationFa": "در متن مرجع، پاورقی‌های ویراستاری در انتهای متن ادغام شده‌اند اما در منبع در بخش حاشیه قرار دارند."
+          }
+        ]
+      },
+      "sourceComplete": true,
+      "authorTextAdded": false,
+      "differences": [
+        {
+          "sourceQuote": "يخنِقُه خَنِقاً (3).",
+          "referenceQuote": "يخنِقُه خَنِقاً (٣) .",
+          "category": "orthographic",
+          "explanationFa": "تفاوت در رسم‌الخط ارقام ارجاع به پاورقی (۳ به جای 3) و فاصله‌گذاری پیش از نقطه."
+        },
+        {
+          "sourceQuote": "3) كذا ضبط فى الأصل بكسر النون من «الخنق» و «خنقا» على اللغة الصحيحة ، وهى التى ذكرها صاحب القاموس ، قال «خنقه خنقا ككتف». وأما صاحب اللسان فذكر اللغتين ، قال : «الخنق ، بكسر لنون مصدر قولك : خنقه يخنقه خنقا وخنقا».",
+          "referenceQuote": "— (١) ديوان الأعشى ١٠٢ واللسان (خنف) برواية «أجدت برجليها نجاء» فى الديوان، و «النجاء» فى اللسان. (٢) عفى: جمع عاف، كغار وغزى. والأجون، بالضم: جمع أجين. وفى اللسان (خنف): «له قلب عادية وصحون». (٣) كذا ضبط فى الأصل بكسر النون من «الخنق» و «خنقا» على اللغة الصحيحة، وهى التى ذكرها صاحب القاموس، قال «خنقه خنقا ككتف». وأما صاحب اللسان فذكر اللغتين، قال: «الخنق، بكسر لنون مصدر قولك: خنقه يخنقه خنقا وخنقا».",
+          "category": "editorial",
+          "explanationFa": "در متن مرجع، پاورقی‌های ویراستاری در انتهای متن ادغام شده‌اند اما در منبع در بخش حاشیه قرار دارند."
+        }
+      ]
+    },
+    "همز": {
+      "sourceSha256": "7de0de781ee00d7059eef9737275d704cd270110b73e2273f636a08b35150ea4",
+      "referenceSha256": "7ed346b8f76c9940883ab2068a94d7e29db735c57ee97ef1330b2732cfa294e9",
+      "sourceFootnotesSha256": "ca88fbb4cf33fefba8f4c47509dba2b511f04088c0dda639ef5ae9e3113333f7",
+      "independentFileSha256": "ed7952841b2dc54e7f0c3aba8d66dff8256016f0984c697d5729c990a3e93606",
+      "model": "gemini-4-argon",
+      "method": "gemini-4-argon-machine-source-forensics-not-literal-concordance",
+      "verdict": "needs_review",
+      "atUtc": "2026-10-16T02:03:56.329417+00:00",
+      "review": {
+        "verdict": "needs_source_repair",
+        "sourceComplete": false,
+        "authorTextAdded": true,
+        "differences": [
+          {
+            "sourceQuote": "الأرض (1)\n\nوفى القاموس : «وهمزت به الأرض : صرعته». ولم يرد فى اللسان.",
+            "referenceQuote": "الأرض (١) . وقوسٌ هَمَزَى: شديدةُ الدَّفعِ للسَّهم. والهمَّاز: العَيَّاب، وكذا الهُمَزَة. قال:",
+            "category": "missing_author",
+            "explanationFa": "بخشی از متن اصلی مؤلف («وقوسٌ هَمَزَى... قال:») در نسخه منبع افتاده و به جای آن توضیحی از حاشیه درباره قاموس و لسان وارد متن شده است."
+          },
+          {
+            "sourceQuote": "وفى القاموس : «وهمزت به الأرض : صرعته». ولم يرد فى اللسان.",
+            "referenceQuote": "الأرض (١) .",
+            "category": "extra_author",
+            "explanationFa": "عبارت مربوط به قاموس و لسان که حاشیه محقق است به اشتباه وارد متن اصلی منبع شده است."
+          },
+          {
+            "sourceQuote": "إذا لقينك من شحط تكاشرني *** وأن تغييت كنت العامز المعزه",
+            "referenceQuote": "تُدْلِى بوُدِّىَ إذْ لاقَيتَنِى كذِباً … وإنْ أُغيَّبْ فأنت الهامزُ اللُّمَزَهْ (٢)",
+            "category": "extra_author",
+            "explanationFa": "بیت دومی (که احتمالاً از حاشیه با تصحیف وارد شده) به اشتباه به متن مؤلف در منبع اضافه شده است."
+          }
+        ]
+      }
+    }
+  },
+  "counts": {
+    "needs_review": 37,
+    "pass": 13
+  },
+  "selectionSkips": {
+    "ambiguous_or_missing_entry": 47,
+    "lacuna": 5
+  },
+  "accountedUsd": "0.197772",
+  "totalAccountedUsd": "6.71227425"
+}

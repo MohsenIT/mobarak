@@ -65,10 +65,23 @@ export default function IshtiqaqiMeaning({ root }: { root: string }) {
 function EntryMeaning({ entry, multiple }: { entry: Entry; multiple: boolean }) {
   const [arabic, setArabic] = useState(false)
   const translation = entry.translation
-  const source = `المعجم الاشتقاقي المؤصل لألفاظ القرآن الكريم\nنویسنده: دکتر محمد حسن حسن جبل\nمدخل: ${entry.heading}${entry.isSupplement ? ' · مستدرک' : ''}\n${entry.references.map(citation).join('\n')}\nمأخذ دیجیتال: ${entry.references[0]?.url ?? 'https://shamela.ws/book/21017'}\n${translation ? `${translation.translator}\n${translation.faFull ? 'متن مدخل نویسنده ترجمه شده است؛ پاورقی‌ها و شرح مشترک فصل، در این ترجمه وارد نشده‌اند.' : 'فقط خلاصهٔ معنای محوری ترجمه شده؛ ترجمهٔ کامل هنوز آماده نیست.'}` : 'متن عربی از فایل ارسالی؛ ترجمهٔ فارسی هنوز آماده نیست.'}`
+  const source = {
+    title: 'المعجم الاشتقاقي المؤصل لألفاظ القرآن الكريم',
+    description: 'فرهنگ اشتقاقی واژگان قرآن با تأکید بر معنای محوری و پیوند واژه‌های هم‌ریشه.',
+    fields: [
+      { label: 'نویسنده', value: 'دکتر محمد حسن حسن جبل' },
+      { label: 'مأخذ دیجیتال', value: 'متن ارسالی از نسخهٔ شامله' },
+      { label: 'مدخل', value: `${entry.heading}${entry.isSupplement ? ' · مستدرک' : ''}` },
+      ...(entry.references.length ? [{ label: 'ارجاع', value: entry.references.map(ref => `جلد ${toFa(ref.volume)}، صفحهٔ ${toFa(ref.printed_page)}`).join('؛ ') }] : []),
+      ...(translation ? [{ label: 'شرح فارسی', value: translation.translator }] : []),
+    ],
+    notes: [translation ? translation.faFull ? 'متن مدخل نویسنده ترجمه شده؛ پاورقی‌ها و شرح مشترک فصل در ترجمه وارد نشده‌اند.' : 'فقط خلاصهٔ معنای محوری به فارسی آماده است؛ ترجمهٔ کامل هنوز آماده نیست.' : 'متن عربی از فایل ارسالی است؛ ترجمهٔ فارسی هنوز آماده نیست.'],
+    links: [{ label: 'متن مأخذ در شامله', href: entry.references[0]?.url ?? 'https://shamela.ws/book/21017' }],
+  }
+
   return <div className="mt-2">
     {multiple && <h4 className="font-bold">{entry.heading}{entry.isSupplement && ' · مستدرک'}</h4>}
-    <SourceReference text={source} />
+    <SourceReference source={source} />
     {translation?.faFull ? <TahqiqText text={translation.faFull} />
       : <div className="mt-2">
         {translation?.summary && <p className="text-justify">{translation.summary}</p>}
@@ -81,10 +94,10 @@ function EntryMeaning({ entry, multiple }: { entry: Entry; multiple: boolean }) 
       <ArabicText text={entry.ar} />
       {entry.footnotes.length > 0 && <details className="mt-3 text-xs"><summary className="cursor-pointer">پاورقی‌های صفحات منبع</summary>
         <p style={{ color: 'var(--ink-soft)' }}>این پاورقی‌ها متعلق به صفحه‌اند و ممکن است به مدخل‌های دیگر همان صفحه هم مربوط باشند.</p>
-        {entry.footnotes.map((note, i) => <div key={i} className="mt-2"><SourceReference label="صفحهٔ منبع" text={`${citation(note.source)}\n${note.source.url}`} /><ArabicText text={note.text} /></div>)}
+        {entry.footnotes.map((note, i) => <div key={i} className="mt-2"><SourceReference label="صفحهٔ منبع" source={{ title: source.title, fields: [{ label: 'نویسنده', value: 'محمد حسن حسن جبل' }, { label: 'ارجاع', value: citation(note.source) }], notes: ['پاورقی این صفحه ممکن است به مدخل‌های دیگر همان صفحه مربوط باشد.'], links: [{ label: 'مشاهدهٔ صفحه', href: note.source.url }] }} /><ArabicText text={note.text} /></div>)}
       </details>}
       {entry.commonMeanings.length > 0 && <details className="mt-3 text-xs"><summary className="cursor-pointer">معنای مشترک فصل</summary>
-        {entry.commonMeanings.map(common => <div key={common.id} className="mt-2"><SourceReference text={`${common.heading}\n${common.references.map(citation).join('\n')}`} /><ArabicText text={common.ar} /></div>)}
+        {entry.commonMeanings.map(common => <div key={common.id} className="mt-2"><SourceReference source={{ title: source.title, fields: [{ label: 'بخش', value: common.heading }, ...common.references.map(ref => ({ label: 'ارجاع', value: citation(ref) }))], links: common.references.map(ref => ({ label: `صفحهٔ ${toFa(ref.printed_page)}`, href: ref.url })) }} /><ArabicText text={common.ar} /></div>)}
       </details>}
     </div>}
   </div>
