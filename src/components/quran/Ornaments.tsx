@@ -20,11 +20,17 @@ export function SurahBand({ sm }: { sm: SurahMeta }) {
   const revelation = sm.rev === 'makkah' ? 'مکی' : sm.rev === 'madinah' ? 'مدنی' : null
   return (
     <div className="surah-band" dir="rtl" role="group" aria-label={`سورهٔ ${sm.ar}، شمارهٔ ${toFa(sm.n)}، ${toFa(sm.vc)} آیه${revelation ? `، ${revelation}` : ''}`}>
-      <span className="band-meta band-number">سورهٔ {toFa(sm.n)}</span>
-      <span className="band-name">سُورَةُ {sm.ar}</span>
-      <span className="band-meta band-info">
-        <span>{toFa(sm.vc)} آیه</span>
-        {revelation && <span className="band-revelation" title={`سورهٔ ${revelation}`}><RevelationIcon makki={sm.rev === 'makkah'} />{revelation}</span>}
+      <span className="band-side">
+        <span className="band-meta band-number">سورهٔ {toFa(sm.n)}</span>
+        <span className="band-line" />
+      </span>
+      <span className="band-name">
+        {revelation && <span className="band-revelation" title={`سورهٔ ${revelation}`} aria-label={revelation}><RevelationIcon makki={sm.rev === 'makkah'} /></span>}
+        <span className="band-title">سُورَةُ {sm.ar}</span>
+      </span>
+      <span className="band-side">
+        <span className="band-meta band-info">{toFa(sm.vc)} آیه</span>
+        <span className="band-line" />
       </span>
     </div>
   )
