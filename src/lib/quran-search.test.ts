@@ -84,3 +84,17 @@ test('a phrase starting after independent waw is exact, including omitted spaces
   expect(local('عد')[0].kind).toBe('partial') // lexical waw is not a word boundary
   expect(local('عد')[0].score).toBeGreaterThan(0)
 })
+
+test('highlights select the matched stem and include waw only when it was queried', () => {
+  for (const query of ['لا تخف', 'لاتخف']) {
+    const result = search(query, 20).find(result => result.a === 21)!
+    const pos = result.words.findIndex(word => normalizeQuranSearch(word) === 'ولا') + 1
+    expect(result.parts[pos]).toBe(2)
+    expect(result.parts[pos + 1]).toBe(2)
+  }
+  const result = search('ولا تخف', 20).find(result => result.a === 21)!
+  const pos = result.words.findIndex(word => normalizeQuranSearch(word) === 'ولا') + 1
+  expect(result.parts[pos]).toBe(3)
+  const repeated = createQuranSearch([[1, 1, ['وَلَا', 'تَخَفْ', 'قَالَ', 'لَا', 'تَخَفْ']]], { '1:1': [1] })('لا تخف')[0]
+  expect(repeated.parts).toEqual({ 1: 2, 2: 2, 4: 2, 5: 2 })
+})

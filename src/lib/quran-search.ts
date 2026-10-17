@@ -29,7 +29,7 @@ export function typoDistance(a: string, b: string, max: number): number {
 }
 
 export type SearchVerse = [s: number, a: number, words: string[]]
-export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; positions: number[]; kind: 'exact' | 'partial' | 'near'; score: number }
+export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; kind: 'exact' | 'partial' | 'near'; score: number }
 type IndexedVerse = { verse: SearchVerse; keys: string[][]; compact: { text: string; ranges: [number, number][]; boundaries: Set<number> }[] }
 
 export function createQuranSearch(verses: SearchVerse[], waw: Record<string, number[]> = {}) {
@@ -73,7 +73,14 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
     const results: QuranSearchResult[] = []
     for (const { verse: [s, a, words], keys, compact } of indexed) {
       if (surah && s !== surah) continue
-      let score = Infinity; let positions: number[] = []; let kind: QuranSearchResult['kind'] = 'near'
+      let score = Infinity; let positions: number[] = []; let parts: Record<number, number> = {}; let kind: QuranSearchResult['kind'] = 'near'
+      const prefixed = new Set(waw[`${s}:${a}`] ?? [])
+      const record = (cost: number, matched: number[], masks: Record<number, number>) => {
+        if (cost < score) { positions = []; parts = {} }
+        positions = [...new Set([...positions, ...matched])]
+        for (const pos of matched) parts[pos] = (parts[pos] ?? 0) | masks[pos]
+        score = cost
+      }
       for (let start = 0; start <= keys.length - terms.length; start++) {
         let cost = 0
         for (let offset = 0; offset < terms.length; offset++) {
@@ -82,8 +89,8 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
         }
         if (cost <= score && cost <= budget) {
           const matched = Array.from({ length: terms.length }, (_, i) => start + i + 1)
-          positions = cost === score ? [...new Set([...positions, ...matched])] : matched
-          score = cost; kind = cost === 0 ? 'exact' : 'near'
+          record(cost, matched, Object.fromEntries(matched.map(pos => [pos, prefixed.has(pos) ? 3 : 2])))
+          kind = cost === 0 ? 'exact' : 'near'
         }
       }
       // Ignore accidental spaces inside words, and also accept incomplete words.
@@ -94,12 +101,20 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
           const whole = item.boundaries.has(start) && item.boundaries.has(end)
           const value = whole ? 0 : 0.5
           if (value <= score) {
-            positions = value === score ? [...new Set([...positions, ...matched])] : matched
-            score = value; kind = whole ? 'exact' : 'partial'
+            const masks: Record<number, number> = {}
+            for (const pos of matched) {
+              const [from, to] = item.ranges[pos - 1]
+              // Bit 1 selects the independent waw; bit 2 selects the stem.
+              masks[pos] = prefixed.has(pos)
+                ? (start < from + 1 && end > from ? 1 : 0) | (start < to && end > from + 1 ? 2 : 0)
+                : 2
+            }
+            record(value, matched, masks)
+            kind = whole ? 'exact' : 'partial'
           }
         }
       }
-      if (Number.isFinite(score)) results.push({ s, a, words, waw: waw[`${s}:${a}`] ?? [], positions: positions.sort((a, b) => a - b), kind, score })
+      if (Number.isFinite(score)) results.push({ s, a, words, parts, waw: waw[`${s}:${a}`] ?? [], positions: positions.sort((a, b) => a - b), kind, score })
     }
     return results.sort((a, b) => a.score - b.score || a.s - b.s || a.a - b.a)
   }

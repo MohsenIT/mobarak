@@ -7,7 +7,7 @@ import type { Meta } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { normalizeQuranSearch, type QuranSearchResult } from '@/lib/quran-search'
 import QuranText from './QuranText'
-import { displayWordText } from '@/lib/word-parts'
+import { splitWord } from '@/lib/word-parts'
 
 interface Props {
   open: boolean
@@ -22,7 +22,20 @@ function snippet(result: QuranSearchResult) {
   while (result.positions.includes(last + 2)) last++
   const from = Math.max(0, first - 6)
   const to = Math.min(result.words.length, Math.max(from + 30, last + 7))
-  return <>{from > 0 && '… '}{result.words.slice(from, to).map((word, offset) => <span key={from + offset}><span className="rounded px-0.5" style={result.positions.includes(from + offset + 1) ? { background: 'var(--word-selected)', color: 'var(--ink)' } : undefined}><QuranText text={displayWordText({ t: word, wa: result.waw.includes(from + offset + 1) })} /></span>{' '}</span>)}{to < result.words.length && ' …'}</>
+  const tokens: { text: string; selected: boolean }[] = []
+  for (let i = from; i < to; i++) {
+    const { prefix, stem } = splitWord({ t: result.words[i], wa: result.waw.includes(i + 1) })
+    const mask = result.parts[i + 1] ?? 0
+    if (prefix) tokens.push({ text: prefix, selected: !!(mask & 1) })
+    tokens.push({ text: stem, selected: !!(mask & 2) })
+  }
+  const runs: { selected: boolean; words: string[] }[] = []
+  for (const token of tokens) {
+    const previous = runs.at(-1)
+    if (previous?.selected === token.selected) previous.words.push(token.text)
+    else runs.push({ selected: token.selected, words: [token.text] })
+  }
+  return <>{from > 0 && '… '}{runs.map((run, i) => <span key={i}><span data-search-match={run.selected ? 'true' : undefined} className={run.selected ? 'rounded px-0.5' : undefined} style={run.selected ? { background: 'var(--word-selected)', color: 'var(--ink)', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' } : undefined}><QuranText text={run.words.join(' ')} /></span>{i < runs.length - 1 ? ' ' : null}</span>)}{to < result.words.length && ' …'}</>
 }
 const labels = { exact: 'تطبیق دقیق', partial: 'شامل عبارت شما', near: 'نتایج نزدیک · با احتمال خطای تایپی' }
 
