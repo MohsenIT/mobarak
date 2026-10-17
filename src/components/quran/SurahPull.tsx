@@ -1,13 +1,17 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { loadSurah, type SurahData, type SurahMeta } from '@/lib/quran'
-import QuranText from './QuranText'
+import { memo, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { loadSurah, loadTrans, type SurahData, type SurahMeta, type Translations, type Translator } from '@/lib/quran'
+import FlowPage, { FlowSurface } from './FlowPage'
 
 const THRESHOLD = 160
+const ignoreWordTap = () => {}
+// Keep full adjacent pages mounted without rerendering their words on every touch move.
+const AdjacentFlowPage = memo(FlowPage)
 
 /** Edge-only, deliberate pull: releasing before the threshold always cancels. */
-export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, onNavigate, children }: {
+export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, onNavigate, children, fontSize, showTrans, translator }: {
+  fontSize: number; showTrans: boolean; translator: Translator
   surah: number; meta: SurahMeta[]; ready: boolean; enabled: boolean; arriveAtEnd: boolean
   onNavigate: (surah: number, atEnd: boolean) => void; children: ReactNode
 }) {
@@ -17,6 +21,7 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
   const [settling, setSettling] = useState(false)
   const [committing, setCommitting] = useState(false)
   const [neighbors, setNeighbors] = useState<Record<number, SurahData>>({})
+  const [translations, setTranslations] = useState<Record<number, Translations>>({})
   const landed = useRef(false)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const navigate = useRef(onNavigate)
@@ -50,6 +55,14 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
     }
     return () => { live = false; clearTimeout(timer.current) }
   }, [surah])
+  useEffect(() => {
+    if (!showTrans) return
+    let live = true
+    for (const n of [surah - 1, surah + 1].filter(n => n >= 1 && n <= 114)) {
+      loadTrans(n).then(data => { if (live) setTranslations(current => ({ ...current, [n]: data })) }).catch(() => {})
+    }
+    return () => { live = false }
+  }, [surah, showTrans])
   useEffect(() => {
     const element = scrollRef.current
     if (!element || !enabled || !ready) return
@@ -113,16 +126,20 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
     }
   }, [enabled, ready, surah])
   const target = surah + (previous ? -1 : 1)
-  const neighbor = neighbors[target]
-  const verse = previous ? neighbor?.v.at(-1) : neighbor?.v[0]
   const progress = Math.min(1, Math.abs(pull) / THRESHOLD)
   const offset = committing ? pull : Math.sign(pull) * Math.min(180, Math.abs(pull) * 0.65)
   return <div className="surah-pull-shell flex-1 min-h-0 relative overflow-hidden">
-    <div aria-hidden="true" className={`surah-pull-preview ${previous ? 'surah-pull-previous' : 'surah-pull-next'}`} style={{ opacity: progress, transition: settling ? 'opacity 240ms ease, transform 240ms ease' : 'none', transform: `translateY(${(previous ? -1 : 1) * (1 - progress) * 24}px)` }}>
-      <div className="text-sm font-bold mb-1">{meta[target - 1]?.ar}</div>
-      <div className="font-quran text-lg leading-9 line-clamp-2" dir="rtl"><QuranText text={verse?.w.map(w => w.t).join(' ') ?? ''} /></div>
-      <div className="text-xs mt-1">{progress >= 1 ? 'برای رفتن رها کنید' : previous ? 'برای سورهٔ قبل پایین بکشید' : 'برای سورهٔ بعد بالا بکشید'}</div>
-    </div>
+    {[surah - 1, surah + 1].filter(n => n >= 1 && n <= 114).map(n => {
+      const isPrevious = n < surah
+      const active = n === target
+      return <div key={n} data-preview-surah={n} aria-hidden="true" className={`surah-pull-preview ${isPrevious ? 'surah-pull-previous' : 'surah-pull-next'}`}
+        style={{ opacity: active ? progress : 0, transition: settling ? 'opacity 240ms ease, transform 240ms cubic-bezier(.22,.68,0,1)' : 'none', transform: `translateY(calc(${isPrevious ? '-100%' : '100%'} + ${active ? offset : 0}px))` }}>
+        <div className="surah-pull-preview-surface">
+          {neighbors[n] && <FlowSurface><AdjacentFlowPage sm={meta[n - 1]} surah={neighbors[n]} trans={translations[n] ?? null} showTrans={showTrans} translator={translator} fontSize={fontSize} selection={null} highlightRoot={null} flash={null} onWordTap={ignoreWordTap} /></FlowSurface>}
+        </div>
+        <div className="surah-pull-hint">{progress >= 1 ? 'برای رفتن رها کنید' : isPrevious ? 'برای سورهٔ قبل پایین بکشید' : 'برای سورهٔ بعد بالا بکشید'}</div>
+      </div>
+    })}
     <div ref={scrollRef} data-reading-scroll className="surah-pull-scroll h-full overflow-y-auto nice-scroll" style={{ overscrollBehaviorY: 'contain' }}>
       <div className="surah-pull-content min-h-full" data-pull-ready={progress >= 1 && !committing ? 'true' : 'false'} style={{ transform: `translate3d(0, ${offset}px, 0)`, transition: settling ? 'transform 240ms cubic-bezier(.22,.68,0,1)' : 'none' }}>{children}</div>
     </div>

@@ -25,7 +25,7 @@ export function useVisibleSelection(main: RefObject<HTMLElement | null>, target:
       const bottom = overlaps ? Math.min(bounds.bottom, panel.top - offset) : bounds.bottom
       if (bottom <= bounds.top + 40) { spacer.style.height = '0px'; return }
       spacer.style.height = `${Math.max(0, bounds.bottom - bottom) + 16}px`
-      const word = reader.querySelector<HTMLElement>(`[data-surah="${target.s}"][data-ayah="${target.a}"][data-pos="${target.pos}"]`)
+      const word = scroll.querySelector<HTMLElement>(`[data-surah="${target.s}"][data-ayah="${target.a}"][data-pos="${target.pos}"]`)
       if (!word) return
       const rect = word.getBoundingClientRect()
       const delta = rect.bottom > bottom - 16 ? rect.bottom - bottom + 16

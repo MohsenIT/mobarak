@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom'
 import type { Meta, SurahData, Translations } from '@/lib/quran'
 import { loadMeta, loadSurah, loadTrans, loadGlobalRoots, compareRootRange, toFa } from '@/lib/quran'
 import MushafPage, { type Selection } from '@/components/quran/MushafPage'
-import FlowPage from '@/components/quran/FlowPage'
+import FlowPage, { FlowSurface } from '@/components/quran/FlowPage'
 import SurahPull from '@/components/quran/SurahPull'
 import RootPanel from '@/components/quran/RootPanel'
 import { rootHue } from '@/lib/comparison-colors'
@@ -261,9 +261,10 @@ export default function Home() {
   }, [mode])
 
   useEffect(() => {
-    if (!searchTarget || loadingPage) return
+    if (!searchTarget || loadingPage || (mode === 'flow' && flowSurah?.n !== searchTarget.s)) return
     const main = mainRef.current
-    const word = main?.querySelector<HTMLElement>(`[data-surah="${searchTarget.s}"][data-ayah="${searchTarget.a}"][data-pos="${searchTarget.pos}"]`)
+    const reading = mode === 'flow' ? main?.querySelector('.surah-pull-content') : main
+    const word = reading?.querySelector<HTMLElement>(`[data-surah="${searchTarget.s}"][data-ayah="${searchTarget.a}"][data-pos="${searchTarget.pos}"]`)
     if (!main || !word) return
     const top = main.scrollTop + word.getBoundingClientRect().top - main.getBoundingClientRect().top - main.clientHeight * 0.35
     main.scrollTo({ top: Math.max(0, top), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
@@ -505,12 +506,12 @@ export default function Home() {
               </div>
             </div>
           ) : (
-            <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs}
+            <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs} fontSize={flowFont} showTrans={showTrans} translator={translator}
               ready={!loadingPage && flowSurah?.n === surah}
               enabled={!sel && !drawerOpen && !searchOpen && !showComparison && !showIndex}
               arriveAtEnd={pullArrival.current?.s === surah && pullArrival.current.end}
               onNavigate={(n, end) => { pullArrival.current = { s: n, end }; setFlash(null); setSel(null); setSurah(n) }}>
-              <div className="max-w-[720px] mx-auto px-4 py-4 pb-24">
+              <FlowSurface>
                 {loadingPage || !flowSurah ? (
                   <p className="text-sm animate-pulse text-center py-10" style={{ color: 'var(--ink-faint)' }}>…</p>
                 ) : (
@@ -530,7 +531,7 @@ export default function Home() {
                     onWordTap={tapWord}
                   />
                 )}
-              </div>
+              </FlowSurface>
             </SurahPull>
           )}
         </main>

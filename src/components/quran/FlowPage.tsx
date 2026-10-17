@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import type { Translator, SurahData, SurahMeta, Translations } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
@@ -25,6 +25,11 @@ interface Props {
   highlightRoot: string | null
   flash: { s: number; a: number; pos: number } | null
   onWordTap: (sel: Selection) => void
+}
+
+/** One reading surface for both the reader and adjacent-surah previews. */
+export function FlowSurface({ children }: { children: ReactNode }) {
+  return <div className="max-w-[720px] mx-auto px-4 py-4 pb-8">{children}</div>
 }
 
 /** Continuous, flowing surah view (متن پیوسته) */
