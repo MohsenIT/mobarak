@@ -9,6 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 source = ROOT / 'data/quranic-corpus-morphology-0.4.txt'
+waw_prefixes = set()
 forms = {}
 form_roots = {}
 BUCKWALTER = dict(zip("'|>&<}AbptvjHxd*rzs$SDTZEgfqklmnhwYy", 'ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهويي'))
@@ -18,6 +19,8 @@ for line in source.read_text().splitlines():
         continue
     location, text, tag, features = line.split('\t')
     s, a, w, segment = map(int, re.findall(r'\d+', location))
+    if segment == 1 and text in ('wa', 'w~a') and features.startswith('PREFIX|w:'):
+        waw_prefixes.add((s, a, w))
     word_counts[s, a] = max(word_counts.get((s, a), 0), w)
     match = re.search(r'(?:^|\|)\(([IVX]+)\)(?:\||$)', features)
     # Unmarked verbs are form I; do not infer forms for unmarked nouns.
@@ -43,6 +46,12 @@ for s in range(1, 115):
             raise ValueError(f'Word alignment mismatch at {s}:{a}')
         for w, word in enumerate(verse['w'], 1):
             key = s, a, w
+            if key in waw_prefixes:
+                if not re.match(r'^(?:۞\s*)?و[\u064b-\u065f\u0670\u06d6-\u06ed]*.', word['t']):
+                    raise ValueError(f'Waw alignment mismatch at {key}')
+                word['wa'] = True
+            else:
+                word.pop('wa', None)
             if key in forms:
                 if key in form_roots and word.get('r') != form_roots[key]:
                     raise ValueError(f'Root alignment mismatch at {key}')

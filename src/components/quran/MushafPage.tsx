@@ -3,7 +3,7 @@
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import type { Meta, SurahData, SurahMeta } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
-import QuranText from './QuranText'
+import SelectableWord from './SelectableWord'
 import { rootColorStyle } from '@/lib/comparison-colors'
 import { matchesAnalysis, type AnalysisSelection } from '@/lib/analysis'
 
@@ -13,12 +13,13 @@ export interface Selection {
   pos: number
   text: string
   root: string | null
+  part?: 'prefix' | 'stem'
 }
 
 type LineItem =
   | { kind: 'band'; sm: SurahMeta }
   | { kind: 'bism' }
-  | { kind: 'word'; s: number; a: number; pos: number; t: string; r: string | null; form?: string }
+  | { kind: 'word'; s: number; a: number; pos: number; t: string; r: string | null; form?: string; wa?: boolean }
   | { kind: 'marker'; n: number }
 
 interface Props {
@@ -62,7 +63,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
         let lastLn = vLines[vLines.length - 1]
         v.w.forEach((w, i) => {
           const ln = w.l ?? lastLn
-          push(ln, { kind: 'word', s: seg.s, a: v.n, pos: i + 1, t: w.t, r: w.r ?? null, form: w.form })
+          push(ln, { kind: 'word', s: seg.s, a: v.n, pos: i + 1, t: w.t, r: w.r ?? null, form: w.form, wa: w.wa })
           lastLn = ln
         })
         push(lastLn, { kind: 'marker', n: v.n })
@@ -157,23 +158,19 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
               }
               if (it.kind !== 'word') return null
               const isFlash = flash && flash.s === it.s && flash.a === it.a && flash.pos === it.pos
-              const isSelected = selection?.s === it.s && selection.a === it.a && selection.pos === it.pos
+              const activeSelection = analysisSelection?.tab === 'word' ? analysisSelection : selection
+              const isSelected = activeSelection?.s === it.s && activeSelection.a === it.a && activeSelection.pos === it.pos
               const isSameRoot = highlightRoot && it.r === highlightRoot
               const hue = comparisonRange?.s === it.s && it.r ? comparisonRoots?.[it.r] : undefined
               const isAnalysis = analysisSelection?.tab !== 'root' && matchesAnalysis(analysisSelection, it.s, it.a, it.pos, { t: it.t, l: null, r: it.r ?? undefined, form: it.form })
               return (
-                <span
+                <SelectableWord word={{ t: it.t, l: null, r: it.r ?? undefined, wa: it.wa }} location={{ s: it.s, a: it.a, pos: it.pos }} selection={activeSelection} onWordTap={onWordTap}
                   key={i}
                   style={hue !== undefined ? rootColorStyle(hue) : undefined}
                   data-comparison-root={hue !== undefined ? it.r : undefined}
                   data-comparison-range={comparisonRange?.s === it.s && it.a >= comparisonRange.from && it.a <= comparisonRange.to ? 'true' : undefined}
-                  data-surah={it.s} data-ayah={it.a} data-pos={it.pos}
                   className={`quran-word${hue !== undefined ? ` comparison-shared${mutedComparisonRoots?.has(it.r!) ? ' comparison-muted' : ''}${it.a >= comparisonRange!.from && it.a <= comparisonRange!.to ? ' comparison-inside' : ' comparison-outside'}` : ''}${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === it.s ? (it.a >= comparisonRange.from && it.a <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
-                    aria-current={isSelected ? 'true' : undefined}
-                  onClick={() => onWordTap({ s: it.s, a: it.a, pos: it.pos, text: it.t, root: it.r })}
-                >
-                  <QuranText text={it.t} />
-                </span>
+                />
               )
             })}
           </div>

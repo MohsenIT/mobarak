@@ -1,4 +1,5 @@
 'use client'
+import { wordTarget, type WordPart } from '@/lib/word-parts'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Translator, SurahData, Translations, Meta } from '@/lib/quran'
@@ -43,7 +44,7 @@ export default function RootPanel({
   sel: anchor, onSelectionChange, onCompareContext, meta, translator, maximized, onToggleMax, onOpenIndex, onClose, onJump, onJumpSurah,
   stackedOverIndex = false, comparisonRange,
 }: Props) {
-  const [tab, setTab] = useState<AnalysisTab>('root')
+  const [tab, setTab] = useState<AnalysisTab>(anchor.part === 'prefix' ? 'word' : 'root')
   const [tabDirection, setTabDirection] = useState<'next' | 'previous' | null>(null)
   const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
   const sel = targets[tab]
@@ -126,7 +127,7 @@ export default function RootPanel({
   }, [root, surah, globalRoots, sel.s])
 
   const verseTr = trans?.[String(sel.a)]?.[translator]
-  const selectedForm = surah?.n === sel.s ? surah.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form : undefined
+  const selectedForm = sel.part !== 'prefix' && surah?.n === sel.s ? surah.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form : undefined
 
   const selectedContext = getContext(sel.s, sel.a)
 
@@ -134,12 +135,12 @@ export default function RootPanel({
     onSelectionChange({ ...sel, tab, form: selectedForm, from: selectedContext?.from, to: selectedContext?.to })
   }, [sel, tab, selectedForm, selectedContext, onSelectionChange])
 
-  const selectTarget = (a: number, pos: number) => {
+  const selectTarget = (a: number, pos: number, part?: WordPart) => {
     if (!surah) return
     const verse = surah.v.find(v => v.n === a)
     const word = verse?.w[pos - 1]
     if (!word || !verse) return
-    const target = { s: sel.s, a, pos, text: word.t, root: word.r ?? null }
+    const target = { s: sel.s, a, pos, ...wordTarget(word, part ?? (tab === 'word' ? sel.part : undefined)) }
     setTargets(current => ({ ...current, [tab]: target, ...(tab === 'root' ? { form: target } : {}) }))
     onJump(sel.s, a, pos, verse.p)
   }

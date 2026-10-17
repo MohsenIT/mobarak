@@ -1,4 +1,5 @@
 'use client'
+import { wordTarget } from '@/lib/word-parts'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -234,7 +235,7 @@ export default function Home() {
     }
     setFlash(null)
     setComparisonRoot(null)
-    setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos ? null : word)
+    setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos && (current.part ?? 'stem') === (word.part ?? 'stem') ? null : word)
   }, [comparisonRange, comparisonRoots, soloComparisonRoot, showComparison, showIndex])
 
   const goSurah = useCallback((n: number) => {
@@ -280,7 +281,7 @@ export default function Home() {
       const [a, pos] = occ[0]
       const w = d.v[a - 1]?.w[pos - 1]
       if (!w) return
-      setSel({ s: surahN, a, pos, text: w.t, root })
+      setSel({ s: surahN, a, pos, ...wordTarget(w), root })
       if (mode === 'mushaf') setPage(d.v[a - 1].p)
       else setSurah(surahN)
       setFlash({ s: surahN, a, pos })
@@ -299,7 +300,7 @@ export default function Home() {
       const [a, pos] = occ[0]
       const w = d.v[a - 1]?.w[pos - 1]
       if (!w) return
-      setSel({ s: targetSurah, a, pos, text: w.t, root })
+      setSel({ s: targetSurah, a, pos, ...wordTarget(w), root })
       // deliberately NOT calling setShowIndex(false) — index stays open
       setFlash({ s: targetSurah, a, pos })
     })
@@ -529,7 +530,7 @@ export default function Home() {
         {sel && (showIndex || showComparison
           ? createPortal(
               <RootPanel
-            key={`${sel.s}:${sel.a}:${sel.pos}`}
+            key={`${sel.s}:${sel.a}:${sel.pos}:${sel.part ?? 'stem'}`}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}
@@ -548,7 +549,7 @@ export default function Home() {
           />, document.body)
           : (
               <RootPanel
-            key={`${sel.s}:${sel.a}:${sel.pos}`}
+            key={`${sel.s}:${sel.a}:${sel.pos}:${sel.part ?? 'stem'}`}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}

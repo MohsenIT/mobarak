@@ -1,5 +1,6 @@
-"""Build exact-written-word and morphology statistics from bundled surahs."""
+"""Build lexical-part and morphology statistics from bundled surahs."""
 import json
+import re
 from pathlib import Path
 from collections import defaultdict
 root = Path(__file__).resolve().parents[1]
@@ -10,7 +11,10 @@ for n in range(1, 115):
     data = json.loads((root / f'public/data/surah/{n}.json').read_text())
     for verse in data['v']:
         for word in verse['w']:
-            words[word['t']][str(n)] = words[word['t']].get(str(n), 0) + 1
+            prefix = re.match(r'^(?:۞\s*)?و[\u064b-\u065f\u0670\u06d6-\u06ed]*', word['t'])[0] if word.get('wa') else ''
+            for text in ([prefix, word['t'][len(prefix):]] if prefix else [word['t']]):
+                key = re.sub(r'[\u064b-\u065f\u0670\u06d6-\u06edـ۞\s]', '', text).translate(str.maketrans('یىکٱ', 'ييكا'))
+                words[key][str(n)] = words[key].get(str(n), 0) + 1
             if word.get('form'):
                 form = word['form']
                 forms[form][str(n)] = forms[form].get(str(n), 0) + 1
@@ -18,4 +22,4 @@ for n in range(1, 115):
                     key = f"{word['r']}:{form}"
                     root_forms[key][str(n)] = root_forms[key].get(str(n), 0) + 1
 (root / 'public/data/analysis-index.json').write_text(json.dumps({'words': words, 'forms': forms, 'rootForms': root_forms}, ensure_ascii=False, separators=(',', ':')) + '\n')
-print(f'Indexed {len(words)} exact words and {len(forms)} annotated forms.')
+print(f'Indexed {len(words)} lexical parts and {len(forms)} annotated forms.')

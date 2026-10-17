@@ -5,6 +5,7 @@ import type { Translator, SurahData, Translations } from '@/lib/quran'
 import { morphologyLabel, formName, toFa } from '@/lib/quran'
 import { analysisOccurrences, type AnalysisSelection, type AnalysisTab } from '@/lib/analysis'
 import QuranText from './QuranText'
+import { splitWord, wordKey } from '@/lib/word-parts'
 import SourceReference from './SourceReference'
 
 type Index = { words: Record<string, Record<string, number>>; forms: Record<string, Record<string, number>>; rootForms: Record<string, Record<string, number>> }
@@ -39,7 +40,7 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
     return [...result.entries()]
   }, [occurrences])
   const verse = surah.v.find(v => v.n === selection.a)
-  const distribution = tab === 'word' ? index?.words[selection.text] : selection.form ? index?.rootForms[`${selection.root}:${selection.form}`] : undefined
+  const distribution = tab === 'word' ? index?.words[wordKey(selection.text)] : selection.form ? index?.rootForms[`${selection.root}:${selection.form}`] : undefined
   const total = distribution ? Object.values(distribution).reduce((a, b) => a + b, 0) : null
   const distinctRoots = new Set(occurrences.map(([a, pos]) => surah.v[a - 1].w[pos - 1].r).filter(Boolean)).size
 
@@ -60,7 +61,7 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
           }} /></div>
         </div>
       )}
-      {tab === 'word' && <p className="text-xs leading-6 mb-3">انتخاب این تب فقط همین واژه است. آمار و فهرست زیر برای تکرارهای دقیق همین صورت نوشتاری است.</p>}
+      {tab === 'word' && <p className="text-xs leading-6 mb-3">انتخاب این تب فقط همین واژه است. آمار و فهرست زیر برای تکرارهای همین واژه، با جدا کردن «و» پیوندی است.</p>}
       {tab === 'verse' ? (
         <div className="flex gap-2 mb-4">
           <div className="stat"><b>{toFa(verse?.w.length ?? 0)}</b><span>واژه در آیه</span></div>
@@ -86,7 +87,11 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
               <button className="w-full text-right" onClick={() => onPick(a, positions[0])} aria-label={`رفتن به آیه ${toFa(a)}`}>
                 <span className="chip mb-2">آیه {toFa(a)} · {tab === 'verse' ? 'همهٔ واژه‌ها' : `${toFa(positions.length)} کاربرد`}</span>
                 <p className="font-quran text-justify" dir="rtl" style={{ fontSize: 20, lineHeight: 2 }}>
-                  {v.w.map((w, i) => <span key={i}><span className={positions.includes(i + 1) ? `hl${comparisonRange?.s === surah.n ? (inRange ? ' range-inside' : ' range-outside') : ''}` : ''}><QuranText text={w.t} /></span>{' '}</span>)}
+                  {v.w.map((w, i) => {
+                    const { prefix, stem } = splitWord(w)
+                    const highlight = positions.includes(i + 1) ? `hl${comparisonRange?.s === surah.n ? (inRange ? ' range-inside' : ' range-outside') : ''}` : ''
+                    return <span key={i}>{prefix && <><span className={tab !== 'word' || selection.part === 'prefix' ? highlight : ''}><QuranText text={prefix} /></span>{' '}</>}<span className={tab === 'word' && selection.part === 'prefix' ? '' : highlight}><QuranText text={stem} /></span>{' '}</span>
+                  })}
                 </p>
               </button>
               {trans[String(a)]?.[translator] && <p className="text-sm leading-7 mt-2 pt-2 border-t text-justify" style={{ borderColor: 'var(--line)', color: 'var(--ink-soft)' }}>{trans[String(a)][translator]}</p>}

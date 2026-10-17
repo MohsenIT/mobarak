@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import type { Translator, SurahData, SurahMeta, Translations } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
-import QuranText from './QuranText'
+import SelectableWord from './SelectableWord'
 import { rootColorStyle } from '@/lib/comparison-colors'
 import FlowTranslations from './FlowTranslations'
 import { matchesAnalysis, type AnalysisSelection } from '@/lib/analysis'
@@ -54,21 +54,17 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
             {v.w.map((w, i) => {
               const hue = comparisonRange?.s === surah.n && w.r ? comparisonRoots?.[w.r] : undefined
               const isFlash = flash && flash.s === surah.n && flash.a === v.n && flash.pos === i + 1
-              const isSelected = selection?.s === surah.n && selection.a === v.n && selection.pos === i + 1
+              const activeSelection = analysisSelection?.tab === 'word' ? analysisSelection : selection
+              const isSelected = activeSelection?.s === surah.n && activeSelection.a === v.n && activeSelection.pos === i + 1
               const isSameRoot = highlightRoot && w.r === highlightRoot
               const isAnalysis = analysisSelection?.tab !== 'root' && matchesAnalysis(analysisSelection, surah.n, v.n, i + 1, w)
               return (
                 <span key={i}>
-                  <span
+                  <SelectableWord word={w} location={{ s: surah.n, a: v.n, pos: i + 1 }} selection={activeSelection} onWordTap={onWordTap}
                     style={hue !== undefined ? rootColorStyle(hue) : undefined}
                     data-comparison-root={hue !== undefined ? w.r : undefined}
-                    data-surah={surah.n}
-                    data-ayah={v.n}
-                    data-pos={i + 1}
                     className={`quran-word${hue !== undefined ? ` comparison-shared${mutedComparisonRoots?.has(w.r!) ? ' comparison-muted' : ''}${v.n >= comparisonRange!.from && v.n <= comparisonRange!.to ? ' comparison-inside' : ' comparison-outside'}` : ''}${isFlash ? ' flash' : ''}${isSameRoot ? ' same-root' : ''}${isSameRoot && comparisonRange?.s === surah.n ? (v.n >= comparisonRange.from && v.n <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}${isAnalysis ? ' analysis-selected' : ''}${isSelected && (!analysisSelection || analysisSelection.tab === 'root' || analysisSelection.tab === 'word') ? ' selected-word' : ''}`}
-                    aria-current={isSelected ? 'true' : undefined}
-                    onClick={() => onWordTap({ s: surah.n, a: v.n, pos: i + 1, text: w.t, root: w.r ?? null })}
-                  ><QuranText text={w.t} /></span>{' '}
+                  />{' '}
                 </span>
               )
             })}

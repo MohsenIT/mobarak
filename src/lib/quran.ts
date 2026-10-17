@@ -2,6 +2,7 @@ import formNames from '../../public/data/form-names.json'
 // Data layer: lazy-loading + caching for quran datasets
 
 export interface Word {
+  wa?: boolean // independent initial waw prefix, identified by the morphology corpus
   t: string // uthmani text
   l: number | null // mushaf line number
   r?: string // arabic root (if any)

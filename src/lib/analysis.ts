@@ -1,8 +1,10 @@
+import { splitWord, wordKey, type WordPart } from './word-parts'
 import type { SurahData, Word } from './quran'
 import { nextContext } from './contexts'
 
 export type AnalysisTab = 'root' | 'form' | 'word' | 'verse' | 'context'
 export interface AnalysisSelection {
+  part?: WordPart
   tab: AnalysisTab
   s: number
   a: number
@@ -28,19 +30,28 @@ export function matchesAnalysis(selection: AnalysisSelection | null | undefined,
 export function analysisOccurrences(surah: SurahData, selection: AnalysisSelection): [number, number][] {
   const occurrences: [number, number][] = []
   for (const verse of surah.v) for (const [i, word] of verse.w.entries()) {
-    // Word statistics and its occurrence list count exact written words;
+    // Word statistics match lexical parts after removing corpus-tagged waw;
     // the actual selection remains a single word at a single location.
-    const match = selection.tab === 'word' ? word.t === selection.text : matchesAnalysis(selection, surah.n, verse.n, i + 1, word)
+    const match = selection.tab === 'word' ? (selection.part === 'prefix' ? !!splitWord(word).prefix : wordKey(splitWord(word).stem) === wordKey(selection.text)) : matchesAnalysis(selection, surah.n, verse.n, i + 1, word)
     if (match) occurrences.push([verse.n, i + 1])
   }
   return occurrences
 }
 
 /** Each tab navigates its own unit, preserving the other tabs' targets. */
-export function nextAnalysisLocation(surah: SurahData, selection: AnalysisSelection, direction: number): [number, number] | null {
+export function nextAnalysisLocation(surah: SurahData, selection: AnalysisSelection, direction: number): [number, number, WordPart?] | null {
   if (selection.tab === 'context') {
     const next = nextContext(selection.s, selection.a, direction)
     return next ? [next.from, 1] : null
+  }
+  if (selection.tab === 'word') {
+    const locations: [number, number, WordPart?][] = []
+    for (const verse of surah.v) for (const [i, word] of verse.w.entries()) {
+      if (splitWord(word).prefix) locations.push([verse.n, i + 1, 'prefix'])
+      locations.push(splitWord(word).prefix ? [verse.n, i + 1, 'stem'] : [verse.n, i + 1])
+    }
+    const current = locations.findIndex(([a, pos, part]) => a === selection.a && pos === selection.pos && (part ?? 'stem') === (selection.part ?? 'stem'))
+    return locations[(current + direction + locations.length) % locations.length] ?? null
   }
   if (selection.tab === 'verse') return [Math.max(1, Math.min(surah.vc, selection.a + direction)), 1]
   const units: { key: string; location: [number, number] }[] = []
