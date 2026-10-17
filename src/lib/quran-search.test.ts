@@ -72,3 +72,15 @@ test('search snippets detach corpus-tagged waw without changing canonical positi
   expect(displayWordText({ t: 'وَعَدَ' })).toBe('وَعَدَ')
 
 })
+
+test('a phrase starting after independent waw is exact, including omitted spaces', () => {
+  for (const query of ['لا تخف', 'لاتخف', 'ولا تخف', 'و لا تخف']) {
+    const result = search(query, 20).find(result => result.a === 21)!
+    expect(result.kind).toBe('exact')
+    expect(result.score).toBe(0)
+  }
+  const local = createQuranSearch([[1, 1, ['لَا', 'تَخَفْ', 'وَلَا', 'تَخَفْ', 'وَعَدَ']]], { '1:1': [3] })
+  expect(local('لا تخف')[0].positions).toEqual([1, 2, 3, 4])
+  expect(local('عد')[0].kind).toBe('partial') // lexical waw is not a word boundary
+  expect(local('عد')[0].score).toBeGreaterThan(0)
+})

@@ -30,7 +30,7 @@ export function typoDistance(a: string, b: string, max: number): number {
 
 export type SearchVerse = [s: number, a: number, words: string[]]
 export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; positions: number[]; kind: 'exact' | 'partial' | 'near'; score: number }
-type IndexedVerse = { verse: SearchVerse; keys: string[][]; compact: { text: string; ranges: [number, number][] }[] }
+type IndexedVerse = { verse: SearchVerse; keys: string[][]; compact: { text: string; ranges: [number, number][]; boundaries: Set<number> }[] }
 
 export function createQuranSearch(verses: SearchVerse[], waw: Record<string, number[]> = {}) {
   const vocabulary = new Set<string>()
@@ -38,9 +38,19 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
     const keys = verse[2].map(word => [...new Set([normalizeQuranSearch(word), normalizeQuranSearch(word, true)])].filter(Boolean))
     keys.flat().forEach(key => vocabulary.add(key))
     const compact = [0, 1].map(variant => {
-      let text = ''; const ranges: [number, number][] = []
-      keys.forEach(options => { const key = options[variant] ?? options[0] ?? ''; ranges.push([text.length, text.length + key.length]); text += key })
-      return { text, ranges }
+      let text = ''; const ranges: [number, number][] = []; const boundaries = new Set<number>()
+      const prefixed = new Set(waw[`${verse[0]}:${verse[1]}`] ?? [])
+      keys.forEach((options, i) => {
+        const key = options[variant] ?? options[0] ?? ''
+        const from = text.length
+        ranges.push([from, from + key.length])
+        boundaries.add(from); boundaries.add(from + key.length)
+        // A corpus-tagged waw and its stem are independent lexical units.
+        // Keep canonical positions for result navigation and highlighting.
+        if (prefixed.has(i + 1) && key.startsWith('و')) boundaries.add(from + 1)
+        text += key
+      })
+      return { text, ranges, boundaries }
     })
     return { verse, keys, compact }
   })
@@ -77,11 +87,11 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
         }
       }
       // Ignore accidental spaces inside words, and also accept incomplete words.
-      if (score > 0) for (const item of compact) {
+      for (const item of compact) {
         for (let start = item.text.indexOf(compactQuery); start >= 0; start = item.text.indexOf(compactQuery, start + 1)) {
           const end = start + compactQuery.length
           const matched = item.ranges.flatMap(([from, to], i) => from < end && to > start ? [i + 1] : [])
-          const whole = item.ranges.some(([from]) => from === start) && item.ranges.some(([, to]) => to === end)
+          const whole = item.boundaries.has(start) && item.boundaries.has(end)
           const value = whole ? 0 : 0.5
           if (value <= score) {
             positions = value === score ? [...new Set([...positions, ...matched])] : matched
