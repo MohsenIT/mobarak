@@ -6,8 +6,8 @@ self.addEventListener('message', async (event: MessageEvent<{ id: number; query:
   try {
     search ??= fetch(new URL('/data/quran-search.json', self.location.origin)).then(async response => {
       if (!response.ok) throw new Error('corpus')
-      const corpus: { verses: SearchVerse[] } = await response.json()
-      return createQuranSearch(corpus.verses)
+      const corpus: { verses: SearchVerse[]; waw?: Record<string, number[]> } = await response.json()
+      return createQuranSearch(corpus.verses, corpus.waw)
     }).catch(error => { search = undefined; throw error })
     self.postMessage({ id, results: (await search)(query, surah) })
   } catch { self.postMessage({ id, error: true }) }

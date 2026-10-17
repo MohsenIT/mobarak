@@ -7,6 +7,7 @@ import type { Meta } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { normalizeQuranSearch, type QuranSearchResult } from '@/lib/quran-search'
 import QuranText from './QuranText'
+import { displayWordText } from '@/lib/word-parts'
 
 interface Props {
   open: boolean
@@ -21,7 +22,7 @@ function snippet(result: QuranSearchResult) {
   while (result.positions.includes(last + 2)) last++
   const from = Math.max(0, first - 6)
   const to = Math.min(result.words.length, Math.max(from + 30, last + 7))
-  return <>{from > 0 && '… '}{result.words.slice(from, to).map((word, offset) => <span key={from + offset}><span className="rounded px-0.5" style={result.positions.includes(from + offset + 1) ? { background: 'var(--word-selected)', color: 'var(--ink)' } : undefined}><QuranText text={word} /></span>{' '}</span>)}{to < result.words.length && ' …'}</>
+  return <>{from > 0 && '… '}{result.words.slice(from, to).map((word, offset) => <span key={from + offset}><span className="rounded px-0.5" style={result.positions.includes(from + offset + 1) ? { background: 'var(--word-selected)', color: 'var(--ink)' } : undefined}><QuranText text={displayWordText({ t: word, wa: result.waw.includes(from + offset + 1) })} /></span>{' '}</span>)}{to < result.words.length && ' …'}</>
 }
 const labels = { exact: 'تطبیق دقیق', partial: 'شامل عبارت شما', near: 'نتایج نزدیک · با احتمال خطای تایپی' }
 

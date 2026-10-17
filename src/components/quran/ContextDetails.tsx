@@ -5,6 +5,7 @@ import type { Translator, SurahData, Translations } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { contextSource, getContext, getSurahContexts } from '@/lib/contexts'
 import QuranText from './QuranText'
+import { displayWordText } from '@/lib/word-parts'
 import SourceReference from './SourceReference'
 
 interface Props {
@@ -51,7 +52,7 @@ export default function ContextDetails({ selection, surah, trans, translator, on
           <div className="flex flex-col gap-3">
             {verses.map(verse => <article key={verse.n} className="rounded-xl border p-3" style={{ borderColor: 'var(--line)' }}>
               <button className="chip mb-2" onClick={() => onPick(verse.n, 1)}>رفتن به آیه {toFa(verse.n)}</button>
-              <p className="font-quran text-justify" dir="rtl" style={{ fontSize: 20, lineHeight: 2 }}>{verse.w.map((w, i) => <span key={i}><QuranText text={w.t} />{' '}</span>)}</p>
+              <p className="font-quran text-justify" dir="rtl" style={{ fontSize: 20, lineHeight: 2 }}>{verse.w.map((w, i) => <span key={i}><QuranText text={displayWordText(w)} />{' '}</span>)}</p>
               {trans[String(verse.n)]?.[translator] && <p className="text-sm leading-7 text-justify mt-2 pt-2 border-t" style={{ borderColor: 'var(--line)', color: 'var(--ink-soft)' }}>{trans[String(verse.n)][translator]}</p>}
             </article>)}
           </div>

@@ -11,6 +11,7 @@ import ContextDetails from './ContextDetails'
 import RootMeaning from './RootMeaning'
 import { getContext } from '@/lib/contexts'
 import QuranText from './QuranText'
+import { displayWordText } from '@/lib/word-parts'
 import { IconClose, IconMaximize, IconRestore, IconRoot, IconSortIndex } from './Ornaments'
 
 interface Props {
@@ -372,7 +373,7 @@ export default function RootPanel({
                             {verse.w.map((w, i) => (
                               <span key={i}>
                                 <span className={poses.includes(i + 1) ? `hl${comparisonRange?.s === sel.s ? (ayah >= comparisonRange.from && ayah <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}` : ''}>
-                                  <QuranText text={w.t} />
+                                  <QuranText text={displayWordText(w)} />
                                 </span>{' '}
                               </span>
                             ))}

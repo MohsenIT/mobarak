@@ -13,3 +13,9 @@ export function wordTarget(word: Word, part?: WordPart) {
     ? { text: prefix, root: null, part: 'prefix' as const }
     : { text: stem, root: word.r ?? null, part: 'stem' as const }
 }
+
+/** Spacing for read-only verse excerpts, with the same corpus-backed split as the reader. */
+export function displayWordText(word: Pick<Word, 't' | 'wa'>): string {
+  const { prefix, stem } = splitWord(word)
+  return prefix ? `${prefix} ${stem}` : stem
+}

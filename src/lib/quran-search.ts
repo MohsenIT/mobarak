@@ -29,10 +29,10 @@ export function typoDistance(a: string, b: string, max: number): number {
 }
 
 export type SearchVerse = [s: number, a: number, words: string[]]
-export type QuranSearchResult = { s: number; a: number; words: string[]; positions: number[]; kind: 'exact' | 'partial' | 'near'; score: number }
+export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; positions: number[]; kind: 'exact' | 'partial' | 'near'; score: number }
 type IndexedVerse = { verse: SearchVerse; keys: string[][]; compact: { text: string; ranges: [number, number][] }[] }
 
-export function createQuranSearch(verses: SearchVerse[]) {
+export function createQuranSearch(verses: SearchVerse[], waw: Record<string, number[]> = {}) {
   const vocabulary = new Set<string>()
   const indexed: IndexedVerse[] = verses.map(verse => {
     const keys = verse[2].map(word => [...new Set([normalizeQuranSearch(word), normalizeQuranSearch(word, true)])].filter(Boolean))
@@ -89,7 +89,7 @@ export function createQuranSearch(verses: SearchVerse[]) {
           }
         }
       }
-      if (Number.isFinite(score)) results.push({ s, a, words, positions: positions.sort((a, b) => a - b), kind, score })
+      if (Number.isFinite(score)) results.push({ s, a, words, waw: waw[`${s}:${a}`] ?? [], positions: positions.sort((a, b) => a - b), kind, score })
     }
     return results.sort((a, b) => a.score - b.score || a.s - b.s || a.a - b.a)
   }

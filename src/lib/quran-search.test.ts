@@ -1,8 +1,9 @@
 import { expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import corpus from '../../public/data/quran-search.json'
+import { displayWordText } from './word-parts'
 import { createQuranSearch, normalizeQuranSearch, typoDistance, type SearchVerse } from './quran-search'
-const search = createQuranSearch(corpus.verses as SearchVerse[])
+const search = createQuranSearch(corpus.verses as SearchVerse[], corpus.waw)
 
 test('search keys normalize Persian/Arabic forms, marks, wasla and presentation forms', () => {
   expect(normalizeQuranSearch('إِيَّاكَ کَریم يى')).toBe(normalizeQuranSearch('ایاک کریم یی'))
@@ -45,13 +46,29 @@ test('verse count and optional scope are correct; noise and short queries do not
 
 test('search corpus preserves every canonical verse and word', () => {
   const canonical: SearchVerse[] = []
+  const waw: Record<string, number[]> = {}
   for (let s = 1; s <= 114; s++) {
     const data = JSON.parse(readFileSync(new URL(`../../public/data/surah/${s}.json`, import.meta.url), 'utf8'))
-    for (const verse of data.v) canonical.push([s, verse.n, verse.w.map((word: { t: string }) => word.t)])
+    for (const verse of data.v) {
+      canonical.push([s, verse.n, verse.w.map((word: { t: string }) => word.t)])
+      const positions = verse.w.flatMap((word: { wa?: boolean }, i: number) => word.wa ? [i + 1] : [])
+      if (positions.length) waw[`${s}:${verse.n}`] = positions
+    }
   }
   expect(corpus.verses).toEqual(canonical)
+  expect(corpus.waw).toEqual(waw)
 })
 test('long phrases are matched in full rather than silently truncated', () => {
   const local = createQuranSearch([[1, 1, [...Array(25).fill('قال'), 'الله']]])
   expect(local([...Array(25).fill('قال'), 'الرحيم'].join(' '))).toEqual([])
+})
+
+test('search snippets detach corpus-tagged waw without changing canonical positions or lexical waw', () => {
+  const result = search('لا تخف', 20).find(result => result.a === 21)!
+  expect(result).toBeDefined()
+  const pos = result.words.findIndex(word => normalizeQuranSearch(word) === 'ولا') + 1
+  expect(result.waw).toContain(pos)
+  expect(normalizeQuranSearch(displayWordText({ t: result.words[pos - 1], wa: result.waw.includes(pos) }))).toBe('و لا')
+  expect(displayWordText({ t: 'وَعَدَ' })).toBe('وَعَدَ')
+
 })
