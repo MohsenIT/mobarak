@@ -14,7 +14,8 @@ import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { GitCompareArrows } from 'lucide-react'
+import { GitCompareArrows, Search } from 'lucide-react'
+import QuranSearch from '@/components/quran/QuranSearch'
 import {
   PatternBG, IconMenu, IconStar,
   IconTranslate, IconSortIndex, Bismillah,
@@ -56,6 +57,8 @@ export default function Home() {
   const [scale, setScale] = useState(() => LS.get('mushaf.scale', 1))
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number } | null>(null)
   const [sel, setSel] = useState<Selection | null>(null)
   const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
   const [flash, setFlash] = useState<{ s: number; a: number; pos: number } | null>(null)
@@ -252,6 +255,16 @@ export default function Home() {
     })
   }, [mode])
 
+  useEffect(() => {
+    if (!searchTarget || loadingPage) return
+    const main = mainRef.current
+    const word = main?.querySelector<HTMLElement>(`[data-surah="${searchTarget.s}"][data-ayah="${searchTarget.a}"][data-pos="${searchTarget.pos}"]`)
+    if (!main || !word) return
+    const top = main.scrollTop + word.getBoundingClientRect().top - main.getBoundingClientRect().top - main.clientHeight * 0.35
+    main.scrollTo({ top: Math.max(0, top), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+    setSearchTarget(null)
+  }, [searchTarget, loadingPage, mode, page, surah, flowSurah?.n, pageData])
+
   // panel jump: keep panel open, highlight target
   const panelJump = useCallback((s: number, a: number, pos: number, p: number) => {
     if (mode === 'mushaf') setPage(p)
@@ -295,7 +308,7 @@ export default function Home() {
   // The sheet handles its active tab's keyboard navigation.
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if (drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select'))) return
+      if (searchOpen || drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select'))) return
       if (sel) return
       // No sheet is open: navigate pages/surahs.
       if (e.key === 'ArrowLeft') mode === 'mushaf' ? goPage(page + 1) : goSurah(surah + 1)
@@ -303,7 +316,7 @@ export default function Home() {
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel])
+  }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel, searchOpen])
 
   // touch: pinch-zoom + swipe
   const touchDist = (t: React.TouchList) =>
@@ -380,6 +393,10 @@ export default function Home() {
     <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 
+      <QuranSearch open={searchOpen} onOpenChange={setSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
+        setSearchOpen(false); setSel(null); setComparisonRoot(null); setSearchTarget({ s, a, pos }); goVerse(s, a, pos)
+      }} />
+
       {/* ===== Top bar =====
           Removed the prev/next-surah chevrons (< >) — user said the
           constant-surah-jumping UX was weird. Surah switching now happens
@@ -401,6 +418,8 @@ export default function Home() {
               : `سوره ${toFa(surah)} از ${toFa(114)} · ${toFa(meta.surahs[surah - 1]?.vc ?? 0)} آیه · متن پیوسته`}
           </p>
         </button>
+
+        <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setSel(null); setSearchOpen(true) }}><Search size={20} /></button>
 
         {/* surah keyword index — opens the sorted-keywords page */}
         <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
