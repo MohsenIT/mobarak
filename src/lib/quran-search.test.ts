@@ -56,7 +56,7 @@ test('search corpus preserves every canonical verse and word', () => {
     }
   }
   expect(corpus.verses).toEqual(canonical)
-  expect(corpus.waw).toEqual(waw)
+  expect(corpus.waw as Record<string, number[]>).toEqual(waw)
 })
 test('long phrases are matched in full rather than silently truncated', () => {
   const local = createQuranSearch([[1, 1, [...Array(25).fill('قال'), 'الله']]])

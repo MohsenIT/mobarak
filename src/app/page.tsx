@@ -170,17 +170,17 @@ export default function Home() {
 
   // flow mode: load current surah (+ translation)
   useEffect(() => {
-    if (mode !== 'flow') return
+    if (mode !== 'flow' || flowSurah?.n === surah) return
     let live = true
     setLoadingPage(true)
-    loadSurah(surah).then(d => {
+    Promise.all([loadSurah(surah), loadTrans(surah)]).then(([d, translations]) => {
       if (!live) return
       setFlowSurah(d)
+      setFlowTrans(translations)
       setLoadingPage(false)
       const pg = d.v[0]?.p
       if (pg) setPage(pg)
     })
-    loadTrans(surah).then(t => live && setFlowTrans(t))
     return () => { live = false }
   }, [mode, surah])
 
@@ -510,9 +510,15 @@ export default function Home() {
               ready={!loadingPage && flowSurah?.n === surah}
               enabled={!sel && !drawerOpen && !searchOpen && !showComparison && !showIndex}
               arriveAtEnd={pullArrival.current?.s === surah && pullArrival.current.end}
-              onNavigate={(n, end) => { pullArrival.current = { s: n, end }; setFlash(null); setSel(null); setSurah(n) }}>
+              onNavigate={async (n, end) => {
+                // Keep the completed preview visible until all destination data is ready.
+                const [data, translations] = await Promise.all([loadSurah(n), loadTrans(n), document.fonts.ready])
+                pullArrival.current = { s: n, end }
+                setFlowSurah(data); setFlowTrans(translations); setLoadingPage(false)
+                setPage(data.v[0].p); setFlash(null); setSel(null); setSurah(n)
+              }}>
               <FlowSurface>
-                {loadingPage || !flowSurah ? (
+                {loadingPage || !flowSurah || flowSurah.n !== surah ? (
                   <p className="text-sm animate-pulse text-center py-10" style={{ color: 'var(--ink-faint)' }}>…</p>
                 ) : (
                   <FlowPage

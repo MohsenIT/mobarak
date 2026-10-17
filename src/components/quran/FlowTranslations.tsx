@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type RefObject } from 'react'
+import { useLayoutEffect, useRef, useState, type RefObject } from 'react'
 import type { SurahData, Translations, Translator } from '@/lib/quran'
 
 type Fragment = { verse: number; text: string; left: number; top: number; width: number; fontSize: number }
@@ -9,9 +9,11 @@ type Fragment = { verse: number; text: string; left: number; top: number; width:
 export default function FlowTranslations({ container, surah, trans, translator, fontSize }: {
   container: RefObject<HTMLDivElement | null>; surah: SurahData; trans: Translations | null; translator: Translator; fontSize: number
 }) {
+  const anchor = useRef<HTMLSpanElement>(null)
   const [fragments, setFragments] = useState<Fragment[]>([])
-  useEffect(() => {
-    const root = container.current
+  useLayoutEffect(() => {
+    // The host ref may attach after this child layout effect on first mount.
+    const root = container.current ?? anchor.current?.parentElement
     if (!root) return
     let live = true
     let frame = 0
@@ -48,16 +50,17 @@ export default function FlowTranslations({ container, surah, trans, translator, 
       }
       root.style.paddingBottom = '20px'
       const height = `${Math.ceil(fontSize * 2.05 + 20)}px`
-      if (root.style.lineHeight !== height) { root.style.lineHeight = height; frame = requestAnimationFrame(measure); return }
+      if (root.style.lineHeight !== height) { root.style.lineHeight = height; measure(); return }
       setFragments(next)
     }
     const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(measure) }
     const observer = new ResizeObserver(schedule)
     observer.observe(root)
     document.fonts.ready.then(() => { if (live) schedule() })
-    schedule()
+    // Finalize line spacing before the parent positions the new surah.
+    measure()
     return () => { live = false; observer.disconnect(); cancelAnimationFrame(frame); root.style.lineHeight = '2.05'; root.style.paddingBottom = '' }
   }, [container, surah, trans, translator, fontSize])
-  return <>{fragments.map((f, i) => <span key={i} className="verse-translation" data-translation-verse={f.verse}
+  return <><span ref={anchor} hidden aria-hidden="true" />{fragments.map((f, i) => <span key={i} className="verse-translation" data-translation-verse={f.verse}
     style={{ left: f.left, top: f.top, width: f.width, fontSize: f.fontSize }}>{f.text}</span>)}</>
 }

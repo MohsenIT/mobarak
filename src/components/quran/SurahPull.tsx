@@ -13,7 +13,7 @@ const AdjacentFlowPage = memo(FlowPage)
 export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, onNavigate, children, fontSize, showTrans, translator }: {
   fontSize: number; showTrans: boolean; translator: Translator
   surah: number; meta: SurahMeta[]; ready: boolean; enabled: boolean; arriveAtEnd: boolean
-  onNavigate: (surah: number, atEnd: boolean) => void; children: ReactNode
+  onNavigate: (surah: number, atEnd: boolean) => Promise<void>; children: ReactNode
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [pull, setPull] = useState(0)
@@ -110,7 +110,14 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
       setSettling(true); setCommitting(true)
       setPull((previous ? 1 : -1) * Math.max(280, element.clientHeight))
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      timer.current = setTimeout(() => navigate.current(surah + (previous ? -1 : 1), previous), reduced ? 0 : 240)
+      timer.current = setTimeout(async () => {
+        try {
+          await navigate.current(surah + (previous ? -1 : 1), previous)
+        } catch {
+          // A failed load leaves the current surah in place and allows a new pull.
+          busy = false; setCommitting(false); reset()
+        }
+      }, reduced ? 0 : 240)
     }
     const cancel = () => { if (!busy) reset() }
     const click = (event: MouseEvent) => { if (claimed || busy || Date.now() < suppressClickUntil) { event.preventDefault(); event.stopPropagation() } }
