@@ -5,7 +5,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { Meta, SurahData, Translations } from '@/lib/quran'
 import { loadMeta, loadSurah, loadTrans, loadGlobalRoots, compareRootRange, toFa } from '@/lib/quran'
-import MushafPage, { type Selection } from '@/components/quran/MushafPage'
+import type { Selection } from '@/components/quran/MushafPage'
+import ContinuousMushaf from '@/components/quran/ContinuousMushaf'
 import FlowPage, { FlowSurface } from '@/components/quran/FlowPage'
 import SurahPull from '@/components/quran/SurahPull'
 import RootPanel from '@/components/quran/RootPanel'
@@ -66,8 +67,6 @@ export default function Home() {
   const [sel, setSel] = useState<Selection | null>(null)
   const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
   const [flash, setFlash] = useState<{ s: number; a: number; pos: number } | null>(null)
-  const [pageTranslations, setPageTranslations] = useState<Map<number, Translations>>(new Map())
-  const [pageTranslationError, setPageTranslationError] = useState(false)
   const [pageData, setPageData] = useState<Map<number, SurahData>>(new Map())
   const pullArrival = useRef<{ s: number; end: boolean } | null>(null)
   const [flowSurah, setFlowSurah] = useState<SurahData | null>(null)
@@ -81,7 +80,9 @@ export default function Home() {
     const timer = setTimeout(() => setStartupMinimumElapsed(true), 1000)
     return () => clearTimeout(timer)
   }, [])
-  const [box, setBox] = useState({ w: 0, h: 0 })
+  const [mushafNavigationRevision, setMushafNavigationRevision] = useState(0)
+  const [mushafContentRevision, setMushafContentRevision] = useState(0)
+  const onMushafContentReady = useCallback(() => setMushafContentRevision(n => n + 1), [])
   const [panelMax, setPanelMax] = useState(false)
   const [sheetH, setSheetH] = useState(46)
   const [showIndex, setShowIndex] = useState(false)
@@ -120,14 +121,12 @@ export default function Home() {
     return () => { live = false }
   }, [contextComparison, showComparison, comparisonRange])
 
-  const frameRef = useRef<HTMLDivElement>(null)
   const mainRef = useRef<HTMLElement>(null)
-  useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, !!sel && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}`)
+  useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, !!sel && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}:${mushafContentRevision}`)
   const focusComparisonRoot = useCallback((root: string) => { setSoloComparisonRoot(root); setSel(null) }, [])
   useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
   useEffect(() => { setHiddenComparisonRoots(new Set()); setSoloComparisonRoot(null) }, [comparisonRange?.s, comparisonRange?.from, comparisonRange?.to])
   const mutedComparisonRoots = useMemo(() => new Set(Object.keys(comparisonRoots).filter(root => soloComparisonRoot ? root !== soloComparisonRoot : hiddenComparisonRoots.has(root))), [comparisonRoots, hiddenComparisonRoots, soloComparisonRoot])
-  const touchRef = useRef<{ x: number; y: number } | null>(null)
   const pinchRef = useRef<{ d: number; s: number } | null>(null)
 
   useEffect(() => { loadMeta().then(setMeta) }, [])
@@ -154,21 +153,7 @@ export default function Home() {
   useEffect(() => { LS.set('mushaf.marks', bookmarks) }, [bookmarks])
 
   const segs = useMemo(() => (meta ? meta.pages[page - 1] || [] : []), [meta, page])
-  const translatedPageSurahs = useMemo(() => new Map(segs.map(seg => {
-    const data = pageData.get(seg.s)
-    return [seg.s, data ? { ...data, v: data.v.filter(v => v.n >= seg.f && v.n <= seg.t) } : undefined] as const
-  })), [segs, pageData])
   const curSurahN = mode === 'mushaf' ? (segs[0]?.s ?? 1) : surah
-
-  useEffect(() => {
-    if (mode !== 'mushaf' || !showTrans || !meta) return
-    let live = true
-    setPageTranslationError(false)
-    Promise.all(segs.map(async seg => [seg.s, await loadTrans(seg.s)] as const))
-      .then(entries => { if (live) setPageTranslations(new Map(entries)) })
-      .catch(() => { if (live) setPageTranslationError(true) })
-    return () => { live = false }
-  }, [mode, showTrans, meta, segs])
 
   // close panel-max when selection changes / panel closes
   useEffect(() => { if (!sel) setPanelMax(false) }, [sel])
@@ -213,17 +198,6 @@ export default function Home() {
     return () => clearTimeout(timer)
   }, [startupLeaving])
 
-  // measure mushaf frame for font fitting
-  useEffect(() => {
-    if (!frameRef.current || mode !== 'mushaf') return
-    const ro = new ResizeObserver(entries => {
-      const r = entries[0].contentRect
-      setBox({ w: r.width, h: r.height })
-    })
-    ro.observe(frameRef.current)
-    return () => ro.disconnect()
-  }, [meta, mode])
-
   // flash cleanup
   useEffect(() => {
     if (!flash) return
@@ -244,12 +218,17 @@ export default function Home() {
     return () => el.removeEventListener('wheel', h)
   }, [meta])
 
-  const goPage = useCallback((p: number) => {
+  const requestMushafPage = useCallback((p: number) => {
     setPage(clamp(p, 1, 604))
+    setMushafNavigationRevision(n => n + 1)
+  }, [])
+
+  const goPage = useCallback((p: number) => {
+    requestMushafPage(p)
     setMode('mushaf')
     setSel(null)
     setComparisonRoot(null)
-  }, [])
+  }, [requestMushafPage])
 
   const tapWord = useCallback((word: Selection) => {
     if (!showComparison && !showIndex && comparisonRange?.s === word.s && word.root && comparisonRoots[word.root] !== undefined) {
@@ -282,30 +261,31 @@ export default function Home() {
     loadSurah(s).then(d => {
       const v = d.v[a - 1]
       if (v) {
-        if (mode === 'mushaf') setPage(v.p)
+        if (mode === 'mushaf') requestMushafPage(v.p)
         else setSurah(s)
         setFlash({ s, a, pos })
       }
     })
-  }, [mode])
+  }, [mode, requestMushafPage])
 
   useEffect(() => {
     if (!searchTarget || loadingPage || (mode === 'flow' && flowSurah?.n !== searchTarget.s)) return
     const main = mainRef.current
-    const reading = mode === 'flow' ? main?.querySelector('.surah-pull-content') : main
+    const reading = mode === 'flow' ? main?.querySelector('.surah-pull-content') : main?.querySelector('[data-reading-scroll]')
     const word = reading?.querySelector<HTMLElement>(`[data-surah="${searchTarget.s}"][data-ayah="${searchTarget.a}"][data-pos="${searchTarget.pos}"]`)
     if (!main || !word) return
-    const top = main.scrollTop + word.getBoundingClientRect().top - main.getBoundingClientRect().top - main.clientHeight * 0.35
-    main.scrollTo({ top: Math.max(0, top), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+    const scroll = main.querySelector<HTMLElement>('[data-reading-scroll]') ?? main
+    const top = scroll.scrollTop + word.getBoundingClientRect().top - scroll.getBoundingClientRect().top - scroll.clientHeight * 0.35
+    scroll.scrollTo({ top: Math.max(0, top), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
     setSearchTarget(null)
-  }, [searchTarget, loadingPage, mode, page, surah, flowSurah?.n, pageData])
+  }, [searchTarget, loadingPage, mode, page, surah, flowSurah?.n, pageData, mushafContentRevision])
 
   // panel jump: keep panel open, highlight target
   const panelJump = useCallback((s: number, a: number, pos: number, p: number) => {
-    if (mode === 'mushaf') setPage(p)
+    if (mode === 'mushaf') requestMushafPage(p)
     else setSurah(s)
     setFlash({ s, a, pos })
-  }, [mode])
+  }, [mode, requestMushafPage])
 
   // jump to root occurrence in another surah; retarget panel selection
   const jumpSurahRoot = useCallback((surahN: number, root: string) => {
@@ -316,11 +296,11 @@ export default function Home() {
       const w = d.v[a - 1]?.w[pos - 1]
       if (!w) return
       setSel({ s: surahN, a, pos, ...wordTarget(w), root })
-      if (mode === 'mushaf') setPage(d.v[a - 1].p)
+      if (mode === 'mushaf') requestMushafPage(d.v[a - 1].p)
       else setSurah(surahN)
       setFlash({ s: surahN, a, pos })
     })
-  }, [mode])
+  }, [mode, requestMushafPage])
 
   // SurahIndex: pick a root from the index page → open RootPanel for first occurrence
   // NOTE: the index STAYS OPEN — user wants to return to the same scroll position
@@ -345,25 +325,22 @@ export default function Home() {
     const h = (e: KeyboardEvent) => {
       if (searchOpen || drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select'))) return
       if (sel) return
-      // No sheet is open: navigate pages/surahs.
-      if (e.key === 'ArrowLeft') mode === 'mushaf' ? goPage(page + 1) : goSurah(surah + 1)
-      else if (e.key === 'ArrowRight') mode === 'mushaf' ? goPage(page - 1) : goSurah(surah - 1)
+      // Mushaf follows native up/down scrolling; flow retains surah shortcuts.
+      if (mode !== 'flow') return
+      if (e.key === 'ArrowLeft') goSurah(surah + 1)
+      else if (e.key === 'ArrowRight') goSurah(surah - 1)
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
   }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel, searchOpen])
 
-  // touch: pinch-zoom + swipe
+  // Pinch zoom; page reading is vertical in both display modes.
   const touchDist = (t: React.TouchList) =>
     Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY)
 
   const onTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 2) {
       pinchRef.current = { d: touchDist(e.touches), s: scale }
-      touchRef.current = null
-    } else if (e.touches.length === 1) {
-      const t = e.touches[0]
-      touchRef.current = { x: t.clientX, y: t.clientY }
     }
   }
   const onTouchMove = (e: React.TouchEvent) => {
@@ -373,18 +350,7 @@ export default function Home() {
       setScale(round05(clamp(pinchRef.current.s * ratio, 0.55, 1.9)))
     }
   }
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (pinchRef.current) { pinchRef.current = null; return }
-    const start = touchRef.current
-    touchRef.current = null
-    if (!start || sel || mode !== 'mushaf') return
-    const dx = e.changedTouches[0].clientX - start.x
-    const dy = e.changedTouches[0].clientY - start.y
-    if (Math.abs(dx) > 64 && Math.abs(dx) > Math.abs(dy) * 1.6) {
-      if (dx < 0) goPage(page + 1)
-      else goPage(page - 1)
-    }
-  }
+  const onTouchEnd = () => { pinchRef.current = null }
 
   const pageInfo = useMemo(() => {
     if (!meta) return { names: '', juz: null as number | null }
@@ -398,11 +364,6 @@ export default function Home() {
     }
     return { names, juz }
   }, [meta, segs, pageData, page])
-
-  const mushafFont = useMemo(() => {
-    if (box.w === 0 || box.h === 0) return 22
-    return Math.max(11, Math.min(box.h / 29, box.w / 14, 48)) * scale
-  }, [box, scale])
 
   const flowFont = 22 * scale
   const isBookmarked = bookmarks.includes(page)
@@ -492,49 +453,14 @@ export default function Home() {
       {/* ===== Main + side root panel ===== */}
       <div className="relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row lg:items-stretch">
         <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main"
-          onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+          onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd}>
           {mode === 'mushaf' ? (
-            <div className="flex-1 min-h-0 flex items-stretch justify-center px-2 py-2 sm:px-6 sm:py-3">
-              <div ref={frameRef} className="w-full max-w-[640px] min-h-0">
-                <div data-reading-scroll key={page} className={`mushaf-frame page-enter h-full ${showTrans || sel ? 'overflow-y-auto nice-scroll' : 'overflow-hidden'}`}>
-                  {loadingPage ? (
-                    <div className="h-full flex items-center justify-center">
-                      <p className="text-sm animate-pulse" style={{ color: 'var(--ink-faint)' }}>…</p>
-                    </div>
-                  ) : showTrans ? (
-                    <div className="px-3 py-4 min-w-0">
-                      {pageTranslationError && <p role="alert" className="text-sm">ترجمه بارگیری نشد؛ صفحه را دوباره باز کنید.</p>}
-                      {segs.map(seg => {
-                        const data = translatedPageSurahs.get(seg.s)
-                        if (!data) return null
-                        return <FlowPage key={seg.s}
-                          sm={{ ...meta.surahs[seg.s - 1], b: seg.f === 1 && meta.surahs[seg.s - 1].b }}
-                          surah={data}
-                          trans={pageTranslations.get(seg.s) ?? null} showTrans translator={translator} fontSize={flowFont}
-                          selection={sel ? analysisSelection ?? sel : null}
-                          highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
-                          analysisSelection={sel ? analysisSelection : null} comparisonRange={comparisonRange} comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots}
-                          flash={flash} onWordTap={tapWord} />
-                      })}
-                    </div>
-                  ) : (
-                    <MushafPage
-                      meta={meta}
-                      page={page}
-                      pageData={pageData}
-                      fontSize={mushafFont}
-                      selection={sel ? analysisSelection ?? sel : null}
-                      highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
-                      analysisSelection={sel ? analysisSelection : null}
-                      comparisonRange={comparisonRange}
-                      comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots}
-                      flash={flash}
-                      onWordTap={tapWord}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
+            <ContinuousMushaf meta={meta} page={page} navigationRevision={mushafNavigationRevision}
+              onPageChange={setPage} onContentReady={onMushafContentReady} showTrans={showTrans} translator={translator} scale={scale}
+              selection={sel ? analysisSelection ?? sel : null}
+              highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
+              analysisSelection={sel ? analysisSelection : null} comparisonRange={comparisonRange}
+              comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots} flash={flash} onWordTap={tapWord} />
           ) : (
             <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs} fontSize={flowFont} showTrans={showTrans} translator={translator}
               ready={!loadingPage && flowSurah?.n === surah}

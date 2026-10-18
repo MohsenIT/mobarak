@@ -1123,3 +1123,6 @@ input[type='range'].page-slider::-moz-range-thumb {
 .startup-splash { opacity: 1; transition: opacity 180ms ease-out; }
 .startup-splash.startup-leaving { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .startup-splash { transition: none; } }
+
+.mushaf-page-divider { height: 44px; display: flex; align-items: center; gap: 12px; padding: 0 18px; color: var(--ink-soft); font-size: 11px; }
+.mushaf-page-divider::before, .mushaf-page-divider::after { content: ''; flex: 1; height: 1px; background: var(--line-strong); }

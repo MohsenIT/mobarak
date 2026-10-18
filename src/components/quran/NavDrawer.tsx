@@ -255,27 +255,6 @@ export default function NavDrawer(props: Props) {
             <div className="p-4 flex flex-col gap-6">
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
-                  <IconBook /> حالت نمایش
-                </h3>
-                <div className="grid grid-cols-2 gap-2" role="group" aria-label="حالت نمایش">
-                  {(['mushaf', 'flow'] as const).map(mode => (
-                    <button key={mode}
-                      className="rounded-xl border py-3 text-sm font-medium transition-all"
-                      aria-pressed={props.mode === mode}
-                      style={{
-                        borderColor: props.mode === mode ? 'var(--sage)' : 'var(--line)',
-                        background: props.mode === mode ? 'var(--word-root)' : 'transparent',
-                        color: 'var(--ink)',
-                      }}
-                      onClick={() => props.onMode(mode)}>
-                      {mode === 'mushaf' ? 'مصحف' : 'پیوسته'}
-                    </button>
-                  ))}
-                </div>
-              </section>
-
-              <section>
-                <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
                   {props.theme === 'night' ? <IconMoon /> : <IconSun />} پوسته
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -337,6 +316,27 @@ export default function NavDrawer(props: Props) {
                   onChange={e => props.onScale(+e.target.value)} />
                 <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--ink-faint)' }}>
                   <span>ریز</span><span>{toFa(Math.round(props.scale * 100))}٪</span><span>درشت</span>
+                </div>
+              </section>
+
+              <section>
+                <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
+                  <IconBook /> حالت نمایش
+                </h3>
+                <div className="grid grid-cols-2 gap-2" role="group" aria-label="حالت نمایش">
+                  {(['flow', 'mushaf'] as const).map(mode => (
+                    <button key={mode}
+                      className="rounded-xl border py-3 text-sm font-medium transition-all"
+                      aria-pressed={props.mode === mode}
+                      style={{
+                        borderColor: props.mode === mode ? 'var(--sage)' : 'var(--line)',
+                        background: props.mode === mode ? 'var(--word-root)' : 'transparent',
+                        color: 'var(--ink)',
+                      }}
+                      onClick={() => props.onMode(mode)}>
+                      {mode === 'mushaf' ? 'مصحف' : 'پیوسته'}
+                    </button>
+                  ))}
                 </div>
               </section>
 

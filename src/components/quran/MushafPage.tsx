@@ -94,7 +94,19 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
     let live = true
     const measure = () => {
       if (!live) return
-      for (const line of frame.querySelectorAll<HTMLElement>('.mushaf-line')) {
+      // Fit the whole page uniformly to its available width. A narrow phone
+      // must never lose words beyond the left edge of a fixed mushaf line.
+      frame.style.fontSize = `${fontSize}px`
+      const pageLines = [...frame.querySelectorAll<HTMLElement>('.mushaf-line')]
+      let fit = 1
+      for (const line of pageLines) {
+        const children = [...line.children] as HTMLElement[]
+        const gap = parseFloat(getComputedStyle(line).columnGap) || 0
+        const needed = children.reduce((sum, child) => sum + child.getBoundingClientRect().width, 0) + gap * Math.max(0, children.length - 1)
+        if (needed > line.clientWidth && needed > 0) fit = Math.min(fit, line.clientWidth / needed)
+      }
+      if (fit < 1) frame.style.fontSize = `${Math.floor(fontSize * fit * 100) / 100}px`
+      for (const line of pageLines) {
         line.removeAttribute('data-comparison-band')
         const comparisonWords = [...line.querySelectorAll<HTMLElement>('[data-comparison-range="true"]')]
         if (comparisonWords.length) {
