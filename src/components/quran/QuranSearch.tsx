@@ -88,7 +88,14 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
 
   return <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent showCloseButton={false} dir="rtl" className="flex flex-col gap-0 p-0 sm:max-w-2xl h-[85dvh] max-h-[50rem] overflow-hidden" style={{ background: 'var(--paper)', color: 'var(--ink)', borderColor: 'var(--line)' }}
-      onOpenAutoFocus={event => { event.preventDefault(); input.current?.focus(); requestAnimationFrame(() => { if (list.current) list.current.scrollTop = scroll.current }) }}>
+      onOpenAutoFocus={event => {
+        event.preventDefault()
+        // Returning to results should restore the list, without reopening the
+        // phone keyboard and covering the result the reader just visited.
+        if (valid && completed.current) list.current?.focus({ preventScroll: true })
+        else input.current?.focus()
+        requestAnimationFrame(() => { if (list.current) list.current.scrollTop = scroll.current })
+      }}>
       <div className="shrink-0 p-4 border-b" style={{ borderColor: 'var(--line)' }}>
         <div className="flex items-center justify-between gap-2 mb-2"><DialogTitle className="text-base font-bold">جست‌وجو در قرآن</DialogTitle><button type="button" className="icon-btn sm" aria-label="بستن جست‌وجو" onClick={() => onOpenChange(false)}><X size={20} /></button></div>
         <DialogDescription className="text-xs leading-6 mb-3" style={{ color: 'var(--ink-soft)' }}>واژه یا عبارت را بنویسید؛ تفاوت حروف فارسی و عربی و اعراب مانع جست‌وجو نیست.</DialogDescription>
@@ -105,12 +112,12 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       <div className="shrink-0 px-4 py-2 text-xs" role="status" aria-live="polite" style={{ color: 'var(--ink-soft)' }}>
         {busy ? <span className="inline-flex items-center gap-2"><LoaderCircle size={14} className="animate-spin" />در حال جست‌وجو…</span> : !valid ? 'حداقل دو حرف وارد کنید.' : error ? 'متن جست‌وجو بارگیری نشد.' : `${toFa(results.length)} آیه پیدا شد`}
       </div>
-      <div ref={list} onScroll={event => { scroll.current = event.currentTarget.scrollTop }} className="min-h-0 flex-1 overflow-y-auto nice-scroll px-4 pb-4" aria-busy={busy} style={{ overscrollBehavior: 'contain' }}>
+      <div ref={list} tabIndex={-1} aria-label="نتایج جست‌وجو" onScroll={event => { scroll.current = event.currentTarget.scrollTop }} className="min-h-0 flex-1 overflow-y-auto nice-scroll px-4 pb-4" aria-busy={busy} style={{ overscrollBehavior: 'contain' }}>
         {error && <button className="chip" onClick={() => setRetry(value => value + 1)}>تلاش دوباره</button>}
         {!busy && !error && valid && results.length === 0 && <p className="text-sm leading-8">نتیجه‌ای پیدا نشد. {includeNear ? 'عبارت کوتاه‌تر یا واژه‌های دیگری را امتحان کنید؛ خطاهای تایپی جزئی هم بررسی شده‌اند.' : 'برای بررسی اشتباه تایپی، «نتایج نزدیک / غلط املایی» را روشن کنید.'}</p>}
         {!busy && !error && valid && results.slice(0, visible).map((result, index) => <div key={`${result.s}:${result.a}`}>
           {(index === 0 || results[index - 1].kind !== result.kind) && <h3 className="text-xs font-bold pt-3 pb-2" style={{ color: 'var(--ink-soft)' }}>{labels[result.kind]}</h3>}
-          <button type="button" className="block w-full text-right rounded-xl border p-3 mb-2 cursor-pointer" style={{ borderColor: 'var(--line)', background: 'var(--sheet)' }} aria-label={`رفتن به ${meta.surahs[result.s - 1]?.fa} آیه ${toFa(result.a)}`} onClick={() => onPick(result.s, result.a, result.positions[0] ?? 1)}>
+          <button type="button" className="block w-full text-right rounded-xl border p-3 mb-2 cursor-pointer" style={{ borderColor: 'var(--line)', background: 'var(--sheet)' }} aria-label={`رفتن به ${meta.surahs[result.s - 1]?.fa} آیه ${toFa(result.a)}`} onClick={() => { scroll.current = list.current?.scrollTop ?? scroll.current; onPick(result.s, result.a, result.positions[0] ?? 1) }}>
             <span className="flex items-center justify-between gap-2 mb-2 text-xs"><b>{meta.surahs[result.s - 1]?.fa} · آیهٔ {toFa(result.a)}</b><span style={{ color: 'var(--ink-soft)' }}>رفتن به آیه ←</span></span>
             <span className="block font-quran text-xl leading-[2.2] line-clamp-4" lang="ar">{snippet(result)}</span>
           </button>

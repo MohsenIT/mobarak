@@ -17,7 +17,7 @@ import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { GitCompareArrows, Search } from 'lucide-react'
+import { ArrowRight, GitCompareArrows, Search } from 'lucide-react'
 import QuranSearch from '@/components/quran/QuranSearch'
 import {
   PatternBG, IconMenu, IconStar,
@@ -61,6 +61,7 @@ export default function Home() {
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [returnToSearch, setReturnToSearch] = useState(false)
   const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number } | null>(null)
   const [sel, setSel] = useState<Selection | null>(null)
   const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
@@ -399,7 +400,7 @@ export default function Home() {
       <PatternBG />
 
       <QuranSearch open={searchOpen} onOpenChange={setSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
-        setSearchOpen(false); setSel(null); setComparisonRoot(null); setSearchTarget({ s, a, pos }); goVerse(s, a, pos)
+        setReturnToSearch(true); setSearchOpen(false); setSel(null); setComparisonRoot(null); setSearchTarget({ s, a, pos }); goVerse(s, a, pos)
       }} />
 
       {/* ===== Top bar =====
@@ -447,6 +448,15 @@ export default function Home() {
             <IconTranslate />
           </button>
       </header>
+
+      {returnToSearch && !searchOpen && (
+        <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
+          <button type="button" className="chip gap-1.5 py-1.5" onClick={() => { setSel(null); setSearchOpen(true) }}>
+            <ArrowRight size={14} aria-hidden="true" /> بازگشت به نتایج جست‌وجو
+          </button>
+          <button type="button" className="icon-btn sm" aria-label="بستن نوار بازگشت به جست‌وجو" onClick={() => setReturnToSearch(false)}>×</button>
+        </div>
+      )}
 
       {!showComparison && comparisonRange?.s === curSurahN && (contextComparison || Object.keys(comparisonRoots).length > 0) && (
         <div className="relative z-10 flex flex-wrap items-center gap-2 px-3 py-2 text-xs" style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
