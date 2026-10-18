@@ -1110,21 +1110,21 @@ input[type='range'].page-slider::-moz-range-thumb {
 .app-update-button:disabled { opacity: .6; }
 
 /* Startup art is removed as soon as the initial reading data is ready. */
-.startup-splash { position: fixed; inset: 0; z-index: 110; background: var(--paper); color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: max(24px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom)); overflow: auto; --left-delay: 0s; --right-delay: 0s; --middle-flower: 0s; --left-flower: .04s; --right-flower: .08s; }
+.startup-splash { position: fixed; inset: 0; z-index: 110; background: var(--paper); color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: max(24px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom)); overflow: auto; --left-delay: 0s; --right-delay: 0s; --middle-flower: 0s; --left-flower: .012s; --right-flower: .025s; }
 .startup-bism { font-size: clamp(22px, 6vw, 32px); margin: 0 0 24px; }
 .startup-logo { position: relative; width: min(220px, 48vw, 32dvh); aspect-ratio: 1; isolation: isolate; }
 .startup-logo svg { display: block; width: 100%; height: auto; overflow: visible; }
-.startup-halo { position: absolute; inset: -22%; z-index: -1; border-radius: 50%; background: radial-gradient(circle, #e2c36770, transparent 66%); animation: startup-halo 2.2s both; }
+.startup-halo { position: absolute; inset: -22%; z-index: -1; border-radius: 50%; background: radial-gradient(circle, #e2c36770, transparent 66%); animation: startup-halo 0.7s both; }
 .startup-logo .disk { fill: #faf4df; }
-.startup-logo .book-reveal { transform-origin: 256px 420px; animation: startup-book 2.2s both; }
-.startup-logo .stem-reveal { fill: none; stroke: white; stroke-width: 46; stroke-linecap: round; stroke-dasharray: 360; stroke-dashoffset: 360; animation: startup-stem 2.2s both; }
-.startup-logo .flower-reveal { animation: startup-flower 2.2s both; }
-.startup-logo .flower-reveal.left { animation-delay: .04s; }
-.startup-logo .flower-reveal.right { animation-delay: .08s; }
-.startup-logo .light-stem { fill: none; stroke: #e7c86f; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 44 360; filter: blur(2px); animation: startup-light 2.2s both; }
-.startup-logo .bloom-light { fill: none; stroke: #e5ce84; stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: startup-bloom 2.2s both; }
-.startup-logo .origin-light { fill: #efda90; filter: blur(2px); animation: startup-origin 2.2s both; }
-.startup-logo .complete-logo { animation: startup-complete 2.2s both; }
+.startup-logo .book-reveal { transform-origin: 256px 420px; animation: startup-book 0.7s both; }
+.startup-logo .stem-reveal { fill: none; stroke: white; stroke-width: 46; stroke-linecap: round; stroke-dasharray: 360; stroke-dashoffset: 360; animation: startup-stem 0.7s both; }
+.startup-logo .flower-reveal { animation: startup-flower 0.7s both; }
+.startup-logo .flower-reveal.left { animation-delay: .012s; }
+.startup-logo .flower-reveal.right { animation-delay: .025s; }
+.startup-logo .light-stem { fill: none; stroke: #e7c86f; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 44 360; filter: blur(2px); animation: startup-light 0.7s both; }
+.startup-logo .bloom-light { fill: none; stroke: #e5ce84; stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: startup-bloom 0.7s both; }
+.startup-logo .origin-light { fill: #efda90; filter: blur(2px); animation: startup-origin 0.7s both; }
+.startup-logo .complete-logo { animation: startup-complete 0.7s both; }
 .startup-splash h1 { font-size: 27px; font-weight: 500; margin: 20px 0 6px; }
 .startup-verse { font-size: clamp(17px, 4.8vw, 23px); text-align: center; margin: 12px 0 8px; color: var(--ink-soft); }
 .startup-splash .chip { font-size: 10px; }
