@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   applicationName: "قرآن واژه",
   appleWebApp: { capable: true, title: "قرآن واژه", statusBarStyle: "black-translucent" },
   icons: {
-    icon: [{ url: "/icons/quran-vajeh.svg", type: "image/svg+xml" }, { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
-    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    icon: [{ url: "/icons/logo-5-192.png", sizes: "192x192", type: "image/png" }, { url: "/icons/logo-5-512.png", sizes: "512x512", type: "image/png" }],
+    apple: [{ url: "/icons/logo-5-apple-180.png", sizes: "180x180", type: "image/png" }],
   },
   description: "قرآن کریم به خط عثمان‌طه، با تحلیل ریشه‌ای و فهرست کلیدواژه‌ها",
 };
