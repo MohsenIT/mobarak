@@ -1125,4 +1125,6 @@ input[type='range'].page-slider::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) { .startup-splash { transition: none; } }
 
 .mushaf-page-divider { height: 44px; display: flex; align-items: center; gap: 12px; padding: 0 18px; color: var(--ink-soft); font-size: 11px; }
-.mushaf-page-divider::before, .mushaf-page-divider::after { content: ''; flex: 1; height: 1px; background: var(--line-strong); }
+.mushaf-page-divider::before, .mushaf-page-divider::after { content: ''; flex: 1; height: 1px; background: rgba(128, 128, 128, .25); }
+
+.mushaf-frame.continuous-mushaf-page { border: 1px solid rgba(128, 128, 128, .25); outline: none; box-shadow: none; }

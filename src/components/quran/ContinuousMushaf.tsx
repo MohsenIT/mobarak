@@ -41,10 +41,7 @@ function PageContent({ meta, page, showTrans, translator, fontSize, flowFont, pa
     return () => observer.disconnect()
   }, [page, onMeasure])
   const ready = bundle && (!showTrans || bundle.translations.size > 0)
-  return <div ref={ref} style={{ minHeight: pageHeight + 44 }}>
-    <div className="mushaf-page-divider" aria-label={`آغاز صفحهٔ ${toFa(page)}`}>
-      <span>صفحهٔ {toFa(page)}</span>
-    </div>
+  return <div ref={ref} className="mushaf-frame continuous-mushaf-page" style={{ minHeight: pageHeight + 44 }}>
     {!ready ? <div className="flex items-center justify-center" style={{ minHeight: pageHeight }}>
       {error ? <button className="chip" onClick={() => setRetry(n => n + 1)}>بارگیری صفحه ناموفق بود · تلاش دوباره</button>
         : <p className="text-xs" role="status" style={{ color: 'var(--ink-faint)' }}>در حال بارگیری صفحهٔ {toFa(page)}…</p>}
@@ -55,9 +52,12 @@ function PageContent({ meta, page, showTrans, translator, fontSize, flowFont, pa
           surah={{ ...data, v: data.v.filter(v => v.n >= seg.f && v.n <= seg.t) }} trans={bundle.translations.get(seg.s) ?? null}
           showTrans translator={translator} fontSize={flowFont} {...reading} />
       })}
-    </div> : <div className="mushaf-frame" style={{ height: pageHeight }}>
+    </div> : <div style={{ height: pageHeight }}>
       <MushafPage meta={meta} page={page} pageData={bundle.data} fontSize={fontSize} {...reading} />
     </div>}
+    <div className="mushaf-page-divider" aria-label={`شمارهٔ صفحهٔ ${toFa(page)}`}>
+      <span>صفحهٔ {toFa(page)}</span>
+    </div>
   </div>
 }
 
