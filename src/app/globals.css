@@ -1104,3 +1104,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) { .surah-pull-content { transition: none !important; } }
 
 @media (prefers-reduced-motion: reduce) { .swipe-tab-page { transition: none !important; } }
+
+.app-update-notice { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 12px; right: 12px; width: auto; max-width: 600px; margin-inline: auto; z-index: 120; display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--line-strong); border-radius: 16px; background: var(--sheet); color: var(--ink); box-shadow: 0 8px 28px #0003; }
+.app-update-button { flex-shrink: 0; border: 1px solid var(--sage); border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--ink); background: var(--word-root); }
+.app-update-button:disabled { opacity: .6; }
