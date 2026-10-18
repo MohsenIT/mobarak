@@ -5,7 +5,7 @@ import PwaRegistration from "@/components/quran/PwaRegistration";
 export const metadata: Metadata = {
   title: "مصحف عثمان‌طه",
   applicationName: "قرآن واژه",
-  appleWebApp: { capable: true, title: "قرآن واژه", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "قرآن واژه", statusBarStyle: "default" },
   icons: {
     icon: [{ url: "/icons/logo-5-192.png", sizes: "192x192", type: "image/png" }, { url: "/icons/logo-5-512.png", sizes: "512x512", type: "image/png" }],
     apple: [{ url: "/icons/logo-5-apple-180.png", sizes: "180x180", type: "image/png" }],
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "قرآن کریم به خط عثمان‌طه، با تحلیل ریشه‌ای و فهرست کلیدواژه‌ها",
 };
 
-export const viewport: Viewport = { themeColor: "#0e2a22", viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#0e2a22", viewportFit: "auto" };
 
 export default function RootLayout({
   children,
