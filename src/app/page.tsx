@@ -511,7 +511,6 @@ export default function Home() {
             sheetH={sheetH}
             onSheetHeightChange={setSheetH}
             onToggleMax={() => setPanelMax(v => !v)}
-            onOpenIndex={() => { setPanelMax(false); setShowIndex(true) }}
             onClose={() => setSel(null)}
             onJump={panelJump}
             onJumpSurah={jumpSurahRoot}
@@ -532,7 +531,6 @@ export default function Home() {
             sheetH={sheetH}
             onSheetHeightChange={setSheetH}
             onToggleMax={() => setPanelMax(v => !v)}
-            onOpenIndex={() => { setPanelMax(false); setShowIndex(true) }}
             onClose={() => setSel(null)}
             onJump={panelJump}
             onJumpSurah={jumpSurahRoot}

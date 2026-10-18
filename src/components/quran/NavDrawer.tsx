@@ -103,7 +103,10 @@ export default function NavDrawer(props: Props) {
       <div className="sheet-backdrop" onClick={onClose} />
       <aside className="drawer" role="dialog" aria-label="فهرست">
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <h2 className="font-bold text-lg" style={{ color: 'var(--ink)' }}>{APP_NAME}</h2>
+          <div className="flex items-center gap-2">
+            <img src="/icons/logo-5-192.png" width="34" height="34" alt="" className="shrink-0 rounded-full" />
+            <h2 className="font-bold text-lg" style={{ color: 'var(--ink)' }}>{APP_NAME}</h2>
+          </div>
           <button className="icon-btn" onClick={onClose} aria-label="بستن"><IconClose /></button>
         </div>
 

@@ -10,7 +10,7 @@ import AnalysisTabContent from './AnalysisTabContent'
 import SwipeTabPages from './SwipeTabPages'
 import { getContext } from '@/lib/contexts'
 import QuranText from './QuranText'
-import { IconClose, IconMaximize, IconRestore, IconRoot, IconSortIndex } from './Ornaments'
+import { IconClose, IconMaximize, IconRestore } from './Ornaments'
 
 interface Props {
   comparisonRange?: { s: number; from: number; to: number } | null
@@ -24,8 +24,6 @@ interface Props {
   onSheetHeightChange: (height: number) => void
   maximized: boolean
   onToggleMax: () => void
-  /** open the surah index page */
-  onOpenIndex: () => void
   onClose: () => void
   /** jump inside current surah — panel stays open */
   onJump: (s: number, a: number, pos: number, page: number) => void
@@ -42,7 +40,7 @@ const TABS = [['root', 'ریشه'], ['form', 'باب'], ['word', 'واژه'], ['
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
 export default function RootPanel({
-  sel: anchor, onSelectionChange, onCompareContext, meta, translator, maximized, onToggleMax, onOpenIndex, onClose, onJump, onJumpSurah,
+  sel: anchor, onSelectionChange, onCompareContext, meta, translator, maximized, onToggleMax, onClose, onJump, onJumpSurah,
   stackedOverIndex = false, comparisonRange, sheetH, onSheetHeightChange: setSheetH,
 }: Props) {
   const [tab, setTab] = useState<AnalysisTab>(anchor.part === 'prefix' ? 'word' : 'root')
@@ -172,9 +170,6 @@ export default function RootPanel({
               <option value="8">کمینه</option><option value="30">۳۰٪</option><option value="46">نیمه</option>
               <option value="70">۷۰٪</option><option value="88">بیشینه</option>
             </select>}
-            <button className="icon-btn sm" onClick={onOpenIndex} title="فهرست کلیدواژه‌های سوره" aria-label="فهرست کلیدواژه‌های سوره">
-              <IconSortIndex />
-            </button>
             <button className="icon-btn sm" onClick={onToggleMax} aria-label={maximized ? 'بازگرداندن به نیم‌صفحه' : 'تمام‌صفحه'}
               title={maximized ? 'بازگرداندن به نیم‌صفحه' : 'تمام‌صفحه'}>
               {maximized ? <IconRestore /> : <IconMaximize />}
