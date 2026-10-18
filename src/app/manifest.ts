@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next'
+import { APP_NAME } from '@/lib/branding'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'قرآن واژه',
-    short_name: 'قرآن واژه',
+    name: APP_NAME,
+    short_name: APP_NAME,
     description: 'خواندن قرآن، جست‌وجو و بررسی ریشه‌ها و سیاق آیات',
     lang: 'fa',
     dir: 'rtl',

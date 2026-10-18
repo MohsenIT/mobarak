@@ -4,3 +4,5 @@
 - The next revision matches the supplied Android screenshot: smaller 128 CSS px icon canvas, center offset -10 px, 24px system-font title at the bottom. Browser viewport excludes the status and navigation bars.
 
 To return only the splash layout to Sib, restore the startup CSS block and `src/components/quran/StartupSplash.tsx` from `splash-sib`. Also restore theme-color timing if needed; preserve unrelated changes in `page.tsx`. The tag records the complete prior state without rewriting history.
+
+After the rename to «قرآن مبارک», keep the current `APP_NAME` and Sad 38:29 verse when reverting the splash layout; the Sib checkpoint predates that naming decision.

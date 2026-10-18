@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { resolveDestination, searchSurahs, type Destination, type JumpKind } from '@/lib/navigation'
@@ -102,7 +103,7 @@ export default function NavDrawer(props: Props) {
       <div className="sheet-backdrop" onClick={onClose} />
       <aside className="drawer" role="dialog" aria-label="فهرست">
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <h2 className="font-bold text-lg" style={{ color: 'var(--ink)' }}>مصحف عثمان‌طه</h2>
+          <h2 className="font-bold text-lg" style={{ color: 'var(--ink)' }}>{APP_NAME}</h2>
           <button className="icon-btn" onClick={onClose} aria-label="بستن"><IconClose /></button>
         </div>
 
