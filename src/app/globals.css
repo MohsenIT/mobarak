@@ -1108,3 +1108,36 @@ input[type='range'].page-slider::-moz-range-thumb {
 .app-update-notice { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 12px; right: 12px; width: auto; max-width: 600px; margin-inline: auto; z-index: 120; display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--line-strong); border-radius: 16px; background: var(--sheet); color: var(--ink); box-shadow: 0 8px 28px #0003; }
 .app-update-button { flex-shrink: 0; border: 1px solid var(--sage); border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--ink); background: var(--word-root); }
 .app-update-button:disabled { opacity: .6; }
+
+/* Startup art is removed as soon as the initial reading data is ready. */
+.startup-splash { position: fixed; inset: 0; z-index: 110; background: var(--paper); color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: max(24px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom)); overflow: auto; --left-delay: 0s; --right-delay: 0s; --middle-flower: 0s; --left-flower: .04s; --right-flower: .08s; }
+.startup-bism { font-size: clamp(22px, 6vw, 32px); margin: 0 0 24px; }
+.startup-logo { position: relative; width: min(220px, 48vw, 32dvh); aspect-ratio: 1; isolation: isolate; }
+.startup-logo svg { display: block; width: 100%; height: auto; overflow: visible; }
+.startup-halo { position: absolute; inset: -22%; z-index: -1; border-radius: 50%; background: radial-gradient(circle, #e2c36770, transparent 66%); animation: startup-halo 2.2s both; }
+.startup-logo .disk { fill: #faf4df; }
+.startup-logo .book-reveal { transform-origin: 256px 420px; animation: startup-book 2.2s both; }
+.startup-logo .stem-reveal { fill: none; stroke: white; stroke-width: 46; stroke-linecap: round; stroke-dasharray: 360; stroke-dashoffset: 360; animation: startup-stem 2.2s both; }
+.startup-logo .flower-reveal { animation: startup-flower 2.2s both; }
+.startup-logo .flower-reveal.left { animation-delay: .04s; }
+.startup-logo .flower-reveal.right { animation-delay: .08s; }
+.startup-logo .light-stem { fill: none; stroke: #e7c86f; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 44 360; filter: blur(2px); animation: startup-light 2.2s both; }
+.startup-logo .bloom-light { fill: none; stroke: #e5ce84; stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: startup-bloom 2.2s both; }
+.startup-logo .origin-light { fill: #efda90; filter: blur(2px); animation: startup-origin 2.2s both; }
+.startup-logo .complete-logo { animation: startup-complete 2.2s both; }
+.startup-splash h1 { font-size: 27px; font-weight: 500; margin: 20px 0 6px; }
+.startup-verse { font-size: clamp(17px, 4.8vw, 23px); text-align: center; margin: 12px 0 8px; color: var(--ink-soft); }
+.startup-splash .chip { font-size: 10px; }
+.startup-loading { display: flex; gap: 5px; margin-top: 24px; }
+.startup-loading i { width: 3px; height: 3px; border-radius: 50%; background: var(--gold); animation: startup-dot 1s infinite alternate; }
+.startup-loading i:nth-child(2) { animation-delay: .2s; }.startup-loading i:nth-child(3) { animation-delay: .4s; }
+@keyframes startup-book { from { opacity: 0; transform: translateY(10px); } 16%, to { opacity: 1; transform: none; } }
+@keyframes startup-stem { 0%, 15% { stroke-dashoffset: 360; } 55%, 100% { stroke-dashoffset: 0; } }
+@keyframes startup-flower { 0%, 43% { transform: scale(0); } 63% { transform: scale(1.06); } 75%, 100% { transform: scale(1); } }
+@keyframes startup-light { 0%, 18% { stroke-dashoffset: 60; opacity: 0; } 24% { opacity: 1; } 56% { stroke-dashoffset: -310; opacity: .85; } 65%, 100% { stroke-dashoffset: -360; opacity: 0; } }
+@keyframes startup-bloom { 0%, 44% { opacity: 0; transform: scale(.4); } 57% { opacity: .8; transform: scale(1); } 78%, 100% { opacity: 0; transform: scale(1.5); } }
+@keyframes startup-origin { 0% { opacity: 0; } 20% { opacity: .9; } 48% { opacity: .2; } 70%, 100% { opacity: 0; } }
+@keyframes startup-halo { from { opacity: 0; transform: translateY(30px) scale(.45); } 38% { opacity: .7; } 70% { opacity: 1; transform: none; } to { opacity: .35; transform: scale(1.1); } }
+@keyframes startup-complete { 0%, 80% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes startup-dot { from { opacity: .25; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .startup-splash * { animation: none !important; } .startup-logo .stem-reveal { stroke-dashoffset: 0; } .startup-logo .complete-logo { opacity: 1; } .startup-logo .light-stem, .startup-logo .bloom-light, .startup-logo .origin-light { display: none; } }

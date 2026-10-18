@@ -9,6 +9,7 @@ import MushafPage, { type Selection } from '@/components/quran/MushafPage'
 import FlowPage, { FlowSurface } from '@/components/quran/FlowPage'
 import SurahPull from '@/components/quran/SurahPull'
 import RootPanel from '@/components/quran/RootPanel'
+import StartupSplash from '@/components/quran/StartupSplash'
 import { rootHue } from '@/lib/comparison-colors'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
@@ -20,7 +21,7 @@ import { GitCompareArrows, Search } from 'lucide-react'
 import QuranSearch from '@/components/quran/QuranSearch'
 import {
   PatternBG, IconMenu, IconStar,
-  IconTranslate, IconSortIndex, Bismillah,
+  IconTranslate, IconSortIndex,
 } from '@/components/quran/Ornaments'
 
 const LS = {
@@ -71,6 +72,7 @@ export default function Home() {
   const [flowSurah, setFlowSurah] = useState<SurahData | null>(null)
   const [flowTrans, setFlowTrans] = useState<Translations | null>(null)
   const [loadingPage, setLoadingPage] = useState(true)
+  const [startupComplete, setStartupComplete] = useState(false)
   const [box, setBox] = useState({ w: 0, h: 0 })
   const [panelMax, setPanelMax] = useState(false)
   const [sheetH, setSheetH] = useState(46)
@@ -184,6 +186,10 @@ export default function Home() {
     })
     return () => { live = false }
   }, [mode, surah])
+
+  useEffect(() => {
+    if (!startupComplete && meta && !loadingPage && (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))) setStartupComplete(true)
+  }, [startupComplete, meta, loadingPage, mode, flowSurah?.n, surah, segs, pageData])
 
   // measure mushaf frame for font fitting
   useEffect(() => {
@@ -386,18 +392,10 @@ export default function Home() {
     setMode(m)
   }
 
-  if (!meta) {
-    return (
-      <div className="h-dvh flex flex-col items-center justify-center gap-6" style={{ background: 'var(--paper)' }}>
-        <PatternBG />
-        <Bismillah size="clamp(22px, 5vw, 34px)" />
-        <p className="text-sm animate-pulse" style={{ color: 'var(--ink-soft)' }}>در حال آماده‌سازی مصحف…</p>
-      </div>
-    )
-  }
-
   return (
-    <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
+    <>
+    {!startupComplete && <StartupSplash />}
+    {meta && <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 
       <QuranSearch open={searchOpen} onOpenChange={setSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
@@ -631,6 +629,7 @@ export default function Home() {
           onPickRoot={pickRootFromIndex}
         />
       )}
-    </div>
+    </div>}
+    </>
   )
 }
