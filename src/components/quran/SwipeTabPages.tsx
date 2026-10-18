@@ -20,6 +20,7 @@ export default function SwipeTabPages({ active, panes, onChange }: {
     if (!element) return
     const tabs = keys.split(',') as AnalysisTab[]
     const index = tabs.indexOf(active)
+    const neighborAt = (dx: number) => tabs[(index + (dx > 0 ? -1 : 1) + tabs.length) % tabs.length]
     let start: { x: number; y: number; id: number } | null = null
     let distance = 0
     let locked = false
@@ -48,14 +49,14 @@ export default function SwipeTabPages({ active, panes, onChange }: {
       }
       event.preventDefault()
       distance = dx
-      const neighbor = tabs[index + (dx > 0 ? 1 : -1)]
+      const neighbor = neighborAt(dx)
       setOffset(neighbor ? Math.max(-element.clientWidth, Math.min(element.clientWidth, dx)) : dx * 0.15)
     }
     const end = (event: PointerEvent) => {
       if (!start || event.pointerId !== start.id) return
       if (!locked) { reset(); return }
       suppressClickUntil = Date.now() + 400
-      const next = tabs[index + (distance > 0 ? 1 : -1)]
+      const next = neighborAt(distance)
       const threshold = Math.min(96, element.clientWidth * 0.25)
       if (!next || Math.abs(distance) < threshold) { reset(); return }
       busy = true; start = null; setDragging(false)
@@ -83,6 +84,11 @@ export default function SwipeTabPages({ active, panes, onChange }: {
   const width = viewport.current?.clientWidth ?? 1
   return <div ref={viewport} className="relative flex-1 min-h-0 overflow-hidden" data-tab-pages style={{ touchAction: 'pan-y' }}>
     {panes.map((pane, i) => {
+      let relative = i - index
+      if (relative > panes.length / 2) relative -= panes.length
+      if (relative < -panes.length / 2) relative += panes.length
+      // Place an opposite page behind the neighbor being revealed, never across the viewport.
+      if (panes.length % 2 === 0 && Math.abs(relative) === panes.length / 2 && offset) relative = offset > 0 ? -panes.length / 2 : panes.length / 2
       const selected = pane.key === active
       const progress = Math.min(1, Math.abs(offset) / width)
       return <div key={pane.key} id={`analysis-panel-${pane.key}`} role={selected ? 'tabpanel' : undefined}
@@ -90,8 +96,8 @@ export default function SwipeTabPages({ active, panes, onChange }: {
         className="swipe-tab-page absolute inset-0 overflow-y-auto nice-scroll px-5 py-4"
         data-tab-page={pane.key}
         style={{ background: 'var(--paper)', overscrollBehavior: 'contain', touchAction: 'pan-y',
-          transform: `translate3d(calc(${(index - i) * 100}% + ${offset}px), 0, 0)`,
-          transition: dragging ? 'none' : 'transform 220ms cubic-bezier(.22,.68,0,1), opacity 220ms ease',
+          transform: `translate3d(calc(${relative * 100}% + ${offset}px), 0, 0)`,
+          transition: dragging || Math.abs(relative) > 1 ? 'none' : 'transform 220ms cubic-bezier(.22,.68,0,1), opacity 220ms ease',
           opacity: selected ? 1 : 0.6 + progress * 0.4 }}>
         {pane.content}
       </div>
