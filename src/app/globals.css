@@ -1096,7 +1096,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 .surah-pull-preview-surface { position: absolute; left: 0; right: 0; min-height: 100%; }
 .surah-pull-previous .surah-pull-preview-surface { bottom: 0; }
 .surah-pull-next .surah-pull-preview-surface { top: 0; }
-.surah-pull-hint { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 10px; line-height: 14px; color: var(--ink-soft); background: var(--paper); padding: 0 6px; border-radius: 8px; }
+.surah-pull-hint { position: absolute; left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); text-align: center; line-height: 1.7; color: var(--ink-soft); background: var(--paper); padding: 0 6px; border-radius: 8px; }
 .surah-pull-previous .surah-pull-hint { bottom: 6px; }
 .surah-pull-next .surah-pull-hint { top: 2px; }
 .surah-pull-scroll { position: relative; }

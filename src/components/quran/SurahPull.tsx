@@ -4,7 +4,7 @@ import { memo, useEffect, useLayoutEffect, useRef, useState, type ReactNode } fr
 import { loadSurah, loadTrans, type SurahData, type SurahMeta, type Translations, type Translator } from '@/lib/quran'
 import FlowPage, { FlowSurface } from './FlowPage'
 
-const THRESHOLD = 160
+const THRESHOLD = 210
 const ignoreWordTap = () => {}
 // Keep full adjacent pages mounted without rerendering their words on every touch move.
 const AdjacentFlowPage = memo(FlowPage)
@@ -144,7 +144,11 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
         <div className="surah-pull-preview-surface">
           {neighbors[n] && <FlowSurface><AdjacentFlowPage sm={meta[n - 1]} surah={neighbors[n]} trans={translations[n] ?? null} showTrans={showTrans} translator={translator} fontSize={fontSize} selection={null} highlightRoot={null} flash={null} onWordTap={ignoreWordTap} /></FlowSurface>}
         </div>
-        <div className="surah-pull-hint">{progress >= 1 ? 'برای رفتن رها کنید' : isPrevious ? 'برای سورهٔ قبل پایین بکشید' : 'برای سورهٔ بعد بالا بکشید'}</div>
+        <div className="surah-pull-hint" style={{ fontSize: fontSize * 0.55 }}>
+          {progress >= 1
+            ? `برای رفتن به سورهٔ ${meta[n - 1].fa} رها کنید`
+            : `برای دیدن سورهٔ ${meta[n - 1].fa} ${isPrevious ? 'بیشتر پایین' : 'بیشتر بالا'} بکشید`}
+        </div>
       </div>
     })}
     <div ref={scrollRef} data-reading-scroll className="surah-pull-scroll h-full overflow-y-auto nice-scroll" style={{ overscrollBehaviorY: 'contain' }}>
