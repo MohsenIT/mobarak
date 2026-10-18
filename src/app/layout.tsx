@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "قرآن کریم به خط عثمان‌طه، با تحلیل ریشه‌ای و فهرست کلیدواژه‌ها",
 };
 
-export const viewport: Viewport = { themeColor: "#0e2a22", viewportFit: "auto" };
+export const viewport: Viewport = { themeColor: "#faf4df", viewportFit: "auto" };
 
 export default function RootLayout({
   children,
