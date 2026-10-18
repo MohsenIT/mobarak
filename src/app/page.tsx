@@ -133,9 +133,12 @@ export default function Home() {
   useEffect(() => { loadMeta().then(setMeta) }, [])
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'night' ? '#0e2a22' : '#f2ecdc')
     LS.set('mushaf.theme', theme)
   }, [theme])
+  useEffect(() => {
+    const color = !startupComplete ? '#faf4df' : theme === 'night' ? '#0e2a22' : '#f2ecdc'
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color)
+  }, [theme, startupComplete])
   useEffect(() => {
     LS.set('mushaf.page', page)
     const url = new URL(window.location.href)

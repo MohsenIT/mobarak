@@ -1109,15 +1109,16 @@ input[type='range'].page-slider::-moz-range-thumb {
 .app-update-button { flex-shrink: 0; border: 1px solid var(--sage); border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--ink); background: var(--word-root); }
 .app-update-button:disabled { opacity: .6; }
 
-/* Keep the native icon canvas/color; surrounding text never moves the mark. */
-.startup-splash { --startup-logo-size: min(260px, 68vw, 38dvh); position: fixed; inset: 0; z-index: 110; background: #faf4df; color: #0e2a22; overflow: hidden; }
-.startup-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: block; width: var(--startup-logo-size); height: var(--startup-logo-size); }
-.startup-bism { position: absolute; left: 12px; right: 12px; bottom: calc(50% + var(--startup-logo-size) / 2 + clamp(18px, 5dvh, 52px)); text-align: center; font-size: clamp(23px, 6vw, 32px); margin: 0; line-height: 1.8; }
-.startup-splash h1 { position: absolute; left: 12px; right: 12px; top: calc(50% + var(--startup-logo-size) / 2 + 12px); text-align: center; font-size: 27px; font-weight: 500; line-height: 1.6; margin: 0; }
-.startup-caption { position: absolute; top: calc(50% + var(--startup-logo-size) / 2 + 82px); left: 14px; right: 14px; text-align: center; }
-.startup-verse { font-size: clamp(18px, 4.8vw, 24px); line-height: 1.9; margin: 0 0 10px; color: #60734d; }
+/* Calibrated against the user's 591x1280 Android screenshot (1.5 DPR).
+   The OS uses a 128dp icon canvas and a bottom-aligned system-font title. */
+.startup-splash { --startup-logo-size: 128px; --startup-logo-center: calc(50% - 10px); position: fixed; inset: 0; z-index: 110; background: #faf4df; color: #0e2a22; overflow: hidden; }
+.startup-logo { position: absolute; top: var(--startup-logo-center); left: 50%; transform: translate(-50%, -50%); display: block; width: var(--startup-logo-size); height: var(--startup-logo-size); }
+.startup-bism { position: absolute; left: 12px; right: 12px; bottom: calc(100% - var(--startup-logo-center) + var(--startup-logo-size) / 2 + clamp(24px, 5dvh, 44px)); text-align: center; font-size: clamp(23px, 6vw, 30px); margin: 0; line-height: 1.8; }
+.startup-splash h1 { position: absolute; left: 12px; right: 12px; bottom: max(8px, env(safe-area-inset-bottom)); text-align: center; font-family: system-ui, sans-serif; font-size: 24px; font-weight: 400; line-height: 32px; margin: 0; color: #202124; }
+.startup-caption { position: absolute; top: calc(var(--startup-logo-center) + var(--startup-logo-size) / 2 + 44px); left: 14px; right: 14px; text-align: center; }
+.startup-verse { font-size: clamp(18px, 4.8vw, 23px); line-height: 1.9; margin: 0 0 10px; color: #60734d; }
 .startup-caption .chip { font-size: 10px; border-color: #cfc69f; color: #827445; background: transparent; }
-@media (max-height: 520px) { .startup-splash { --startup-logo-size: min(170px, 34dvh); } .startup-bism { font-size: 21px; bottom: calc(50% + var(--startup-logo-size) / 2 + 10px); } .startup-splash h1 { font-size: 23px; top: calc(50% + var(--startup-logo-size) / 2 + 4px); } .startup-caption { top: calc(50% + var(--startup-logo-size) / 2 + 47px); } .startup-verse { font-size: 17px; margin-bottom: 3px; } }
+@media (max-height: 520px) { .startup-splash { --startup-logo-size: 96px; } .startup-bism { font-size: 21px; bottom: calc(100% - var(--startup-logo-center) + var(--startup-logo-size) / 2 + 16px); } .startup-caption { top: calc(var(--startup-logo-center) + var(--startup-logo-size) / 2 + 16px); } .startup-verse { font-size: 17px; margin-bottom: 3px; } .startup-splash h1 { font-size: 18px; line-height: 28px; } }
 
 .startup-splash { opacity: 1; transition: opacity 180ms ease-out; }
 .startup-splash.startup-leaving { opacity: 0; }
