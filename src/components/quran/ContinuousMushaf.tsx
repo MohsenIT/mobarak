@@ -9,6 +9,7 @@ type ReadingProps = Pick<ComponentProps<typeof MushafPage>, 'selection' | 'highl
 type Bundle = { data: Map<number, SurahData>; translations: Map<number, Translations> }
 const bundles = new Map<string, Bundle>()
 const totalPages = 604
+const PAGE_GAP = 12
 
 function PageContent({ meta, page, showTrans, translator, fontSize, flowFont, pageHeight, onReady, onMeasure, ...reading }: ReadingProps & {
   meta: Meta; page: number; showTrans: boolean; translator: Translator; fontSize: number; flowFont: number; pageHeight: number
@@ -79,7 +80,7 @@ export default function ContinuousMushaf({ meta, page, navigationRevision, onPag
   report.current = onPageChange
   const fontSize = Math.max(11, Math.min(size.h / 29, Math.min(640, size.w - 16) / 14, 48)) * scale
   const pageHeight = Math.ceil(Math.max(size.h - 44, fontSize * 29))
-  const rowHeight = pageHeight + 44
+  const rowHeight = pageHeight + 44 + PAGE_GAP
   const findPage = useCallback((y: number) => {
     let low = 1, high = totalPages
     while (low < high) {
@@ -104,7 +105,7 @@ export default function ContinuousMushaf({ meta, page, navigationRevision, onPag
     frame.current = requestAnimationFrame(update)
   }, [update])
   const measure = useCallback((p: number, height: number) => {
-    heights.current.set(p, Math.ceil(height))
+    heights.current.set(p, Math.ceil(height) + PAGE_GAP)
     schedule()
   }, [schedule])
   useLayoutEffect(() => {
@@ -130,7 +131,7 @@ export default function ContinuousMushaf({ meta, page, navigationRevision, onPag
       const visible = p >= range.from && p <= range.to
       return <section key={p} ref={el => { if (el) sections.current.set(p, el); else sections.current.delete(p) }}
         data-mushaf-page={p} aria-label={`صفحهٔ ${toFa(p)}`} className="relative w-full max-w-[640px] mx-auto"
-        style={{ minHeight: visible ? rowHeight : heights.current.get(p) ?? rowHeight }}>
+        style={{ minHeight: visible ? rowHeight : heights.current.get(p) ?? rowHeight, paddingBottom: PAGE_GAP }}>
         {visible && <PageContent key={`${p}:${showTrans}`} meta={meta} page={p} showTrans={showTrans} translator={translator}
           fontSize={fontSize} flowFont={22 * scale} pageHeight={pageHeight} onReady={onContentReady} onMeasure={measure} {...reading} />}
       </section>
