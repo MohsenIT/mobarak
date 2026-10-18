@@ -20,7 +20,7 @@ export default function SwipeTabPages({ active, panes, onChange }: {
     if (!element) return
     const tabs = keys.split(',') as AnalysisTab[]
     const index = tabs.indexOf(active)
-    const neighborAt = (dx: number) => tabs[(index + (dx > 0 ? -1 : 1) + tabs.length) % tabs.length]
+    const neighborAt = (dx: number) => tabs[(index + (dx > 0 ? 1 : -1) + tabs.length) % tabs.length]
     let start: { x: number; y: number; id: number } | null = null
     let distance = 0
     let locked = false
@@ -84,7 +84,7 @@ export default function SwipeTabPages({ active, panes, onChange }: {
   const width = viewport.current?.clientWidth ?? 1
   return <div ref={viewport} className="relative flex-1 min-h-0 overflow-hidden" data-tab-pages style={{ touchAction: 'pan-y' }}>
     {panes.map((pane, i) => {
-      let relative = i - index
+      let relative = index - i
       if (relative > panes.length / 2) relative -= panes.length
       if (relative < -panes.length / 2) relative += panes.length
       // Place an opposite page behind the neighbor being revealed, never across the viewport.
