@@ -51,6 +51,16 @@ export default function NavDrawer(props: Props) {
   const [pageInput, setPageInput] = useState('')
   const [jumpKind, setJumpKind] = useState<JumpKind>('surah')
   const [pageError, setPageError] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const refreshApp = () => {
+    if (refreshing) return
+    setRefreshing(true)
+    // A unique navigation URL bypasses an older document without touching
+    // bookmarks, reading preferences, or the current surah/page parameters.
+    const url = new URL(window.location.href)
+    url.searchParams.set('_refresh', Date.now().toString())
+    window.location.replace(url.href)
+  }
   // ref to the surah list container — we scrollIntoView the active row
   // when the drawer opens.
   const surahListRef = useRef<HTMLDivElement>(null)
@@ -337,6 +347,17 @@ export default function NavDrawer(props: Props) {
                 <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--ink-faint)' }}>
                   <span>ریز</span><span>{toFa(Math.round(props.scale * 100))}٪</span><span>درشت</span>
                 </div>
+              </section>
+
+              <section>
+                <button type="button" onClick={refreshApp} disabled={refreshing}
+                  className="w-full rounded-xl border px-4 py-3 text-sm font-medium disabled:opacity-60"
+                  style={{ color: 'var(--ink)', borderColor: 'var(--line)' }}>
+                  {refreshing ? 'در حال تازه‌سازی…' : 'دریافت نسخهٔ جدید'}
+                </button>
+                <p className="text-xs leading-6 mt-2" style={{ color: 'var(--ink-soft)' }}>
+                  صفحه دوباره بارگذاری می‌شود؛ نشان‌ها و تنظیمات شما حفظ می‌شوند.
+                </p>
               </section>
 
               <p className="text-xs leading-6 pt-2 border-t" style={{ color: 'var(--ink-faint)', borderColor: 'var(--line)' }}>
