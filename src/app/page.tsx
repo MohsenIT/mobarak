@@ -74,6 +74,13 @@ export default function Home() {
   const [flowTrans, setFlowTrans] = useState<Translations | null>(null)
   const [loadingPage, setLoadingPage] = useState(true)
   const [startupComplete, setStartupComplete] = useState(false)
+  const [startupMinimumElapsed, setStartupMinimumElapsed] = useState(false)
+  const [startupLeaving, setStartupLeaving] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setStartupMinimumElapsed(true), 1000)
+    return () => clearTimeout(timer)
+  }, [])
   const [box, setBox] = useState({ w: 0, h: 0 })
   const [panelMax, setPanelMax] = useState(false)
   const [sheetH, setSheetH] = useState(46)
@@ -193,8 +200,15 @@ export default function Home() {
   }, [mode, surah])
 
   useEffect(() => {
-    if (!startupComplete && meta && !loadingPage && (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))) setStartupComplete(true)
-  }, [startupComplete, meta, loadingPage, mode, flowSurah?.n, surah, segs, pageData])
+    if (!startupComplete && startupMinimumElapsed && meta && !loadingPage && (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))) setStartupLeaving(true)
+  }, [startupComplete, startupMinimumElapsed, meta, loadingPage, mode, flowSurah?.n, surah, segs, pageData])
+
+  useEffect(() => {
+    if (!startupLeaving) return
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const timer = setTimeout(() => setStartupComplete(true), reduced ? 0 : 180)
+    return () => clearTimeout(timer)
+  }, [startupLeaving])
 
   // measure mushaf frame for font fitting
   useEffect(() => {
@@ -399,7 +413,7 @@ export default function Home() {
 
   return (
     <>
-    {!startupComplete && <StartupSplash />}
+    {!startupComplete && <StartupSplash leaving={startupLeaving} />}
     {meta && <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 

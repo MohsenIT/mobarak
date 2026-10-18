@@ -1,5 +1,5 @@
-export default function StartupSplash() {
-  return <div className="startup-splash" role="status" aria-label="در حال آماده‌سازی قرآن واژه">
+export default function StartupSplash({ leaving = false }: { leaving?: boolean }) {
+  return <div className={`startup-splash${leaving ? ' startup-leaving' : ''}`} role="status" aria-label="در حال آماده‌سازی قرآن واژه">
     <p className="startup-bism font-quran">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
     <img className="startup-logo" src="/icons/app-logo-v3-maskable-512.png" width="512" height="512" alt="" />
     <h1>قرآن واژه</h1>

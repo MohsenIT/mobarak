@@ -1118,3 +1118,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 .startup-verse { font-size: clamp(18px, 4.8vw, 24px); line-height: 1.9; margin: 0 0 10px; color: #60734d; }
 .startup-caption .chip { font-size: 10px; border-color: #cfc69f; color: #827445; background: transparent; }
 @media (max-height: 520px) { .startup-splash { --startup-logo-size: min(170px, 34dvh); } .startup-bism { font-size: 21px; bottom: calc(50% + var(--startup-logo-size) / 2 + 10px); } .startup-splash h1 { font-size: 23px; top: calc(50% + var(--startup-logo-size) / 2 + 4px); } .startup-caption { top: calc(50% + var(--startup-logo-size) / 2 + 47px); } .startup-verse { font-size: 17px; margin-bottom: 3px; } }
+
+.startup-splash { opacity: 1; transition: opacity 180ms ease-out; }
+.startup-splash.startup-leaving { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .startup-splash { transition: none; } }
