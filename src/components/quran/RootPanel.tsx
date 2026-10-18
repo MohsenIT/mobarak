@@ -20,6 +20,8 @@ interface Props {
   meta: Meta
   translator: Translator
   /** when true, the panel goes full-screen / wide (mobile + desktop) */
+  sheetH: number
+  onSheetHeightChange: (height: number) => void
   maximized: boolean
   onToggleMax: () => void
   /** open the surah index page */
@@ -41,13 +43,12 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
 export default function RootPanel({
   sel: anchor, onSelectionChange, onCompareContext, meta, translator, maximized, onToggleMax, onOpenIndex, onClose, onJump, onJumpSurah,
-  stackedOverIndex = false, comparisonRange,
+  stackedOverIndex = false, comparisonRange, sheetH, onSheetHeightChange: setSheetH,
 }: Props) {
   const [tab, setTab] = useState<AnalysisTab>(anchor.part === 'prefix' ? 'word' : 'root')
   const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
   const sel = targets[tab]
   const [surah, setSurah] = useState<SurahData | null>(null)
-  const [sheetH, setSheetH] = useState(46)
   const dragRef = useRef<{ y: number; h: number } | null>(null)
   const [formAvailable, setFormAvailable] = useState<boolean | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)

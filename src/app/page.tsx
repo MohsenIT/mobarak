@@ -73,6 +73,7 @@ export default function Home() {
   const [loadingPage, setLoadingPage] = useState(true)
   const [box, setBox] = useState({ w: 0, h: 0 })
   const [panelMax, setPanelMax] = useState(false)
+  const [sheetH, setSheetH] = useState(46)
   const [showIndex, setShowIndex] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
   const [contextComparison, setContextComparison] = useState(false)
@@ -552,6 +553,8 @@ export default function Home() {
             meta={meta}
             translator={translator}
             maximized={panelMax}
+            sheetH={sheetH}
+            onSheetHeightChange={setSheetH}
             onToggleMax={() => setPanelMax(v => !v)}
             onOpenIndex={() => { setPanelMax(false); setShowIndex(true) }}
             onClose={() => setSel(null)}
@@ -571,6 +574,8 @@ export default function Home() {
             meta={meta}
             translator={translator}
             maximized={panelMax}
+            sheetH={sheetH}
+            onSheetHeightChange={setSheetH}
             onToggleMax={() => setPanelMax(v => !v)}
             onOpenIndex={() => { setPanelMax(false); setShowIndex(true) }}
             onClose={() => setSel(null)}
