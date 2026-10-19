@@ -23,9 +23,9 @@ export const STAT_OPTIONS: Record<AnalysisTab, Option[]> = {
 const MEANING_OPTIONS: Record<AnalysisTab, Option[]> = {
   root: [...ROOT_BOOKS],
   form: [{ id: 'morphology', label: 'شرح ساخت صرفی و منبع' }],
-  word: [{ id: 'lemma', label: 'توضیح بن‌واژه' }, { id: 'translation', label: 'ترجمهٔ آیهٔ انتخاب‌شده' }],
+  word: [{ id: 'lemma', label: 'توضیح بن‌واژه' }],
   verse: [{ id: 'translation', label: 'ترجمهٔ آیه' }],
-  context: [{ id: 'note', label: 'توضیح سیاق و منبع' }, { id: 'translation', label: 'ترجمهٔ آیات سیاق' }],
+  context: [{ id: 'note', label: 'توضیح سیاق و منبع' }],
 }
 type Preferences = { hidden: string[]; collapsed: string[]; statsFirst: boolean }
 const defaults: Preferences = { hidden: [], collapsed: [], statsFirst: false }

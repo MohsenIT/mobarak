@@ -25,7 +25,7 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
   const [globalRoots, setGlobalRoots] = useState<Record<string, Record<string, number>> | null>(null)
   useEffect(() => {
     let live = true
-    Promise.all([loadSurah(sel.s), tab === 'root' ? Promise.resolve(null) : loadTrans(sel.s)]).then(([surah, trans]) => { if (live) setData({ surah, trans }) })
+    Promise.all([loadSurah(sel.s), tab === 'root' || tab === 'context' ? Promise.resolve(null) : loadTrans(sel.s)]).then(([surah, trans]) => { if (live) setData({ surah, trans }) })
     if (tab === 'root') loadGlobalRoots().then(data => { if (live) setGlobalRoots(data) })
     return () => { live = false }
   }, [sel.s, tab])
@@ -56,7 +56,7 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
 
   const selectedForm = sel.part !== 'prefix' && surah?.n === sel.s ? surah.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form : undefined
 
-  return <>          {tab !== 'root' ? (surah?.n === sel.s && trans ? (tab === 'context' ? <ContextDetails selection={sel} surah={surah} trans={trans} translator={translator} onPick={selectTarget} onCompare={onCompareContext} /> : <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} onPick={selectTarget} comparisonRange={comparisonRange} />) : <p role="status">در حال بارگیری…</p>) : <>
+  return <>          {tab !== 'root' ? (surah?.n !== sel.s ? <p role="status">در حال بارگیری…</p> : tab === 'context' ? <ContextDetails selection={sel} surah={surah} onPick={selectTarget} onCompare={onCompareContext} /> : trans ? <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} /> : <p role="status">در حال بارگیری…</p>) : <>
           {!root ? (
             <div className="text-center py-6" style={{ color: 'var(--ink-soft)' }}>
               <p className="text-sm leading-8">این واژه حرف یا ضمیر است و ریشهٔ مستقلی ندارد.</p>

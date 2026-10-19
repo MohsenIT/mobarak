@@ -121,7 +121,10 @@ function RootPanelContent({
   const canUnitNext = !!nextUnit
   const headingAyah = tab === 'context' ? selectedContext?.from ?? sel.a : sel.a
   const headingVerse = surah?.n === sel.s ? surah.v.find(verse => verse.n === headingAyah) : undefined
-  const headingText = tab === 'verse' || tab === 'context' ? headingVerse?.w.slice(0, 2).map(displayWordText).join(' ') ?? sel.text : sel.text
+  const headingPreview = tab === 'verse' || tab === 'context'
+  const headingWords = tab === 'context' && selectedContext ? (surah?.n === sel.s ? surah.v.filter(verse => verse.n >= selectedContext.from && verse.n <= selectedContext.to).flatMap(verse => verse.w) : undefined) : headingVerse?.w
+  const headingText = headingPreview ? headingWords?.slice(0, 2).map(displayWordText).join(' ') ?? sel.text : sel.text
+  const headingHasMore = headingPreview && (headingWords?.length ?? 0) > 2
   const headingReference = tab === 'context' && selectedContext ? `${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : toFa(sel.a)
   const unitTitle = (location?: [number, number, WordPart?]) => {
     if (!location || !surah || surah.n !== sel.s) return '—'
@@ -203,7 +206,7 @@ function RootPanelContent({
 
         <div className="panel-header" style={{ borderColor: 'var(--line)' }}>
           <div className="panel-selection">
-            <span className="font-quran panel-word" dir="rtl" title={headingText}><QuranText text={headingText} /></span>
+            <span className={`font-quran panel-word${headingPreview ? ' panel-word-preview' : ''}`} dir="rtl" title={`${headingText}${headingHasMore ? '…' : ''}`}>{headingPreview ? <><span className="panel-preview-text"><QuranText text={headingText} /></span>{headingHasMore && <span className="panel-preview-ellipsis">…</span>}</> : <QuranText text={headingText} />}</span>
             <span className="chip panel-reference" title={`سورهٔ ${meta.surahs[sel.s - 1]?.fa} · ${tab === 'context' ? 'آیات' : 'آیه'} ${headingReference}`}>
               <span className="panel-reference-surah">{meta.surahs[sel.s - 1]?.fa}</span><span>· {headingReference}</span>
             </span>

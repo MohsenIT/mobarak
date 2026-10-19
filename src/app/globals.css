@@ -1266,3 +1266,6 @@ input[type='range'].page-slider::-moz-range-thumb {
 .analysis-position-title.font-quran { font-size: 20px; line-height: 1.5; }
 .analysis-position-count { font-size: 9px; color: var(--ink-soft); font-weight: 400; }
 @media (max-width: 380px) { .analysis-unit-title.font-quran { font-size: 16px; } .analysis-unit-title { max-width: 48px; } .analysis-position-title { max-width: 54px; } .analysis-position-title.font-quran { font-size: 18px; } .analysis-navigation .analysis-position-button { gap: 3px; padding-inline: 4px; } .panel-header { padding-inline: 8px; gap: 5px; } .panel-reference-surah { max-width: 38px; } .panel-reference { font-size: 9px; padding-inline: 4px; } .panel-actions { gap: 2px; } .panel-actions .sheet-size-select { max-width: 52px; font-size: 10px; } }
+.panel-word.panel-word-preview { display: inline-flex; align-items: baseline; gap: 2px; }
+.panel-preview-text { min-width: 0; overflow: hidden; text-overflow: clip; }
+.panel-preview-ellipsis { flex-shrink: 0; }
