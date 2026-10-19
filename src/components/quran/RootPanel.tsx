@@ -1,11 +1,11 @@
 'use client'
-import { lexicalKey, wordTarget, type WordPart } from '@/lib/word-parts'
+import { displayWordText, lexicalKey, wordTarget, type WordPart } from '@/lib/word-parts'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Translator, SurahData, Meta } from '@/lib/quran'
-import { loadSurah, spacedRoot, toFa, morphologyLabel, formName } from '@/lib/quran'
+import { loadSurah, spacedRoot, toFa, morphologyLabel } from '@/lib/quran'
 import type { Selection } from './MushafPage'
-import { analysisNavigation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
+import { adjacentRootLocations, analysisNavigation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import AnalysisTabContent from './AnalysisTabContent'
@@ -114,11 +114,34 @@ function RootPanelContent({
   const items = nav?.repetitions ?? []
   const index = nav?.repetitionIndex ?? -1
   const hasRepetitions = nav?.hasRepetitions ?? (tab !== 'verse' && tab !== 'context')
-  const canUnitPrevious = !!nav && nav.unitIndex > 0
-  const canUnitNext = !!nav && nav.unitIndex >= 0 && nav.unitIndex < nav.units.length - 1
+  const rootNeighbors = useMemo(() => tab === 'root' && surah?.n === sel.s ? adjacentRootLocations(surah, sel) : null, [tab, surah, sel])
+  const previousUnit = tab === 'root' ? rootNeighbors?.previous : nav && nav.unitIndex > 0 ? nav.units[nav.unitIndex - 1] : undefined
+  const nextUnit = tab === 'root' ? rootNeighbors?.next : nav && nav.unitIndex >= 0 ? nav.units[nav.unitIndex + 1] : undefined
+  const canUnitPrevious = !!previousUnit
+  const canUnitNext = !!nextUnit
+  const headingAyah = tab === 'context' ? selectedContext?.from ?? sel.a : sel.a
+  const headingVerse = surah?.n === sel.s ? surah.v.find(verse => verse.n === headingAyah) : undefined
+  const headingText = tab === 'verse' || tab === 'context' ? headingVerse?.w.slice(0, 2).map(displayWordText).join(' ') ?? sel.text : sel.text
+  const headingReference = tab === 'context' && selectedContext ? `${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : toFa(sel.a)
+  const unitTitle = (location?: [number, number, WordPart?]) => {
+    if (!location || !surah || surah.n !== sel.s) return '—'
+    const [a, pos, part] = location
+    const word = surah.v[a - 1]?.w[pos - 1]
+    if (!word) return '—'
+    if (tab === 'root') return word.r ? spacedRoot(word.r) : '—'
+    if (tab === 'form') return word.form ? morphologyLabel(word.form) : '—'
+    if (tab === 'word') return wordTarget(word, part).text
+    if (tab === 'verse') return `آیه ${toFa(a)}`
+    const range = getContext(sel.s, a)
+    return range ? `آیات ${toFa(range.from)}–${toFa(range.to)}` : `آیه ${toFa(a)}`
+  }
+  const previousUnitTitle = unitTitle(previousUnit)
+  const nextUnitTitle = unitTitle(nextUnit)
+  const currentUnitTitle = tab === 'root' ? root ? spacedRoot(root) : '—' : tab === 'form' ? selectedForm ? morphologyLabel(selectedForm) : 'باب' : tab === 'word' ? sel.text : tab === 'verse' ? `آیه ${toFa(sel.a)}` : selectedContext ? `آیات ${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : 'سیاق'
+  const unitQuranFont = tab === 'root' || tab === 'word'
+  const positionTitle = <><span className={`analysis-position-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={currentUnitTitle} /></span><span className="analysis-position-count" dir="ltr">{index >= 0 ? `${toFa(index + 1)}/${toFa(items.length)}` : '—'}</span></>
   const navigateUnit = (direction: number) => {
-    if (!nav || nav.unitIndex < 0) return
-    const target = nav.units[nav.unitIndex + direction]
+    const target = direction < 0 ? previousUnit : nextUnit
     if (target) selectTarget(...target)
   }
   const navigate = (direction: number) => {
@@ -178,14 +201,13 @@ function RootPanelContent({
             if (next !== null && !maximized) { event.preventDefault(); setSheetH(clamp(next, 8, 88)) }
           }} />
 
-        {/* ===== Single-row header: word + root inline + chip + actions =====
-            Everything on ONE line — no wrapping. Word and root must sit
-            side-by-side (user complained the root was wrapping to a 2nd line). */}
         <div className="panel-header" style={{ borderColor: 'var(--line)' }}>
-          <span className={`${tab === 'verse' || tab === 'context' || tab === 'form' ? '' : 'font-quran '}panel-word`} dir="rtl">
-            {tab === 'root' && root ? spacedRoot(root) : tab === 'form' ? `${formName(root, selectedForm) ?? ''} (${selectedForm ? morphologyLabel(selectedForm) : 'باب'})` : tab === 'context' ? (selectedContext ? `سیاق ${toFa(selectedContext.id)}` : 'سیاق') : tab === 'verse' ? `آیه ${toFa(sel.a)}` : <QuranText text={sel.text} />}
-          </span>
-          <span className="chip panel-chip hidden sm:inline-flex">سوره {meta.surahs[sel.s - 1]?.fa} · {tab === 'context' && selectedContext ? `آیات ${toFa(selectedContext.from)} تا ${toFa(selectedContext.to)}` : `آیه ${toFa(sel.a)}`}</span>
+          <div className="panel-selection">
+            <span className="font-quran panel-word" dir="rtl" title={headingText}><QuranText text={headingText} /></span>
+            <span className="chip panel-reference" title={`سورهٔ ${meta.surahs[sel.s - 1]?.fa} · ${tab === 'context' ? 'آیات' : 'آیه'} ${headingReference}`}>
+              <span className="panel-reference-surah">{meta.surahs[sel.s - 1]?.fa}</span><span>· {headingReference}</span>
+            </span>
+          </div>
           <div className="panel-actions">
             <AnalysisSettings tab={tab} />
             {!maximized && <select aria-label="اندازهٔ باتم‌شیت" title="اندازهٔ باتم‌شیت"
@@ -215,23 +237,23 @@ function RootPanelContent({
           ))}
         </div>
         <nav className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={`پیمایش ${noun}`}>
-          <button className="analysis-unit-button" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={`${noun} قبل`}>
+          <button className="analysis-unit-button" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={`${noun} قبل`} title={`${noun} قبل: ${previousUnitTitle}`}>
             {hasRepetitions ? <ChevronsRight size={15} aria-hidden="true" /> : <ChevronRight size={15} aria-hidden="true" />}
-            <span>{noun} قبل</span>
+            <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={previousUnitTitle} /></span>
           </button>
           {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(-1)} disabled={index <= 0}
             aria-label="تکرار قبل" title={`${toFa(Math.max(0, index))} تکرار قبل`}>
             <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))} تکرار</span>
           </button>}
           {hasRepetitions ? <OccurrencePicker open={pickerOpen} onOpenChange={setPickerOpen} items={items} index={index} surah={surah}
-            groupKey={`${tab}:${sel.s}:${tab === 'root' ? root : tab === 'form' ? `${root}:${selectedForm}` : surah ? lexicalKey(surah.v[sel.a - 1].w[sel.pos - 1], sel.part) : sel.text}`}
-            title={index < 0 ? '—' : `${toFa(index + 1)} از ${toFa(items.length)}`}
+            groupKey={`${tab}:${sel.s}:${tab === 'root' ? root : tab === 'form' ? `${root}:${selectedForm}` : surah?.n === sel.s ? lexicalKey(surah.v[sel.a - 1].w[sel.pos - 1], sel.part) : sel.text}`}
+            title={positionTitle}
             label={`تکرار ${toFa(index + 1)} از ${toFa(items.length)}؛ انتخاب تکرار`}
             onSelect={location => selectTarget(...location)} onFull={() => onOpenOccurrences({ ...sel, tab, form: selectedForm })} /> : <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
             <PopoverTrigger asChild>
               <button className="analysis-position-button" disabled={index < 0 || !items.length}
                 aria-label={`${hasRepetitions ? 'تکرار' : noun} ${toFa(index + 1)} از ${toFa(items.length)}؛ انتخاب ${hasRepetitions ? 'تکرار' : noun}`}>
-                {index < 0 ? '—' : tab === 'context' && selectedContext ? `آیات ${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : `${toFa(index + 1)} از ${toFa(items.length)}`}
+                {positionTitle}
               </button>
             </PopoverTrigger>
             <PopoverContent className="analysis-position-picker" dir="rtl" data-analysis-picker
@@ -254,8 +276,8 @@ function RootPanelContent({
             aria-label="تکرار بعد" title={`${toFa(Math.max(0, items.length - index - 1))} تکرار بعد`}>
             <span>{toFa(Math.max(0, items.length - index - 1))} تکرار</span><ChevronLeft size={17} aria-hidden="true" />
           </button>}
-          <button className="analysis-unit-button" onClick={() => navigateUnit(1)} disabled={!canUnitNext} aria-label={`${noun} بعد`}>
-            <span>{noun} بعد</span>
+          <button className="analysis-unit-button" onClick={() => navigateUnit(1)} disabled={!canUnitNext} aria-label={`${noun} بعد`} title={`${noun} بعد: ${nextUnitTitle}`}>
+            <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={nextUnitTitle} /></span>
             {hasRepetitions ? <ChevronsLeft size={15} aria-hidden="true" /> : <ChevronLeft size={15} aria-hidden="true" />}
           </button>
         </nav>

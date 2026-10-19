@@ -1,5 +1,5 @@
 'use client'
-import { useLayoutEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
 import { Arrow as PopoverArrow } from '@radix-ui/react-popover'
 import { List, X } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -12,7 +12,7 @@ import QuranText from './QuranText'
 
 export default function OccurrencePicker({ open, onOpenChange, items, index, surah, groupKey, label, title, onSelect, onFull }: {
   open: boolean; onOpenChange: (open: boolean) => void; items: AnalysisLocation[]; index: number
-  surah: SurahData | null; groupKey: string; label: string; title: string
+  surah: SurahData | null; groupKey: string; label: string; title: ReactNode
   onSelect: (location: AnalysisLocation) => void; onFull?: () => void
 }) {
   const list = useRef<HTMLDivElement>(null)

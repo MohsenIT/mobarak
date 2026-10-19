@@ -1,6 +1,6 @@
 /// <reference types="bun-types" />
 import { expect, test } from 'bun:test'
-import { analysisOccurrences, matchesAnalysis, nextAnalysisLocation, analysisNavigation, type AnalysisSelection } from './analysis'
+import { analysisOccurrences, adjacentRootLocations, matchesAnalysis, nextAnalysisLocation, analysisNavigation, type AnalysisSelection } from './analysis'
 import { formName } from './quran'
 import taha from '../../public/data/surah/20.json'
 import type { SurahData } from './quran'
@@ -80,4 +80,23 @@ test('waw and stem have independent word-unit positions and repetitions', () => 
   expect(nav.units[nav.unitIndex + 1]).toEqual([21, 3, 'stem'])
   expect(nav.repetitionIndex).toBeGreaterThanOrEqual(0)
   expect(nav.repetitions.every(([a, pos, part]) => tahaData.v[a - 1].w[pos - 1].wa && part === 'prefix')).toBe(true)
+})
+
+
+test('root neighbors follow the current occurrence rather than the first occurrence of that root', () => {
+  const surah: SurahData = { ...taha, ri: {} }
+  const neighbors = adjacentRootLocations(surah, { a: 48, pos: 3, root: 'وحي' })
+  expect(neighbors.previous).toEqual([47, 21])
+  expect(neighbors.next).toEqual([48, 6])
+  expect(surah.v[neighbors.previous![0] - 1].w[neighbors.previous![1] - 1].r).toBe('هدي')
+  expect(surah.v[neighbors.next![0] - 1].w[neighbors.next![1] - 1].r).toBe('عذب')
+})
+
+test('adjacent root navigation skips the same root and stops at the surah boundaries', () => {
+  const first = adjacentRootLocations(surah, base)
+  expect(first.previous).toBeUndefined()
+  expect(first.next).toEqual([2, 1])
+  const last = adjacentRootLocations(surah, { a: 2, pos: 1, root: 'قول' })
+  expect(last.previous).toEqual([1, 2])
+  expect(last.next).toBeUndefined()
 })

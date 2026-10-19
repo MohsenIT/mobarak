@@ -111,3 +111,17 @@ export function analysisNavigation(surah: SurahData, selection: AnalysisSelectio
   const repetitionIndex = hasRepetitions ? repetitions.findIndex(([a, pos]) => a === selection.a && pos === selection.pos) : unitIndex
   return { units, unitIndex, repetitions, repetitionIndex, hasRepetitions }
 }
+
+/** Neighboring different roots around the current occurrence in reading order. */
+export function adjacentRootLocations(surah: SurahData, selection: Pick<AnalysisSelection, 'a' | 'pos' | 'root'>) {
+  const words = surah.v.flatMap(verse => verse.w.map((word, i) => ({ a: verse.n, pos: i + 1, root: word.r })))
+  const current = words.findIndex(word => word.a === selection.a && word.pos === selection.pos)
+  const find = (direction: number): AnalysisLocation | undefined => {
+    if (current < 0) return undefined
+    for (let i = current + direction; i >= 0 && i < words.length; i += direction) {
+      const word = words[i]
+      if (word.root && word.root !== selection.root) return [word.a, word.pos]
+    }
+  }
+  return { previous: find(-1), next: find(1) }
+}

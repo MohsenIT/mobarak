@@ -1255,3 +1255,14 @@ input[type='range'].page-slider::-moz-range-thumb {
 @media (min-width: 768px) { .search-page-header { padding-inline: 32px; padding-top: 24px; } .search-page-results { padding-inline: 32px; } .search-results-summary { padding-inline: 34px; } .search-page-title h1 { font-size: 24px; } }
 @media (max-width: 360px) { .search-page-header { padding-inline: 12px; } .search-page-title { margin-bottom: 12px; } .search-match-options { gap: 2px 11px; } .search-scope-action { font-size: 9px; } }
 .search-page-header { max-height: 70dvh; overflow-y: auto; }
+
+.panel-selection { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1; }
+.panel-reference { display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0; font-size: 10px; padding: 3px 6px; white-space: nowrap; }
+.panel-reference-surah { max-width: 60px; overflow: hidden; text-overflow: ellipsis; }
+.analysis-unit-title { display: block; max-width: 70px; overflow: hidden; text-overflow: ellipsis; }
+.analysis-unit-title.font-quran { font-size: 18px; line-height: 1.5; }
+.analysis-navigation .analysis-position-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding-inline: 7px; }
+.analysis-position-title { display: block; max-width: 60px; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
+.analysis-position-title.font-quran { font-size: 20px; line-height: 1.5; }
+.analysis-position-count { font-size: 9px; color: var(--ink-soft); font-weight: 400; }
+@media (max-width: 380px) { .analysis-unit-title.font-quran { font-size: 16px; } .analysis-unit-title { max-width: 48px; } .analysis-position-title { max-width: 54px; } .analysis-position-title.font-quran { font-size: 18px; } .analysis-navigation .analysis-position-button { gap: 3px; padding-inline: 4px; } .panel-header { padding-inline: 8px; gap: 5px; } .panel-reference-surah { max-width: 38px; } .panel-reference { font-size: 9px; padding-inline: 4px; } .panel-actions { gap: 2px; } .panel-actions .sheet-size-select { max-width: 52px; font-size: 10px; } }
