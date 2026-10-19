@@ -1161,3 +1161,5 @@ input[type='range'].page-slider::-moz-range-thumb {
 @keyframes app-update-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .app-update-spinner { animation: none; } }
 @media (max-width: 360px) { .app-update-notice { gap: 6px; padding: 10px 8px; } .app-update-button { padding: 8px 6px; } }
+
+.startup-verse strong { font-weight: 700; color: #284b34; }

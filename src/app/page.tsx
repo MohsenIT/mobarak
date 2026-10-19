@@ -77,7 +77,7 @@ export default function Home() {
   const [startupLeaving, setStartupLeaving] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setStartupMinimumElapsed(true), 1000)
+    const timer = setTimeout(() => setStartupMinimumElapsed(true), 2000)
     return () => clearTimeout(timer)
   }, [])
   const [mushafNavigationRevision, setMushafNavigationRevision] = useState(0)
