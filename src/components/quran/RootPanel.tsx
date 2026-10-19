@@ -266,7 +266,6 @@ function OccurrencePreview({ surah, ayah, pos, part }: { surah: SurahData; ayah:
   const after = words.slice(pos, pos + 3).map(displayWordText).join(' ')
   return <span className="analysis-occurrence-preview font-quran" dir="rtl">
     <span className="analysis-occurrence-before"><span><QuranText text={[before, part !== 'prefix' ? prefix : ''].filter(Boolean).join(' ')} /></span></span>
-    <span className="analysis-occurrence-target"><span className="analysis-occurrence-match"><QuranText text={part === 'prefix' ? prefix : stem} /></span></span>
-    <span className="analysis-occurrence-after"><QuranText text={[part === 'prefix' ? stem : '', after].filter(Boolean).join(' ')} /></span>
+    <span className="analysis-occurrence-target"><span className="analysis-occurrence-match"><QuranText text={part === 'prefix' ? prefix : stem} /></span>{' '}<QuranText text={[part === 'prefix' ? stem : '', after].filter(Boolean).join(' ')} /></span>
   </span>
 }

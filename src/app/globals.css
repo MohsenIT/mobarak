@@ -1144,13 +1144,13 @@ input[type='range'].page-slider::-moz-range-thumb {
 @media (hover: hover) { .analysis-navigation button:not(:disabled):hover, .analysis-position-option:hover { background: var(--word-hover); } }
 .analysis-navigation .analysis-position-button { min-height: 28px; border: 1px solid var(--line); border-radius: 14px; }
 
-.analysis-position-option.has-excerpt { display: grid; grid-template-columns: 48px minmax(0, 1fr); }
+.analysis-position-option.has-excerpt { display: grid; grid-template-columns: 58px minmax(0, 1fr); overflow: hidden; }
 .analysis-occurrence-reference { font-size: 10px; color: var(--ink-soft); white-space: nowrap; }
-.analysis-occurrence-preview { display: grid; grid-template-columns: minmax(0, 1fr) 88px minmax(0, 1fr); gap: 5px; min-width: 0; font-size: 21px; line-height: 2; color: var(--ink-soft); white-space: nowrap; }
-.analysis-occurrence-before, .analysis-occurrence-after, .analysis-occurrence-target { min-width: 0; overflow: hidden; }
+.analysis-occurrence-preview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 6px; min-width: 0; width: 100%; overflow: hidden; contain: inline-size; font-size: 17px; line-height: 2; color: var(--ink-soft); white-space: nowrap; }
+.analysis-occurrence-before, .analysis-occurrence-target { min-width: 0; max-width: 100%; overflow: hidden; white-space: nowrap; }
 .analysis-occurrence-before { display: flex; justify-content: flex-end; }
 .analysis-occurrence-before > span { flex-shrink: 0; }
-.analysis-occurrence-target { text-align: right; }
+.analysis-occurrence-target { display: block; text-align: right; text-overflow: ellipsis; }
 .analysis-position-option[aria-current="true"] { background: transparent; box-shadow: inset -2px 0 var(--sage); }
 .analysis-occurrence-match { color: var(--ink); background: var(--word-selected); border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; text-decoration: underline; text-decoration-color: var(--sage); text-underline-offset: 5px; }
 @media (max-width: 380px) { .analysis-unit-button svg { display: none; } .analysis-navigation { gap: 2px; padding-inline: 5px; } .analysis-repeat-button { font-size: 11px; } }
