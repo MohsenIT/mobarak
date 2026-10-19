@@ -230,9 +230,9 @@ export default function RootPanel({
                 })
               }}>
               <p className="text-xs font-bold px-3 py-2">{hasRepetitions ? 'تکرارها در این سوره' : `${noun}‌های این سوره`}</p>
-              {items.map(([a, pos, part], i) => <button key={`${a}:${pos}:${part ?? 'stem'}`} className="analysis-position-option" aria-current={i === index ? 'true' : undefined}
+              {items.map(([a, pos, part], i) => <button key={`${a}:${pos}:${part ?? 'stem'}`} className={`analysis-position-option${hasRepetitions ? ' has-excerpt' : ''}`} aria-current={i === index ? 'true' : undefined}
                 onClick={() => { selectTarget(a, pos, part); setPickerOpen(false) }}>
-                <span>{toFa(i + 1)} · {tab === 'context' ? (() => { const range = getContext(sel.s, a); return range ? `آیات ${toFa(range.from)} تا ${toFa(range.to)}` : `آیه ${toFa(a)}` })() : `آیه ${toFa(a)}`}</span>
+                <span className="analysis-occurrence-reference">{toFa(i + 1)} · {tab === 'context' ? (() => { const range = getContext(sel.s, a); return range ? `آیات ${toFa(range.from)} تا ${toFa(range.to)}` : `آیه ${toFa(a)}` })() : `آیه ${toFa(a)}`}</span>
                 {hasRepetitions && surah && <OccurrencePreview surah={surah} ayah={a} pos={pos} part={part} />}
               </button>)}
             </PopoverContent>
@@ -259,19 +259,14 @@ export default function RootPanel({
 
 function OccurrencePreview({ surah, ayah, pos, part }: { surah: SurahData; ayah: number; pos: number; part?: WordPart }) {
   const words = surah.v.find(verse => verse.n === ayah)?.w ?? []
-  const start = Math.max(0, pos - 4)
-  const end = Math.min(words.length, pos + 3)
+  const word = words[pos - 1]
+  if (!word) return null
+  const { prefix, stem } = splitWord(word)
+  const before = words.slice(Math.max(0, pos - 4), pos - 1).map(displayWordText).join(' ')
+  const after = words.slice(pos, pos + 3).map(displayWordText).join(' ')
   return <span className="analysis-occurrence-preview font-quran" dir="rtl">
-    {start > 0 && '… '}
-    {words.slice(start, end).map((word, offset) => {
-      const selected = start + offset === pos - 1
-      const { prefix, stem } = splitWord(word)
-      return <span key={start + offset}>
-        {offset > 0 && ' '}
-        {selected ? <>{prefix && <><span className={part === 'prefix' ? 'analysis-occurrence-match' : undefined}><QuranText text={prefix} /></span>{' '}</>}
-          <span className={part !== 'prefix' ? 'analysis-occurrence-match' : undefined}><QuranText text={stem} /></span></> : <QuranText text={displayWordText(word)} />}
-      </span>
-    })}
-    {end < words.length && ' …'}
+    <span className="analysis-occurrence-before"><span><QuranText text={[before, part !== 'prefix' ? prefix : ''].filter(Boolean).join(' ')} /></span></span>
+    <span className="analysis-occurrence-target"><span className="analysis-occurrence-match"><QuranText text={part === 'prefix' ? prefix : stem} /></span></span>
+    <span className="analysis-occurrence-after"><QuranText text={[part === 'prefix' ? stem : '', after].filter(Boolean).join(' ')} /></span>
   </span>
 }
