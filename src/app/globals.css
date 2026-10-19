@@ -1269,3 +1269,9 @@ input[type='range'].page-slider::-moz-range-thumb {
 .panel-word.panel-word-preview { display: inline-flex; align-items: baseline; gap: 2px; }
 .panel-preview-text { min-width: 0; overflow: hidden; text-overflow: clip; }
 .panel-preview-ellipsis { flex-shrink: 0; }
+
+.analysis-tab-strip { position: relative; }
+.analysis-tab-strip .tab-btn.active { border-bottom-color: transparent; }
+.analysis-tab-indicator-track { position: absolute; bottom: 0; height: 2px; overflow: hidden; pointer-events: none; }
+.analysis-tab-indicator-track > span { position: absolute; left: 0; bottom: 0; height: 2px; background: var(--sage); transition: transform 220ms cubic-bezier(.22,.68,0,1), width 220ms cubic-bezier(.22,.68,0,1); }
+@media (prefers-reduced-motion: reduce) { .analysis-tab-indicator-track > span { transition: none; } }

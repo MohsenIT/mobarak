@@ -1,7 +1,7 @@
 'use client'
 import { displayWordText, lexicalKey, wordTarget, type WordPart } from '@/lib/word-parts'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Translator, SurahData, Meta } from '@/lib/quran'
 import { loadSurah, spacedRoot, toFa, morphologyLabel } from '@/lib/quran'
 import type { Selection } from './MushafPage'
@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import AnalysisTabContent from './AnalysisTabContent'
 import OccurrencePicker from './OccurrencePicker'
 import { AnalysisPreferencesProvider, AnalysisSettings } from './AnalysisSections'
-import SwipeTabPages from './SwipeTabPages'
+import SwipeTabPages, { type TabSwipeMotion } from './SwipeTabPages'
 import { getContext } from '@/lib/contexts'
 import QuranText from './QuranText'
 import { IconClose, IconMaximize, IconRestore } from './Ornaments'
@@ -61,6 +61,43 @@ function RootPanelContent({
   const [formAvailable, setFormAvailable] = useState<boolean | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const tabStrip = useRef<HTMLDivElement>(null)
+  const indicatorTrack = useRef<HTMLDivElement>(null)
+  const indicator = useRef<HTMLSpanElement>(null)
+  const indicatorCopy = useRef<HTMLSpanElement>(null)
+  const paintTabIndicator = (motion: TabSwipeMotion) => {
+    const strip = tabStrip.current, track = indicatorTrack.current, line = indicator.current, copy = indicatorCopy.current
+    if (!strip || !track || !line || !copy) return
+    const available = [...strip.querySelectorAll<HTMLButtonElement>('[role="tab"]:not(:disabled)')]
+    const from = available.find(button => button.id === `analysis-tab-${motion.from}`)
+    const to = available.find(button => button.id === `analysis-tab-${motion.to}`)
+    if (!from || !to) return
+    const base = strip.getBoundingClientRect()
+    const boxes = available.map(button => button.getBoundingClientRect())
+    const left = Math.min(...boxes.map(box => box.left))
+    const right = Math.max(...boxes.map(box => box.right))
+    const trackWidth = right - left
+    track.style.left = `${left - base.left}px`; track.style.width = `${trackWidth}px`
+    const start = from.getBoundingClientRect(), end = to.getBoundingClientRect()
+    const wrapDirection = motion.wrap ? available.indexOf(from) === 0 ? 1 : -1 : 0
+    const destination = end.left - left + wrapDirection * trackWidth
+    const x = start.left - left + (destination - (start.left - left)) * motion.progress
+    const width = start.width + (end.width - start.width) * motion.progress
+    for (const element of [line, copy]) {
+      element.style.transition = motion.dragging || motion.settled ? 'none' : ''
+      element.style.width = `${width}px`
+    }
+    line.style.transform = `translateX(${x}px)`
+    copy.style.transform = `translateX(${x - wrapDirection * trackWidth}px)`
+    copy.style.visibility = motion.wrap ? 'visible' : 'hidden'
+  }
+  useLayoutEffect(() => {
+    const align = () => paintTabIndicator({ from: tab, to: tab, progress: 0, dragging: false, wrap: false, settled: true })
+    align()
+    const observer = new ResizeObserver(align)
+    if (tabStrip.current) observer.observe(tabStrip.current)
+    return () => observer.disconnect()
+  }, [tab, formAvailable, rootAvailable])
 
   useEffect(() => {
     let live = true
@@ -231,13 +268,14 @@ function RootPanelContent({
           </div>
         </div>
 
-        <div className="flex border-b px-2" role="tablist" aria-label="نوع تحلیل" style={{ borderColor: 'var(--line)' }}>
+        <div ref={tabStrip} className="analysis-tab-strip flex border-b px-2" role="tablist" aria-label="نوع تحلیل" style={{ borderColor: 'var(--line)' }}>
           {TABS.map(([key, label]) => (
             <button key={key} role="tab" id={`analysis-tab-${key}`} aria-controls={`analysis-panel-${key}`} aria-selected={tab === key}
               disabled={(key === 'form' && !formAvailable) || (key === 'root' && !rootAvailable)}
               title={key === 'root' && !rootAvailable ? 'برای این واژه ریشه ثبت نشده است' : key === 'form' && !formAvailable ? (formAvailable === null ? 'در حال بارگیری باب واژه' : 'برای این واژه باب ثبت نشده است') : undefined}
               className={`tab-btn flex-1${tab === key ? ' active' : ''}`} onClick={() => switchTab(key)}>{label}</button>
           ))}
+          <div ref={indicatorTrack} className="analysis-tab-indicator-track" aria-hidden="true"><span ref={indicator} /><span ref={indicatorCopy} /></div>
         </div>
         <nav className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={`پیمایش ${noun}`}>
           <button className="analysis-unit-button" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={`${noun} قبل`} title={`${noun} قبل: ${previousUnitTitle}`}>
@@ -284,7 +322,7 @@ function RootPanelContent({
             {hasRepetitions ? <ChevronsLeft size={15} aria-hidden="true" /> : <ChevronLeft size={15} aria-hidden="true" />}
           </button>
         </nav>
-        <SwipeTabPages active={tab} onChange={switchTab} panes={TABS.filter(([key]) => (key !== 'form' || formAvailable) && (key !== 'root' || rootAvailable)).map(([key]) => ({
+        <SwipeTabPages active={tab} onChange={switchTab} onProgress={paintTabIndicator} panes={TABS.filter(([key]) => (key !== 'form' || formAvailable) && (key !== 'root' || rootAvailable)).map(([key]) => ({
           key,
           content: <AnalysisTabContent tab={key} selection={targets[key]} meta={meta} translator={translator} comparisonRange={comparisonRange}
             onPick={(a, pos, part) => selectTargetFor(key, a, pos, part)} onCompareContext={onCompareContext}

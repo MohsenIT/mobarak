@@ -3,17 +3,22 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { AnalysisTab } from '@/lib/analysis'
 
+export type TabSwipeMotion = { from: AnalysisTab; to: AnalysisTab; progress: number; dragging: boolean; wrap: boolean; settled?: boolean }
+
 /** Real, independently scrollable tab pages, revealed by a horizontal drag. */
-export default function SwipeTabPages({ active, panes, onChange }: {
+export default function SwipeTabPages({ active, panes, onChange, onProgress }: {
   active: AnalysisTab
   panes: { key: AnalysisTab; content: ReactNode }[]
   onChange: (tab: AnalysisTab) => void
+  onProgress?: (motion: TabSwipeMotion) => void
 }) {
   const viewport = useRef<HTMLDivElement>(null)
   const [offset, setOffset] = useState(0)
   const [dragging, setDragging] = useState(false)
   const change = useRef(onChange)
   change.current = onChange
+  const progress = useRef(onProgress)
+  progress.current = onProgress
   const keys = panes.map(pane => pane.key).join(',')
   useEffect(() => {
     const element = viewport.current
@@ -27,7 +32,13 @@ export default function SwipeTabPages({ active, panes, onChange }: {
     let busy = false
     let suppressClickUntil = 0
     let timer: ReturnType<typeof setTimeout> | undefined
-    const reset = () => { start = null; locked = false; distance = 0; setDragging(false); setOffset(0) }
+    const paintProgress = (dx: number, dragging: boolean, fraction = Math.min(1, Math.abs(dx) / element.clientWidth)) => {
+      const next = neighborAt(dx) ?? active
+      const nextIndex = tabs.indexOf(next)
+      const wrap = dx < 0 ? index === 0 && nextIndex === tabs.length - 1 : index === tabs.length - 1 && nextIndex === 0
+      progress.current?.({ from: active, to: next, progress: fraction, dragging, wrap })
+    }
+    const reset = () => { const dx = distance; start = null; locked = false; distance = 0; setDragging(false); setOffset(0); paintProgress(dx, false, 0) }
     reset()
     const down = (event: PointerEvent) => {
       if (busy) return
@@ -51,6 +62,7 @@ export default function SwipeTabPages({ active, panes, onChange }: {
       distance = dx
       const neighbor = neighborAt(dx)
       setOffset(neighbor ? Math.max(-element.clientWidth, Math.min(element.clientWidth, dx)) : dx * 0.15)
+      paintProgress(dx, true)
     }
     const end = (event: PointerEvent) => {
       if (!start || event.pointerId !== start.id) return
@@ -61,8 +73,9 @@ export default function SwipeTabPages({ active, panes, onChange }: {
       if (!next || Math.abs(distance) < threshold) { reset(); return }
       busy = true; start = null; setDragging(false)
       setOffset((distance > 0 ? 1 : -1) * element.clientWidth)
+      paintProgress(distance, false, 1)
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      timer = setTimeout(() => { change.current(next); setOffset(0) }, reduced ? 0 : 220)
+      timer = setTimeout(() => { progress.current?.({ from: next, to: next, progress: 0, dragging: false, wrap: false, settled: true }); change.current(next); setOffset(0) }, reduced ? 0 : 220)
     }
     const cancel = () => { if (!busy) { if (locked) suppressClickUntil = Date.now() + 400; reset() } }
     const click = (event: MouseEvent) => {
