@@ -7,10 +7,10 @@ export default function StartupSplash({ leaving = false, onHoldChange }: { leavi
       onHoldChange(true)
     }}
     onPointerUp={() => onHoldChange(false)} onPointerCancel={() => onHoldChange(false)}
-    onLostPointerCapture={() => onHoldChange(false)} onContextMenu={event => event.preventDefault()}
+    onLostPointerCapture={event => { if (event.target === event.currentTarget) onHoldChange(false) }} onContextMenu={event => event.preventDefault()}
     role="status" aria-label={`در حال آماده‌سازی ${APP_NAME}`}>
     <p className="startup-bism font-quran" lang="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
-    <img className="startup-logo" src="/icons/app-logo-v3-maskable-512.png" width="512" height="512" alt="" />
+    <img draggable={false} className="startup-logo" src="/icons/app-logo-v3-maskable-512.png" width="512" height="512" alt="" />
     <h1>{APP_NAME}</h1>
     <div className="startup-caption">
       <p className="startup-verse font-quran" lang="ar">{STARTUP_VERSE.split(' ').map((word, index) => <span key={index}>{index > 0 && ' '}{['مُبَارَكٌ', "لِيَدَّبَّرُوا", 'وَلِيَتَذَكَّرَ'].includes(word) ? <strong>{word}</strong> : word}</span>)}</p>
