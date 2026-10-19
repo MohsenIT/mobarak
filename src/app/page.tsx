@@ -62,6 +62,7 @@ export default function Home() {
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [occurrenceSearch, setOccurrenceSearch] = useState<AnalysisSelection | null>(null)
   const [returnToSearch, setReturnToSearch] = useState(false)
   const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number } | null>(null)
   const [sel, setSel] = useState<Selection | null>(null)
@@ -382,7 +383,7 @@ export default function Home() {
     {meta && <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 
-      <QuranSearch open={searchOpen} onOpenChange={setSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
+      <QuranSearch occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={setSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
         setReturnToSearch(true); setSearchOpen(false); setSel(null); setComparisonRoot(null); setSearchTarget({ s, a, pos }); goVerse(s, a, pos)
       }} />
 
@@ -408,7 +409,7 @@ export default function Home() {
           </p>
         </button>
 
-        <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setSel(null); setSearchOpen(true) }}><Search size={20} /></button>
+        <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setOccurrenceSearch(null); setSel(null); setSearchOpen(true) }}><Search size={20} /></button>
 
         {/* surah keyword index — opens the sorted-keywords page */}
         <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
@@ -503,6 +504,7 @@ export default function Home() {
           ? createPortal(
               <RootPanel
             key={`${sel.s}:${sel.a}:${sel.pos}:${sel.part ?? 'stem'}`}
+            onOpenOccurrences={selection => { setOccurrenceSearch(selection); setSearchOpen(true) }}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}
@@ -523,6 +525,7 @@ export default function Home() {
           : (
               <RootPanel
             key={`${sel.s}:${sel.a}:${sel.pos}:${sel.part ?? 'stem'}`}
+            onOpenOccurrences={selection => { setOccurrenceSearch(selection); setSearchOpen(true) }}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}

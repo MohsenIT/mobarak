@@ -1,5 +1,5 @@
 'use client'
-import { displayWordText, splitWord, wordTarget, type WordPart } from '@/lib/word-parts'
+import { lexicalKey, wordTarget, type WordPart } from '@/lib/word-parts'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Translator, SurahData, Meta } from '@/lib/quran'
@@ -9,6 +9,7 @@ import { analysisNavigation, type AnalysisTab, type AnalysisSelection } from '@/
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import AnalysisTabContent from './AnalysisTabContent'
+import OccurrencePicker from './OccurrencePicker'
 import { AnalysisPreferencesProvider, AnalysisSettings } from './AnalysisSections'
 import SwipeTabPages from './SwipeTabPages'
 import { getContext } from '@/lib/contexts'
@@ -16,6 +17,7 @@ import QuranText from './QuranText'
 import { IconClose, IconMaximize, IconRestore } from './Ornaments'
 
 interface Props {
+  onOpenOccurrences: (selection: AnalysisSelection) => void
   comparisonRange?: { s: number; from: number; to: number } | null
   onCompareContext: (s: number, from: number, to: number) => void
   onSelectionChange: (selection: AnalysisSelection) => void
@@ -47,7 +49,7 @@ export default function RootPanel(props: Props) {
 }
 
 function RootPanelContent({
-  sel: anchor, onSelectionChange, onCompareContext, meta, translator, maximized, onToggleMax, onClose, onJump, onJumpSurah,
+  sel: anchor, onSelectionChange, onCompareContext, onOpenOccurrences, meta, translator, maximized, onToggleMax, onClose, onJump, onJumpSurah,
   stackedOverIndex = false, comparisonRange, sheetH, onSheetHeightChange: setSheetH,
 }: Props) {
   const [tab, setTab] = useState<AnalysisTab>(!anchor.root || anchor.part === 'prefix' ? 'word' : 'root')
@@ -126,6 +128,7 @@ function RootPanelContent({
 
   useEffect(() => {
     const handle = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLElement && event.target.closest('[role="dialog"]') && event.target.closest('[role="dialog"]') !== panelRef.current) return
       if (event.target instanceof HTMLElement && (event.target.matches('input, textarea, select') || event.target.closest('[role="tablist"], [data-analysis-picker]'))) return
       if (event.key === 'ArrowRight') { event.preventDefault(); navigate(-1) }
       if (event.key === 'ArrowLeft') { event.preventDefault(); navigate(1) }
@@ -219,7 +222,11 @@ function RootPanelContent({
             aria-label="تکرار قبل" title={`${toFa(Math.max(0, index))} تکرار قبل`}>
             <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))} تکرار</span>
           </button>}
-          <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+          {hasRepetitions ? <OccurrencePicker open={pickerOpen} onOpenChange={setPickerOpen} items={items} index={index} surah={surah}
+            groupKey={`${tab}:${sel.s}:${tab === 'root' ? root : tab === 'form' ? `${root}:${selectedForm}` : surah ? lexicalKey(surah.v[sel.a - 1].w[sel.pos - 1], sel.part) : sel.text}`}
+            title={index < 0 ? '—' : `${toFa(index + 1)} از ${toFa(items.length)}`}
+            label={`تکرار ${toFa(index + 1)} از ${toFa(items.length)}؛ انتخاب تکرار`}
+            onSelect={location => selectTarget(...location)} onFull={() => onOpenOccurrences({ ...sel, tab, form: selectedForm })} /> : <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
             <PopoverTrigger asChild>
               <button className="analysis-position-button" disabled={index < 0 || !items.length}
                 aria-label={`${hasRepetitions ? 'تکرار' : noun} ${toFa(index + 1)} از ${toFa(items.length)}؛ انتخاب ${hasRepetitions ? 'تکرار' : noun}`}>
@@ -239,10 +246,9 @@ function RootPanelContent({
               {items.map(([a, pos, part], i) => <button key={`${a}:${pos}:${part ?? 'stem'}`} className={`analysis-position-option${hasRepetitions ? ' has-excerpt' : ''}`} aria-current={i === index ? 'true' : undefined}
                 onClick={() => { selectTarget(a, pos, part); setPickerOpen(false) }}>
                 <span className="analysis-occurrence-reference">{toFa(i + 1)} · {tab === 'context' ? (() => { const range = getContext(sel.s, a); return range ? `آیات ${toFa(range.from)} تا ${toFa(range.to)}` : `آیه ${toFa(a)}` })() : `آیه ${toFa(a)}`}</span>
-                {hasRepetitions && surah && <OccurrencePreview surah={surah} ayah={a} pos={pos} part={part} />}
               </button>)}
             </PopoverContent>
-          </Popover>
+          </Popover>}
           {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(1)} disabled={index < 0 || index >= items.length - 1}
             aria-label="تکرار بعد" title={`${toFa(Math.max(0, items.length - index - 1))} تکرار بعد`}>
             <span>{toFa(Math.max(0, items.length - index - 1))} تکرار</span><ChevronLeft size={17} aria-hidden="true" />
@@ -261,17 +267,4 @@ function RootPanelContent({
       </div>
     </>
   )
-}
-
-function OccurrencePreview({ surah, ayah, pos, part }: { surah: SurahData; ayah: number; pos: number; part?: WordPart }) {
-  const words = surah.v.find(verse => verse.n === ayah)?.w ?? []
-  const word = words[pos - 1]
-  if (!word) return null
-  const { prefix, stem } = splitWord(word)
-  const before = words.slice(Math.max(0, pos - 4), pos - 1).map(displayWordText).join(' ')
-  const after = words.slice(pos, pos + 3).map(displayWordText).join(' ')
-  return <span className="analysis-occurrence-preview font-quran" dir="rtl">
-    <span className="analysis-occurrence-before"><span><QuranText text={[before, part !== 'prefix' ? prefix : ''].filter(Boolean).join(' ')} /></span></span>
-    <span className="analysis-occurrence-target"><span className="analysis-occurrence-match"><QuranText text={part === 'prefix' ? prefix : stem} /></span>{' '}<QuranText text={[part === 'prefix' ? stem : '', after].filter(Boolean).join(' ')} /></span>
-  </span>
 }
