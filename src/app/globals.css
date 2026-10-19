@@ -329,8 +329,8 @@ body {
   align-items: center;
   justify-content: center;
   flex: none;
-  width: 1.35em;
-  height: 1.35em;
+  width: 2.2em;
+  height: 2.2em;
   margin: 0 0.12em;
   border: 1px solid var(--gold-deep);
   border-radius: 50%;
