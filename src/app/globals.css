@@ -1150,7 +1150,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 
 .analysis-position-option.has-excerpt { display: grid; grid-template-columns: 58px minmax(0, 1fr); overflow: hidden; }
 .analysis-occurrence-reference { font-size: 10px; color: var(--ink-soft); white-space: nowrap; }
-.analysis-position-option[aria-current="true"] { background: transparent; box-shadow: inset -2px 0 var(--sage); }
+.analysis-position-option[aria-current="true"] { background: var(--word-active); box-shadow: none; }
 .analysis-occurrence-match { color: var(--ink); background: var(--word-selected); border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; text-decoration: underline; text-decoration-color: var(--sage); text-underline-offset: 5px; }
 @media (max-width: 380px) { .analysis-unit-button svg { display: none; } .analysis-navigation { gap: 2px; padding-inline: 5px; } .analysis-repeat-button { font-size: 11px; } }
 
@@ -1203,3 +1203,55 @@ input[type='range'].page-slider::-moz-range-thumb {
 .occurrence-picker-arrow { fill: var(--sheet); stroke: var(--line-strong); stroke-width: 1px; }
 .analysis-navigation .analysis-position-button[data-state='open'] { border-color: var(--sage); outline: 1px solid var(--sage); outline-offset: 1px; }
 .quran-filtered-search { z-index: 160; }
+
+/* Full-page search is a reader destination, not a floating dialog. */
+.quran-search-page { position: fixed; inset: 0; z-index: 180; height: 100dvh; background: var(--paper); color: var(--ink); display: flex; overflow: hidden; }
+.search-page-shell { display: flex; flex-direction: column; width: 100%; max-width: 960px; min-height: 0; margin-inline: auto; }
+.search-page-header { flex-shrink: 0; padding: max(12px, env(safe-area-inset-top)) 16px 8px; border-bottom: 1px solid var(--line); }
+.search-page-title { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.search-page-title h1 { font-size: 19px; font-weight: 700; }
+.search-page-title p { font-size: 11px; color: var(--ink-soft); margin-top: 3px; }
+.search-page-input { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line-strong); background: var(--sheet); border-radius: 14px; padding: 0 12px; }
+.search-page-input:focus-within { border-color: var(--sage); box-shadow: 0 0 0 2px var(--word-active); }
+.search-page-input input { width: 100%; min-width: 0; padding: 13px 0; font-size: 16px; background: transparent; outline: none; }
+.search-page-input > svg { flex-shrink: 0; color: var(--ink-soft); }
+.search-page-input button { flex-shrink: 0; padding: 8px; }
+.search-active-filter { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--word-active); border-radius: 18px; padding: 5px 9px; margin-top: 10px; font-size: 11px; }
+.search-active-filter button { display: flex; padding: 3px; }
+.search-page-tools { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; }
+.search-scope { flex: 1; min-width: 0; }
+.search-scope summary { display: flex; align-items: center; gap: 7px; min-height: 38px; cursor: pointer; font-size: 12px; }
+.search-scope-action { margin-inline-start: auto; color: var(--ink-soft); font-size: 10px; }
+.search-scope-panel { padding: 10px; border: 1px solid var(--line); border-radius: 12px; margin: 5px 0; background: var(--sheet); }
+.search-scope-shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.search-scope-shortcuts button { font-size: 11px; border: 1px solid var(--line); border-radius: 14px; padding: 5px 9px; }
+.search-scope-panel > input { width: 100%; min-width: 0; border-bottom: 1px solid var(--line); padding: 7px 0; background: transparent; font-size: 12px; outline: none; }
+.search-scope-panel > p { color: var(--ink-soft); font-size: 10px; margin: 8px 0; }
+.search-surah-options { max-height: min(200px, 25dvh); overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 2px 8px; }
+.search-surah-options label { display: flex; align-items: center; gap: 7px; font-size: 12px; padding: 9px 0; cursor: pointer; }
+.search-translation-toggle { display: flex; align-items: center; gap: 6px; flex-shrink: 0; font-size: 12px; padding: 8px 10px; min-height: 38px; border: 1px solid var(--line); border-radius: 10px; }
+.search-translation-toggle[aria-pressed='true'] { border-color: var(--sage); background: var(--word-active); }
+.search-match-options { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-top: 6px; }
+.search-match-options label { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 9px 0; cursor: pointer; }
+.search-match-options label:has(input:disabled) { opacity: .45; cursor: default; }
+.quran-search-page input[type='checkbox'] { accent-color: var(--sage); width: 15px; height: 15px; flex-shrink: 0; }
+.search-results-summary { flex-shrink: 0; font-size: 11px; color: var(--ink-soft); padding: 12px 18px; }
+.search-results-summary > span { display: inline-flex; align-items: center; gap: 7px; }
+.search-page-results { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px max(20px, env(safe-area-inset-bottom)); }
+.search-result-group { font-size: 11px; font-weight: 700; color: var(--ink-soft); padding: 5px 0 10px; }
+.search-result-card { border: 1px solid var(--line); border-radius: 16px; background: var(--sheet); margin-bottom: 12px; overflow: hidden; }
+.search-result-open { display: block; width: 100%; text-align: right; padding: 14px; }
+.search-result-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; margin-bottom: 10px; }
+.search-result-meta > span { color: var(--ink-soft); font-size: 10px; }
+.search-result-text { display: block; font-size: 23px; line-height: 2.15; }
+.search-result-translation { font-size: 13px; line-height: 2; border-top: 1px solid var(--line); color: var(--ink-soft); margin: 0 14px; padding: 12px 0; text-align: justify; }
+.search-result-translation button { text-decoration: underline; }
+.search-more { display: block; width: 100%; padding: 13px; font-size: 12px; border: 1px solid var(--line-strong); border-radius: 12px; margin-top: 12px; }
+.search-empty { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 40px 16px; text-align: center; color: var(--ink-soft); }
+.search-empty h2 { font-size: 17px; font-weight: 700; color: var(--ink); }
+.search-empty p { font-size: 12px; line-height: 2; max-width: 340px; }
+.search-empty > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.search-empty button { border: 1px solid var(--line); border-radius: 18px; padding: 7px 12px; font-size: 12px; }
+@media (min-width: 768px) { .search-page-header { padding-inline: 32px; padding-top: 24px; } .search-page-results { padding-inline: 32px; } .search-results-summary { padding-inline: 34px; } .search-page-title h1 { font-size: 24px; } }
+@media (max-width: 360px) { .search-page-header { padding-inline: 12px; } .search-page-title { margin-bottom: 12px; } .search-match-options { gap: 2px 11px; } .search-scope-action { font-size: 9px; } }
+.search-page-header { max-height: 70dvh; overflow-y: auto; }

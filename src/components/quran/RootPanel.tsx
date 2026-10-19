@@ -128,6 +128,7 @@ function RootPanelContent({
 
   useEffect(() => {
     const handle = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLElement && event.target.closest('[data-search-page]')) return
       if (event.target instanceof HTMLElement && event.target.closest('[role="dialog"]') && event.target.closest('[role="dialog"]') !== panelRef.current) return
       if (event.target instanceof HTMLElement && (event.target.matches('input, textarea, select') || event.target.closest('[role="tablist"], [data-analysis-picker]'))) return
       if (event.key === 'ArrowRight') { event.preventDefault(); navigate(-1) }

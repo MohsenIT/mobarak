@@ -30,7 +30,7 @@ export function typoDistance(a: string, b: string, max: number): number {
 
 export type QuranSearchOptions = { includePartial?: boolean; includeNear?: boolean }
 export type SearchVerse = [s: number, a: number, words: string[]]
-export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; kind: 'exact' | 'partial' | 'near'; score: number }
+export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; kind: 'exact' | 'partial' | 'near' | 'root'; score: number }
 type IndexedVerse = { verse: SearchVerse; keys: string[][]; compact: { text: string; ranges: [number, number][]; boundaries: Set<number> }[] }
 
 export function createQuranSearch(verses: SearchVerse[], waw: Record<string, number[]> = {}) {
