@@ -1,7 +1,7 @@
 import { toFa, type SurahMeta } from '@/lib/quran'
 
 export function AyahMarker({ n }: { n: number }) {
-  return <span className="ayah-marker" aria-hidden>{toFa(n)}</span>
+  return <span className="ayah-marker" aria-hidden><span>{toFa(n)}</span></span>
 }
 
 function RevelationIcon({ makki }: { makki: boolean }) {

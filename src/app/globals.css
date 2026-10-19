@@ -325,9 +325,8 @@ body {
 }
 
 .ayah-marker {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
+  position: relative;
   flex: none;
   width: 2.2em;
   height: 2.2em;
@@ -339,9 +338,11 @@ body {
   font-size: 0.42em;
   font-weight: 500;
   line-height: 1;
-  transform: translateY(0.28em);
+  /* Empty inline box baseline is its bottom; lower by half its height. */
+  vertical-align: -1.1em;
   background: var(--gold-faint);
 }
+.ayah-marker > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 [data-theme='night'] .ayah-marker { color: var(--gold); }
 
 /* ============ Backdrop ============ */
