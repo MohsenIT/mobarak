@@ -47,7 +47,7 @@ export default function PwaRegistration() {
       const url = new URL(window.location.href)
       url.searchParams.set('_refresh', Date.now().toString())
       window.location.replace(url.href)
-    }}><RefreshCw size={14} aria-hidden="true" className={refreshing ? 'app-update-spinner' : undefined} /><span>به‌روزرسانی</span></button>
+    }}><RefreshCw size={14} aria-hidden="true" className={refreshing ? 'app-update-spinner' : undefined} /><span className="app-update-label"><span className="app-update-label-space" aria-hidden="true">در حال به‌روزرسانی…</span><span>{refreshing ? 'در حال به‌روزرسانی…' : 'به‌روزرسانی'}</span></span></button>
     <button type="button" className="icon-btn sm" aria-label="بستن اعلان به‌روزرسانی" onClick={() => {
       dismissed.current = available; setAvailable(null)
     }}>×</button>
