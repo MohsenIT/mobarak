@@ -338,8 +338,9 @@ body {
   font-size: 0.42em;
   font-weight: 500;
   line-height: 1;
-  /* Empty inline box baseline is its bottom; lower by half its height. */
-  vertical-align: -1.1em;
+  /* Raise the marker so the numeral, rather than the circle center,
+     follows the visual baseline of the Hafs text. */
+  vertical-align: -0.72em;
   background: var(--gold-faint);
 }
 .ayah-marker > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
