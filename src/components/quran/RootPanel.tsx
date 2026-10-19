@@ -1,5 +1,5 @@
 'use client'
-import { wordTarget, type WordPart } from '@/lib/word-parts'
+import { displayWordText, splitWord, wordTarget, type WordPart } from '@/lib/word-parts'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Translator, SurahData, Meta } from '@/lib/quran'
@@ -45,8 +45,9 @@ export default function RootPanel({
   sel: anchor, onSelectionChange, onCompareContext, meta, translator, maximized, onToggleMax, onClose, onJump, onJumpSurah,
   stackedOverIndex = false, comparisonRange, sheetH, onSheetHeightChange: setSheetH,
 }: Props) {
-  const [tab, setTab] = useState<AnalysisTab>(anchor.part === 'prefix' ? 'word' : 'root')
+  const [tab, setTab] = useState<AnalysisTab>(!anchor.root || anchor.part === 'prefix' ? 'word' : 'root')
   const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
+  const rootAvailable = !!targets.root.root
   const sel = targets[tab]
   const [surah, setSurah] = useState<SurahData | null>(null)
   const dragRef = useRef<{ y: number; h: number } | null>(null)
@@ -72,7 +73,7 @@ export default function RootPanel({
   }, [formTarget])
 
   const switchTab = (key: AnalysisTab) => {
-    if (key === tab || (key === 'form' && !formAvailable)) return
+    if (key === tab || (key === 'form' && !formAvailable) || (key === 'root' && !rootAvailable)) return
     setPickerOpen(false)
     setTab(key)
     const target = targets[key]
@@ -198,8 +199,8 @@ export default function RootPanel({
         <div className="flex border-b px-2" role="tablist" aria-label="نوع تحلیل" style={{ borderColor: 'var(--line)' }}>
           {TABS.map(([key, label]) => (
             <button key={key} role="tab" id={`analysis-tab-${key}`} aria-controls={`analysis-panel-${key}`} aria-selected={tab === key}
-              disabled={key === 'form' && !formAvailable}
-              title={key === 'form' && !formAvailable ? (formAvailable === null ? 'در حال بارگیری باب واژه' : 'برای این واژه باب ثبت نشده است') : undefined}
+              disabled={(key === 'form' && !formAvailable) || (key === 'root' && !rootAvailable)}
+              title={key === 'root' && !rootAvailable ? 'برای این واژه ریشه ثبت نشده است' : key === 'form' && !formAvailable ? (formAvailable === null ? 'در حال بارگیری باب واژه' : 'برای این واژه باب ثبت نشده است') : undefined}
               className={`tab-btn flex-1${tab === key ? ' active' : ''}`} onClick={() => switchTab(key)}>{label}</button>
           ))}
         </div>
@@ -210,7 +211,7 @@ export default function RootPanel({
           </button>
           {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(-1)} disabled={index <= 0}
             aria-label="تکرار قبل" title={`${toFa(Math.max(0, index))} تکرار قبل`}>
-            <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))}</span>
+            <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))} تکرار</span>
           </button>}
           <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
             <PopoverTrigger asChild>
@@ -232,20 +233,20 @@ export default function RootPanel({
               {items.map(([a, pos, part], i) => <button key={`${a}:${pos}:${part ?? 'stem'}`} className="analysis-position-option" aria-current={i === index ? 'true' : undefined}
                 onClick={() => { selectTarget(a, pos, part); setPickerOpen(false) }}>
                 <span>{toFa(i + 1)} · {tab === 'context' ? (() => { const range = getContext(sel.s, a); return range ? `آیات ${toFa(range.from)} تا ${toFa(range.to)}` : `آیه ${toFa(a)}` })() : `آیه ${toFa(a)}`}</span>
-                {hasRepetitions && <span className="font-quran text-lg"><QuranText text={surah ? wordTarget(surah.v[a - 1].w[pos - 1], part).text : ''} /></span>}
+                {hasRepetitions && surah && <OccurrencePreview surah={surah} ayah={a} pos={pos} part={part} />}
               </button>)}
             </PopoverContent>
           </Popover>
           {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(1)} disabled={index < 0 || index >= items.length - 1}
             aria-label="تکرار بعد" title={`${toFa(Math.max(0, items.length - index - 1))} تکرار بعد`}>
-            <span>{toFa(Math.max(0, items.length - index - 1))}</span><ChevronLeft size={17} aria-hidden="true" />
+            <span>{toFa(Math.max(0, items.length - index - 1))} تکرار</span><ChevronLeft size={17} aria-hidden="true" />
           </button>}
           <button className="analysis-unit-button" onClick={() => navigateUnit(1)} disabled={!canUnitNext} aria-label={`${noun} بعد`}>
             <span>{noun} بعد</span>
             {hasRepetitions ? <ChevronsLeft size={15} aria-hidden="true" /> : <ChevronLeft size={15} aria-hidden="true" />}
           </button>
         </nav>
-        <SwipeTabPages active={tab} onChange={switchTab} panes={TABS.filter(([key]) => key !== 'form' || formAvailable).map(([key]) => ({
+        <SwipeTabPages active={tab} onChange={switchTab} panes={TABS.filter(([key]) => (key !== 'form' || formAvailable) && (key !== 'root' || rootAvailable)).map(([key]) => ({
           key,
           content: <AnalysisTabContent tab={key} selection={targets[key]} meta={meta} translator={translator} comparisonRange={comparisonRange}
             onPick={(a, pos, part) => selectTargetFor(key, a, pos, part)} onCompareContext={onCompareContext}
@@ -254,4 +255,23 @@ export default function RootPanel({
       </div>
     </>
   )
+}
+
+function OccurrencePreview({ surah, ayah, pos, part }: { surah: SurahData; ayah: number; pos: number; part?: WordPart }) {
+  const words = surah.v.find(verse => verse.n === ayah)?.w ?? []
+  const start = Math.max(0, pos - 4)
+  const end = Math.min(words.length, pos + 3)
+  return <span className="analysis-occurrence-preview font-quran" dir="rtl">
+    {start > 0 && '… '}
+    {words.slice(start, end).map((word, offset) => {
+      const selected = start + offset === pos - 1
+      const { prefix, stem } = splitWord(word)
+      return <span key={start + offset}>
+        {offset > 0 && ' '}
+        {selected ? <>{prefix && <><span className={part === 'prefix' ? 'analysis-occurrence-match' : undefined}><QuranText text={prefix} /></span>{' '}</>}
+          <span className={part !== 'prefix' ? 'analysis-occurrence-match' : undefined}><QuranText text={stem} /></span></> : <QuranText text={displayWordText(word)} />}
+      </span>
+    })}
+    {end < words.length && ' …'}
+  </span>
 }
