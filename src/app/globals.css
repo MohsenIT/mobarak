@@ -1170,3 +1170,25 @@ input[type='range'].page-slider::-moz-range-thumb {
 .app-update-label > span { grid-area: 1 / 1; }
 .app-update-label-space { visibility: hidden; }
 @media (max-width: 360px) { .app-update-title { font-size: 11px; } .app-update-button { font-size: 10px; gap: 3px; } .app-update-notice > .icon-btn { width: 26px; min-width: 26px; } }
+
+/* Independent, reorderable sections within each analysis tab. */
+.analysis-section-stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.analysis-section { border-bottom: 1px solid var(--line); min-width: 0; }
+.analysis-section-heading { display: flex; align-items: center; gap: 8px; }
+.analysis-section-toggle { display: flex; flex: 1; min-width: 0; align-items: center; gap: 6px; text-align: right; min-height: 40px; font-size: 12px; font-weight: 700; }
+.analysis-settings-button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 36px; flex-shrink: 0; color: var(--ink-soft); border-radius: 8px; }
+.analysis-section-content { padding: 4px 0 12px; }
+.analysis-section-content > :last-child { margin-bottom: 0; }
+.analysis-section [hidden] { display: none !important; }
+.analysis-section .stat { min-width: 0; flex: 1; }
+.analysis-section .flex:has(> .stat) { flex-wrap: wrap; }
+.analysis-section .stat span { font-size: 10px; }
+.analysis-examples { order: 2; min-width: 0; }
+.analysis-settings-popover { z-index: 150; background: var(--sheet); color: var(--ink); border-color: var(--line-strong); width: min(280px, calc(100vw - 24px)); max-height: min(480px, 70dvh); overflow-y: auto; }
+.analysis-settings-popover input { accent-color: var(--sage); }
+.analysis-order-select { background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 6px; min-width: 0; }
+.analysis-settings-button:focus-visible, .analysis-section-toggle:focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }
+
+.panel-word { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.panel-chip.hidden { display: none; }
+@media (min-width: 640px) { .panel-chip.hidden { display: inline-flex; } }

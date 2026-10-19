@@ -7,6 +7,7 @@ import { analysisOccurrences, type AnalysisSelection, type AnalysisTab } from '@
 import QuranText from './QuranText'
 import { lexicalKey, splitWord } from '@/lib/word-parts'
 import SourceReference from './SourceReference'
+import { AnalysisSection, STAT_OPTIONS, useAnalysisPreferences } from './AnalysisSections'
 
 type Index = { words: Record<string, Record<string, number>>; forms: Record<string, Record<string, number>>; rootForms: Record<string, Record<string, number>> }
 let indexPromise: Promise<Index> | null = null
@@ -26,6 +27,9 @@ interface Props {
 }
 
 export default function SelectionDetails({ tab, selection, surah, trans, translator, onPick, comparisonRange }: Props) {
+  const { enabled } = useAnalysisPreferences()
+  const showStat = (id: string) => enabled(tab, 'stats', id)
+  const showMeaning = (id: string) => enabled(tab, 'meaning', id)
   const [index, setIndex] = useState<Index | null>(null)
   const [indexError, setIndexError] = useState(false)
   useEffect(() => {
@@ -46,9 +50,12 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
 
   if (tab === 'form' && !selection.form) return <p className="text-sm leading-8">برای این واژه باب صرفی در منبع ثبت نشده است؛ باب از روی ریشه حدس زده نمی‌شود.</p>
 
+  const translation = trans[String(selection.a)]?.[translator]
+  const hasMeaning = (tab === 'form' && showMeaning('morphology') && !!selection.form) || (tab === 'word' && showMeaning('lemma')) || (tab !== 'form' && showMeaning('translation') && !!translation)
   return (
-    <>
-      {tab === 'form' && (
+    <div className="analysis-section-stack">
+      {hasMeaning && <AnalysisSection tab={tab} kind="meaning">
+      {tab === 'form' && showMeaning('morphology') && (
         <div className="rounded-xl border p-3 mb-3 text-sm" style={{ borderColor: 'var(--line)' }}>
           <p>{formName(selection.root, selection.form) && <b>{formName(selection.root, selection.form)} · </b>}باب / ساخت صرفی: <b>{morphologyLabel(selection.form!)}</b> <span dir="ltr">({selection.form})</span></p>
           <p className="text-xs leading-6 mt-1">واژه‌های همین ریشه در همین باب انتخاب شده‌اند.</p>
@@ -61,20 +68,26 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
           }} /></div>
         </div>
       )}
-      {tab === 'word' && <p className="text-xs leading-6 mb-3">آمار و تکرارها بر پایهٔ لِمّا است؛ صورت‌های صرفی و ضمیرهای پیوستهٔ یک واژه با هم شمرده می‌شوند.</p>}
+      {tab === 'word' && showMeaning('lemma') && <p className="text-xs leading-6 mb-3">آمار و تکرارها بر پایهٔ لِمّا است؛ صورت‌های صرفی و ضمیرهای پیوستهٔ یک واژه با هم شمرده می‌شوند.</p>}
+      {tab !== 'form' && showMeaning('translation') && translation && <p className="text-sm leading-8 text-justify">{translation}</p>}
+      </AnalysisSection>}
+      {STAT_OPTIONS[tab].some(option => showStat(option.id) && (option.id !== 'total' && option.id !== 'hosts' || !!distribution)) && <AnalysisSection tab={tab} kind="stats">
       {tab === 'verse' ? (
         <div className="flex gap-2 mb-4">
-          <div className="stat"><b>{toFa(verse?.w.length ?? 0)}</b><span>واژه در آیه</span></div>
-          <div className="stat"><b>{toFa(distinctRoots)}</b><span>ریشهٔ متفاوت</span></div>
-          <div className="stat"><b>{toFa(verse?.p ?? 0)}</b><span>صفحه · جزء {toFa(verse?.j ?? 0)}</span></div>
+          <div className="stat" hidden={!showStat('words')}><b>{toFa(verse?.w.length ?? 0)}</b><span>واژه در آیه</span></div>
+          <div className="stat" hidden={!showStat('roots')}><b>{toFa(distinctRoots)}</b><span>ریشهٔ متفاوت</span></div>
+          <div className="stat" hidden={!showStat('page')}><b>{toFa(verse?.p ?? 0)}</b><span>صفحه · جزء {toFa(verse?.j ?? 0)}</span></div>
         </div>
       ) : (
         <div className="flex gap-2 mb-4">
-          <div className="stat"><b>{toFa(occurrences.length)}</b><span>بار در سوره</span></div>
-          <div className="stat"><b>{total === null ? '…' : toFa(total)}</b><span>بار در قرآن</span></div>
-          <div className="stat"><b>{toFa(groups.length)}</b><span>آیه در این سوره</span></div>
+          <div className="stat" hidden={!showStat('surahCount')}><b>{toFa(occurrences.length)}</b><span>بار در سوره</span></div>
+          <div className="stat" hidden={!showStat('total') || !distribution}><b>{total === null ? '…' : toFa(total)}</b><span>بار در قرآن</span></div>
+          <div className="stat" hidden={!showStat('ayahCount')}><b>{toFa(groups.length)}</b><span>آیه در این سوره</span></div>
+          {distribution && showStat('hosts') && <div className="stat"><b>{toFa(Object.keys(distribution).length)}</b><span>سوره میزبان</span></div>}
         </div>
       )}
+      </AnalysisSection>}
+      <div className="analysis-examples">
       {indexError && tab !== 'verse' && <p role="alert" className="text-xs mb-2">آمار کل قرآن بارگیری نشد؛ آمار این سوره نمایش داده می‌شود.</p>}
       {tab === 'word' && <p className="text-xs mb-3" style={{ color: 'var(--ink-soft)' }}>ترجمهٔ مستقل واژه در داده‌ها موجود نیست؛ ترجمهٔ آیهٔ حاوی آن در زیر آمده است.</p>}
       <h3 className="text-xs font-bold mb-2">{tab === 'verse' ? `متن و ترجمهٔ آیه ${toFa(selection.a)}` : tab === 'form' ? 'کاربردهای این باب و ترجمهٔ آیات' : 'کاربردهای این واژه و ترجمهٔ آیات'}</h3>
@@ -94,12 +107,13 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
                   })}
                 </p>
               </button>
-              {trans[String(a)]?.[translator] && <p className="text-sm leading-7 mt-2 pt-2 border-t text-justify" style={{ borderColor: 'var(--line)', color: 'var(--ink-soft)' }}>{trans[String(a)][translator]}</p>}
+              {tab !== 'verse' && trans[String(a)]?.[translator] && <p className="text-sm leading-7 mt-2 pt-2 border-t text-justify" style={{ borderColor: 'var(--line)', color: 'var(--ink-soft)' }}>{trans[String(a)][translator]}</p>}
               {tab !== 'verse' && positions.length > 1 && <div className="flex flex-wrap gap-2 mt-2">{positions.map(pos => <button key={pos} className="chip" onClick={() => onPick(a, pos)}>واژه {toFa(pos)}</button>)}</div>}
             </div>
           )
         })}
       </div>
-    </>
+      </div>
+    </div>
   )
 }

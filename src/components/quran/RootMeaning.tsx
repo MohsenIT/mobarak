@@ -7,6 +7,7 @@ import SourceReference from './SourceReference'
 import { ChevronDown } from 'lucide-react'
 import MaqayisMeaning from './MaqayisMeaning'
 import IshtiqaqiMeaning from './IshtiqaqiMeaning'
+import { AnalysisSection, ROOT_BOOKS, useAnalysisPreferences } from './AnalysisSections'
 
 type Entry = { word: string; ar: string; fa: string; provenance?: { kind: string; translator: string; volume: number; page: number; pageEnd: number; heading: string }; examples?: { s: number; a: number; text: string; surahName: string }[] }
 type Definition = { root: string; entries: Entry[] }
@@ -22,8 +23,32 @@ function load(root: string) {
   return cache.get(root)!
 }
 
+const bookComponents = { tahqiq: TahqiqMeaning, maqayis: MaqayisMeaning, ishtiqaqi: IshtiqaqiMeaning }
+let availability: Promise<Record<string, string[]>> | undefined
+function loadAvailability() {
+  availability ??= Promise.all(ROOT_BOOKS.map(async book => {
+    const response = await fetch(book.index)
+    if (!response.ok) throw new Error('book index')
+    const data = await response.json()
+    return [book.id, data[book.field] ?? []] as const
+  })).then(entries => Object.fromEntries(entries)).catch(error => { availability = undefined; throw error })
+  return availability
+}
 export default function RootMeaning({ root }: { root: string }) {
-  return <><TahqiqMeaning root={root} /><MaqayisMeaning key={root} root={root} /><IshtiqaqiMeaning key={`ishtiqaqi:${root}`} root={root} /></>
+  const { enabled } = useAnalysisPreferences()
+  const [indexes, setIndexes] = useState<Record<string, string[]> | null>(null)
+  const [failed, setFailed] = useState(false)
+  useEffect(() => {
+    let live = true
+    loadAvailability().then(data => { if (live) setIndexes(data) }).catch(() => { if (live) setFailed(true) })
+    return () => { live = false }
+  }, [])
+  const books = ROOT_BOOKS.filter(book => enabled('root', 'meaning', book.id) && indexes?.[book.id]?.includes(root))
+  if (!books.length) return failed && ROOT_BOOKS.some(book => enabled('root', 'meaning', book.id)) ? <p role="alert" className="text-xs">فهرست منابع بارگیری نشد؛ دوباره بخش تحلیل را باز کنید.</p> : null
+  return <AnalysisSection tab="root" kind="meaning">{books.map(book => {
+    const Component = bookComponents[book.id]
+    return <Component key={`${book.id}:${root}`} root={root} />
+  })}</AnalysisSection>
 }
 
 function TahqiqMeaning({ root }: { root: string }) {

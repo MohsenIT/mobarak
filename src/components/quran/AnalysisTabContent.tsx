@@ -9,6 +9,7 @@ import SelectionDetails from './SelectionDetails'
 import ContextDetails from './ContextDetails'
 import RootMeaning from './RootMeaning'
 import QuranText from './QuranText'
+import { AnalysisSection, STAT_OPTIONS, useAnalysisPreferences } from './AnalysisSections'
 
 export default function AnalysisTabContent({ tab, selection: sel, meta, translator, comparisonRange, onPick: selectTarget, onCompareContext, onRootTarget }: {
   tab: AnalysisTab; selection: Selection; meta: Meta; translator: Translator
@@ -17,6 +18,8 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
   onCompareContext: (s: number, from: number, to: number) => void
   onRootTarget: (selection: Selection, page: number) => void
 }) {
+  const { enabled } = useAnalysisPreferences()
+  const showStat = (id: string) => enabled('root', 'stats', id)
   const [data, setData] = useState<{ surah: SurahData; trans: Translations } | null>(null)
   const surah = data?.surah.n === sel.s ? data.surah : null
   const trans = surah ? data!.trans : null
@@ -77,20 +80,20 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
               )}
             </div>
           ) : (
-            <>
+            <div className="analysis-section-stack">
               <RootMeaning key={root} root={root} />
-              {stats && (
-                <>
-                  <div className="flex gap-2 mb-4">
-                    <div className="stat">
+              {stats && STAT_OPTIONS.root.some(option => showStat(option.id)) && (
+                <AnalysisSection tab="root" kind="stats">
+                  <div className="flex gap-2 mb-4" hidden={!(['surahCount', 'total', 'hosts'].some(showStat))}>
+                    <div className="stat" hidden={!showStat('surahCount')}>
                       <b>{toFa(stats.inSurah)}</b>
                       <span>بار در این سوره</span>
                     </div>
-                    <div className="stat">
+                    <div className="stat" hidden={!showStat('total')}>
                       <b>{toFa(stats.total)}</b>
                       <span>بار در کل قرآن</span>
                     </div>
-                    <div className="stat">
+                    <div className="stat" hidden={!showStat('hosts')}>
                       {/* Host surahs: "df / 114" where df = number of surahs
                           containing this root, 114 = total surahs in the Quran.
                           Styled EXACTLY like the other two stats — plain bold
@@ -106,6 +109,7 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                     </div>
                   </div>
 
+                  <div hidden={!showStat('keyword')}>
                   {/* keyword gauge — v3 lift-based score.
                       Now a proper progress bar: empty track + filled portion
                       whose width = score*100%. In RTL, fill grows from the
@@ -121,8 +125,9 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                   </div>
                   <p className="text-xs mb-4 text-center" style={{ color: 'var(--ink-soft)' }}>{stats.tier.label}</p>
 
+                  </div>
                   {/* share of this surah */}
-                  <div className="rounded-xl border px-3 py-2.5 mb-4" style={{ borderColor: 'var(--line)' }}>
+                  <div hidden={!showStat('share')} className="rounded-xl border px-3 py-2.5 mb-4" style={{ borderColor: 'var(--line)' }}>
                     <div className="flex justify-between text-xs mb-2" style={{ color: 'var(--ink-soft)' }}>
                       <span>سهم این سوره از همهٔ کاربردهای ریشه</span>
                       <b style={{ color: 'var(--ink)' }}>{toFa(Math.round(stats.share * 100))}٪</b>
@@ -132,6 +137,7 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                     </div>
                   </div>
 
+                  <div hidden={!showStat('distribution')}>
                   {/* distribution across surahs */}
                   <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--ink-faint)' }}>
                     پراکندگی ریشه در قرآن — برای پرش لمس کنید
@@ -150,9 +156,11 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                       </button>
                     ))}
                   </div>
-                </>
+                  </div>
+                </AnalysisSection>
               )}
 
+              <div className="analysis-examples">
               {verseTr && (
                 <p className="mb-4 text-justify rounded-xl px-3 py-2"
                   style={{ background: 'color-mix(in srgb, var(--paper) 60%, transparent)', border: '1px solid var(--line)', color: 'var(--ink-soft)', fontSize: 13.5, lineHeight: 2 }}>
@@ -191,7 +199,8 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                   </div>
                 </>
               )}
-            </>
+              </div>
+            </div>
           )}
           </>}</>
 }

@@ -26,7 +26,7 @@ test('Taha ma occurrences include independent and prefixed ma', () => {
 })
 
 test('lemma repetitions include ala with attached pronouns, without merging unrelated words', () => {
-  const surah = taha as SurahData
+  const surah: SurahData = { ...taha, ri: {} }
   const word = surah.v[79].w[11]
   const selection = { tab: 'word' as const, s: 20, a: 80, pos: 12, ...wordTarget(word) }
   const hits = analysisOccurrences(surah, selection)

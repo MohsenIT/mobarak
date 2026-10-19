@@ -9,6 +9,7 @@ import { analysisNavigation, type AnalysisTab, type AnalysisSelection } from '@/
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import AnalysisTabContent from './AnalysisTabContent'
+import { AnalysisPreferencesProvider, AnalysisSettings } from './AnalysisSections'
 import SwipeTabPages from './SwipeTabPages'
 import { getContext } from '@/lib/contexts'
 import QuranText from './QuranText'
@@ -41,7 +42,11 @@ const TABS = [['root', 'ریشه'], ['form', 'باب'], ['word', 'واژه'], ['
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
-export default function RootPanel({
+export default function RootPanel(props: Props) {
+  return <AnalysisPreferencesProvider><RootPanelContent {...props} /></AnalysisPreferencesProvider>
+}
+
+function RootPanelContent({
   sel: anchor, onSelectionChange, onCompareContext, meta, translator, maximized, onToggleMax, onClose, onJump, onJumpSurah,
   stackedOverIndex = false, comparisonRange, sheetH, onSheetHeightChange: setSheetH,
 }: Props) {
@@ -178,6 +183,7 @@ export default function RootPanel({
           </span>
           <span className="chip panel-chip hidden sm:inline-flex">سوره {meta.surahs[sel.s - 1]?.fa} · {tab === 'context' && selectedContext ? `آیات ${toFa(selectedContext.from)} تا ${toFa(selectedContext.to)}` : `آیه ${toFa(sel.a)}`}</span>
           <div className="panel-actions">
+            <AnalysisSettings tab={tab} />
             {!maximized && <select aria-label="اندازهٔ باتم‌شیت" title="اندازهٔ باتم‌شیت"
               className={stackedOverIndex ? 'sheet-size-select' : 'sheet-size-select lg:hidden'}
               value={[8, 30, 46, 70, 88].includes(sheetH) ? sheetH : 'custom'}
