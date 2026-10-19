@@ -4,11 +4,10 @@ import type { Translator, SurahData, Translations, Meta } from '@/lib/quran'
 import { loadGlobalRoots, loadSurah, loadTrans, keywordScore, keywordTier, toFa } from '@/lib/quran'
 import type { Selection } from './MushafPage'
 import type { AnalysisTab } from '@/lib/analysis'
-import { displayWordText, wordTarget, type WordPart } from '@/lib/word-parts'
+import { wordTarget, type WordPart } from '@/lib/word-parts'
 import SelectionDetails from './SelectionDetails'
 import ContextDetails from './ContextDetails'
 import RootMeaning from './RootMeaning'
-import QuranText from './QuranText'
 import { AnalysisSection, STAT_OPTIONS, useAnalysisPreferences } from './AnalysisSections'
 
 export default function AnalysisTabContent({ tab, selection: sel, meta, translator, comparisonRange, onPick: selectTarget, onCompareContext, onRootTarget }: {
@@ -20,27 +19,17 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
 }) {
   const { enabled } = useAnalysisPreferences()
   const showStat = (id: string) => enabled('root', 'stats', id)
-  const [data, setData] = useState<{ surah: SurahData; trans: Translations } | null>(null)
+  const [data, setData] = useState<{ surah: SurahData; trans: Translations | null } | null>(null)
   const surah = data?.surah.n === sel.s ? data.surah : null
   const trans = surah ? data!.trans : null
   const [globalRoots, setGlobalRoots] = useState<Record<string, Record<string, number>> | null>(null)
   useEffect(() => {
     let live = true
-    Promise.all([loadSurah(sel.s), loadTrans(sel.s)]).then(([surah, trans]) => { if (live) setData({ surah, trans }) })
+    Promise.all([loadSurah(sel.s), tab === 'root' ? Promise.resolve(null) : loadTrans(sel.s)]).then(([surah, trans]) => { if (live) setData({ surah, trans }) })
     if (tab === 'root') loadGlobalRoots().then(data => { if (live) setGlobalRoots(data) })
     return () => { live = false }
   }, [sel.s, tab])
   const root = sel.root
-  const byAyah = useMemo(() => {
-    if (!root || !surah) return []
-    const groups = new Map<number, number[]>()
-    for (const [a, pos] of surah.ri[root] || []) {
-      if (!groups.has(a)) groups.set(a, [])
-      groups.get(a)!.push(pos)
-    }
-    return Array.from(groups.entries())
-  }, [root, surah])
-
   const stats = useMemo(() => {
     if (!root || !surah || !globalRoots) return null
     const g = globalRoots[root]
@@ -65,19 +54,12 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
     return { inSurah, total, df, share, surahDensity, score, tier, top, maxC }
   }, [root, surah, globalRoots, sel.s])
 
-  const verseTr = trans?.[String(sel.a)]?.[translator]
   const selectedForm = sel.part !== 'prefix' && surah?.n === sel.s ? surah.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form : undefined
 
   return <>          {tab !== 'root' ? (surah?.n === sel.s && trans ? (tab === 'context' ? <ContextDetails selection={sel} surah={surah} trans={trans} translator={translator} onPick={selectTarget} onCompare={onCompareContext} /> : <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} onPick={selectTarget} comparisonRange={comparisonRange} />) : <p role="status">در حال بارگیری…</p>) : <>
           {!root ? (
             <div className="text-center py-6" style={{ color: 'var(--ink-soft)' }}>
               <p className="text-sm leading-8">این واژه حرف یا ضمیر است و ریشهٔ مستقلی ندارد.</p>
-              {verseTr && (
-                <p className="mt-4 text-justify rounded-xl px-3 py-2"
-                  style={{ background: 'color-mix(in srgb, var(--paper) 60%, transparent)', border: '1px solid var(--line)', fontSize: 13.5, lineHeight: 2 }}>
-                  {verseTr}
-                </p>
-              )}
             </div>
           ) : (
             <div className="analysis-section-stack">
@@ -160,46 +142,6 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                 </AnalysisSection>
               )}
 
-              <div className="analysis-examples">
-              {verseTr && (
-                <p className="mb-4 text-justify rounded-xl px-3 py-2"
-                  style={{ background: 'color-mix(in srgb, var(--paper) 60%, transparent)', border: '1px solid var(--line)', color: 'var(--ink-soft)', fontSize: 13.5, lineHeight: 2 }}>
-                  {verseTr}
-                </p>
-              )}
-
-              {comparisonRange?.s === sel.s && <p className="text-xs mb-3"><span className="range-inside rounded px-2 py-1">درون بازه</span>{' · '}<span className="range-outside rounded px-2 py-1">بیرون بازه</span></p>}
-              {surah && (
-                <>
-                  <p className="text-xs mb-2 font-medium" style={{ color: 'var(--ink-faint)' }}>
-                    واژه‌های هم‌ریشه در این سوره — برای پرش لمس کنید
-                  </p>
-                  <div className="flex flex-col gap-2 pb-2">
-                    {byAyah.map(([ayah, poses]) => {
-                      const verse = surah.v[ayah - 1]
-                      if (!verse) return null
-                      return (
-                        <button key={ayah} className="occ-row"
-                          onClick={() => selectTarget(ayah, poses[0])}>
-                          <span className="chip flex-none mt-1" style={{ borderColor: 'var(--sage)', color: 'var(--ink)' }}>
-                            آیه {toFa(ayah)}
-                          </span>
-                          <span className="font-quran" dir="rtl" style={{ fontSize: 19, lineHeight: 1.9, color: 'var(--ink)' }}>
-                            {verse.w.map((w, i) => (
-                              <span key={i}>
-                                <span className={poses.includes(i + 1) ? `hl${comparisonRange?.s === sel.s ? (ayah >= comparisonRange.from && ayah <= comparisonRange.to ? ' range-inside' : ' range-outside') : ''}` : ''}>
-                                  <QuranText text={displayWordText(w)} />
-                                </span>{' '}
-                              </span>
-                            ))}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </>
-              )}
-              </div>
             </div>
           )}
           </>}</>
