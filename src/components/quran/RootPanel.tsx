@@ -1,11 +1,13 @@
 'use client'
 import { wordTarget, type WordPart } from '@/lib/word-parts'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Translator, SurahData, Meta } from '@/lib/quran'
 import { loadSurah, spacedRoot, toFa, morphologyLabel, formName } from '@/lib/quran'
 import type { Selection } from './MushafPage'
-import { nextAnalysisLocation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
+import { analysisNavigation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import AnalysisTabContent from './AnalysisTabContent'
 import SwipeTabPages from './SwipeTabPages'
 import { getContext } from '@/lib/contexts'
@@ -50,6 +52,7 @@ export default function RootPanel({
   const dragRef = useRef<{ y: number; h: number } | null>(null)
   const [formAvailable, setFormAvailable] = useState<boolean | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   useEffect(() => {
     let live = true
@@ -70,6 +73,7 @@ export default function RootPanel({
 
   const switchTab = (key: AnalysisTab) => {
     if (key === tab || (key === 'form' && !formAvailable)) return
+    setPickerOpen(false)
     setTab(key)
     const target = targets[key]
     loadSurah(target.s).then(data => onJump(target.s, target.a, target.pos, data.v[target.a - 1].p))
@@ -97,15 +101,26 @@ export default function RootPanel({
 
   const selectTarget = (a: number, pos: number, part?: WordPart) => selectTargetFor(tab, a, pos, part)
 
+  const nav = useMemo(() => surah?.n === sel.s ? analysisNavigation(surah, { ...sel, tab, form: selectedForm }) : null, [surah, sel, tab, selectedForm])
+  const noun = tab === 'context' ? 'سیاق' : tab === 'verse' ? 'آیه' : tab === 'word' ? 'واژه' : tab === 'form' ? 'باب' : 'ریشه'
+  const items = nav?.repetitions ?? []
+  const index = nav?.repetitionIndex ?? -1
+  const hasRepetitions = nav?.hasRepetitions ?? (tab !== 'verse' && tab !== 'context')
+  const canUnitPrevious = !!nav && nav.unitIndex > 0
+  const canUnitNext = !!nav && nav.unitIndex >= 0 && nav.unitIndex < nav.units.length - 1
+  const navigateUnit = (direction: number) => {
+    if (!nav || nav.unitIndex < 0) return
+    const target = nav.units[nav.unitIndex + direction]
+    if (target) selectTarget(...target)
+  }
   const navigate = (direction: number) => {
-    if (!surah) return
-    const location = nextAnalysisLocation(surah, { ...sel, tab, form: selectedForm }, direction)
-    if (location) selectTarget(...location)
+    const target = index >= 0 ? items[index + direction] : null
+    if (target) selectTarget(...target)
   }
 
   useEffect(() => {
     const handle = (event: KeyboardEvent) => {
-      if (event.target instanceof HTMLElement && (event.target.matches('input, textarea, select') || event.target.closest('[role="tablist"]'))) return
+      if (event.target instanceof HTMLElement && (event.target.matches('input, textarea, select') || event.target.closest('[role="tablist"], [data-analysis-picker]'))) return
       if (event.key === 'ArrowRight') { event.preventDefault(); navigate(-1) }
       if (event.key === 'ArrowLeft') { event.preventDefault(); navigate(1) }
     }
@@ -188,11 +203,48 @@ export default function RootPanel({
               className={`tab-btn flex-1${tab === key ? ' active' : ''}`} onClick={() => switchTab(key)}>{label}</button>
           ))}
         </div>
-        <div className="flex items-center justify-between px-4 py-2 text-xs border-b" style={{ borderColor: 'var(--line)' }}>
-          <button onClick={() => navigate(-1)} aria-label={tab === 'context' ? 'سیاق قبل' : tab === 'verse' ? 'آیه قبل' : tab === 'word' ? 'واژه قبل' : tab === 'form' ? 'باب قبل' : 'ریشه قبل'}>→ {tab === 'context' ? 'سیاق قبل' : tab === 'verse' ? 'آیه قبل' : tab === 'word' ? 'واژه قبل' : tab === 'form' ? 'باب قبل' : 'ریشه قبل'}</button>
-          <span>{tab === 'context' && selectedContext ? `آیات ${toFa(selectedContext.from)} تا ${toFa(selectedContext.to)}` : `آیه ${toFa(sel.a)} · واژه ${toFa(sel.pos)}`}</span>
-          <button onClick={() => navigate(1)} aria-label={tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'}>{tab === 'context' ? 'سیاق بعد' : tab === 'verse' ? 'آیه بعد' : tab === 'word' ? 'واژه بعد' : tab === 'form' ? 'باب بعد' : 'ریشه بعد'} ←</button>
-        </div>
+        <nav className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={`پیمایش ${noun}`}>
+          <button className="analysis-unit-button" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={`${noun} قبل`}>
+            {hasRepetitions ? <ChevronsRight size={15} aria-hidden="true" /> : <ChevronRight size={15} aria-hidden="true" />}
+            <span>{noun} قبل</span>
+          </button>
+          {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(-1)} disabled={index <= 0}
+            aria-label="تکرار قبل" title={`${toFa(Math.max(0, index))} تکرار قبل`}>
+            <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))}</span>
+          </button>}
+          <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+            <PopoverTrigger asChild>
+              <button className="analysis-position-button" disabled={index < 0 || !items.length}
+                aria-label={`${hasRepetitions ? 'تکرار' : noun} ${toFa(index + 1)} از ${toFa(items.length)}؛ انتخاب ${hasRepetitions ? 'تکرار' : noun}`}>
+                {index < 0 ? '—' : tab === 'context' && selectedContext ? `آیات ${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : `${toFa(index + 1)} از ${toFa(items.length)}`}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="analysis-position-picker" dir="rtl" data-analysis-picker
+              aria-label={hasRepetitions ? 'فهرست تکرارها' : `فهرست ${noun}‌ها`}
+              onOpenAutoFocus={event => {
+                event.preventDefault()
+                requestAnimationFrame(() => {
+                  const selected = document.querySelector<HTMLButtonElement>('[data-analysis-picker] [aria-current="true"]')
+                  selected?.focus({ preventScroll: true }); selected?.scrollIntoView({ block: 'nearest' })
+                })
+              }}>
+              <p className="text-xs font-bold px-3 py-2">{hasRepetitions ? 'تکرارها در این سوره' : `${noun}‌های این سوره`}</p>
+              {items.map(([a, pos, part], i) => <button key={`${a}:${pos}:${part ?? 'stem'}`} className="analysis-position-option" aria-current={i === index ? 'true' : undefined}
+                onClick={() => { selectTarget(a, pos, part); setPickerOpen(false) }}>
+                <span>{toFa(i + 1)} · {tab === 'context' ? (() => { const range = getContext(sel.s, a); return range ? `آیات ${toFa(range.from)} تا ${toFa(range.to)}` : `آیه ${toFa(a)}` })() : `آیه ${toFa(a)}`}</span>
+                {hasRepetitions && <span className="font-quran text-lg"><QuranText text={surah ? wordTarget(surah.v[a - 1].w[pos - 1], part).text : ''} /></span>}
+              </button>)}
+            </PopoverContent>
+          </Popover>
+          {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(1)} disabled={index < 0 || index >= items.length - 1}
+            aria-label="تکرار بعد" title={`${toFa(Math.max(0, items.length - index - 1))} تکرار بعد`}>
+            <span>{toFa(Math.max(0, items.length - index - 1))}</span><ChevronLeft size={17} aria-hidden="true" />
+          </button>}
+          <button className="analysis-unit-button" onClick={() => navigateUnit(1)} disabled={!canUnitNext} aria-label={`${noun} بعد`}>
+            <span>{noun} بعد</span>
+            {hasRepetitions ? <ChevronsLeft size={15} aria-hidden="true" /> : <ChevronLeft size={15} aria-hidden="true" />}
+          </button>
+        </nav>
         <SwipeTabPages active={tab} onChange={switchTab} panes={TABS.filter(([key]) => key !== 'form' || formAvailable).map(([key]) => ({
           key,
           content: <AnalysisTabContent tab={key} selection={targets[key]} meta={meta} translator={translator} comparisonRange={comparisonRange}

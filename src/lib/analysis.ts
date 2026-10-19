@@ -1,6 +1,6 @@
 import { splitWord, wordKey, type WordPart } from './word-parts'
 import type { SurahData, Word } from './quran'
-import { nextContext } from './contexts'
+import { nextContext, getContext, getSurahContexts } from './contexts'
 
 export type AnalysisTab = 'root' | 'form' | 'word' | 'verse' | 'context'
 export interface AnalysisSelection {
@@ -68,4 +68,44 @@ export function nextAnalysisLocation(surah: SurahData, selection: AnalysisSelect
   const current = units.findIndex(unit => unit.key === key)
   const next = current < 0 ? (direction > 0 ? 0 : units.length - 1) : (current + direction + units.length) % units.length
   return units[next].location
+}
+
+export type AnalysisLocation = [number, number, WordPart?]
+
+/** Separate changing a tab's unit from visiting repetitions of that same unit. */
+export function analysisNavigation(surah: SurahData, selection: AnalysisSelection) {
+  const units: AnalysisLocation[] = []
+  const seen = new Set<string>()
+  if (selection.tab === 'verse') {
+    for (const verse of surah.v) units.push([verse.n, 1])
+  } else if (selection.tab === 'context') {
+    for (const range of getSurahContexts(surah.n)?.ranges ?? []) units.push([range.from, 1])
+  } else {
+    for (const verse of surah.v) for (const [i, word] of verse.w.entries()) {
+      if (selection.tab === 'word') {
+        if (splitWord(word).prefix) units.push([verse.n, i + 1, 'prefix'])
+        units.push([verse.n, i + 1, splitWord(word).prefix ? 'stem' : undefined])
+        continue
+      }
+      if (selection.tab === 'form' && word.r !== selection.root) continue
+      const key = selection.tab === 'root' ? word.r : word.form
+      if (!key || seen.has(key)) continue
+      seen.add(key)
+      units.push([verse.n, i + 1])
+    }
+  }
+  const unitIndex = units.findIndex(([a, pos, part]) => {
+    const word = surah.v[a - 1]?.w[pos - 1]
+    if (selection.tab === 'root') return word?.r === selection.root
+    if (selection.tab === 'form') return word?.form === selection.form
+    if (selection.tab === 'context') return getContext(surah.n, selection.a)?.from === a
+    if (selection.tab === 'verse') return a === selection.a
+    return a === selection.a && pos === selection.pos && (part ?? 'stem') === (selection.part ?? 'stem')
+  })
+  const hasRepetitions = selection.tab === 'root' || selection.tab === 'form' || selection.tab === 'word'
+  const repetitions: AnalysisLocation[] = hasRepetitions ? analysisOccurrences(surah, selection).map(([a, pos]) => [a, pos,
+    selection.tab === 'word' ? selection.part === 'prefix' ? 'prefix' : splitWord(surah.v[a - 1].w[pos - 1]).prefix ? 'stem' : undefined : undefined,
+  ]) : units
+  const repetitionIndex = hasRepetitions ? repetitions.findIndex(([a, pos]) => a === selection.a && pos === selection.pos) : unitIndex
+  return { units, unitIndex, repetitions, repetitionIndex, hasRepetitions }
 }
