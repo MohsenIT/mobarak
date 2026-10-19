@@ -1106,7 +1106,8 @@ input[type='range'].page-slider::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) { .swipe-tab-page { transition: none !important; } }
 
 .app-update-notice { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 12px; right: 12px; width: auto; max-width: 600px; margin-inline: auto; z-index: 120; display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--line-strong); border-radius: 16px; background: var(--sheet); color: var(--ink); box-shadow: 0 8px 28px #0003; }
-.app-update-button { flex-shrink: 0; border: 1px solid var(--sage); border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--ink); background: var(--word-root); }
+.app-update-title { font-size: 12px; font-weight: 700; white-space: nowrap; }
+.app-update-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; flex-shrink: 0; border: 1px solid var(--sage); border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--ink); background: var(--word-root); }
 .app-update-button:disabled { opacity: .6; }
 
 /* Calibrated against the user's 591x1280 Android screenshot (1.5 DPR).
@@ -1155,3 +1156,8 @@ input[type='range'].page-slider::-moz-range-thumb {
 .analysis-position-option[aria-current="true"] { background: transparent; box-shadow: inset -2px 0 var(--sage); }
 .analysis-occurrence-match { color: var(--ink); background: var(--word-selected); border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; text-decoration: underline; text-decoration-color: var(--sage); text-underline-offset: 5px; }
 @media (max-width: 380px) { .analysis-unit-button svg { display: none; } .analysis-navigation { gap: 2px; padding-inline: 5px; } .analysis-repeat-button { font-size: 11px; } }
+
+.app-update-spinner { animation: app-update-spin 1s linear infinite; }
+@keyframes app-update-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .app-update-spinner { animation: none; } }
+@media (max-width: 360px) { .app-update-notice { gap: 6px; padding: 10px 8px; } .app-update-button { padding: 8px 6px; } }
