@@ -75,9 +75,10 @@ export default function Home() {
   const [startupComplete, setStartupComplete] = useState(false)
   const [startupMinimumElapsed, setStartupMinimumElapsed] = useState(false)
   const [startupLeaving, setStartupLeaving] = useState(false)
+  const [startupHeld, setStartupHeld] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setStartupMinimumElapsed(true), 2000)
+    const timer = setTimeout(() => setStartupMinimumElapsed(true), 1000)
     return () => clearTimeout(timer)
   }, [])
   const [mushafNavigationRevision, setMushafNavigationRevision] = useState(0)
@@ -188,15 +189,15 @@ export default function Home() {
   }, [mode, surah])
 
   useEffect(() => {
-    if (!startupComplete && startupMinimumElapsed && meta && !loadingPage && (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))) setStartupLeaving(true)
-  }, [startupComplete, startupMinimumElapsed, meta, loadingPage, mode, flowSurah?.n, surah, segs, pageData])
+    if (!startupHeld && !startupComplete && startupMinimumElapsed && meta && !loadingPage && (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))) setStartupLeaving(true)
+  }, [startupHeld, startupComplete, startupMinimumElapsed, meta, loadingPage, mode, flowSurah?.n, surah, segs, pageData])
 
   useEffect(() => {
-    if (!startupLeaving) return
+    if (!startupLeaving || startupHeld) return
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const timer = setTimeout(() => setStartupComplete(true), reduced ? 0 : 180)
     return () => clearTimeout(timer)
-  }, [startupLeaving])
+  }, [startupLeaving, startupHeld])
 
   // flash cleanup
   useEffect(() => {
@@ -377,7 +378,7 @@ export default function Home() {
 
   return (
     <>
-    {!startupComplete && <StartupSplash leaving={startupLeaving} />}
+    {!startupComplete && <StartupSplash leaving={startupLeaving} onHoldChange={held => { setStartupHeld(held); if (held) setStartupLeaving(false) }} />}
     {meta && <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 

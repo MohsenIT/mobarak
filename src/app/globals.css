@@ -1163,3 +1163,5 @@ input[type='range'].page-slider::-moz-range-thumb {
 @media (max-width: 360px) { .app-update-notice { gap: 6px; padding: 10px 8px; } .app-update-button { padding: 8px 6px; } }
 
 .startup-verse strong { font-weight: 700; color: #284b34; }
+
+.startup-splash { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
