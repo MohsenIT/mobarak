@@ -19,3 +19,9 @@ export function displayWordText(word: Pick<Word, 't' | 'wa'>): string {
   const { prefix, stem } = splitWord(word)
   return prefix ? `${prefix} ${stem}` : stem
 }
+
+/** A corpus lemma groups inflections and attached pronouns, without conflating roots. */
+export function lexicalKey(word: Word, part?: WordPart): string {
+  if (part === 'prefix' && splitWord(word).prefix) return 'و'
+  return word.lemma ? `lemma:${word.lemma}` : wordKey(splitWord(word).stem)
+}

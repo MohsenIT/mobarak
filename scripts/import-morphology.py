@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 source = ROOT / 'data/quranic-corpus-morphology-0.4.txt'
 waw_prefixes = set()
 forms = {}
+lemmas = {}
 form_roots = {}
 BUCKWALTER = dict(zip("'|>&<}AbptvjHxd*rzs$SDTZEgfqklmnhwYy", 'ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهويي'))
 word_counts = {}
@@ -22,6 +23,9 @@ for line in source.read_text().splitlines():
     if segment == 1 and text in ('wa', 'w~a') and features.startswith('PREFIX|w:'):
         waw_prefixes.add((s, a, w))
     word_counts[s, a] = max(word_counts.get((s, a), 0), w)
+    lemma = re.search(r'(?:^|\|)LEM:([^|]+)', features)
+    if features.startswith('STEM|') and lemma:
+        lemmas[s, a, w] = lemma[1]
     match = re.search(r'(?:^|\|)\(([IVX]+)\)(?:\||$)', features)
     # Unmarked verbs are form I; do not infer forms for unmarked nouns.
     form = match[1] if match else ('I' if tag == 'V' else None)
@@ -52,6 +56,10 @@ for s in range(1, 115):
                 word['wa'] = True
             else:
                 word.pop('wa', None)
+            if key in lemmas:
+                word['lemma'] = lemmas[key]
+            else:
+                word.pop('lemma', None)
             if key in forms:
                 if key in form_roots and word.get('r') != form_roots[key]:
                     raise ValueError(f'Root alignment mismatch at {key}')

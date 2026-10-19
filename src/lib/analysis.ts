@@ -1,4 +1,4 @@
-import { splitWord, wordKey, type WordPart } from './word-parts'
+import { lexicalKey, splitWord, wordKey, type WordPart } from './word-parts'
 import type { SurahData, Word } from './quran'
 import { nextContext, getContext, getSurahContexts } from './contexts'
 
@@ -29,10 +29,12 @@ export function matchesAnalysis(selection: AnalysisSelection | null | undefined,
 
 export function analysisOccurrences(surah: SurahData, selection: AnalysisSelection): [number, number][] {
   const occurrences: [number, number][] = []
+  const selectedWord = surah.v.find(verse => verse.n === selection.a)?.w[selection.pos - 1]
+  const selectedKey = selectedWord ? lexicalKey(selectedWord, selection.part) : wordKey(selection.text)
   for (const verse of surah.v) for (const [i, word] of verse.w.entries()) {
-    // Word statistics match lexical parts after removing corpus-tagged waw;
+    // Word statistics group attested lemmas, excluding corpus-tagged waw;
     // the actual selection remains a single word at a single location.
-    const match = selection.tab === 'word' ? (selection.part === 'prefix' ? !!splitWord(word).prefix : wordKey(splitWord(word).stem) === wordKey(selection.text)) : matchesAnalysis(selection, surah.n, verse.n, i + 1, word)
+    const match = selection.tab === 'word' ? (selection.part === 'prefix' ? !!splitWord(word).prefix : lexicalKey(word) === selectedKey) : matchesAnalysis(selection, surah.n, verse.n, i + 1, word)
     if (match) occurrences.push([verse.n, i + 1])
   }
   return occurrences

@@ -12,8 +12,10 @@ for n in range(1, 115):
     for verse in data['v']:
         for word in verse['w']:
             prefix = re.match(r'^(?:۞\s*)?و[\u064b-\u065f\u0670\u06d6-\u06ed]*', word['t'])[0] if word.get('wa') else ''
-            for text in ([prefix, word['t'][len(prefix):]] if prefix else [word['t']]):
+            for part, text in ([('prefix', prefix), ('stem', word['t'][len(prefix):])] if prefix else [('stem', word['t'])]):
                 key = re.sub(r'[\u064b-\u065f\u0670\u06d6-\u06edـ۞\s]', '', text).translate(str.maketrans('یىکٱ', 'ييكا'))
+                if part == 'stem' and word.get('lemma'):
+                    key = f"lemma:{word['lemma']}"
                 words[key][str(n)] = words[key].get(str(n), 0) + 1
             if word.get('form'):
                 form = word['form']

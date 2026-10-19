@@ -24,3 +24,17 @@ test('Taha ma occurrences include independent and prefixed ma', () => {
   expect(hits.some(([a, pos]) => !!taha.v[a - 1].w[pos - 1].wa)).toBe(true)
   expect(hits.some(([a, pos]) => !taha.v[a - 1].w[pos - 1].wa)).toBe(true)
 })
+
+test('lemma repetitions include ala with attached pronouns, without merging unrelated words', () => {
+  const surah = taha as SurahData
+  const word = surah.v[79].w[11]
+  const selection = { tab: 'word' as const, s: 20, a: 80, pos: 12, ...wordTarget(word) }
+  const hits = analysisOccurrences(surah, selection)
+  expect(hits).toContainEqual([5, 2]) // على
+  expect(hits).toContainEqual([2, 3]) // عليك
+  expect(hits).toContainEqual([45, 7]) // علينا
+  expect(hits).toContainEqual([73, 9]) // عليه
+  expect(hits).toContainEqual([81, 10]) // عليكم
+  expect(hits.every(([a, pos]) => surah.v[a - 1].w[pos - 1].lemma === word.lemma)).toBe(true)
+  expect(analysisOccurrences(surah, { ...selection, a: 5, pos: 2, ...wordTarget(surah.v[4].w[1]) })).toEqual(hits)
+})

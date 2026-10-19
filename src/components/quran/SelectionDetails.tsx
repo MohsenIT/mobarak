@@ -5,7 +5,7 @@ import type { Translator, SurahData, Translations } from '@/lib/quran'
 import { morphologyLabel, formName, toFa } from '@/lib/quran'
 import { analysisOccurrences, type AnalysisSelection, type AnalysisTab } from '@/lib/analysis'
 import QuranText from './QuranText'
-import { splitWord, wordKey } from '@/lib/word-parts'
+import { lexicalKey, splitWord } from '@/lib/word-parts'
 import SourceReference from './SourceReference'
 
 type Index = { words: Record<string, Record<string, number>>; forms: Record<string, Record<string, number>>; rootForms: Record<string, Record<string, number>> }
@@ -40,7 +40,7 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
     return [...result.entries()]
   }, [occurrences])
   const verse = surah.v.find(v => v.n === selection.a)
-  const distribution = tab === 'word' ? index?.words[wordKey(selection.text)] : selection.form ? index?.rootForms[`${selection.root}:${selection.form}`] : undefined
+  const distribution = tab === 'word' ? index?.words[lexicalKey(surah.v[selection.a - 1].w[selection.pos - 1], selection.part)] : selection.form ? index?.rootForms[`${selection.root}:${selection.form}`] : undefined
   const total = distribution ? Object.values(distribution).reduce((a, b) => a + b, 0) : null
   const distinctRoots = new Set(occurrences.map(([a, pos]) => surah.v[a - 1].w[pos - 1].r).filter(Boolean)).size
 
@@ -61,7 +61,7 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
           }} /></div>
         </div>
       )}
-      {tab === 'word' && <p className="text-xs leading-6 mb-3">انتخاب این تب فقط همین واژه است. آمار و فهرست زیر برای تکرارهای همین واژه، با جدا کردن «و» پیوندی است.</p>}
+      {tab === 'word' && <p className="text-xs leading-6 mb-3">آمار و تکرارها بر پایهٔ لِمّا است؛ صورت‌های صرفی و ضمیرهای پیوستهٔ یک واژه با هم شمرده می‌شوند.</p>}
       {tab === 'verse' ? (
         <div className="flex gap-2 mb-4">
           <div className="stat"><b>{toFa(verse?.w.length ?? 0)}</b><span>واژه در آیه</span></div>
