@@ -31,3 +31,9 @@ test('the compatibility fix covers the same pattern across all 114 surahs', asyn
   }
   expect(affected).toBe(91)
 })
+
+test('hidden pause signs do not leave whitespace inside selectable words', () => {
+  expect(quranDisplayText('مِسَاسَ ۖ')).toBe('مِسَاسَ')
+  expect(quranDisplayText('أَسِفًۭا ۚ')).toBe('أَسِفًا')
+  expect(quranDisplayText('لَا مِسَاسَ ۖ')).toBe('لَا مِسَاسَ')
+})

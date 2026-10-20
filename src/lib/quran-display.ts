@@ -7,4 +7,6 @@ export function quranDisplayText(text: string): string {
     // Do not apply this to all tatweel/hamza pairs: الآخرة has a different seat.
     .replace(/سْـٔ/g, 'سْئ')
     .replace(/[\u06D6-\u06ED\u0670]/g, '')
+    // A hidden pause mark may leave a trailing space inside a selectable word.
+    .trim()
 }

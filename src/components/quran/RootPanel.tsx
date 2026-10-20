@@ -179,7 +179,7 @@ function RootPanelContent({
   const nextUnitTitle = unitTitle(nextUnit)
   const currentUnitTitle = tab === 'root' ? root ? spacedRoot(root) : '—' : tab === 'form' ? selectedForm ? morphologyLabel(selectedForm) : 'باب' : tab === 'word' ? sel.text : tab === 'verse' ? `آیه ${toFa(sel.a)}` : selectedContext ? `آیات ${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : 'سیاق'
   const unitQuranFont = tab === 'root' || tab === 'word'
-  const positionTitle = <><span className={`analysis-position-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={currentUnitTitle} /></span><span className="analysis-position-count" dir="ltr">{index >= 0 ? `${toFa(index + 1)}/${toFa(items.length)}` : '—'}</span></>
+  const positionTitle = <><span className={`analysis-position-title${tab === 'context' ? ' analysis-position-range' : ''}${unitQuranFont ? ' font-quran' : ''}`}>{tab === 'context' && selectedContext ? <>آیات <bdi dir="ltr">{toFa(selectedContext.from)}–{toFa(selectedContext.to)}</bdi></> : <QuranText text={currentUnitTitle} />}</span><span className="analysis-position-count" dir="ltr">{index >= 0 ? `${toFa(index + 1)}/${toFa(items.length)}` : '—'}</span></>
   const navigateUnit = (direction: number) => {
     const target = direction < 0 ? previousUnit : nextUnit
     if (target) selectTarget(...target)
