@@ -78,10 +78,6 @@ export function toFa(n: number | string): string {
   return String(n).replace(/[0-9]/g, d => FA_DIGITS[+d])
 }
 
-export function spacedRoot(root: string): string {
-  return root.split('').join(' ')
-}
-
 const FORM_LABELS: Record<string, string> = {
   I: 'ثلاثی مجرد', II: 'تفعیل', III: 'مفاعله', IV: 'افعال',
   V: 'تفعّل', VI: 'تفاعل', VII: 'انفعال', VIII: 'افتعال',

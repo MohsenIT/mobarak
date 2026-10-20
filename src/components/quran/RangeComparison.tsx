@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import type { Meta, SurahData } from '@/lib/quran'
-import { compareRootRange, loadGlobalRoots, loadSurah, spacedRoot, toFa } from '@/lib/quran'
+import { compareRootRange, loadGlobalRoots, loadSurah, toFa } from '@/lib/quran'
 import { rootHue, rootColorStyle } from '@/lib/comparison-colors'
 import { getSurahContexts } from '@/lib/contexts'
 import { IconClose } from './Ornaments'
@@ -123,7 +123,7 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
                     style={{ borderColor: 'var(--line)' }} onClick={() => onPickRoot(row.root)}>
                     <div className="flex items-center gap-3">
                       <span className="comparison-color-key rounded px-2 py-1 text-xs" style={rootColorStyle(rootHue(row.root))}>{toFa(index + 1)}</span>
-                      <b className="font-quran text-xl flex-1">{spacedRoot(row.root)}</b>
+                      <b className="font-quran text-xl flex-1">{row.root}</b>
                       <span className="text-xs">ارتباط {toFa(Math.round(row.connection * 100))}٪</span>
                     </div>
                     <div className="dist-track my-2"><div className="dist-fill cur" style={{ width: `${row.connection * 100}%`, height: '100%' }} /></div>

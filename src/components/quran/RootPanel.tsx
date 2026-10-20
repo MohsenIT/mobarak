@@ -3,7 +3,7 @@ import { displayWordText, lexicalKey, wordTarget, type WordPart } from '@/lib/wo
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Translator, SurahData, Meta } from '@/lib/quran'
-import { loadSurah, spacedRoot, toFa, morphologyLabel } from '@/lib/quran'
+import { loadSurah, toFa, morphologyLabel } from '@/lib/quran'
 import type { Selection } from './MushafPage'
 import { adjacentRootLocations, analysisNavigation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
@@ -168,7 +168,7 @@ function RootPanelContent({
     const [a, pos, part] = location
     const word = surah.v[a - 1]?.w[pos - 1]
     if (!word) return '—'
-    if (tab === 'root') return word.r ? spacedRoot(word.r) : '—'
+    if (tab === 'root') return word.r ? word.r : '—'
     if (tab === 'form') return word.form ? morphologyLabel(word.form) : '—'
     if (tab === 'word') return wordTarget(word, part).text
     if (tab === 'verse') return `آیه ${toFa(a)}`
@@ -177,7 +177,7 @@ function RootPanelContent({
   }
   const previousUnitTitle = unitTitle(previousUnit)
   const nextUnitTitle = unitTitle(nextUnit)
-  const currentUnitTitle = tab === 'root' ? root ? spacedRoot(root) : '—' : tab === 'form' ? selectedForm ? morphologyLabel(selectedForm) : 'باب' : tab === 'word' ? sel.text : tab === 'verse' ? `آیه ${toFa(sel.a)}` : selectedContext ? `آیات ${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : 'سیاق'
+  const currentUnitTitle = tab === 'root' ? root ? root : '—' : tab === 'form' ? selectedForm ? morphologyLabel(selectedForm) : 'باب' : tab === 'word' ? sel.text : tab === 'verse' ? `آیه ${toFa(sel.a)}` : selectedContext ? `آیات ${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : 'سیاق'
   const unitQuranFont = tab === 'root' || tab === 'word'
   const positionTitle = <><span className={`analysis-position-title${tab === 'context' ? ' analysis-position-range' : ''}${unitQuranFont ? ' font-quran' : ''}`}>{tab === 'context' && selectedContext ? <>آیات <bdi dir="ltr">{toFa(selectedContext.from)}–{toFa(selectedContext.to)}</bdi></> : <QuranText text={currentUnitTitle} />}</span><span className="analysis-position-count" dir="ltr">{index >= 0 ? `${toFa(index + 1)}/${toFa(items.length)}` : '—'}</span></>
   const navigateUnit = (direction: number) => {

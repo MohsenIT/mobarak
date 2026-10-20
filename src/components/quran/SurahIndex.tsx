@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Meta, SurahData } from '@/lib/quran'
 import {
   keywordScore, keywordTier, loadGlobalRoots, loadSurah, loadTrans,
-  spacedRoot, toFa,
+  toFa,
 } from '@/lib/quran'
 import { IconClose, IconInfo, IconSearch } from './Ornaments'
 
@@ -156,7 +156,7 @@ export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRo
                     <span className="idx-rank">{toFa(idx + 1)}</span>
                     <span className="font-quran flex-none" dir="rtl"
                       style={{ fontSize: 22, letterSpacing: '0.12em', color: 'var(--gold-deep)', fontWeight: 700, minWidth: 80 }}>
-                      {spacedRoot(r.root)}
+                      {r.root}
                     </span>
                     <span className="flex-1 flex flex-col gap-1 min-w-0">
                       <span className="idx-bar-track">

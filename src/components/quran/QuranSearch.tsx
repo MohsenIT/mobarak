@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Search, X, LoaderCircle, ArrowRight, SlidersHorizontal, Languages, BookOpen } from 'lucide-react'
 import type { Meta, Translator, Translations } from '@/lib/quran'
-import { loadTrans, spacedRoot, toFa } from '@/lib/quran'
+import { loadTrans, toFa } from '@/lib/quran'
 import { type AnalysisSelection } from '@/lib/analysis'
 import { normalizeQuranSearch, type QuranSearchResult } from '@/lib/quran-search'
 import QuranText from './QuranText'
@@ -142,7 +142,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       <header className="search-page-header">
         <div className="search-page-title"><button type="button" className="icon-btn" aria-label="بازگشت به قرآن" onClick={() => onOpenChange(false)}><ArrowRight size={21} /></button><div><h1>جست‌وجو در قرآن</h1><p>از واژه تا ریشه، در سوره‌های دلخواه</p></div></div>
         <div className="search-page-input"><Search size={20} aria-hidden="true" /><input ref={input} type="search" value={query} maxLength={160} onChange={event => { if (occurrenceFilter) onClearOccurrenceFilter?.(); setQuery(event.target.value) }} aria-label="عبارت جست‌وجو در متن قرآن" placeholder={occurrenceFilter ? 'برای جست‌وجوی تازه بنویسید…' : 'واژه یا عبارت قرآنی…'} autoComplete="off" autoCorrect="off" spellCheck={false} />{query && <button type="button" aria-label="پاک کردن عبارت" onClick={() => setQuery('')}><X size={17} /></button>}</div>
-        {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? `ریشهٔ ${spacedRoot(occurrenceFilter.root ?? '')}` : occurrenceFilter.tab === 'form' ? `باب ${occurrenceFilter.form} · ${spacedRoot(occurrenceFilter.root ?? '')}` : `بن‌واژهٔ ${occurrenceFilter.text}`}</span><button type="button" aria-label="حذف فیلتر تکرارها" onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
+        {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? `ریشهٔ ${occurrenceFilter.root ?? ''}` : occurrenceFilter.tab === 'form' ? `باب ${occurrenceFilter.form} · ${occurrenceFilter.root ?? ''}` : `بن‌واژهٔ ${occurrenceFilter.text}`}</span><button type="button" aria-label="حذف فیلتر تکرارها" onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
         <div className="search-page-tools">
           <details className="search-scope"><summary><SlidersHorizontal size={16} /><span>{scopeLabel}</span><span className="search-scope-action">انتخاب سوره‌ها</span></summary>
             <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>همهٔ قرآن</button><button type="button" onClick={() => setSurahs([currentSurah])}>همین سوره</button></div><input type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder="نام یا شمارهٔ سوره" aria-label="یافتن سوره" /><p>بدون انتخاب سوره، در کل قرآن جست‌وجو می‌شود.</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
