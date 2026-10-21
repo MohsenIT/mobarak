@@ -40,7 +40,7 @@ interface Props {
   stackedOverIndex?: boolean
 }
 
-const TABS = [['root', 'ریشه'], ['form', 'باب'], ['word', 'واژه'], ['verse', 'آیه'], ['context', 'سیاق']] as const
+const TABS = [['root', 'ریشه'], ['form', 'باب'], ['word', 'بُن‌واژه'], ['verse', 'آیه'], ['context', 'سیاق']] as const
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
