@@ -36,3 +36,22 @@ test('one navigation field suggests named surahs, explicit references and numeri
   expect(alternatives.some(item => item.destination.kind === 'verse' && item.destination.s === 20 && item.destination.a === 20)).toBe(true)
   expect(destinationSuggestions(meta, '۹۹۹', 20)).toEqual([])
 })
+
+test('common aliases rank before substring matches but retain useful alternatives', async () => {
+  const { destinationSuggestions } = await import('./navigation')
+  const hamd = searchSurahs(meta, 'حمد')
+  expect(hamd[0].n).toBe(1)
+  expect(hamd.map(s => s.n)).toContain(47)
+  const chips = destinationSuggestions(meta, 'حمد', 20)
+  expect(chips[0].destination).toEqual({ kind: 'surah', s: 1 })
+  expect(chips.some(chip => chip.destination.kind === 'surah' && chip.destination.s === 47)).toBe(true)
+  expect(resolveDestination(meta, 'surah', 'حمد', 20)).toEqual({ kind: 'surah', s: 1 })
+})
+test('alternate names and opening phrases support Persian/Arabic spelling and verse references', () => {
+  for (const [query, s] of [['توحید',112], ['احد',112], ['قُلْ هُوَ اللَّهُ أَحَدٌ',112], ['قتال',47], ['بنی اسرائیل',17], ['براءة',9], ['ملائکه',35], ['مؤمن',40], ['حم سجده',41], ['تبارک',67], ['دهر',76], ['عم یتساءلون',78], ['انشراح',94], ['اقرأ',96], ['لهب',111]] as const) {
+    expect(searchSurahs(meta, query)[0]?.n).toBe(s)
+    expect(resolveDestination(meta, 'surah', query, 20)).toEqual({ kind:'surah', s })
+  }
+  expect(resolveDestination(meta, 'verse', 'توحید:۳', 20)).toEqual({ kind:'verse', s:112, a:3 })
+  expect(resolveDestination(meta, 'surah', 'سوره حمد', 20)).toEqual({ kind:'surah', s:1 })
+})

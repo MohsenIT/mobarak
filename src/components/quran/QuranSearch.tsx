@@ -11,6 +11,7 @@ import QuranText from './QuranText'
 import { splitWord } from '@/lib/word-parts'
 import type { SearchMode } from '@/lib/quran-search-session'
 import { lemmaDisplay } from '@/lib/lemma-display'
+import { searchFormLabels } from '@/lib/search-form-labels'
 import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
 export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number }
 
@@ -79,6 +80,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const completed = useRef('')
   const pending = useRef('')
   const facets = { lemmas, forms }
+  const formLabels = searchFormLabels(rawResults)
   const results = filterSearchFacets(rawResults, facets)
   useEffect(() => { if (initialSearch) { setQuery(initialSearch.query); setMode(initialSearch.mode); setSurahs(initialSearch.surahs); setIncludeRoots(false); setIncludeNear(false); setIncludePartial(true) } }, [initialSearch])
   useEffect(() => { setLemmas([]); setForms([]) }, [query, mode, includeRoots, occurrenceFilter, surahs.join(',')])
@@ -196,8 +198,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       <div className="search-results-summary" role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />در حال جست‌وجو…</span> : !valid ? 'اعراب و تفاوت «ک» و «ی» فارسی و عربی مانع جست‌وجو نیست.' : error ? 'بارگیری جست‌وجو انجام نشد.' : `${toFa(results.length)} آیه · ${toFa(results.reduce((sum, r) => sum + r.positions.length, 0))} تطبیق`}</div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label="نتایج جست‌وجو" aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
         {!busy && rawResults.length > 0 && <div className="search-facets-inline" aria-label="فیلتر نتایج">
-          {(['forms', 'lemmas'] as const).map(kind => <SearchFacetGroup key={`${mode}:${query}:${kind}`} kind={kind} counts={searchFacetCounts(rawResults, facets, kind)} selected={facets[kind]} onToggle={value => toggleFacet(kind, value)} />)}
-          {(lemmas.length > 0 || forms.length > 0) && <div className="search-active-facets">{(['forms', 'lemmas'] as const).flatMap(kind => facets[kind].map(value => <button type="button" key={`${kind}:${value}`} aria-label={`حذف فیلتر ${kind === 'forms' ? morphologyLabel(value) : lemmaDisplay(value)}`} onClick={() => toggleFacet(kind, value)}>{kind === 'forms' ? morphologyLabel(value) : lemmaDisplay(value)}<X size={12} /></button>))}<button type="button" onClick={() => { setLemmas([]); setForms([]) }}>حذف فیلترها</button></div>}
+          {(['forms', 'lemmas'] as const).map(kind => <SearchFacetGroup key={`${mode}:${query}:${kind}`} kind={kind} formLabels={formLabels} counts={searchFacetCounts(rawResults, facets, kind)} selected={facets[kind]} onToggle={value => toggleFacet(kind, value)} />)}
+          {(lemmas.length > 0 || forms.length > 0) && <div className="search-active-facets">{(['forms', 'lemmas'] as const).flatMap(kind => facets[kind].map(value => <button type="button" key={`${kind}:${value}`} aria-label={`حذف فیلتر ${kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value)}`} onClick={() => toggleFacet(kind, value)}>{kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value)}<X size={12} /></button>))}<button type="button" onClick={() => { setLemmas([]); setForms([]) }}>حذف فیلترها</button></div>}
         </div>}
         {!valid && <div className="search-empty"><BookOpen size={34} /><h2>دنبال چه می‌گردی؟</h2><p>یک واژه یا عبارت بنویس و محدودهٔ جست‌وجو را انتخاب کن.</p><div>{['لا تخف', 'رحمة', 'رزق'].map(text => <button type="button" key={text} onClick={() => setQuery(text)}>{text}</button>)}</div></div>}
         {error && <button type="button" className="chip" onClick={() => setRetry(value => value + 1)}>تلاش دوباره</button>}
@@ -217,13 +219,13 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
 }
 
 
-function SearchFacetGroup({ kind, counts, selected, onToggle }: {
-  kind: 'forms' | 'lemmas'; counts: { value: string; count: number }[]; selected: string[]; onToggle: (value: string) => void
+function SearchFacetGroup({ kind, counts, selected, onToggle, formLabels }: {
+  formLabels: Map<string, { label: string; description: string }>; kind: 'forms' | 'lemmas'; counts: { value: string; count: number }[]; selected: string[]; onToggle: (value: string) => void
 }) {
   const [expanded, setExpanded] = useState(false)
   if (!counts.length) return null
   return <div className="search-facet-row" role="group" aria-label={kind === 'forms' ? 'فیلتر باب' : 'فیلتر بُن‌واژه'}>
-    <span>{kind === 'forms' ? 'باب' : 'بُن‌واژه'}</span><div>{(expanded ? counts : counts.slice(0, 3)).map(({ value, count }) => <button type="button" key={value} aria-pressed={selected.includes(value)} onClick={() => onToggle(value)}><span>{kind === 'forms' ? morphologyLabel(value) : <QuranText text={lemmaDisplay(value)} />}</span><small>{toFa(count)}</small></button>)}
+    <span>{kind === 'forms' ? 'باب' : 'بُن‌واژه'}</span><div>{(expanded ? counts : counts.slice(0, 3)).map(({ value, count }) => <button type="button" key={value} aria-pressed={selected.includes(value)} title={kind === 'forms' ? formLabels.get(value)?.description ?? morphologyLabel(value) : undefined} onClick={() => onToggle(value)}><span>{kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : <QuranText text={lemmaDisplay(value)} />}</span><small>{toFa(count)}</small></button>)}
     {counts.length > 3 && <button type="button" className="search-facet-more" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'کمتر' : `+${toFa(counts.length - 3)} بیشتر`}</button>}</div>
   </div>
 }

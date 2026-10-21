@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
-import { destinationSuggestions, searchSurahs, type Destination } from '@/lib/navigation'
+import { destinationSuggestions, resolveDestination, normalizeSearch, searchSurahs, type Destination } from '@/lib/navigation'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate } from './Ornaments'
 
 export type { Translator } from '@/lib/quran'
@@ -91,7 +91,7 @@ export default function NavDrawer(props: Props) {
   }
   const submitPage = (e: React.FormEvent) => {
     e.preventDefault()
-    const destination = suggestions.length === 1 ? suggestions[0].destination : undefined
+    const destination = suggestions.length === 1 ? suggestions[0].destination : !/^\d+$/.test(normalizeSearch(pageInput)) ? resolveDestination(meta, 'surah', pageInput, currentSurah) : undefined
     if (destination) goTo(destination)
     else setPageError(true)
   }

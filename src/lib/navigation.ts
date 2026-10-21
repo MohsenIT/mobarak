@@ -1,20 +1,28 @@
 import type { Meta, SurahMeta } from './quran'
+import { SURAH_ALIASES } from './surah-aliases'
 export type JumpKind = 'surah' | 'page' | 'juz' | 'verse'
 export type Destination = { kind: 'surah'; s: number } | { kind: 'page'; p: number } | { kind: 'verse'; s: number; a: number }
 export function normalizeSearch(value: string): string {
   return value.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
     .replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
     .replace(/[\u064B-\u065F\u0670]/g, '').replace(/[يى]/g, 'ی').replace(/ك/g, 'ک')
-    .replace(/[أإآ]/g, 'ا').replace(/[\u200c\sـ]/g, '').toLowerCase()
+    .replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/[\u200c\sـ]/g, '').toLowerCase()
+}
+function nameKey(value: string) { return normalizeSearch(value).replace(/^ال/, '') }
+function surahKeys(s: SurahMeta) { return [s.fa, s.ar, ...(SURAH_ALIASES[s.n] ?? [])].map(nameKey) }
+function surahScore(s: SurahMeta, query: string): number {
+  if (String(s.n) === normalizeSearch(query)) return 0
+  const key = nameKey(query)
+  if (!key) return 3
+  const names = surahKeys(s)
+  return names.includes(key) ? 0 : names.some(name => name.startsWith(key)) ? 1 : names.some(name => name.includes(key)) ? 2 : Infinity
 }
 export function searchSurahs(meta: Meta, input: string): SurahMeta[] {
-  const query = normalizeSearch(input)
-  if (!query) return meta.surahs
-  return meta.surahs.filter(s => String(s.n) === query || normalizeSearch(s.fa).includes(query) || normalizeSearch(s.ar).includes(query))
+  if (!normalizeSearch(input)) return meta.surahs
+  return meta.surahs.map(s => ({ s, score: surahScore(s, input) })).filter(item => Number.isFinite(item.score)).sort((a, b) => a.score - b.score || a.s.n - b.s.n).map(item => item.s)
 }
 function findSurah(meta: Meta, query: string) {
-  const normalized = normalizeSearch(query)
-  const exact = meta.surahs.filter(s => String(s.n) === normalized || normalizeSearch(s.fa) === normalized || normalizeSearch(s.ar) === normalized)
+  const exact = meta.surahs.filter(s => surahScore(s, query) === 0)
   if (exact.length === 1) return exact[0]
   const matches = searchSurahs(meta, query)
   return matches.length === 1 ? matches[0] : undefined
@@ -64,7 +72,8 @@ export function destinationSuggestions(meta: Meta, input: string, currentSurah: 
       return destination ? [{ destination, label: kind === 'juz' ? `جزء ${normalizeSearch(value)}` : label(destination) }] : []
     })
   }
-  const exact = findSurah(meta, value)
-  if (exact) return [{ destination: { kind: 'surah', s: exact.n }, label: `سورهٔ ${exact.fa}` }]
-  return searchSurahs(meta, value).slice(0, 6).map(s => ({ destination: { kind: 'surah' as const, s: s.n }, label: `سورهٔ ${s.fa}` }))
+  return searchSurahs(meta, value).slice(0, 6).map(s => {
+    const alias = SURAH_ALIASES[s.n]?.find(alias => nameKey(alias) === nameKey(value))
+    return { destination: { kind: 'surah' as const, s: s.n }, label: alias ? `سورهٔ ${s.fa} (${alias})` : `سورهٔ ${s.fa}` }
+  })
 }
