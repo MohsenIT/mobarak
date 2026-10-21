@@ -6,7 +6,7 @@ import type { Translator, SurahData, Meta } from '@/lib/quran'
 import { loadSurah, toFa, morphologyLabel } from '@/lib/quran'
 import type { Selection } from './MushafPage'
 import { adjacentRootLocations, analysisNavigation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Minus } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import AnalysisTabContent from './AnalysisTabContent'
 import OccurrencePicker from './OccurrencePicker'
@@ -14,6 +14,7 @@ import { AnalysisPreferencesProvider, AnalysisSettings } from './AnalysisSection
 import SwipeTabPages, { type TabSwipeMotion } from './SwipeTabPages'
 import { getContext } from '@/lib/contexts'
 import QuranText from './QuranText'
+import { readAnalysisView, saveAnalysisView } from '@/lib/analysis-view'
 import { IconClose, IconMaximize, IconRestore } from './Ornaments'
 
 interface Props {
@@ -52,7 +53,7 @@ function RootPanelContent({
   sel: anchor, onSelectionChange, onCompareContext, onOpenOccurrences, meta, translator, maximized, onToggleMax, onClose, onJump, onJumpSurah,
   stackedOverIndex = false, comparisonRange, sheetH, onSheetHeightChange: setSheetH,
 }: Props) {
-  const [tab, setTab] = useState<AnalysisTab>(!anchor.root || anchor.part === 'prefix' ? 'word' : 'root')
+  const [tab, setTab] = useState<AnalysisTab>(() => { const saved = readAnalysisView().tab ?? 'root'; return (!anchor.root || anchor.part === 'prefix') && (saved === 'root' || saved === 'form') ? 'word' : saved })
   const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
   const rootAvailable = !!targets.root.root
   const sel = targets[tab]
@@ -60,15 +61,19 @@ function RootPanelContent({
   const dragRef = useRef<{ y: number; h: number } | null>(null)
   const [formAvailable, setFormAvailable] = useState<boolean | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const navigationRef = useRef<HTMLElement>(null)
+  const [minimized, setMinimized] = useState(() => readAnalysisView().minimized ?? false)
+  const [minimumHeight, setMinimumHeight] = useState(180)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [previousAnchor, setPreviousAnchor] = useState(anchor)
   // Retarget an existing sheet without remounting its DOM or replaying sheetUp.
   if (anchor !== previousAnchor) {
     setPreviousAnchor(anchor)
     setTargets({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
-    setTab(!anchor.root || anchor.part === 'prefix' ? 'word' : 'root')
+    setTab(current => (!anchor.root || anchor.part === 'prefix') && (current === 'root' || current === 'form') ? 'word' : current)
     setPickerOpen(false)
   }
+  useEffect(() => { saveAnalysisView({ tab, minimized }) }, [tab, minimized])
   const tabStrip = useRef<HTMLDivElement>(null)
   const indicatorTrack = useRef<HTMLDivElement>(null)
   const indicator = useRef<HTMLSpanElement>(null)
@@ -107,6 +112,23 @@ function RootPanelContent({
     return () => observer.disconnect()
   }, [tab, formAvailable, rootAvailable])
 
+  useLayoutEffect(() => {
+    const measure = () => {
+      const panel = panelRef.current, nav = navigationRef.current
+      if (panel && nav) setMinimumHeight(Math.ceil(nav.getBoundingClientRect().bottom - panel.getBoundingClientRect().top))
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    const panel = panelRef.current
+    if (panel) for (const child of [...panel.children].slice(0, 4)) observer.observe(child)
+    return () => observer.disconnect()
+  }, [])
+  const minimumPercent = minimumHeight / (typeof window !== 'undefined' ? window.visualViewport?.height ?? window.innerHeight : 844) * 100
+  const minimize = () => {
+    if (maximized) onToggleMax()
+    setMinimized(value => !value)
+  }
+
   useEffect(() => {
     let live = true
     setSurah(null)
@@ -123,6 +145,8 @@ function RootPanelContent({
     }).catch(() => { if (live) setFormAvailable(false) })
     return () => { live = false }
   }, [formTarget])
+
+  useEffect(() => { if (tab === 'form' && formAvailable === false) setTab('word') }, [tab, formAvailable])
 
   const switchTab = (key: AnalysisTab) => {
     if (key === tab || (key === 'form' && !formAvailable) || (key === 'root' && !rootAvailable)) return
@@ -212,7 +236,11 @@ function RootPanelContent({
   // Keep the exact released height; presets are an explicit alternative.
   const onHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (maximized) return
-    dragRef.current = { y: e.clientY, h: sheetH }
+    const viewport = window.visualViewport?.height ?? window.innerHeight
+    const height = (panelRef.current?.getBoundingClientRect().height ?? viewport * sheetH / 100) / viewport * 100
+    dragRef.current = { y: e.clientY, h: height }
+    setMinimized(false)
+    setSheetH(height)
     e.currentTarget.setPointerCapture(e.pointerId)
     panelRef.current?.classList.add('dragging')
   }
@@ -220,14 +248,14 @@ function RootPanelContent({
     const start = dragRef.current
     if (!start) return
     const viewport = window.visualViewport?.height ?? window.innerHeight
-    setSheetH(clamp(start.h + (start.y - e.clientY) / viewport * 100, 8, 88))
+    setSheetH(clamp(start.h + (start.y - e.clientY) / viewport * 100, minimumHeight / viewport * 100, Math.max(88, minimumHeight / viewport * 100)))
   }
   const onHandleEnd = () => {
     dragRef.current = null
     panelRef.current?.classList.remove('dragging')
   }
 
-  const panelClass = `root-panel${maximized ? ' maximized' : ''}${stackedOverIndex ? ' stacked' : ''}`
+  const panelClass = `root-panel${minimized && !maximized ? ' minimized' : ''}${maximized ? ' maximized' : ''}${stackedOverIndex ? ' stacked' : ''}`
 
   return (
     <>
@@ -237,16 +265,17 @@ function RootPanelContent({
         className={panelClass}
         role="dialog"
         aria-label="تحلیل ریشه کلمه"
-        style={{ touchAction: 'pan-y', ...(!maximized ? { ['--sheet-h' as string]: `${sheetH}dvh` } : {}) }}
+        style={{ touchAction: 'pan-y', ['--sheet-min-height' as string]: `${minimumHeight}px`, ...(!maximized ? { ['--sheet-h' as string]: `${sheetH}dvh` } : {}) }}
       >
         <div className="panel-handle" role="slider" tabIndex={maximized ? -1 : 0}
-          aria-label="ارتفاع باتم‌شیت" aria-orientation="vertical" aria-valuemin={8} aria-valuemax={88}
-          aria-valuenow={Math.round(sheetH)} aria-valuetext={`${toFa(Math.round(sheetH))} درصد صفحه`}
+          aria-label="ارتفاع باتم‌شیت" aria-orientation="vertical" aria-valuemin={Math.ceil(minimumPercent)} aria-valuemax={88}
+          aria-valuenow={Math.round(minimized ? minimumPercent : sheetH)} aria-valuetext={minimized ? 'کمینه؛ تا پایان نویگیشن' : `${toFa(Math.round(sheetH))} درصد صفحه`}
           onPointerDown={onHandleDown} onPointerMove={onHandleMove} onPointerUp={onHandleEnd}
           onPointerCancel={onHandleEnd} onLostPointerCapture={onHandleEnd}
           onKeyDown={event => {
-            const next = event.key === 'ArrowUp' ? sheetH + 5 : event.key === 'ArrowDown' ? sheetH - 5 : event.key === 'Home' ? 8 : event.key === 'End' ? 88 : null
-            if (next !== null && !maximized) { event.preventDefault(); setSheetH(clamp(next, 8, 88)) }
+            const height = minimized ? minimumPercent : sheetH
+            const next = event.key === 'ArrowUp' ? height + 5 : event.key === 'ArrowDown' ? height - 5 : event.key === 'Home' ? minimumPercent : event.key === 'End' ? 88 : null
+            if (next !== null && !maximized) { event.preventDefault(); setMinimized(false); setSheetH(clamp(next, minimumPercent, Math.max(88, minimumPercent))) }
           }} />
 
         <div className="panel-header" style={{ borderColor: 'var(--line)' }}>
@@ -258,15 +287,10 @@ function RootPanelContent({
           </div>
           <div className="panel-actions">
             <AnalysisSettings tab={tab} />
-            {!maximized && <select aria-label="اندازهٔ باتم‌شیت" title="اندازهٔ باتم‌شیت"
-              className={stackedOverIndex ? 'sheet-size-select' : 'sheet-size-select lg:hidden'}
-              value={[8, 30, 46, 70, 88].includes(sheetH) ? sheetH : 'custom'}
-              onChange={event => { if (event.target.value !== 'custom') setSheetH(Number(event.target.value)) }}>
-              <option value="custom" disabled>دلخواه</option>
-              <option value="8">کمینه</option><option value="30">۳۰٪</option><option value="46">نیمه</option>
-              <option value="70">۷۰٪</option><option value="88">بیشینه</option>
-            </select>}
-            <button className="icon-btn sm" onClick={onToggleMax} aria-label={maximized ? 'بازگرداندن به نیم‌صفحه' : 'تمام‌صفحه'}
+            <button className="icon-btn sm" onClick={minimize} aria-label={minimized ? 'بازگرداندن اندازهٔ باتم‌شیت' : 'کمینه‌کردن باتم‌شیت'} title={minimized ? 'بازگرداندن اندازه' : 'کمینه'}>
+              {minimized ? <IconRestore /> : <Minus size={18} />}
+            </button>
+            <button className="icon-btn sm" onClick={() => { setMinimized(false); onToggleMax() }} aria-label={maximized ? 'بازگرداندن به نیم‌صفحه' : 'تمام‌صفحه'}
               title={maximized ? 'بازگرداندن به نیم‌صفحه' : 'تمام‌صفحه'}>
               {maximized ? <IconRestore /> : <IconMaximize />}
             </button>
@@ -285,7 +309,7 @@ function RootPanelContent({
           ))}
           <div ref={indicatorTrack} className="analysis-tab-indicator-track" aria-hidden="true"><span ref={indicator} /><span ref={indicatorCopy} /></div>
         </div>
-        <nav className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={`پیمایش ${noun}`}>
+        <nav ref={navigationRef} className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={`پیمایش ${noun}`}>
           <button className="analysis-unit-button" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={`${noun} قبل`} title={`${noun} قبل: ${previousUnitTitle}`}>
             {hasRepetitions ? <ChevronsRight size={15} aria-hidden="true" /> : <ChevronRight size={15} aria-hidden="true" />}
             <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={previousUnitTitle} /></span>
@@ -330,7 +354,7 @@ function RootPanelContent({
             {hasRepetitions ? <ChevronsLeft size={15} aria-hidden="true" /> : <ChevronLeft size={15} aria-hidden="true" />}
           </button>
         </nav>
-        <SwipeTabPages active={tab} onChange={switchTab} onProgress={paintTabIndicator} panes={TABS.filter(([key]) => (key !== 'form' || formAvailable) && (key !== 'root' || rootAvailable)).map(([key]) => ({
+        <SwipeTabPages contentKey={`${anchor.s}:${anchor.a}:${anchor.pos}:${anchor.part ?? 'stem'}`} active={tab} onChange={switchTab} onProgress={paintTabIndicator} panes={TABS.filter(([key]) => (key !== 'form' || formAvailable) && (key !== 'root' || rootAvailable)).map(([key]) => ({
           key,
           content: <AnalysisTabContent tab={key} selection={targets[key]} meta={meta} translator={translator} comparisonRange={comparisonRange}
             onPick={(a, pos, part) => selectTargetFor(key, a, pos, part)} onCompareContext={onCompareContext}

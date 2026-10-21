@@ -5,7 +5,7 @@ import { loadSurah, loadTrans, toFa, type Meta, type SurahData, type Translation
 import MushafPage from './MushafPage'
 import FlowPage from './FlowPage'
 
-type ReadingProps = Pick<ComponentProps<typeof MushafPage>, 'selection' | 'highlightRoot' | 'analysisSelection' | 'comparisonRange' | 'comparisonRoots' | 'mutedComparisonRoots' | 'flash' | 'onWordTap'>
+type ReadingProps = Pick<ComponentProps<typeof MushafPage>, 'selection' | 'highlightRoot' | 'analysisSelection' | 'comparisonRange' | 'comparisonRoots' | 'mutedComparisonRoots' | 'flash' | 'onWordTap' | 'onOpenSurahs'>
 type Bundle = { data: Map<number, SurahData>; translations: Map<number, Translations> }
 const bundles = new Map<string, Bundle>()
 const totalPages = 604

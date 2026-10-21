@@ -24,6 +24,7 @@ interface Props {
   analysisSelection?: AnalysisSelection | null
   highlightRoot: string | null
   flash: { s: number; a: number; pos: number } | null
+  onOpenSurahs?: () => void
   onWordTap: (sel: Selection) => void
 }
 
@@ -33,7 +34,7 @@ export function FlowSurface({ children }: { children: ReactNode }) {
 }
 
 /** Continuous, flowing surah view (متن پیوسته) */
-export default function FlowPage({ sm, surah, trans, showTrans, translator, fontSize, selection, highlightRoot, mutedComparisonRoots, comparisonRoots, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
+export default function FlowPage({ sm, surah, trans, showTrans, translator, fontSize, selection, highlightRoot, mutedComparisonRoots, comparisonRoots, comparisonRange, analysisSelection, flash, onWordTap, onOpenSurahs }: Props) {
   const textRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!flash || flash.s !== surah.n) return
@@ -43,7 +44,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
   return (
     <div>
       <div style={{ fontSize: fontSize * 1.12 }}>
-        <SurahBand sm={sm} />
+        <SurahBand sm={sm} onNavigate={onOpenSurahs} />
         {sm.b && <Bismillah size={`${fontSize}px`} />}
       </div>
       <div ref={textRef} className="font-quran text-justify mt-2 relative" dir="rtl"

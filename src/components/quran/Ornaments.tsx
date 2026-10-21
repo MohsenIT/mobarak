@@ -16,10 +16,11 @@ function RevelationIcon({ makki }: { makki: boolean }) {
   )
 }
 
-export function SurahBand({ sm }: { sm: SurahMeta }) {
+export function SurahBand({ sm, onNavigate }: { sm: SurahMeta; onNavigate?: () => void }) {
+  const Tag = onNavigate ? 'button' : 'div'
   const revelation = sm.rev === 'makkah' ? 'مکی' : sm.rev === 'madinah' ? 'مدنی' : null
   return (
-    <div className="surah-band" dir="rtl" role="group" aria-label={`سورهٔ ${sm.ar}، شمارهٔ ${toFa(sm.n)}، ${toFa(sm.vc)} آیه${revelation ? `، ${revelation}` : ''}`}>
+    <Tag onClick={onNavigate} type={onNavigate ? 'button' : undefined} className="surah-band" dir="rtl" role={onNavigate ? undefined : 'group'} aria-label={`سورهٔ ${sm.ar}، شمارهٔ ${toFa(sm.n)}، ${toFa(sm.vc)} آیه${revelation ? `، ${revelation}` : ''}`}>
       <span className="band-side">
         <span className="band-meta band-number">سورهٔ {toFa(sm.n)}</span>
         <span className="band-line" />
@@ -32,7 +33,7 @@ export function SurahBand({ sm }: { sm: SurahMeta }) {
         <span className="band-meta band-info">{toFa(sm.vc)} آیه</span>
         <span className="band-line" />
       </span>
-    </div>
+    </Tag>
   )
 }
 

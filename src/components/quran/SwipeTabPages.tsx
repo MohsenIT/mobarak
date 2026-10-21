@@ -1,13 +1,15 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, type ComponentProps } from 'react'
 import type { AnalysisTab } from '@/lib/analysis'
+import { readAnalysisView, saveAnalysisView } from '@/lib/analysis-view'
 
 export type TabSwipeMotion = { from: AnalysisTab; to: AnalysisTab; progress: number; dragging: boolean; wrap: boolean; settled?: boolean }
 
 /** Real, independently scrollable tab pages, revealed by a horizontal drag. */
-export default function SwipeTabPages({ active, panes, onChange, onProgress }: {
+export default function SwipeTabPages({ active, panes, onChange, onProgress, contentKey }: {
   active: AnalysisTab
+  contentKey: string
   panes: { key: AnalysisTab; content: ReactNode }[]
   onChange: (tab: AnalysisTab) => void
   onProgress?: (motion: TabSwipeMotion) => void
@@ -104,7 +106,7 @@ export default function SwipeTabPages({ active, panes, onChange, onProgress }: {
       if (panes.length % 2 === 0 && Math.abs(relative) === panes.length / 2 && offset) relative = offset > 0 ? -panes.length / 2 : panes.length / 2
       const selected = pane.key === active
       const progress = Math.min(1, Math.abs(offset) / width)
-      return <div key={pane.key} id={`analysis-panel-${pane.key}`} role={selected ? 'tabpanel' : undefined}
+      return <PersistentTabPage key={pane.key} tab={pane.key} contentKey={contentKey} id={`analysis-panel-${pane.key}`} role={selected ? 'tabpanel' : undefined}
         aria-labelledby={`analysis-tab-${pane.key}`} aria-hidden={!selected} inert={!selected}
         className="swipe-tab-page absolute inset-0 overflow-y-auto nice-scroll px-5 py-4"
         data-tab-page={pane.key}
@@ -112,8 +114,43 @@ export default function SwipeTabPages({ active, panes, onChange, onProgress }: {
           transform: `translate3d(calc(${relative * 100}% + ${offset}px), 0, 0)`,
           transition: dragging || Math.abs(relative) > 1 ? 'none' : 'transform 220ms cubic-bezier(.22,.68,0,1), opacity 220ms ease',
           opacity: selected ? 1 : 0.6 + progress * 0.4 }}>
-        {pane.content}
-      </div>
+        <div data-analysis-scroll-content>{pane.content}</div>
+      </PersistentTabPage>
     })}
   </div>
+}
+
+
+/** Restore after async sources expand, without treating loading-time clamps as user scrolls. */
+function PersistentTabPage({ tab, contentKey, children, ...props }: ComponentProps<'div'> & { tab: AnalysisTab; contentKey: string }) {
+  const page = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const element = page.current
+    if (!element) return
+    let top = readAnalysisView().scroll?.[tab] ?? 0
+    let restoring = true
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const restore = () => { if (restoring) element.scrollTop = top }
+    const flush = () => { clearTimeout(timer); saveAnalysisView({ scroll: { [tab]: top } }) }
+    const intent = () => { restoring = false }
+    const scroll = () => {
+      if (restoring) return
+      top = element.scrollTop
+      clearTimeout(timer); timer = setTimeout(flush, 120)
+    }
+    restore()
+    const resize = new ResizeObserver(restore)
+    const content = element.querySelector('[data-analysis-scroll-content]')
+    if (content) resize.observe(content)
+    element.addEventListener('scroll', scroll)
+    element.addEventListener('wheel', intent, { passive: true })
+    element.addEventListener('touchmove', intent, { passive: true })
+    element.addEventListener('keydown', intent)
+    return () => {
+      flush(); resize.disconnect()
+      element.removeEventListener('scroll', scroll); element.removeEventListener('wheel', intent)
+      element.removeEventListener('touchmove', intent); element.removeEventListener('keydown', intent)
+    }
+  }, [tab, contentKey])
+  return <div {...props} ref={page}>{children}</div>
 }

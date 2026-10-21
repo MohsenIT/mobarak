@@ -57,7 +57,7 @@ export default function Home() {
   })
   const [showTrans, setShowTrans] = useState(() => LS.get('mushaf.showTrans', false))
   const [theme, setTheme] = useState<'paper' | 'night'>(() => LS.get('mushaf.theme', 'paper'))
-  const [translator, setTranslator] = useState<Translator>(() => LS.get('mushaf.tr', 'f'))
+  const [translator, setTranslator] = useState<Translator>(() => LS.get('mushaf.safavi-default.v1', false) ? LS.get('mushaf.tr', 's') : 's')
   const [scale, setScale] = useState(() => LS.get('mushaf.scale', 1))
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -150,7 +150,7 @@ export default function Home() {
   useEffect(() => { LS.set('mushaf.mode', mode) }, [mode])
   useEffect(() => { LS.set('mushaf.surah', surah) }, [surah])
   useEffect(() => { LS.set('mushaf.showTrans', showTrans) }, [showTrans])
-  useEffect(() => { LS.set('mushaf.tr', translator) }, [translator])
+  useEffect(() => { LS.set('mushaf.tr', translator); LS.set('mushaf.safavi-default.v1', true) }, [translator])
   useEffect(() => { LS.set('mushaf.scale', scale) }, [scale])
   useEffect(() => { LS.set('mushaf.marks', bookmarks) }, [bookmarks])
 
@@ -398,7 +398,7 @@ export default function Home() {
         }}>
         <button className="icon-btn" onClick={() => setDrawerOpen(true)} aria-label="فهرست"><IconMenu /></button>
 
-        <button className="flex-1 min-w-0 text-center" onClick={() => setDrawerOpen(true)}>
+        <button className="flex-1 min-w-0 text-center" aria-label="بازکردن فهرست سوره‌ها" onClick={() => setDrawerOpen(true)}>
           <p className="font-bold text-[14px] sm:text-[15px] truncate" style={{ color: 'var(--ink)' }}>
             {mode === 'mushaf' ? pageInfo.names : meta.surahs[surah - 1]?.ar}
           </p>
@@ -462,7 +462,7 @@ export default function Home() {
               selection={sel ? analysisSelection ?? sel : null}
               highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
               analysisSelection={sel ? analysisSelection : null} comparisonRange={comparisonRange}
-              comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots} flash={flash} onWordTap={tapWord} />
+              comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots} flash={flash} onOpenSurahs={() => setDrawerOpen(true)} onWordTap={tapWord} />
           ) : (
             <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs} fontSize={flowFont} showTrans={showTrans} translator={translator}
               ready={!loadingPage && flowSurah?.n === surah}
@@ -492,7 +492,7 @@ export default function Home() {
                     comparisonRange={comparisonRange}
                     comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots}
                     flash={flash}
-                    onWordTap={tapWord}
+                    onOpenSurahs={() => setDrawerOpen(true)} onWordTap={tapWord}
                   />
                 )}
               </FlowSurface>

@@ -39,10 +39,10 @@ const TABS = [
 ] as const
 
 const TRANSLATORS: { id: Translator; name: string }[] = [
+  { id: 's', name: 'سید محمدرضا صفوی (مبتنی بر المیزان)' },
   { id: 'f', name: 'محمدمهدی فولادوند' },
   { id: 'a', name: 'حسین انصاریان' },
   { id: 'm', name: 'ناصر مکارم شیرازی' },
-  { id: 's', name: 'سید محمدرضا صفوی (مبتنی بر المیزان)' },
 ]
 
 export default function NavDrawer(props: Props) {

@@ -34,10 +34,11 @@ interface Props {
   analysisSelection?: AnalysisSelection | null
   highlightRoot: string | null
   flash: { s: number; a: number; pos: number } | null
+  onOpenSurahs?: () => void
   onWordTap: (sel: Selection) => void
 }
 
-export default function MushafPage({ meta, page, pageData, fontSize, selection, highlightRoot, mutedComparisonRoots, comparisonRoots, comparisonRange, analysisSelection, flash, onWordTap }: Props) {
+export default function MushafPage({ meta, page, pageData, fontSize, selection, highlightRoot, mutedComparisonRoots, comparisonRoots, comparisonRange, analysisSelection, flash, onWordTap, onOpenSurahs }: Props) {
   const frameRef = useRef<HTMLDivElement>(null)
   const lines = useMemo(() => {
     const map = new Map<number, LineItem[]>()
@@ -157,7 +158,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
       {lineNums.map(ln => {
         const items = lines.get(ln)!
         if (items.length === 1 && items[0].kind === 'band')
-          return <SurahBand key={ln} sm={items[0].sm} />
+          return <SurahBand key={ln} sm={items[0].sm} onNavigate={onOpenSurahs} />
         if (items.length === 1 && items[0].kind === 'bism')
           return <Bismillah key={ln} />
         return (

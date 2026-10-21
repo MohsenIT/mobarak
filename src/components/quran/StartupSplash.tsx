@@ -1,4 +1,4 @@
-import { APP_NAME, STARTUP_VERSE, STARTUP_VERSE_REFERENCE } from '@/lib/branding'
+import { APP_NAME, STARTUP_VERSE, STARTUP_VERSE_REFERENCE, STARTUP_VERSE_TRANSLATION } from '@/lib/branding'
 
 export default function StartupSplash({ leaving = false, onHoldChange }: { leaving?: boolean; onHoldChange: (held: boolean) => void }) {
   return <div className={`startup-splash${leaving ? ' startup-leaving' : ''}`} onPointerDown={event => {
@@ -14,6 +14,7 @@ export default function StartupSplash({ leaving = false, onHoldChange }: { leavi
     <h1>{APP_NAME}</h1>
     <div className="startup-caption">
       <p className="startup-verse font-quran" lang="ar">{STARTUP_VERSE.split(' ').map((word, index) => <span key={index}>{index > 0 && ' '}{['مُبَارَكٌ', "لِيَدَّبَّرُوا", 'وَلِيَتَذَكَّرَ'].includes(word) ? <strong>{word}</strong> : word}</span>)}</p>
+      <p className="startup-translation" lang="fa">{STARTUP_VERSE_TRANSLATION}</p>
       <span className="chip" title="آیهٔ ۲۹ سورهٔ ص">{STARTUP_VERSE_REFERENCE}</span>
     </div>
   </div>
