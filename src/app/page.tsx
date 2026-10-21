@@ -19,7 +19,8 @@ import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
 import { ArrowRight, GitCompareArrows, Search } from 'lucide-react'
-import QuranSearch from '@/components/quran/QuranSearch'
+import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
+import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import {
   PatternBG, IconMenu, IconStar,
   IconTranslate, IconSortIndex,
@@ -62,6 +63,8 @@ export default function Home() {
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [quickSearchOpen, setQuickSearchOpen] = useState(false)
+  const [searchStart, setSearchStart] = useState<SearchStart | null>(null)
   const [occurrenceSearch, setOccurrenceSearch] = useState<AnalysisSelection | null>(null)
   const [returnToSearch, setReturnToSearch] = useState(false)
   const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number } | null>(null)
@@ -202,10 +205,10 @@ export default function Home() {
 
   // flash cleanup
   useEffect(() => {
-    if (!flash) return
+    if (!flash || quickSearchOpen) return
     const t = setTimeout(() => setFlash(null), 2500)
     return () => clearTimeout(t)
-  }, [flash])
+  }, [flash, quickSearchOpen])
 
   // ctrl+wheel zoom on main area
   useEffect(() => {
@@ -383,8 +386,8 @@ export default function Home() {
     {meta && <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 
-      <QuranSearch occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={setSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
-        setReturnToSearch(true); setSearchOpen(false); setSel(null); setComparisonRoot(null); setSearchTarget({ s, a, pos }); goVerse(s, a, pos)
+      <QuranSearch initialSearch={searchStart} occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={setSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
+        setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); setComparisonRoot(null); setSearchTarget({ s, a, pos }); goVerse(s, a, pos)
       }} />
 
       {/* ===== Top bar =====
@@ -396,6 +399,9 @@ export default function Home() {
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
           backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
         }}>
+        {quickSearchOpen ? <QuickSurahSearch surah={meta.surahs[curSurahN - 1]} onClose={() => setQuickSearchOpen(false)}
+          onPick={(s, a, pos) => { setSel(null); setSearchTarget({ s, a, pos }); goVerse(s, a, pos) }}
+          onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
         <button className="icon-btn" onClick={() => setDrawerOpen(true)} aria-label="فهرست"><IconMenu /></button>
 
         <button className="flex-1 min-w-0 text-center" aria-label="بازکردن فهرست سوره‌ها" onClick={() => setDrawerOpen(true)}>
@@ -409,7 +415,7 @@ export default function Home() {
           </p>
         </button>
 
-        <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setOccurrenceSearch(null); setSel(null); setSearchOpen(true) }}><Search size={20} /></button>
+        <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setSel(null); setQuickSearchOpen(true) }}><Search size={20} /></button>
 
         {/* surah keyword index — opens the sorted-keywords page */}
         <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
@@ -431,6 +437,7 @@ export default function Home() {
             onClick={() => setShowTrans(v => !v)}>
             <IconTranslate />
           </button>
+        </>}
       </header>
 
       {returnToSearch && !searchOpen && (

@@ -1,9 +1,11 @@
 import { createQuranSearch, normalizeQuranSearch, type SearchVerse, type QuranSearchResult, type QuranSearchOptions } from './quran-search'
 import type { AnalysisSelection } from './analysis'
 import { wordKey } from './word-parts'
+import { lemmaDisplay } from './lemma-display'
 
 export type SearchCorpus = { verses: SearchVerse[]; waw?: Record<string, number[]>; morphology: Record<string, [string | null, string | null, string | null][]> }
-export type SearchSessionOptions = QuranSearchOptions & { surahs?: number[]; includeRoots?: boolean }
+export type SearchMode = 'text' | 'root' | 'lemma'
+export type SearchSessionOptions = QuranSearchOptions & { mode?: SearchMode; surahs?: number[]; includeRoots?: boolean }
 export function createSearchSession(corpus: SearchCorpus) {
   const search = createQuranSearch(corpus.verses, corpus.waw)
   const verseMap = new Map(corpus.verses.map(([s, a, words]) => [`${s}:${a}`, words]))
@@ -13,9 +15,19 @@ export function createSearchSession(corpus: SearchCorpus) {
     return corpus.waw?.[`${s}:${a}`]?.includes(pos) ? key.replace(/^و/, '') : key
   }
 
-  return (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null): QuranSearchResult[] => {
+  const execute = (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null): QuranSearchResult[] => {
     const scope = new Set(options.surahs ?? [])
     const within = (s: number) => !scope.size || scope.has(s)
+    if (!filter && options.mode && options.mode !== 'text') {
+      const column = options.mode === 'root' ? 0 : 1
+      const key = normalizeQuranSearch(query).replace(/\s/g, '')
+      if (!key) return []
+      return corpus.verses.flatMap(([s, a, words]) => {
+        if (!within(s)) return []
+        const positions = (corpus.morphology[`${s}:${a}`] ?? []).flatMap((m, i) => m[column] && normalizeQuranSearch(column === 1 ? lemmaDisplay(m[column]!) : m[column]!).replace(/\s/g, '') === key ? [i + 1] : [])
+        return positions.length ? [{ s, a, words, waw: corpus.waw?.[`${s}:${a}`] ?? [], positions, parts: Object.fromEntries(positions.map(pos => [pos, 2])), kind: 'exact' as const, score: 0 }] : []
+      })
+    }
     if (filter) {
       const source = corpus.morphology[`${filter.s}:${filter.a}`]?.[filter.pos - 1]
       const lemma = source?.[1]
@@ -57,4 +69,6 @@ export function createSearchSession(corpus: SearchCorpus) {
     }
     return [...merged.values()].sort((a, b) => a.score - b.score || a.s - b.s || a.a - b.a)
   }
+  return (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null) => execute(query, options, filter).map(result => ({ ...result, morphology: corpus.morphology[`${result.s}:${result.a}`] ?? [] }))
+
 }

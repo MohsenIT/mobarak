@@ -4,13 +4,18 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Search, X, LoaderCircle, ArrowRight, SlidersHorizontal, Languages, BookOpen } from 'lucide-react'
 import type { Meta, Translator, Translations } from '@/lib/quran'
-import { loadTrans, toFa } from '@/lib/quran'
+import { loadTrans, toFa, morphologyLabel } from '@/lib/quran'
 import { type AnalysisSelection } from '@/lib/analysis'
 import { normalizeQuranSearch, type QuranSearchResult } from '@/lib/quran-search'
 import QuranText from './QuranText'
 import { splitWord } from '@/lib/word-parts'
+import type { SearchMode } from '@/lib/quran-search-session'
+import { lemmaDisplay } from '@/lib/lemma-display'
+import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
+export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number }
 
 interface Props {
+  initialSearch?: SearchStart | null
   occurrenceFilter?: AnalysisSelection | null
   onClearOccurrenceFilter?: () => void
   translator: Translator
@@ -43,8 +48,12 @@ function snippet(result: QuranSearchResult, full = false) {
 }
 const labels = { exact: 'تطبیق دقیق', partial: 'شامل عبارت', near: 'نزدیک از نظر نوشتار', root: 'هم‌ریشه‌ها' }
 
-export default function QuranSearch({ open, onOpenChange, meta, currentSurah, onPick, occurrenceFilter, onClearOccurrenceFilter, translator }: Props) {
+export default function QuranSearch({ open, onOpenChange, meta, currentSurah, onPick, occurrenceFilter, onClearOccurrenceFilter, translator, initialSearch }: Props) {
   const [query, setQuery] = useState('')
+  const [mode, setMode] = useState<SearchMode>('text')
+  const [suggestions, setSuggestions] = useState<string[]>([])
+  const [lemmas, setLemmas] = useState<string[]>([])
+  const [forms, setForms] = useState<string[]>([])
   const [includePartial, setIncludePartial] = useState(true)
   const [includeNear, setIncludeNear] = useState(false)
   const [includeRoots, setIncludeRoots] = useState(false)
@@ -54,7 +63,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const [translations, setTranslations] = useState<Record<number, Translations>>({})
   const [translationErrors, setTranslationErrors] = useState<number[]>([])
   const [translationRetry, setTranslationRetry] = useState(0)
-  const [results, setResults] = useState<QuranSearchResult[]>([])
+  const [rawResults, setResults] = useState<QuranSearchResult[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(false)
   const [retry, setRetry] = useState(0)
@@ -67,6 +76,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const request = useRef(0)
   const completed = useRef('')
   const pending = useRef('')
+  const facets = { lemmas, forms }
+  const results = filterSearchFacets(rawResults, facets)
+  useEffect(() => { if (initialSearch) { setQuery(initialSearch.query); setMode(initialSearch.mode); setSurahs(initialSearch.surahs); setIncludeRoots(false) } }, [initialSearch])
+  useEffect(() => { setLemmas([]); setForms([]) }, [query, mode, includeRoots, occurrenceFilter, surahs.join(',')])
   const valid = !!occurrenceFilter || normalizeQuranSearch(query).replace(/\s/g, '').length >= 2
   const scopeKey = surahs.join(',')
   const canExpandRoots = occurrenceFilter ? !!occurrenceFilter.root && occurrenceFilter.part !== 'prefix' : !normalizeQuranSearch(query).includes(' ')
@@ -99,21 +112,21 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   useEffect(() => {
     if (!open) { request.current++; return }
     const id = ++request.current
-    const options = { includePartial, includeNear, includeRoots: includeRoots && canExpandRoots, surahs }
+    const options = { mode, includePartial, includeNear, includeRoots: includeRoots && canExpandRoots, surahs }
     const key = JSON.stringify({ query, options, filter: occurrenceFilter })
     if (!error && completed.current === key) { setBusy(false); return }
     pending.current = key; setVisible(20); scroll.current = 0; setError(false)
     if (list.current) list.current.scrollTop = 0
-    if (!valid) { completed.current = ''; setResults([]); setBusy(false); return }
+    if (!valid) { completed.current = ''; setResults([]); setSuggestions([]); setBusy(false); return }
     setBusy(true)
     const timer = setTimeout(() => {
       try {
         if (!worker.current) {
           worker.current = new Worker(new URL('../../lib/quran-search.worker.ts', import.meta.url), { type: 'module' })
-          worker.current.onmessage = (event: MessageEvent<{ id: number; results?: QuranSearchResult[]; error?: boolean }>) => {
+          worker.current.onmessage = (event: MessageEvent<{ id: number; results?: QuranSearchResult[]; suggestions?: string[]; error?: boolean }>) => {
             if (event.data.id !== request.current) return
             completed.current = event.data.error ? '' : pending.current
-            setResults(event.data.results ?? []); setError(!!event.data.error); setBusy(false)
+            setResults(event.data.results ?? []); setSuggestions(event.data.suggestions ?? []); setError(!!event.data.error); setBusy(false)
           }
           worker.current.onerror = () => { setError(true); setBusy(false); worker.current?.terminate(); worker.current = null }
         }
@@ -121,7 +134,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       } catch { setError(true); setBusy(false) }
     }, 180)
     return () => { clearTimeout(timer); request.current++ }
-  }, [query, scopeKey, includePartial, includeNear, includeRoots, canExpandRoots, valid, retry, open, occurrenceFilter])
+  }, [query, mode, scopeKey, includePartial, includeNear, includeRoots, canExpandRoots, valid, retry, open, occurrenceFilter])
 
   const visibleSurahs = showTranslation && open ? [...new Set(results.slice(0, visible).map(r => r.s))].join(',') : ''
   useEffect(() => {
@@ -134,6 +147,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     return () => { live = false }
   }, [visibleSurahs, translationRetry])
 
+  const toggleFacet = (kind: 'lemmas' | 'forms', value: string) => {
+    const setter = kind === 'lemmas' ? setLemmas : setForms
+    setter(current => current.includes(value) ? current.filter(x => x !== value) : [...current, value]); setVisible(20); scroll.current = 0; if (list.current) list.current.scrollTop = 0
+  }
   const setScope = (s: number, checked: boolean) => setSurahs(current => checked ? [...current, s].sort((a, b) => a - b) : current.filter(n => n !== s))
   const scopeLabel = surahs.length === 0 ? 'همهٔ قرآن' : surahs.length === 1 ? `سورهٔ ${meta.surahs[surahs[0] - 1]?.fa}` : `${toFa(surahs.length)} سوره`
   if (!open) return null
@@ -141,7 +158,9 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     <div className="search-page-shell">
       <header className="search-page-header">
         <div className="search-page-title"><button type="button" className="icon-btn" aria-label="بازگشت به قرآن" onClick={() => onOpenChange(false)}><ArrowRight size={21} /></button><div><h1>جست‌وجو در قرآن</h1><p>از واژه تا ریشه، در سوره‌های دلخواه</p></div></div>
-        <div className="search-page-input"><Search size={20} aria-hidden="true" /><input ref={input} type="search" value={query} maxLength={160} onChange={event => { if (occurrenceFilter) onClearOccurrenceFilter?.(); setQuery(event.target.value) }} aria-label="عبارت جست‌وجو در متن قرآن" placeholder={occurrenceFilter ? 'برای جست‌وجوی تازه بنویسید…' : 'واژه یا عبارت قرآنی…'} autoComplete="off" autoCorrect="off" spellCheck={false} />{query && <button type="button" aria-label="پاک کردن عبارت" onClick={() => setQuery('')}><X size={17} /></button>}</div>
+        <div className="search-mode-tabs" role="group" aria-label="روش جست‌وجو">{([['text', 'متن'], ['root', 'ریشه'], ['lemma', 'بُن‌واژه']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={mode === key && !occurrenceFilter} onClick={() => { onClearOccurrenceFilter?.(); setMode(key) }}>{label}</button>)}</div>
+        <div className="search-page-input"><Search size={20} aria-hidden="true" /><input ref={input} type="search" value={query} maxLength={160} onChange={event => { if (occurrenceFilter) onClearOccurrenceFilter?.(); setQuery(event.target.value) }} aria-label={mode === 'root' ? 'جست‌وجوی ریشه' : mode === 'lemma' ? 'جست‌وجوی بُن‌واژه' : 'عبارت جست‌وجو در متن قرآن'} placeholder={occurrenceFilter ? 'برای جست‌وجوی تازه بنویسید…' : mode === 'root' ? 'ریشه را بنویس؛ مثلاً علم…' : mode === 'lemma' ? 'بُن‌واژه را بنویس…' : 'واژه، عبارت یا بخشی از کلمه…'} autoComplete="off" autoCorrect="off" spellCheck={false} />{query && <button type="button" aria-label="پاک کردن عبارت" onClick={() => setQuery('')}><X size={17} /></button>}</div>
+        {mode !== 'text' && !occurrenceFilter && suggestions.length > 0 && <div className="search-suggestions" aria-label="پیشنهادهای جست‌وجو">{suggestions.map(value => <button type="button" key={value} onClick={() => setQuery(value)}><QuranText text={value} /></button>)}</div>}
         {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? `ریشهٔ ${occurrenceFilter.root ?? ''}` : occurrenceFilter.tab === 'form' ? `باب ${occurrenceFilter.form} · ${occurrenceFilter.root ?? ''}` : `بن‌واژهٔ ${occurrenceFilter.text}`}</span><button type="button" aria-label="حذف فیلتر تکرارها" onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
         <div className="search-page-tools">
           <details className="search-scope"><summary><SlidersHorizontal size={16} /><span>{scopeLabel}</span><span className="search-scope-action">انتخاب سوره‌ها</span></summary>
@@ -149,11 +168,12 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           </details>
           <button type="button" className="search-translation-toggle" aria-pressed={showTranslation} onClick={() => setShowTranslation(value => !value)}><Languages size={17} />ترجمه</button>
         </div>
-        <div className="search-match-options">
+        <div className="search-match-options" hidden={mode !== 'text' && !occurrenceFilter}>
           <label><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter} onChange={e => setIncludePartial(e.target.checked)} />شامل عبارت</label>
           <label title={!canExpandRoots ? 'هم‌ریشه‌ها برای جست‌وجوی تک‌واژه فعال می‌شود' : undefined}><input type="checkbox" checked={includeRoots && canExpandRoots} disabled={!canExpandRoots} onChange={e => setIncludeRoots(e.target.checked)} />هم‌ریشه‌ها</label>
           <label><input type="checkbox" checked={includeNear} disabled={!!occurrenceFilter} onChange={e => setIncludeNear(e.target.checked)} />خطای املایی</label>
         </div>
+        {!busy && rawResults.length > 0 && <div className="search-facets" aria-label="فیلتر نتایج">{(['forms', 'lemmas'] as const).flatMap(kind => facets[kind].map(value => <button type="button" className="search-selected-facet" key={`${kind}:${value}`} aria-label={`حذف فیلتر ${kind === 'forms' ? morphologyLabel(value) : lemmaDisplay(value)}`} onClick={() => toggleFacet(kind, value)}><span>{kind === 'forms' ? morphologyLabel(value) : lemmaDisplay(value)}</span><X size={12} /></button>))}{(['forms', 'lemmas'] as const).map(kind => { const counts = searchFacetCounts(rawResults, facets, kind); return counts.length > 0 ? <details key={kind}><summary>{kind === 'forms' ? 'باب' : 'بُن‌واژه'}{facets[kind].length > 0 ? ` · ${toFa(facets[kind].length)} انتخاب` : ` · ${toFa(counts.length)}`}</summary><div>{counts.map(({ value, count }) => <button type="button" key={value} aria-pressed={facets[kind].includes(value)} onClick={() => toggleFacet(kind, value)}><span>{kind === 'forms' ? morphologyLabel(value) : <QuranText text={lemmaDisplay(value)} />}</span><small>{toFa(count)}</small></button>)}</div></details> : null })}{(lemmas.length > 0 || forms.length > 0) && <button type="button" onClick={() => { setLemmas([]); setForms([]) }}>حذف فیلترها</button>}</div>}
       </header>
       <div className="search-results-summary" role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />در حال جست‌وجو…</span> : !valid ? 'اعراب و تفاوت «ک» و «ی» فارسی و عربی مانع جست‌وجو نیست.' : error ? 'بارگیری جست‌وجو انجام نشد.' : `${toFa(results.length)} آیه · ${toFa(results.reduce((sum, r) => sum + r.positions.length, 0))} تطبیق`}</div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label="نتایج جست‌وجو" aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>

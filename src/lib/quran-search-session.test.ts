@@ -34,3 +34,15 @@ test('attached pronouns match one lemma while independent waw remains separate',
   expect(hits.some(r => r.a === 5 && r.positions.includes(2))).toBe(true)
   expect(hits.some(r => r.a === 73 && r.positions.includes(9))).toBe(true)
 })
+
+test('a directly typed root works without a seed verse, including spaced letters', () => {
+  const direct = search('علم', { mode: 'root', surahs: [2, 3, 20] })
+  expect(direct.length).toBeGreaterThan(0)
+  expect(direct.every(r => [2, 3, 20].includes(r.s) && r.positions.every(pos => r.morphology?.[pos - 1]?.[0] === 'علم'))).toBe(true)
+  expect(search('ع ل م', { mode: 'root', surahs: [2, 3, 20] })).toEqual(direct)
+})
+test('direct lemma search groups inflections while keeping different lemmas separate', () => {
+  const hits = search('عَلَىٰ', { mode: 'lemma', surahs: [20] })
+  expect(hits.some(r => r.a === 5)).toBe(true)
+  expect(hits.some(r => r.a === 80 && r.positions.includes(12))).toBe(true)
+})
