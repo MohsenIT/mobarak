@@ -503,7 +503,6 @@ export default function Home() {
         {sel && (showIndex || showComparison
           ? createPortal(
               <RootPanel
-            key={`${sel.s}:${sel.a}:${sel.pos}:${sel.part ?? 'stem'}`}
             onOpenOccurrences={selection => { setOccurrenceSearch(selection); setSearchOpen(true) }}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
@@ -524,7 +523,6 @@ export default function Home() {
           />, document.body)
           : (
               <RootPanel
-            key={`${sel.s}:${sel.a}:${sel.pos}:${sel.part ?? 'stem'}`}
             onOpenOccurrences={selection => { setOccurrenceSearch(selection); setSearchOpen(true) }}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}

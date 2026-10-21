@@ -1284,3 +1284,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 .analysis-navigation .analysis-repeat-button,
 .analysis-navigation .analysis-position-button { align-items: baseline; }
 .analysis-navigation button > svg { align-self: center; }
+
+.analysis-tab-strip .tab-btn { border-radius: 8px 8px 0 0; transition: color 180ms ease, background-color 180ms ease; }
+.analysis-tab-strip .tab-btn.active { background: var(--word-active); color: var(--ink); font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .analysis-tab-strip .tab-btn { transition: none; } }

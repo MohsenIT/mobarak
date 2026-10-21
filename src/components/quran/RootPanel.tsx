@@ -61,6 +61,14 @@ function RootPanelContent({
   const [formAvailable, setFormAvailable] = useState<boolean | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [previousAnchor, setPreviousAnchor] = useState(anchor)
+  // Retarget an existing sheet without remounting its DOM or replaying sheetUp.
+  if (anchor !== previousAnchor) {
+    setPreviousAnchor(anchor)
+    setTargets({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
+    setTab(!anchor.root || anchor.part === 'prefix' ? 'word' : 'root')
+    setPickerOpen(false)
+  }
   const tabStrip = useRef<HTMLDivElement>(null)
   const indicatorTrack = useRef<HTMLDivElement>(null)
   const indicator = useRef<HTMLSpanElement>(null)
