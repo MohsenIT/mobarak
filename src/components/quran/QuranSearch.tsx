@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Search, X, LoaderCircle, ArrowRight, SlidersHorizontal, Languages, BookOpen } from 'lucide-react'
+import { Search, X, LoaderCircle, ArrowRight, SlidersHorizontal, Languages, BookOpen, MoreHorizontal } from 'lucide-react'
 import type { Meta, Translator, Translations } from '@/lib/quran'
 import { loadTrans, toFa, morphologyLabel } from '@/lib/quran'
 import { type AnalysisSelection } from '@/lib/analysis'
@@ -52,6 +52,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const [query, setQuery] = useState('')
   const [mode, setMode] = useState<SearchMode>('text')
   const [suggestions, setSuggestions] = useState<string[]>([])
+  const [completionOpen, setCompletionOpen] = useState(false)
+  const [completionIndex, setCompletionIndex] = useState(-1)
   const [lemmas, setLemmas] = useState<string[]>([])
   const [forms, setForms] = useState<string[]>([])
   const [includePartial, setIncludePartial] = useState(true)
@@ -117,7 +119,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     if (!error && completed.current === key) { setBusy(false); return }
     pending.current = key; setVisible(20); scroll.current = 0; setError(false)
     if (list.current) list.current.scrollTop = 0
-    if (!valid) { completed.current = ''; setResults([]); setSuggestions([]); setBusy(false); return }
+    if (!valid && normalizeQuranSearch(query).length === 0) { completed.current = ''; setResults([]); setSuggestions([]); setBusy(false); return }
     setBusy(true)
     const timer = setTimeout(() => {
       try {
@@ -126,13 +128,13 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           worker.current.onmessage = (event: MessageEvent<{ id: number; results?: QuranSearchResult[]; suggestions?: string[]; error?: boolean }>) => {
             if (event.data.id !== request.current) return
             completed.current = event.data.error ? '' : pending.current
-            setResults(event.data.results ?? []); setSuggestions(event.data.suggestions ?? []); setError(!!event.data.error); setBusy(false)
+            setResults(event.data.results ?? []); setSuggestions(event.data.suggestions ?? []); setCompletionIndex(-1); setError(!!event.data.error); setBusy(false)
           }
           worker.current.onerror = () => { setError(true); setBusy(false); worker.current?.terminate(); worker.current = null }
         }
         worker.current.postMessage({ id, query, options, filter: occurrenceFilter })
       } catch { setError(true); setBusy(false) }
-    }, 180)
+    }, 100)
     return () => { clearTimeout(timer); request.current++ }
   }, [query, mode, scopeKey, includePartial, includeNear, includeRoots, canExpandRoots, valid, retry, open, occurrenceFilter])
 
@@ -157,26 +159,45 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir="rtl" aria-label="جست‌وجو در قرآن" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
     <div className="search-page-shell">
       <header className="search-page-header">
-        <div className="search-page-title"><button type="button" className="icon-btn" aria-label="بازگشت به قرآن" onClick={() => onOpenChange(false)}><ArrowRight size={21} /></button><div><h1>جست‌وجو در قرآن</h1><p>از واژه تا ریشه، در سوره‌های دلخواه</p></div></div>
-        <div className="search-mode-tabs" role="group" aria-label="روش جست‌وجو">{([['text', 'متن'], ['root', 'ریشه'], ['lemma', 'بُن‌واژه']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={mode === key && !occurrenceFilter} onClick={() => { onClearOccurrenceFilter?.(); setMode(key) }}>{label}</button>)}</div>
-        <div className="search-page-input"><Search size={20} aria-hidden="true" /><input ref={input} type="search" value={query} maxLength={160} onChange={event => { if (occurrenceFilter) onClearOccurrenceFilter?.(); setQuery(event.target.value) }} aria-label={mode === 'root' ? 'جست‌وجوی ریشه' : mode === 'lemma' ? 'جست‌وجوی بُن‌واژه' : 'عبارت جست‌وجو در متن قرآن'} placeholder={occurrenceFilter ? 'برای جست‌وجوی تازه بنویسید…' : mode === 'root' ? 'ریشه را بنویس؛ مثلاً علم…' : mode === 'lemma' ? 'بُن‌واژه را بنویس…' : 'واژه، عبارت یا بخشی از کلمه…'} autoComplete="off" autoCorrect="off" spellCheck={false} />{query && <button type="button" aria-label="پاک کردن عبارت" onClick={() => setQuery('')}><X size={17} /></button>}</div>
-        {mode !== 'text' && !occurrenceFilter && suggestions.length > 0 && <div className="search-suggestions" aria-label="پیشنهادهای جست‌وجو">{suggestions.map(value => <button type="button" key={value} onClick={() => setQuery(value)}><QuranText text={value} /></button>)}</div>}
-        {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? `ریشهٔ ${occurrenceFilter.root ?? ''}` : occurrenceFilter.tab === 'form' ? `باب ${occurrenceFilter.form} · ${occurrenceFilter.root ?? ''}` : `بن‌واژهٔ ${occurrenceFilter.text}`}</span><button type="button" aria-label="حذف فیلتر تکرارها" onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
-        <div className="search-page-tools">
-          <details className="search-scope"><summary><SlidersHorizontal size={16} /><span>{scopeLabel}</span><span className="search-scope-action">انتخاب سوره‌ها</span></summary>
+        <h1 className="sr-only">جست‌وجو در قرآن</h1>
+        <div className="search-command-row">
+          <button type="button" className="icon-btn" aria-label="بازگشت به قرآن" onClick={() => onOpenChange(false)}><ArrowRight size={20} /></button>
+          <div className="search-page-input">
+            <Search size={17} aria-hidden="true" />
+            <input ref={input} type="search" value={query} maxLength={160} role="combobox" aria-autocomplete="list" aria-expanded={completionOpen && !busy && suggestions.length > 0} aria-controls="search-completions" aria-activedescendant={completionOpen && completionIndex >= 0 ? `search-completion-${completionIndex}` : undefined}
+              onFocus={() => setCompletionOpen(true)} onBlur={event => { if (!event.currentTarget.parentElement?.contains(event.relatedTarget)) setCompletionOpen(false) }}
+              onChange={event => { if (occurrenceFilter) onClearOccurrenceFilter?.(); setQuery(event.target.value); setCompletionOpen(true); setCompletionIndex(-1) }}
+              onKeyDown={event => {
+                if (event.key === 'ArrowDown' && !busy && suggestions.length) { event.preventDefault(); setCompletionOpen(true); setCompletionIndex(i => (i + 1) % suggestions.length) }
+                else if (event.key === 'ArrowUp' && !busy && suggestions.length) { event.preventDefault(); setCompletionOpen(true); setCompletionIndex(i => (i - 1 + suggestions.length) % suggestions.length) }
+                else if (event.key === 'Enter') { event.preventDefault(); if (completionOpen && completionIndex >= 0) setQuery(suggestions[completionIndex]); setCompletionOpen(false); input.current?.blur() }
+                else if (event.key === 'Escape' && completionOpen) { event.preventDefault(); event.stopPropagation(); setCompletionOpen(false) }
+              }}
+              aria-label={mode === 'root' ? 'جست‌وجوی ریشه' : mode === 'lemma' ? 'جست‌وجوی بُن‌واژه' : 'عبارت جست‌وجو در متن قرآن'} placeholder={occurrenceFilter ? 'جست‌وجوی تازه…' : mode === 'root' ? 'ریشه؛ مثلاً علم' : mode === 'lemma' ? 'بُن‌واژه…' : 'واژه یا عبارت…'} autoComplete="off" autoCorrect="off" spellCheck={false} />
+            {query && <button type="button" aria-label="پاک کردن عبارت" onClick={() => { setQuery(''); input.current?.focus({ preventScroll: true }) }}><X size={15} /></button>}
+            {completionOpen && !busy && suggestions.length > 0 && !occurrenceFilter && <div id="search-completions" className="search-completion-menu" role="listbox" aria-label="پیشنهادهای جست‌وجو">{suggestions.map((value, i) => <button type="button" role="option" id={`search-completion-${i}`} aria-selected={completionIndex === i} key={value} onMouseDown={event => event.preventDefault()} onClick={() => { setQuery(value); setCompletionOpen(false); input.current?.blur() }}><Search size={14} /><QuranText text={value} /><span aria-hidden="true">↖</span></button>)}</div>}
+          </div>
+          <button type="button" className="icon-btn search-translation-toggle" aria-label="ترجمه" title="نمایش یا پنهان‌کردن ترجمه" aria-pressed={showTranslation} onClick={() => setShowTranslation(value => !value)}><Languages size={20} /></button>
+        </div>
+        <div className="search-controls-row">
+          <div className="search-mode-tabs" role="group" aria-label="روش جست‌وجو">{([['text', 'متن'], ['root', 'ریشه'], ['lemma', 'بُن‌واژه']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={mode === key && !occurrenceFilter} onClick={() => { onClearOccurrenceFilter?.(); setSuggestions([]); setMode(key); input.current?.focus({ preventScroll: true }) }}>{label}</button>)}</div>
+          {(mode === 'text' || !!occurrenceFilter) && <button type="button" className="search-roots-toggle" aria-pressed={includeRoots && canExpandRoots} disabled={!canExpandRoots} title={!canExpandRoots ? 'هم‌ریشه‌ها برای یک واژه فعال است' : 'صورت‌های دیگر همین ریشه را هم نشان بده'} onClick={() => setIncludeRoots(value => !value)}>هم‌ریشه‌ها</button>}
+          <details className="search-scope"><summary aria-label="انتخاب سوره‌ها"><SlidersHorizontal size={14} /><span>{scopeLabel}</span></summary>
             <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>همهٔ قرآن</button><button type="button" onClick={() => setSurahs([currentSurah])}>همین سوره</button></div><input type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder="نام یا شمارهٔ سوره" aria-label="یافتن سوره" /><p>بدون انتخاب سوره، در کل قرآن جست‌وجو می‌شود.</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
           </details>
-          <button type="button" className="search-translation-toggle" aria-pressed={showTranslation} onClick={() => setShowTranslation(value => !value)}><Languages size={17} />ترجمه</button>
+          <details className="search-extra-options"><summary aria-label="گزینه‌های بیشتر جست‌وجو"><MoreHorizontal size={19} /></summary><div>
+            <label><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />شامل بخشی از کلمه</label>
+            <label><input type="checkbox" checked={includeNear} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludeNear(e.target.checked)} />تحمل خطای املایی</label>
+          </div></details>
         </div>
-        <div className="search-match-options" hidden={mode !== 'text' && !occurrenceFilter}>
-          <label><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter} onChange={e => setIncludePartial(e.target.checked)} />شامل عبارت</label>
-          <label title={!canExpandRoots ? 'هم‌ریشه‌ها برای جست‌وجوی تک‌واژه فعال می‌شود' : undefined}><input type="checkbox" checked={includeRoots && canExpandRoots} disabled={!canExpandRoots} onChange={e => setIncludeRoots(e.target.checked)} />هم‌ریشه‌ها</label>
-          <label><input type="checkbox" checked={includeNear} disabled={!!occurrenceFilter} onChange={e => setIncludeNear(e.target.checked)} />خطای املایی</label>
-        </div>
-        {!busy && rawResults.length > 0 && <div className="search-facets" aria-label="فیلتر نتایج">{(['forms', 'lemmas'] as const).flatMap(kind => facets[kind].map(value => <button type="button" className="search-selected-facet" key={`${kind}:${value}`} aria-label={`حذف فیلتر ${kind === 'forms' ? morphologyLabel(value) : lemmaDisplay(value)}`} onClick={() => toggleFacet(kind, value)}><span>{kind === 'forms' ? morphologyLabel(value) : lemmaDisplay(value)}</span><X size={12} /></button>))}{(['forms', 'lemmas'] as const).map(kind => { const counts = searchFacetCounts(rawResults, facets, kind); return counts.length > 0 ? <details key={kind}><summary>{kind === 'forms' ? 'باب' : 'بُن‌واژه'}{facets[kind].length > 0 ? ` · ${toFa(facets[kind].length)} انتخاب` : ` · ${toFa(counts.length)}`}</summary><div>{counts.map(({ value, count }) => <button type="button" key={value} aria-pressed={facets[kind].includes(value)} onClick={() => toggleFacet(kind, value)}><span>{kind === 'forms' ? morphologyLabel(value) : <QuranText text={lemmaDisplay(value)} />}</span><small>{toFa(count)}</small></button>)}</div></details> : null })}{(lemmas.length > 0 || forms.length > 0) && <button type="button" onClick={() => { setLemmas([]); setForms([]) }}>حذف فیلترها</button>}</div>}
+        {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? `ریشهٔ ${occurrenceFilter.root ?? ''}` : occurrenceFilter.tab === 'form' ? `باب ${occurrenceFilter.form} · ${occurrenceFilter.root ?? ''}` : `بن‌واژهٔ ${occurrenceFilter.text}`}</span><button type="button" aria-label="حذف فیلتر تکرارها" onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
       </header>
       <div className="search-results-summary" role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />در حال جست‌وجو…</span> : !valid ? 'اعراب و تفاوت «ک» و «ی» فارسی و عربی مانع جست‌وجو نیست.' : error ? 'بارگیری جست‌وجو انجام نشد.' : `${toFa(results.length)} آیه · ${toFa(results.reduce((sum, r) => sum + r.positions.length, 0))} تطبیق`}</div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label="نتایج جست‌وجو" aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
+        {!busy && rawResults.length > 0 && <div className="search-facets-inline" aria-label="فیلتر نتایج">
+          {(['forms', 'lemmas'] as const).map(kind => <SearchFacetGroup key={`${mode}:${query}:${kind}`} kind={kind} counts={searchFacetCounts(rawResults, facets, kind)} selected={facets[kind]} onToggle={value => toggleFacet(kind, value)} />)}
+          {(lemmas.length > 0 || forms.length > 0) && <div className="search-active-facets">{(['forms', 'lemmas'] as const).flatMap(kind => facets[kind].map(value => <button type="button" key={`${kind}:${value}`} aria-label={`حذف فیلتر ${kind === 'forms' ? morphologyLabel(value) : lemmaDisplay(value)}`} onClick={() => toggleFacet(kind, value)}>{kind === 'forms' ? morphologyLabel(value) : lemmaDisplay(value)}<X size={12} /></button>))}<button type="button" onClick={() => { setLemmas([]); setForms([]) }}>حذف فیلترها</button></div>}
+        </div>}
         {!valid && <div className="search-empty"><BookOpen size={34} /><h2>دنبال چه می‌گردی؟</h2><p>یک واژه یا عبارت بنویس و محدودهٔ جست‌وجو را انتخاب کن.</p><div>{['لا تخف', 'رحمة', 'رزق'].map(text => <button type="button" key={text} onClick={() => setQuery(text)}>{text}</button>)}</div></div>}
         {error && <button type="button" className="chip" onClick={() => setRetry(value => value + 1)}>تلاش دوباره</button>}
         {!busy && !error && valid && !results.length && <div className="search-empty"><Search size={30} /><h2>نتیجه‌ای پیدا نشد</h2><p>عبارت یا سوره‌های انتخابی را تغییر بده؛ برای واژه‌های نزدیک، «خطای املایی» را روشن کن.</p></div>}
@@ -192,4 +213,16 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       </div>
     </div>
   </main>, document.body)
+}
+
+
+function SearchFacetGroup({ kind, counts, selected, onToggle }: {
+  kind: 'forms' | 'lemmas'; counts: { value: string; count: number }[]; selected: string[]; onToggle: (value: string) => void
+}) {
+  const [expanded, setExpanded] = useState(false)
+  if (!counts.length) return null
+  return <div className="search-facet-row" role="group" aria-label={kind === 'forms' ? 'فیلتر باب' : 'فیلتر بُن‌واژه'}>
+    <span>{kind === 'forms' ? 'باب' : 'بُن‌واژه'}</span><div>{(expanded ? counts : counts.slice(0, 3)).map(({ value, count }) => <button type="button" key={value} aria-pressed={selected.includes(value)} onClick={() => onToggle(value)}><span>{kind === 'forms' ? morphologyLabel(value) : <QuranText text={lemmaDisplay(value)} />}</span><small>{toFa(count)}</small></button>)}
+    {counts.length > 3 && <button type="button" className="search-facet-more" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'کمتر' : `+${toFa(counts.length - 3)} بیشتر`}</button>}</div>
+  </div>
 }
