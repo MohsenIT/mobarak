@@ -1277,3 +1277,10 @@ input[type='range'].page-slider::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) { .analysis-tab-indicator-track > span { transition: none; } }
 
 .analysis-position-title.analysis-position-range { max-width: none; overflow: visible; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+/* Share the text baseline across Hafs roots, Persian labels and the counter. */
+.analysis-navigation { align-items: first baseline; }
+.analysis-navigation .analysis-unit-button,
+.analysis-navigation .analysis-repeat-button,
+.analysis-navigation .analysis-position-button { align-items: baseline; }
+.analysis-navigation button > svg { align-self: center; }
