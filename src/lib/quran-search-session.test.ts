@@ -46,3 +46,12 @@ test('direct lemma search groups inflections while keeping different lemmas sepa
   expect(hits.some(r => r.a === 5)).toBe(true)
   expect(hits.some(r => r.a === 80 && r.positions.includes(12))).toBe(true)
 })
+
+test('رحم does not invent a word from الجوارح مكلبين or other adjacent word edges', () => {
+  for (const includeRoots of [false, true]) {
+    const hits = search('رحم', { includeNear: false, includeRoots })
+    expect(hits.length).toBeGreaterThan(0)
+    expect(hits.some(r => r.s === 5 && r.a === 4)).toBe(false)
+    expect(hits.every(r => r.positions.every(pos => r.morphology?.[pos - 1]?.[0] === 'رحم'))).toBe(true)
+  }
+})

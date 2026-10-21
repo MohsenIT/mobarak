@@ -18,11 +18,11 @@ import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, GitCompareArrows, Search, SlidersHorizontal } from 'lucide-react'
+import { ArrowRight, GitCompareArrows, Search } from 'lucide-react'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import {
-  PatternBG, IconMenu, IconStar,
+  PatternBG, IconMenu,
   IconTranslate, IconSortIndex,
 } from '@/components/quran/Ornaments'
 
@@ -61,6 +61,7 @@ export default function Home() {
   const [translator, setTranslator] = useState<Translator>(() => LS.get('mushaf.safavi-default.v1', false) ? LS.get('mushaf.tr', 's') : 's')
   const [scale, setScale] = useState(() => LS.get('mushaf.scale', 1))
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
+  const [recentSurahs, setRecentSurahs] = useState<number[]>(() => LS.get('mushaf.recent-surahs', []))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [quickSearchOpen, setQuickSearchOpen] = useState(false)
@@ -159,6 +160,10 @@ export default function Home() {
 
   const segs = useMemo(() => (meta ? meta.pages[page - 1] || [] : []), [meta, page])
   const curSurahN = mode === 'mushaf' ? (segs[0]?.s ?? 1) : surah
+  useEffect(() => {
+    if (!meta || loadingPage) return
+    setRecentSurahs(previous => { const next = [curSurahN, ...previous.filter(n => n !== curSurahN && Number.isInteger(n) && n >= 1 && n <= 114)].slice(0, 12); LS.set('mushaf.recent-surahs', next); return next })
+  }, [curSurahN, meta, loadingPage])
 
   // close panel-max when selection changes / panel closes
   useEffect(() => { if (!sel) setPanelMax(false) }, [sel])
@@ -372,10 +377,6 @@ export default function Home() {
   }, [meta, segs, pageData, page])
 
   const flowFont = 22 * scale
-  const isBookmarked = bookmarks.includes(page)
-  const toggleBookmark = () =>
-    setBookmarks(b => (b.includes(page) ? b.filter(x => x !== page) : [...b, page]))
-
   const switchMode = (m: 'mushaf' | 'flow') => {
     if (m === 'flow') setSurah(curSurahN)
     setMode(m)
@@ -409,16 +410,10 @@ export default function Home() {
           <p className="font-bold text-[14px] sm:text-[15px] truncate" style={{ color: 'var(--ink)' }}>
             {mode === 'mushaf' ? pageInfo.names : meta.surahs[surah - 1]?.ar}
           </p>
-          <p className="text-[10px] sm:text-[11px] truncate" style={{ color: 'var(--ink-faint)' }}>
-            {mode === 'mushaf'
-              ? `${pageInfo.juz ? `جزء ${toFa(pageInfo.juz)} · ` : ''}صفحه ${toFa(page)} از ${toFa(604)}`
-              : `سوره ${toFa(surah)} از ${toFa(114)} · ${toFa(meta.surahs[surah - 1]?.vc ?? 0)} آیه · متن پیوسته`}
-          </p>
         </button>
 
         <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setSel(null); setQuickSearchOpen(true) }}><Search size={20} /></button>
 
-        <button className="icon-btn" aria-label="جست‌وجوی پیشرفته" title="جست‌وجوی پیشرفته در کل قرآن" onClick={() => { setOccurrenceSearch(null); setSel(null); setSearchStart({ query: '', mode: 'text', surahs: [], revision: Date.now() }); setSearchOpen(true) }}><SlidersHorizontal size={19} /></button>
 
         {/* surah keyword index — opens the sorted-keywords page */}
         <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
@@ -428,10 +423,6 @@ export default function Home() {
           <GitCompareArrows size={20} />
         </button>
 
-        <button className="icon-btn" onClick={toggleBookmark} aria-label="نشان کردن صفحه"
-          style={{ color: isBookmarked ? 'var(--gold-deep)' : undefined }}>
-          <IconStar filled={isBookmarked} />
-        </button>
 
           <button className="icon-btn" aria-label="نمایش ترجمه"
             title="ترجمه"
@@ -558,6 +549,9 @@ export default function Home() {
         <NavDrawer
           meta={meta}
           bookmarks={bookmarks}
+          recentSurahs={recentSurahs}
+          onClearRecent={() => { setRecentSurahs([]); LS.set('mushaf.recent-surahs', []) }}
+          onAdvancedSearch={() => { setDrawerOpen(false); setOccurrenceSearch(null); setSel(null); setSearchStart({ query: '', mode: 'text', surahs: [], revision: Date.now() }); setSearchOpen(true) }}
           theme={theme}
           mode={mode}
           onMode={switchMode}

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
-import { resolveDestination, searchSurahs, type Destination, type JumpKind } from '@/lib/navigation'
+import { destinationSuggestions, searchSurahs, type Destination } from '@/lib/navigation'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate } from './Ornaments'
 
 export type { Translator } from '@/lib/quran'
@@ -12,6 +12,9 @@ export type { Translator } from '@/lib/quran'
 interface Props {
   meta: Meta
   bookmarks: number[]
+  recentSurahs: number[]
+  onClearRecent: () => void
+  onAdvancedSearch: () => void
   theme: 'paper' | 'night'
   mode: 'mushaf' | 'flow'
   onMode: (mode: 'mushaf' | 'flow') => void
@@ -34,7 +37,7 @@ interface Props {
 const TABS = [
   { id: 'surah', label: 'سوره‌ها' },
   { id: 'juz', label: 'اجزاء' },
-  { id: 'marks', label: 'نشان‌ها' },
+  { id: 'recent', label: 'اخیر' },
   { id: 'settings', label: 'تنظیمات' },
 ] as const
 
@@ -48,9 +51,9 @@ const TRANSLATORS: { id: Translator; name: string }[] = [
 export default function NavDrawer(props: Props) {
   const { meta, onClose, onGoPage, onGoSurah, onGoVerse, currentSurah } = props
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('surah')
-  const [q, setQ] = useState('')
   const [pageInput, setPageInput] = useState('')
-  const [jumpKind, setJumpKind] = useState<JumpKind>('surah')
+  const q = pageInput
+  const contentRef = useRef<HTMLDivElement>(null)
   const [pageError, setPageError] = useState(false)
   // ref to the surah list container — we scrollIntoView the active row
   // when the drawer opens.
@@ -65,13 +68,14 @@ export default function NavDrawer(props: Props) {
     // Use a tiny timeout to let the drawer's slide-in animation start first,
     // otherwise scrollIntoView happens before the layout settles.
     const t = setTimeout(() => {
-      activeSurahRef.current?.scrollIntoView({ block: 'center', behavior: 'auto' })
+      const pane = contentRef.current, row = activeSurahRef.current
+      if (pane && row) pane.scrollTop = Math.max(0, pane.scrollTop + row.getBoundingClientRect().top - pane.getBoundingClientRect().top - (pane.clientHeight - row.clientHeight) / 2)
     }, 50)
     return () => clearTimeout(t)
   }, [tab, q])
 
   const surahs = useMemo(() => searchSurahs(meta, q), [q, meta])
-  const suggestions = useMemo(() => jumpKind === 'surah' && pageInput.trim() ? searchSurahs(meta, pageInput.replace(/^سوره\s+/, '')).slice(0, 6) : [], [meta, jumpKind, pageInput])
+  const suggestions = useMemo(() => destinationSuggestions(meta, pageInput, currentSurah), [meta, pageInput, currentSurah])
 
   const juzList = useMemo(() =>
     Object.entries(meta.juz).map(([j, [s, a]]) => ({
@@ -87,15 +91,9 @@ export default function NavDrawer(props: Props) {
   }
   const submitPage = (e: React.FormEvent) => {
     e.preventDefault()
-    const destination = resolveDestination(meta, jumpKind, pageInput, currentSurah)
+    const destination = suggestions.length === 1 ? suggestions[0].destination : undefined
     if (destination) goTo(destination)
     else setPageError(true)
-  }
-  const placeholders: Record<JumpKind, string> = {
-    surah: 'نام یا شمارهٔ سوره؛ مثلاً طه یا ۲۰',
-    page: 'شمارهٔ صفحه؛ ۱ تا ۶۰۴',
-    juz: 'شمارهٔ جزء؛ ۱ تا ۳۰',
-    verse: `آیه در سورهٔ جاری یا طه:۱۱`,
   }
 
   return (
@@ -110,14 +108,7 @@ export default function NavDrawer(props: Props) {
           <button className="icon-btn" onClick={onClose} aria-label="بستن"><IconClose /></button>
         </div>
 
-        {/* Search by destination type, with direct surah suggestions. */}
-        <label className="px-4 pb-2 flex items-center gap-3 text-xs">
-          برو به
-          <select aria-label="نوع مقصد" className="flex-1 min-w-0 rounded-lg border p-2 text-sm" style={{ background: 'var(--paper)', borderColor: 'var(--line-strong)' }}
-            value={jumpKind} onChange={e => { setJumpKind(e.target.value as JumpKind); setPageInput(''); setPageError(false) }}>
-            <option value="surah">سوره</option><option value="page">صفحه</option><option value="juz">جزء</option><option value="verse">آیه</option>
-          </select>
-        </label>
+        <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>جست‌وجوی پیشرفته</span><span>در متن، ریشه و بُن‌واژه ←</span></button>
         <form onSubmit={submitPage} className="flex items-center gap-2 px-4 pb-3">
           <input
             value={pageInput}
@@ -125,8 +116,8 @@ export default function NavDrawer(props: Props) {
             aria-label="جستجو و رفتن به مقصد"
             aria-invalid={pageError}
             aria-describedby={pageError ? 'page-jump-error' : undefined}
-            inputMode={jumpKind === 'page' || jumpKind === 'juz' ? 'numeric' : 'text'}
-            placeholder={placeholders[jumpKind]}
+            inputMode="text"
+            placeholder="برو به… طه، ۲۰:۱۴، صفحه ۵۰"
             className="flex-1 min-w-0 rounded-xl border px-3 py-2.5 text-sm bg-transparent outline-none"
             style={{ borderColor: 'var(--line-strong)', color: 'var(--ink)' }}
           />
@@ -135,11 +126,12 @@ export default function NavDrawer(props: Props) {
             برو
           </button>
         </form>
-        {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">مقصد معتبر نیست یا نام سوره مبهم است؛ نام کامل یا شماره را وارد کنید. برای آیه می‌توانید «طه:۱۱» بنویسید.</p>}
+        {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">مقصد را از پیشنهادها انتخاب کنید یا دقیق‌تر بنویسید؛ مثلاً «طه:۱۴» یا «صفحه ۵۰».</p>}
 
-        {suggestions.length > 0 && <div className="px-4 pb-3 flex flex-wrap gap-2" aria-label="نتایج جستجوی سوره">
-          {suggestions.map(s => <button key={s.n} className="chip" onClick={() => goTo({ kind: 'surah', s: s.n })}>{s.fa} · {toFa(s.n)}</button>)}
+        {suggestions.length > 0 && <div className="drawer-destination-options" aria-label="مقصدهای پیشنهادی">
+          {suggestions.map((item, index) => <button key={index} type="button" onClick={() => goTo(item.destination)}>{toFa(item.label)}</button>)}
         </div>}
+        {!pageInput && props.recentSurahs.length > 1 && <div className="drawer-recent-shortcuts" aria-label="سوره‌های اخیر"><span>اخیراً خوانده‌اید</span>{props.recentSurahs.filter(n => n !== currentSurah).slice(0, 4).map(n => <button type="button" key={n} onClick={() => goTo({ kind: 'surah', s: n })}>{meta.surahs[n - 1]?.fa}</button>)}</div>}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
@@ -148,22 +140,10 @@ export default function NavDrawer(props: Props) {
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto nice-scroll">
+        <div ref={contentRef} className="flex-1 overflow-y-auto nice-scroll">
           {tab === 'surah' && (
             <div className="p-3">
-              <label className="flex items-center gap-2 rounded-xl border px-3 py-2.5 mb-3"
-                style={{ borderColor: 'var(--line-strong)', background: 'color-mix(in srgb, var(--paper) 60%, transparent)' }}>
-                <IconSearch />
-                <input
-                  value={q}
-                  onChange={e => setQ(e.target.value)}
-                  placeholder="جستجوی سوره با نام یا شماره…"
-                  aria-label="جستجوی سوره"
-                  className="bg-transparent outline-none w-full text-sm"
-                  style={{ color: 'var(--ink)' }}
-                />
-              </label>
-              {surahs.length === 0 && <p role="status" className="text-center py-4 text-sm">سوره‌ای با این نام یا شماره پیدا نشد.</p>}
+              {surahs.length === 0 && !suggestions.length && <p role="status" className="text-center py-4 text-sm">مقصدی با این نام یا شماره پیدا نشد.</p>}
               <div ref={surahListRef} className="flex flex-col">
                 {surahs.map(s => {
                   const isActive = s.n === currentSurah
@@ -223,13 +203,17 @@ export default function NavDrawer(props: Props) {
             </div>
           )}
 
-          {tab === 'marks' && (
+          {tab === 'recent' && (
             <div className="p-3">
+              <div className="drawer-recent-heading"><h3>سوره‌های اخیر</h3>{props.recentSurahs.length > 0 && <button type="button" onClick={props.onClearRecent}>پاک‌کردن سابقه</button>}</div>
+              {props.recentSurahs.length === 0 && <p className="text-xs py-4" style={{ color: 'var(--ink-soft)' }}>هنوز سابقه‌ای ثبت نشده است.</p>}
+              {props.recentSurahs.map(n => <button type="button" className="nav-surah-row" key={n} onClick={() => goTo({ kind: 'surah', s: n })}><span>{toFa(n)} · {meta.surahs[n - 1]?.fa}</span>{n === currentSurah && <small>سورهٔ جاری</small>}</button>)}
+              <details className="drawer-legacy-bookmarks"><summary>نشان‌های قبلی · {toFa(props.bookmarks.length)}</summary>
               {props.bookmarks.length === 0 ? (
                 <div className="text-center py-12 text-sm" style={{ color: 'var(--ink-faint)' }}>
                   <div className="flex justify-center mb-3 opacity-60"><IconStar /></div>
                   هنوز صفحه‌ای نشان نکرده‌اید.
-                  <br />با ستارهٔ بالای صفحه، صفحهٔ جاری را نشان کنید.
+                  <br />نشان‌های ذخیره‌شدهٔ قبلی اینجا نگه داشته می‌شوند.
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -251,6 +235,7 @@ export default function NavDrawer(props: Props) {
                   })}
                 </div>
               )}
+              </details>
             </div>
           )}
 

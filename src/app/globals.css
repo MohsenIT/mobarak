@@ -1370,3 +1370,17 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .search-facet-row .search-facet-more { border-color: transparent; color: var(--ink-soft); }
 .search-active-facets { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; font-size: 10px; }
 @media (max-width: 380px) { .search-page-header { padding-inline: 6px; } .search-controls-row { gap: 3px; } .search-controls-row .search-mode-tabs button { padding-inline: 5px; } .search-roots-toggle { font-size: 10px; padding-inline: 5px; } .search-controls-row .search-scope summary { font-size: 10px; gap: 3px; } .search-controls-row .search-scope summary span { max-width: 62px; } }
+
+.drawer-advanced-search { display: flex; align-items: center; gap: 9px; margin: 4px 16px 12px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--word-active); font-size: 13px; }
+.drawer-advanced-search > span:last-child { margin-inline-start: auto; font-size: 10px; color: var(--ink-soft); }
+.drawer-destination-options { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 16px 12px; }
+.drawer-destination-options button { border: 1px solid var(--line); border-radius: 12px; padding: 7px 10px; font-size: 12px; }
+.drawer-recent-shortcuts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 0 16px 10px; font-size: 11px; }
+.drawer-recent-shortcuts > span { color: var(--ink-soft); }
+.drawer-recent-shortcuts button { padding: 5px 9px; border-radius: 12px; background: var(--word-active); }
+.drawer-recent-heading { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 12px; }
+.drawer-recent-heading button { font-size: 10px; color: var(--ink-soft); padding: 6px; }
+.drawer-legacy-bookmarks { margin-top: 18px; font-size: 12px; color: var(--ink-soft); }
+.drawer-legacy-bookmarks summary { cursor: pointer; padding: 8px 0; }
+.drawer-advanced-search > span:first-of-type { flex: 1; text-align: start; white-space: nowrap; }
+@media (max-width: 640px) { .drawer-advanced-search > span:last-child { display: none; } }

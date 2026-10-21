@@ -46,3 +46,25 @@ export function resolveDestination(meta: Meta, kind: JumpKind, input: string, cu
   const first = meta.juz[String(n)]
   return n >= 1 && n <= 30 && first ? { kind: 'verse', s: first[0], a: first[1] } : null
 }
+
+export type DestinationSuggestion = { destination: Destination; label: string }
+/** Infer the destination after typing; show explicit choices for ambiguous numbers. */
+export function destinationSuggestions(meta: Meta, input: string, currentSurah: number): DestinationSuggestion[] {
+  const value = input.trim()
+  if (!value) return []
+  const label = (destination: Destination) => destination.kind === 'surah' ? `سورهٔ ${meta.surahs[destination.s - 1]?.fa}` : destination.kind === 'page' ? `صفحهٔ ${destination.p}` : `${meta.surahs[destination.s - 1]?.fa} · آیهٔ ${destination.a}`
+  const prefix = value.match(/^(سوره|صفحه|جزء|آیه)\s+/)
+  if (prefix || /[:：/]/.test(value)) {
+    const destination = resolveDestination(meta, /[:：/]/.test(value) ? 'verse' : 'surah', value, currentSurah)
+    return destination ? [{ destination, label: prefix?.[1] === 'جزء' ? `جزء ${normalizeSearch(value.replace(/^جزء\s+/, ''))}` : label(destination) }] : []
+  }
+  if (/^\d+$/.test(normalizeSearch(value))) {
+    return (['surah', 'verse', 'page', 'juz'] as const).flatMap(kind => {
+      const destination = resolveDestination(meta, kind, value, currentSurah)
+      return destination ? [{ destination, label: kind === 'juz' ? `جزء ${normalizeSearch(value)}` : label(destination) }] : []
+    })
+  }
+  const exact = findSurah(meta, value)
+  if (exact) return [{ destination: { kind: 'surah', s: exact.n }, label: `سورهٔ ${exact.fa}` }]
+  return searchSurahs(meta, value).slice(0, 6).map(s => ({ destination: { kind: 'surah' as const, s: s.n }, label: `سورهٔ ${s.fa}` }))
+}

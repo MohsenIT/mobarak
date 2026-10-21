@@ -39,3 +39,11 @@ Research references (source-code inspection, not claims about live user ratings)
 - [Flutter Material SearchAnchor](https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/search_anchor.dart): query-driven suggestions and explicit search-field/view interaction.
 
 Browser scenarios cover direct entry without quick search, keyboard completion, expanding a typed word to its root, immediately visible facets, more/less without increasing fixed-header height, translation in the command bar, preserved result return/scroll and narrow/mobile/desktop widths.
+
+## Reader navigation and false-match regression
+
+Advanced search lives in the three-line menu with a magnifier and text label; the reader toolbar keeps quick search and shows only the surah name. The toolbar star was replaced by recent-surah navigation in the menu. Recent surahs persist locally; existing page bookmarks remain accessible in a secondary legacy collection. The menu has one input for surah names, explicit page/juz/verse references and numeric destination alternatives, without a prior destination-type selector. Ambiguous alternatives require an explicit choice rather than guessing.
+
+The reported رحم → مكلبين bug was reproduced at 5:4: compact matching joined the end of الجوارح and the beginning of مكلبين. A no-space single-word query may now match within one word, or a sequence of complete adjacent words, but cannot match two partial word edges. Core tests cover both ordinary and root-expanded searches, retain inside-word matching and omitted-space phrases, and verify that every match for رحم with typo tolerance off belongs to root رحم. Fresh searches also reset typo tolerance; explicitly enabled tolerance is visible outside its settings menu.
+
+Browser checks cover menu search entry, absent toolbar star/extra metadata, numeric alternatives, 20:14 navigation, recent surahs, corrected رحم facets with and without root expansion, explicit/reset typo tolerance and 320/390 layouts.

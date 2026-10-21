@@ -105,6 +105,9 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
           const end = start + compactQuery.length
           const matched = item.ranges.flatMap(([from, to], i) => from < end && to > start ? [i + 1] : [])
           const whole = item.boundaries.has(start) && item.boundaries.has(end)
+          // A single word may match inside one token, or full adjacent tokens
+          // with omitted spaces; never invent a word from two partial edges.
+          if (terms.length === 1 && matched.length > 1 && !whole) continue
           if (!whole && !includePartial) continue
           const value = whole ? 0 : 0.5
           literalScore = Math.min(literalScore, value)

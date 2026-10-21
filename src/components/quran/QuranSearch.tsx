@@ -80,7 +80,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const pending = useRef('')
   const facets = { lemmas, forms }
   const results = filterSearchFacets(rawResults, facets)
-  useEffect(() => { if (initialSearch) { setQuery(initialSearch.query); setMode(initialSearch.mode); setSurahs(initialSearch.surahs); setIncludeRoots(false) } }, [initialSearch])
+  useEffect(() => { if (initialSearch) { setQuery(initialSearch.query); setMode(initialSearch.mode); setSurahs(initialSearch.surahs); setIncludeRoots(false); setIncludeNear(false); setIncludePartial(true) } }, [initialSearch])
   useEffect(() => { setLemmas([]); setForms([]) }, [query, mode, includeRoots, occurrenceFilter, surahs.join(',')])
   const valid = !!occurrenceFilter || normalizeQuranSearch(query).replace(/\s/g, '').length >= 2
   const scopeKey = surahs.join(',')
@@ -88,7 +88,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
 
   useEffect(() => {
     if (occurrenceFilter) {
-      setSurahs([occurrenceFilter.s]); setIncludeRoots(occurrenceFilter.tab === 'root'); setQuery('')
+      setIncludeNear(false); setSurahs([occurrenceFilter.s]); setIncludeRoots(occurrenceFilter.tab === 'root'); setQuery('')
     }
   }, [occurrenceFilter])
   useEffect(() => () => worker.current?.terminate(), [])
@@ -190,6 +190,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
             <label><input type="checkbox" checked={includeNear} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludeNear(e.target.checked)} />تحمل خطای املایی</label>
           </div></details>
         </div>
+        {includeNear && mode === 'text' && <button type="button" className="search-active-filter" aria-label="غیرفعال‌کردن خطای املایی" onClick={() => setIncludeNear(false)}>خطای املایی فعال است <X size={12} /></button>}
         {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? `ریشهٔ ${occurrenceFilter.root ?? ''}` : occurrenceFilter.tab === 'form' ? `باب ${occurrenceFilter.form} · ${occurrenceFilter.root ?? ''}` : `بن‌واژهٔ ${occurrenceFilter.text}`}</span><button type="button" aria-label="حذف فیلتر تکرارها" onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
       </header>
       <div className="search-results-summary" role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />در حال جست‌وجو…</span> : !valid ? 'اعراب و تفاوت «ک» و «ی» فارسی و عربی مانع جست‌وجو نیست.' : error ? 'بارگیری جست‌وجو انجام نشد.' : `${toFa(results.length)} آیه · ${toFa(results.reduce((sum, r) => sum + r.positions.length, 0))} تطبیق`}</div>
