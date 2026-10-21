@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 import type { Translator, SurahData, SurahMeta, Translations } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
@@ -36,11 +36,6 @@ export function FlowSurface({ children }: { children: ReactNode }) {
 /** Continuous, flowing surah view (متن پیوسته) */
 export default function FlowPage({ sm, surah, trans, showTrans, translator, fontSize, selection, highlightRoot, mutedComparisonRoots, comparisonRoots, comparisonRange, analysisSelection, flash, onWordTap, onOpenSurahs }: Props) {
   const textRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    if (!flash || flash.s !== surah.n) return
-    textRef.current?.querySelector(`[data-ayah="${flash.a}"][data-pos="${flash.pos}"]`)
-      ?.scrollIntoView({ block: 'start', behavior: 'smooth' })
-  }, [flash, surah.n])
   return (
     <div>
       <div style={{ fontSize: fontSize * 1.12 }}>

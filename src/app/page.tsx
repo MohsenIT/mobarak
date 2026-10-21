@@ -269,6 +269,7 @@ export default function Home() {
         if (mode === 'mushaf') requestMushafPage(v.p)
         else setSurah(s)
         setFlash({ s, a, pos })
+        setSearchTarget({ s, a, pos })
       }
     })
   }, [mode, requestMushafPage])
@@ -281,9 +282,9 @@ export default function Home() {
     if (!main || !word) return
     const scroll = main.querySelector<HTMLElement>('[data-reading-scroll]') ?? main
     const top = scroll.scrollTop + word.getBoundingClientRect().top - scroll.getBoundingClientRect().top - scroll.clientHeight * 0.35
-    scroll.scrollTo({ top: Math.max(0, top), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+    scroll.scrollTo({ top: Math.max(0, top), behavior: quickSearchOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
     setSearchTarget(null)
-  }, [searchTarget, loadingPage, mode, page, surah, flowSurah?.n, pageData, mushafContentRevision])
+  }, [searchTarget, quickSearchOpen, loadingPage, mode, page, surah, flowSurah?.n, pageData, mushafContentRevision])
 
   // panel jump: keep panel open, highlight target
   const panelJump = useCallback((s: number, a: number, pos: number, p: number) => {
@@ -383,24 +384,24 @@ export default function Home() {
   return (
     <>
     {!startupComplete && <StartupSplash leaving={startupLeaving} onHoldChange={held => { setStartupHeld(held); if (held) setStartupLeaving(false) }} />}
-    {meta && <div className={`h-dvh flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
+    {meta && <div className={`h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 
       <QuranSearch initialSearch={searchStart} occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={setSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
-        setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); setComparisonRoot(null); setSearchTarget({ s, a, pos }); goVerse(s, a, pos)
+        setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); setComparisonRoot(null); goVerse(s, a, pos)
       }} />
 
       {/* ===== Top bar =====
           Removed the prev/next-surah chevrons (< >) — user said the
           constant-surah-jumping UX was weird. Surah switching now happens
           via the drawer (tap the title) or the slider in the drawer. */}
-      <header className="relative z-10 flex items-center gap-1 px-2 sm:px-4 border-b"
+      <header className="relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
         style={{
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
           backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
         }}>
         {quickSearchOpen ? <QuickSurahSearch surah={meta.surahs[curSurahN - 1]} onClose={() => setQuickSearchOpen(false)}
-          onPick={(s, a, pos) => { setSel(null); setSearchTarget({ s, a, pos }); goVerse(s, a, pos) }}
+          onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos) }}
           onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
         <button className="icon-btn" onClick={() => setDrawerOpen(true)} aria-label="فهرست"><IconMenu /></button>
 
