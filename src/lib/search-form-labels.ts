@@ -1,14 +1,13 @@
 import type { QuranSearchResult } from './quran-search'
 import { formName, morphologyLabel } from './quran'
-import { lemmaDisplay } from './lemma-display'
 
-/** Use recorded verbal nouns, then an attested lemma; never inflect a weak root by guesswork. */
+/** Use recorded verbal nouns, otherwise the technical form; conjugated verbs are not family names. */
 export function searchFormLabels(results: QuranSearchResult[]): Map<string, { label: string; description: string }> {
   const groups = new Map<string, Map<string, { text: string; count: number }>>()
   for (const result of results) for (const pos of result.positions) {
-    const [root, lemma, form] = result.morphology?.[pos - 1] ?? []
+    const [root, , form] = result.morphology?.[pos - 1] ?? []
     if (!form) continue
-    const text = formName(root ?? null, form) ?? (root === 'علم' && form === 'I' ? 'عِلْم' : lemma ? lemmaDisplay(lemma) : root)
+    const text = formName(root ?? null, form) ?? (root === 'علم' && form === 'I' ? 'عِلْم' : morphologyLabel(form))
     if (!text) continue
     let entries = groups.get(form)
     if (!entries) { entries = new Map(); groups.set(form, entries) }

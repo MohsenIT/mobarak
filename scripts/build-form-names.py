@@ -16,7 +16,7 @@ for line in (root/'data/quranic-corpus-morphology-0.4.txt').read_text().splitlin
  if '|VN|' not in features:continue
  form=re.search(r'\(([IVX]+)\)',features);lemma=re.search(r'LEM:([^|]+)',features);r=re.search(r'ROOT:([^|]+)',features)
  if form and lemma and r:names[f'{arabic(r[1],True)}:{form[1]}'].add(arabic(lemma[1]))
-examples={'لقي:IV':'إلقاء','علم:II':'تعليم','علم:V':'تعلّم','علم:X':'استعلام'}
+examples={'لقي:IV':'إلقاء','علم:II':'تعليم','علم:V':'تعلّم','علم:X':'استعلام','دبر:II':'تدبير','دبر:IV':'إدبار','دبر:V':'تدبّر'}
 for key,name in examples.items():names[key].add(name)
 result={key:sorted(values) for key,values in sorted(names.items())}
 (root/'public/data/form-names.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
