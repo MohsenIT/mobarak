@@ -1326,3 +1326,10 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .search-selected-facet { background: var(--word-active); }
 .quick-surah-search input::-webkit-search-cancel-button,
 .search-page-input input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+
+/* Center the shared baseline group, rather than the buttons' empty min-height. */
+.analysis-navigation { min-height: 48px; align-content: center; padding-block: 7px; }
+.analysis-navigation .analysis-unit-button,
+.analysis-navigation .analysis-repeat-button,
+.analysis-navigation .analysis-position-button { min-height: 0; position: relative; }
+.analysis-navigation button::before { content: ''; position: absolute; top: 50%; inset-inline: 0; height: 44px; transform: translateY(-50%); }
