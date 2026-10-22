@@ -1,4 +1,5 @@
 'use client'
+import { readVerseAddress, writeVerseAddress } from '@/lib/verse-link'
 import { wordTarget } from '@/lib/word-parts'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -147,6 +148,7 @@ export default function Home() {
   useEffect(() => {
     LS.set('mushaf.page', page)
     const url = new URL(window.location.href)
+    if (url.searchParams.get('s') !== String(surah) || mode === 'mushaf') { url.searchParams.delete('a'); url.searchParams.delete('w') }
     url.searchParams.delete(mode === 'flow' ? 'p' : 's')
     url.searchParams.set(mode === 'flow' ? 's' : 'p', String(mode === 'flow' ? surah : page))
     window.history.replaceState(null, '', url.toString())
@@ -253,6 +255,7 @@ export default function Home() {
       setSel(null)
       return
     }
+    writeVerseAddress(word)
     setFlash(null)
     setComparisonRoot(null)
     setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos && (current.part ?? 'stem') === (word.part ?? 'stem') ? null : word)
@@ -273,11 +276,39 @@ export default function Home() {
       if (v) {
         if (mode === 'mushaf') requestMushafPage(v.p)
         else setSurah(s)
+        writeVerseAddress({ s, a, pos })
         setFlash({ s, a, pos })
         setSearchTarget({ s, a, pos })
       }
     })
   }, [mode, requestMushafPage])
+
+  useEffect(() => {
+    const restore = () => {
+      const target = readVerseAddress(window.location.search)
+      if (target) {
+        setMode('flow')
+        setSurah(target.s)
+        setSel(null)
+        loadSurah(target.s).then(data => {
+          const verse = data.v[target.a - 1]
+          if (!verse) return
+          const pos = Math.min(target.pos, verse.w.length)
+          setFlash({ ...target, pos })
+          setSearchTarget({ ...target, pos })
+        })
+      } else {
+        const q = new URLSearchParams(window.location.search)
+        const s = Number(q.get('s')), p = Number(q.get('p'))
+        setSel(null); setFlash(null)
+        if (s >= 1 && s <= 114) { setMode('flow'); setSurah(s) }
+        else if (p >= 1 && p <= 604) { setMode('mushaf'); requestMushafPage(p) }
+      }
+    }
+    restore()
+    window.addEventListener('popstate', restore)
+    return () => window.removeEventListener('popstate', restore)
+  }, [requestMushafPage])
 
   useEffect(() => {
     if (!searchTarget || loadingPage || (mode === 'flow' && flowSurah?.n !== searchTarget.s)) return
