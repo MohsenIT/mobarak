@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Pin, PinOff } from 'lucide-react'
 import UpdateSettings from './UpdateSettings'
+import SurahShortcuts from './SurahShortcuts'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
@@ -59,8 +60,6 @@ export default function NavDrawer(props: Props) {
   const q = pageInput
   const contentRef = useRef<HTMLDivElement>(null)
   const [pageError, setPageError] = useState(false)
-  const [shortcutsExpanded, setShortcutsExpanded] = useState(false)
-  const shortcuts = [...props.pinnedSurahs, ...props.recentSurahs.filter(n => !props.pinnedSurahs.includes(n))]
   // ref to the surah list container — we scrollIntoView the active row
   // when the drawer opens.
   const surahListRef = useRef<HTMLDivElement>(null)
@@ -144,7 +143,7 @@ export default function NavDrawer(props: Props) {
         {suggestions.length > 0 && <div className="drawer-destination-options" aria-label="مقصدهای پیشنهادی">
           {suggestions.map((item, index) => <button key={index} type="button" onClick={() => goTo(item.destination)}>{toFa(item.label)}</button>)}
         </div>}
-        {!pageInput && (props.pinnedSurahs.length > 0 || props.recentSurahs.length > 0) && <div className="drawer-recent-shortcuts" aria-label="میان‌بر سوره‌ها">{shortcuts.slice(0, shortcutsExpanded ? undefined : 3).map(n => <button type="button" key={n} className="chip" data-pinned={props.pinnedSurahs.includes(n) || undefined} onClick={() => goTo({ kind: 'surah', s: n })} title={props.pinnedSurahs.includes(n) ? 'سورهٔ سنجاق‌شده' : 'اخیراً خوانده‌اید'}>{meta.surahs[n - 1]?.fa}</button>)}{shortcuts.length > 3 && <button type="button" aria-label={shortcutsExpanded ? 'نمایش کمتر سوره‌ها' : 'نمایش همهٔ میان‌برها'} aria-expanded={shortcutsExpanded} onClick={() => setShortcutsExpanded(value => !value)}>{shortcutsExpanded ? 'کمتر' : '…'}</button>}</div>}
+        {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onGo={s => goTo({ kind: 'surah', s })} />}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
