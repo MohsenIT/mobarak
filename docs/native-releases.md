@@ -1,0 +1,50 @@
+# Offline native releases
+
+`bun run build:desktop` exports the reader into `desktop-dist`, including all files from `public`: Quran text, fonts, translations, root/lemma search corpus, and dictionaries. It creates an ignored staging directory, excludes the two web-only API handlers, and makes the manifest static. The ordinary `bun run build` remains the server-backed web build. The native client skips service-worker registration and web update polling. Sharing always uses the public HTTPS site, not a device-local address.
+
+## Local development
+
+Install Bun 1.3.4, Rust 1.90+, and the Tauri 2 prerequisites for your operating system. On Ubuntu 22.04, the native compiler needs `libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf`; RPM packaging additionally needs `rpm`. Windows needs the Visual Studio C++ build tools and WebView2; macOS needs Xcode command-line tools.
+
+```
+bun install --frozen-lockfile
+bun run desktop:dev
+bun run desktop:build
+```
+
+The source is in `src-tauri`, with identifier `app.quranmubarak.reader`. Do not change the identifier or Android release signing key after publication. The Rust dependency lockfile and Bun lockfile are committed.
+
+## Daily GitHub Releases
+
+`.github/workflows/releases.yml` runs at 02:30 UTC (06:00 Iran), on manual workflow dispatch, and when the release workflow itself is changed on main (to bootstrap it). It compares the source commit with the last offline release and does nothing when unchanged. Tests and the static client build run before the platform builds. Native outputs are built on their own OS, then published together with SHA-256 checksums. Failed required jobs prevent publication. Version numbers use `0.2.<GitHub run number>` and release tags include the date and run number.
+
+Outputs:
+
+- Linux x64: DEB, RPM, AppImage.
+- Windows x64: NSIS EXE and MSI.
+- macOS Intel and Apple Silicon: DMG.
+- Android: APK per ABI, published only when a permanent signing key is configured. Without the key, unsigned APKs remain workflow artifacts and are explicitly not advertised as installable releases.
+
+Windows and macOS packages currently have no publisher certificate / Apple notarization. iOS source is supported by the Tauri mobile entry point, but installable iOS distribution is not configured; it requires Apple signing credentials. Store submission and in-app native auto-update installation are not configured. Users download an installer from Releases; daily publication alone does not install updates on devices.
+
+### Android signing
+
+Repository Actions secrets:
+
+- `ANDROID_KEYSTORE_BASE64`: base64 encoding of the permanent keystore.
+- `ANDROID_KEYSTORE_PASSWORD`: keystore password.
+- Optional `ANDROID_KEY_ALIAS` (default `quran-mubarak`).
+- Optional `ANDROID_KEY_PASSWORD` (defaults to the keystore password).
+
+The workflow aligns the APK, signs with Android `apksigner`, and verifies the signature before upload. Keep an independent private backup of the keystore and password. Never commit the keystore, its base64 value, or passwords to this public repository. A private key has been prepared outside the checkout; it is not part of these source files.
+
+With GitHub API access and permission to manage repository secrets, an authorized maintainer can register the two prepared values without printing them:
+
+```
+gh secret set ANDROID_KEYSTORE_BASE64 --repo MohsenIT/quran-vajeh < /path/to/ANDROID_KEYSTORE_BASE64.txt
+gh secret set ANDROID_KEYSTORE_PASSWORD --repo MohsenIT/quran-vajeh < /path/to/ANDROID_KEYSTORE_PASSWORD.txt
+```
+
+## Validation so far
+
+The exported client was served from a plain static file server in a fresh browser context with all external network requests blocked. First launch, Quran reading, selected-verse navigation, Persian translation, and global root search worked with zero API calls and zero external requests. The 70 library tests passed. This is client/offline-data validation; it does not establish that native installers build or run on real devices. Those require the platform jobs and device testing.

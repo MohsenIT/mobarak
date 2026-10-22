@@ -1,0 +1,45 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Quran Mubarak",
+  "version": "0.2.1",
+  "identifier": "app.quranmubarak.reader",
+  "build": {
+    "frontendDist": "../desktop-dist",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "bun run dev",
+    "beforeBuildCommand": "bun run build:desktop"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "قرآن مبارک",
+        "width": 1100,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false,
+        "minWidth": 320,
+        "minHeight": 480
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "android": {
+      "debugApplicationIdSuffix": ".debug"
+    },
+    "category": "Education",
+    "shortDescription": "Offline Quran reader and root search",
+    "longDescription": "Quran reader with Arabic text, Persian translations, root and lemma search. All reading and search data is bundled for offline use."
+  }
+}

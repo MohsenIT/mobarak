@@ -63,3 +63,9 @@ server.log
 *.pid
 
 /upload/
+
+# Native builds
+/.desktop-build/
+/desktop-dist/
+/src-tauri/target/
+/src-tauri/gen/

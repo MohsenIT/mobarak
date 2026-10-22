@@ -8,6 +8,7 @@ export default function PwaRegistration() {
   const dismissed = useRef<string | null>(null)
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_DESKTOP === '1') return
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {
       // Reading remains available when the browser disables installation support.
     })
