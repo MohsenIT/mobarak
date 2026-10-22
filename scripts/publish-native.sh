@@ -36,10 +36,10 @@ if body=$(gh release view "$RELEASE_TAG" --repo "$GH_REPO" --json body --jq .bod
   if [[ "$body" != *"Source: $RELEASE_SHA"* ]]; then echo 'Existing release has a different source commit.' >&2; exit 1; fi
   gh release upload "$RELEASE_TAG" --repo "$GH_REPO" --clobber "${assets[@]}" SHA256SUMS.txt
 else
-  release_target=(--target "$RELEASE_SHA")
   if tag_sha=$(gh api "repos/$GH_REPO/commits/$RELEASE_TAG" --jq .sha 2>/dev/null); then
     if [[ "$tag_sha" != "$RELEASE_SHA" ]]; then echo 'Existing tag has a different source commit.' >&2; exit 1; fi
-    release_target=(--verify-tag)
+  else
+    gh api --method POST "repos/$GH_REPO/git/refs" -f "ref=refs/tags/$RELEASE_TAG" -f "sha=$RELEASE_SHA" >/dev/null
   fi
-  gh release create "$RELEASE_TAG" "${release_target[@]}" --title "Quran Mubarak $RELEASE_TAG" --notes-file release-notes.md --latest --repo "$GH_REPO" "${assets[@]}" SHA256SUMS.txt
+  gh release create "$RELEASE_TAG" --verify-tag --title "Quran Mubarak $RELEASE_TAG" --notes-file release-notes.md --latest --repo "$GH_REPO" "${assets[@]}" SHA256SUMS.txt
 fi
