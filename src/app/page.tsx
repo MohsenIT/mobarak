@@ -232,11 +232,20 @@ export default function Home() {
   }, [])
 
   const goPage = useCallback((p: number) => {
-    requestMushafPage(p)
-    setMode('mushaf')
+    const destination = clamp(p, 1, 604)
+    if (mode === 'flow') {
+      const first = meta?.pages[destination - 1]?.[0]
+      if (!first) return
+      const target = { s: first.s, a: first.f, pos: 1 }
+      pullArrival.current = null
+      writeVerseAddress(target)
+      setSurah(first.s)
+      setFlash(target)
+      setSearchTarget(target)
+    } else requestMushafPage(destination)
     setSel(null)
     setComparisonRoot(null)
-  }, [requestMushafPage])
+  }, [mode, meta, requestMushafPage])
 
   const tapWord = useCallback((word: Selection) => {
     if (!showComparison && !showIndex && comparisonRange?.s === word.s && word.root && comparisonRoots[word.root] !== undefined) {

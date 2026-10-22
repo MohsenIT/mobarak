@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Pin, PinOff } from 'lucide-react'
+import UpdateSettings from './UpdateSettings'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
@@ -248,6 +249,7 @@ export default function NavDrawer(props: Props) {
 
           {tab === 'settings' && (
             <div className="p-4 flex flex-col gap-6">
+              <UpdateSettings />
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
                   {props.theme === 'night' ? <IconMoon /> : <IconSun />} پوسته

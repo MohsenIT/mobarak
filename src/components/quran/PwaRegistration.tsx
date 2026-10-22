@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { refreshApplication } from './UpdateSettings'
 import { RefreshCw } from 'lucide-react'
 
 export default function PwaRegistration() {
@@ -45,9 +46,7 @@ export default function PwaRegistration() {
     </div>
     <button type="button" className="app-update-button" disabled={refreshing} aria-busy={refreshing} aria-label={refreshing ? 'در حال به‌روزرسانی' : 'به‌روزرسانی'} onClick={() => {
       setRefreshing(true)
-      const url = new URL(window.location.href)
-      url.searchParams.set('_refresh', Date.now().toString())
-      window.location.replace(url.href)
+      refreshApplication()
     }}><RefreshCw size={14} aria-hidden="true" className={refreshing ? 'app-update-spinner' : undefined} /><span className="app-update-label"><span className="app-update-label-space" aria-hidden="true">در حال به‌روزرسانی…</span><span>{refreshing ? 'در حال به‌روزرسانی…' : 'به‌روزرسانی'}</span></span></button>
     <button type="button" className="icon-btn sm" aria-label="بستن اعلان به‌روزرسانی" onClick={() => {
       dismissed.current = available; setAvailable(null)
