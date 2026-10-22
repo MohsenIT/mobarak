@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Minus } from 'l
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import AnalysisTabContent from './AnalysisTabContent'
 import OccurrencePicker from './OccurrencePicker'
+import VerseActions from './VerseActions'
 import { AnalysisPreferencesProvider, AnalysisSettings } from './AnalysisSections'
 import SwipeTabPages, { type TabSwipeMotion } from './SwipeTabPages'
 import { getContext } from '@/lib/contexts'
@@ -286,6 +287,7 @@ function RootPanelContent({
             </span>
           </div>
           <div className="panel-actions">
+            {surah?.n === sel.s && surah.v.find(v => v.n === sel.a) && <VerseActions key={`${sel.s}:${sel.a}`} surah={surah} verse={surah.v.find(v => v.n === sel.a)!} translator={translator} />}
             <AnalysisSettings tab={tab} />
             <button className="icon-btn sm" onClick={minimize} aria-label={minimized ? 'بازگرداندن اندازهٔ باتم‌شیت' : 'کمینه‌کردن باتم‌شیت'} title={minimized ? 'بازگرداندن اندازه' : 'کمینه'}>
               {minimized ? <IconRestore /> : <Minus size={18} />}

@@ -59,7 +59,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const [forms, setForms] = useState<string[]>([])
   const [includePartial, setIncludePartial] = useState(true)
   const [includeNear, setIncludeNear] = useState(false)
-  const [includeRoots, setIncludeRoots] = useState(false)
+  const [includeRoots, setIncludeRoots] = useState(true)
   const [surahs, setSurahs] = useState<number[]>([])
   const [surahQuery, setSurahQuery] = useState('')
   const [showTranslation, setShowTranslation] = useState(false)

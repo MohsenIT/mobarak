@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Link, Share2 } from 'lucide-react'
-import type { SurahData, Verse } from '@/lib/quran'
+import { Dialog, DialogPortal, DialogOverlay, DialogTitle, DialogClose } from '@/components/ui/dialog'
+import { Content as DialogContentPrimitive } from '@radix-ui/react-dialog'
+import { Copy, Link, Share2, X } from 'lucide-react'
+import type { SurahData, Verse, Translator, Translations } from '@/lib/quran'
 import { versePath } from '@/lib/verse-link'
-import { toFa } from '@/lib/quran'
+import { toFa, loadTrans } from '@/lib/quran'
 
 async function copyText(text: string) {
   if (navigator.clipboard?.writeText) {
@@ -23,30 +25,67 @@ async function copyText(text: string) {
   if (!copied) throw new Error('copy unavailable')
 }
 
-export default function VerseActions({ surah, verse, translation }: { surah: SurahData; verse: Verse; translation?: string }) {
+export default function VerseActions({ surah, verse, translator }: { surah: SurahData; verse: Verse; translator: Translator }) {
+  const [open, setOpen] = useState(false)
+  const [selected, setSelected] = useState<number[]>([verse.n])
+  const [visible, setVisible] = useState<[number, number]>([Math.max(1, verse.n - 1), Math.min(surah.v.length, verse.n + 1)])
+  const [withTranslation, setWithTranslation] = useState(false)
+  const [bismillah, setBismillah] = useState(false)
+  const [translations, setTranslations] = useState<Translations | null>(null)
   const [status, setStatus] = useState('')
-  const reference = `سورهٔ ${surah.fa}، آیهٔ ${toFa(verse.n)}`
-  // Preserve the source text, including connected prefixes and Quranic signs.
-  const arabic = verse.w.map(word => word.t).join(' ')
-  const link = () => new URL(versePath({ s: surah.n, a: verse.n, pos: 1 }), process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app/' : window.location.origin).href
-  const copy = async (text: string, message: string) => {
-    try { await copyText(text); setStatus(message) } catch { setStatus('کپی انجام نشد؛ دوباره تلاش کنید.') }
+  const [failed, setFailed] = useState(false)
+  const chosen = surah.v.filter(v => selected.includes(v.n))
+  const reference = `سورهٔ ${surah.fa}، ${chosen.length === 1 ? 'آیهٔ' : 'آیات'} ${chosen.map(v => toFa(v.n)).join('، ')}`
+  const text = [bismillah ? 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ' : '', ...chosen.map(v => [v.w.map(w => w.t).join(' '), withTranslation ? translations?.[String(v.n)]?.[translator] : ''].filter(Boolean).join('\n')), reference].filter(Boolean).join('\n\n')
+  const ready = chosen.length > 0 && (!withTranslation || chosen.every(v => translations?.[String(v.n)]?.[translator]))
+  const links = () => chosen.map(v => new URL(versePath({ s: surah.n, a: v.n, pos: 1 }), process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app/' : window.location.origin).href).join('\n')
+  const copy = async (value: string) => {
+    try { await copyText(value); setStatus('کپی شد.') } catch { setStatus('کپی انجام نشد؛ دوباره تلاش کنید.') }
   }
   const share = async () => {
-    const url = link()
     if (navigator.share) {
-      try { await navigator.share({ title: reference, url }); setStatus('لینک به اشتراک گذاشته شد.'); return }
+      try { await navigator.share({ title: reference, text }); setStatus('ارسال شد.'); return }
       catch (error) { if (error instanceof Error && error.name === 'AbortError') return }
     }
-    await copy(url, 'لینک آیه کپی شد.')
+    await copy(text)
   }
-  return <div className="verse-actions" key={`${surah.n}:${verse.n}`}>
-    <div className="flex flex-wrap gap-2" role="group" aria-label="کپی و اشتراک‌گذاری آیه">
-      <button className="chip inline-flex items-center gap-1.5 min-h-11" onClick={share}><Share2 size={16} aria-hidden="true" />اشتراک لینک</button>
-      <button className="chip inline-flex items-center gap-1.5 min-h-11" onClick={() => copy(link(), 'لینک آیه کپی شد.')}><Link size={16} aria-hidden="true" />کپی لینک</button>
-      <button className="chip inline-flex items-center gap-1.5 min-h-11" onClick={() => copy(`${arabic}\n\n${reference}`, 'متن آیه کپی شد.')}><Copy size={16} aria-hidden="true" />کپی آیه</button>
-      <button className="chip inline-flex items-center gap-1.5 min-h-11" disabled={!translation} onClick={() => copy(`${arabic}\n\n${translation}\n\n${reference}`, 'آیه همراه ترجمه کپی شد.')}><Copy size={16} aria-hidden="true" />کپی با ترجمه</button>
-    </div>
-    <p role="status" className="text-xs mt-2" style={{ color: 'var(--ink-soft)', minHeight: '1.25rem' }}>{status}</p>
-  </div>
+  const begin = () => {
+    setSelected([verse.n]); setVisible([Math.max(1, verse.n - 1), Math.min(surah.v.length, verse.n + 1)]); setStatus(''); setOpen(true)
+    setFailed(false); setTranslations(null)
+    loadTrans(surah.n).then(setTranslations).catch(() => setFailed(true))
+  }
+  return <Dialog open={open} onOpenChange={setOpen}>
+    <button className="icon-btn sm" aria-label="کپی و اشتراک آیات" title="کپی و اشتراک آیات" onClick={begin}><Share2 size={18} /></button>
+    <DialogPortal>
+      <DialogOverlay style={{ zIndex: 10000 }} />
+      <DialogContentPrimitive dir="rtl" aria-describedby="share-help" className="verse-share-dialog">
+        <div className="flex items-center justify-between gap-3">
+          <DialogTitle className="font-bold">کپی و ارسال آیات</DialogTitle>
+          <DialogClose className="icon-btn" aria-label="بستن اشتراک"><X size={20} /></DialogClose>
+        </div>
+        <p id="share-help" className="text-sm" style={{ color: 'var(--ink-soft)' }}>آیه آماده است؛ برای اضافه یا حذف کردن آیات، متنشان را لمس کنید.</p>
+        <div className="flex items-center gap-3 text-sm">
+          <label className="flex items-center gap-2 min-h-11"><input type="checkbox" checked={withTranslation} onChange={e => setWithTranslation(e.target.checked)} />با ترجمه</label>
+          <details className="relative"><summary className="cursor-pointer p-2">بیشتر</summary><div className="verse-share-options">
+            <label className="flex items-center gap-2 min-h-11"><input type="checkbox" checked={bismillah} onChange={e => setBismillah(e.target.checked)} />بسم‌الله در آغاز</label>
+            <button className="chip min-h-11 w-full" disabled={!chosen.length} onClick={() => copy(links())}><Link size={16} className="inline mx-1" />کپی لینک {chosen.length > 1 ? 'آیات' : 'آیه'}</button>
+          </div></details>
+        </div>
+        <div className="verse-share-scroll">
+          {visible[0] > 1 && <button className="chip min-h-11 w-full" onClick={() => setVisible(([a,b]) => [Math.max(1,a-3),b])}>نمایش آیات قبل</button>}
+          {bismillah && <p className="font-quran text-center text-2xl py-3">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>}
+          {surah.v.filter(v => v.n >= visible[0] && v.n <= visible[1]).map(v => <button key={v.n} aria-pressed={selected.includes(v.n)} className="verse-share-verse" onClick={() => setSelected(old => old.includes(v.n) ? old.filter(n => n !== v.n) : [...old,v.n])}>
+            <span className="text-xs flex justify-between mb-2"><span>{surah.fa} · آیهٔ {toFa(v.n)}</span><span>{selected.includes(v.n) ? '✓ انتخاب‌شده' : '+ افزودن'}</span></span>
+            <span className="font-quran block text-2xl leading-loose">{v.w.map(w => w.t).join(' ')}</span>
+            {withTranslation && <span className="block text-sm leading-8 mt-2">{translations?.[String(v.n)]?.[translator] || (failed ? 'دریافت ترجمه انجام نشد؛ دوباره باز کنید.' : 'در حال دریافت ترجمه…')}</span>}
+          </button>)}
+          {visible[1] < surah.v.length && <button className="chip min-h-11 w-full" onClick={() => setVisible(([a,b]) => [a,Math.min(surah.v.length,b+3)])}>نمایش آیات بعد</button>}
+        </div>
+        <div className="verse-share-footer">
+          <p role="status" className="text-xs mb-2">{status || (chosen.length ? `${toFa(chosen.length)} آیه انتخاب شده` : 'یک آیه را انتخاب کنید.')}</p>
+          <div className="flex gap-2"><button className="chip min-h-11 flex-1" disabled={!ready} onClick={() => copy(text)}><Copy size={17} className="inline mx-1" />کپی</button><button className="chip min-h-11 flex-1" style={{ background: 'var(--sage)', color: '#fff' }} disabled={!ready} onClick={share}><Share2 size={17} className="inline mx-1" />ارسال</button></div>
+        </div>
+      </DialogContentPrimitive>
+    </DialogPortal>
+  </Dialog>
 }

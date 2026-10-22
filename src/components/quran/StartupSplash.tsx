@@ -14,7 +14,7 @@ export default function StartupSplash({ leaving = false, onHoldChange }: { leavi
     <h1>{APP_NAME}</h1>
     <div className="startup-caption">
       <p className="startup-verse font-quran" lang="ar">{STARTUP_VERSE.split(' ').map((word, index) => <span key={index}>{index > 0 && ' '}{['مُبَارَكٌ', "لِيَدَّبَّرُوا", 'وَلِيَتَذَكَّرَ'].includes(word) ? <strong>{word}</strong> : word}</span>)}</p>
-      <p className="startup-translation" lang="fa">{STARTUP_VERSE_TRANSLATION}</p>
+      <p className="startup-translation" lang="fa">{STARTUP_VERSE_TRANSLATION.split(/(مبارک|تدبر کنند|متذکر شوند)/g).map((part, i) => ['مبارک', 'تدبر کنند', 'متذکر شوند'].includes(part) ? <strong key={i}>{part}</strong> : part)}</p>
       <span className="chip" title="آیهٔ ۲۹ سورهٔ ص">{STARTUP_VERSE_REFERENCE}</span>
     </div>
   </div>

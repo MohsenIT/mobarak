@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Pin, PinOff } from 'lucide-react'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
@@ -13,6 +14,8 @@ interface Props {
   meta: Meta
   bookmarks: number[]
   recentSurahs: number[]
+  pinnedSurahs: number[]
+  onTogglePin: (n: number) => void
   onClearRecent: () => void
   onAdvancedSearch: () => void
   theme: 'paper' | 'night'
@@ -131,7 +134,8 @@ export default function NavDrawer(props: Props) {
         {suggestions.length > 0 && <div className="drawer-destination-options" aria-label="مقصدهای پیشنهادی">
           {suggestions.map((item, index) => <button key={index} type="button" onClick={() => goTo(item.destination)}>{toFa(item.label)}</button>)}
         </div>}
-        {!pageInput && props.recentSurahs.length > 1 && <div className="drawer-recent-shortcuts" aria-label="سوره‌های اخیر"><span>اخیراً خوانده‌اید</span>{props.recentSurahs.filter(n => n !== currentSurah).slice(0, 4).map(n => <button type="button" key={n} onClick={() => goTo({ kind: 'surah', s: n })}>{meta.surahs[n - 1]?.fa}</button>)}</div>}
+        {!pageInput && <div className="drawer-recent-shortcuts" aria-label="سنجاق‌شده‌ها"><span>سنجاق‌شده‌ها</span>{props.pinnedSurahs.map(n => <span key={n} className="inline-flex items-center"><button type="button" onClick={() => goTo({ kind: 'surah', s: n })}>{meta.surahs[n - 1]?.fa}</button><button type="button" aria-label={`برداشتن سنجاق ${meta.surahs[n - 1]?.fa}`} onClick={() => props.onTogglePin(n)}><PinOff size={14} /></button></span>)}{!props.pinnedSurahs.includes(currentSurah) && <button type="button" onClick={() => props.onTogglePin(currentSurah)}><Pin size={14} className="inline mx-1" />سنجاق {meta.surahs[currentSurah - 1]?.fa}</button>}</div>}
+        {!pageInput && props.recentSurahs.length > 0 && <div className="drawer-recent-shortcuts" aria-label="سوره‌های اخیر"><span>اخیراً خوانده‌اید</span>{props.recentSurahs.slice(0, 4).map(n => <button type="button" key={n} onClick={() => goTo({ kind: 'surah', s: n })}>{meta.surahs[n - 1]?.fa}</button>)}</div>}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
@@ -148,10 +152,11 @@ export default function NavDrawer(props: Props) {
                 {surahs.map(s => {
                   const isActive = s.n === currentSurah
                   return (
+                    <div key={s.n} className="flex items-center">
                     <button
-                      key={s.n}
+
                       ref={isActive ? activeSurahRef : null}
-                      className="nav-surah-row"
+                      className="nav-surah-row flex-1 min-w-0"
                       data-active={isActive || undefined}
                       style={isActive ? {
                         background: 'var(--word-root)',
@@ -178,6 +183,8 @@ export default function NavDrawer(props: Props) {
                         </span>
                       </span>
                     </button>
+                    <button type="button" className="icon-btn" aria-label={`${props.pinnedSurahs.includes(s.n) ? 'برداشتن سنجاق' : 'سنجاق'} ${s.fa}`} aria-pressed={props.pinnedSurahs.includes(s.n)} onClick={() => props.onTogglePin(s.n)}>{props.pinnedSurahs.includes(s.n) ? <PinOff size={17} /> : <Pin size={17} />}</button>
+                    </div>
                   )
                 })}
               </div>

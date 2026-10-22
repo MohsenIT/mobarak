@@ -60,6 +60,7 @@ export default function Home() {
   const [translator, setTranslator] = useState<Translator>(() => LS.get('mushaf.safavi-default.v1', false) ? LS.get('mushaf.tr', 's') : 's')
   const [scale, setScale] = useState(() => LS.get('mushaf.scale', 1))
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
+  const [pinnedSurahs, setPinnedSurahs] = useState<number[]>(() => LS.get('mushaf.pinned-surahs', []))
   const [recentSurahs, setRecentSurahs] = useState<number[]>(() => LS.get('mushaf.recent-surahs', []))
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -576,6 +577,8 @@ export default function Home() {
           meta={meta}
           bookmarks={bookmarks}
           recentSurahs={recentSurahs}
+          pinnedSurahs={pinnedSurahs}
+          onTogglePin={n => setPinnedSurahs(old => { const next = old.includes(n) ? old.filter(s => s !== n) : [...old, n]; LS.set('mushaf.pinned-surahs', next); return next })}
           onClearRecent={() => { setRecentSurahs([]); LS.set('mushaf.recent-surahs', []) }}
           onAdvancedSearch={() => { setDrawerOpen(false); setOccurrenceSearch(null); setSel(null); setSearchStart({ query: '', mode: 'text', surahs: [], revision: Date.now() }); setSearchOpen(true) }}
           theme={theme}

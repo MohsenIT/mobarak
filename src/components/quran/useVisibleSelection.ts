@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, type RefObject } from 'react'
 
-/** Reserve scroll room beneath an overlay sheet and reveal only obscured words. */
+/** Reserve scroll room beneath an overlay sheet and center the selected passage above it. */
 export function useVisibleSelection(main: RefObject<HTMLElement | null>, target: { s: number; a: number; pos: number } | null, enabled: boolean, layoutKey: string) {
   useLayoutEffect(() => {
     const reader = main.current
@@ -28,8 +28,7 @@ export function useVisibleSelection(main: RefObject<HTMLElement | null>, target:
       const word = scroll.querySelector<HTMLElement>(`[data-surah="${target.s}"][data-ayah="${target.a}"][data-pos="${target.pos}"]`)
       if (!word) return
       const rect = word.getBoundingClientRect()
-      const delta = rect.bottom > bottom - 16 ? rect.bottom - bottom + 16
-        : rect.top < bounds.top + 12 ? rect.top - bounds.top - 12 : 0
+      const delta = (rect.top + rect.bottom) / 2 - (bounds.top + bottom) / 2
       const next = Math.max(0, Math.min(scroll.scrollHeight - scroll.clientHeight, scroll.scrollTop + delta))
       if (Math.abs(delta) > 1 && (destination === null || Math.abs(next - destination) > 1)) {
         destination = next
