@@ -3,9 +3,6 @@ on:
   schedule:
     - cron: '30 2 * * *'
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/releases.yml']
 permissions:
   contents: read
 concurrency:
@@ -28,7 +25,7 @@ jobs:
             const releases = await github.paginate(github.rest.repos.listReleases, {...context.repo, per_page: 100});
             const previous = releases.find(r => !r.draft && r.tag_name.startsWith('offline-'));
             const sha = context.sha;
-            core.setOutput('changed', String(!previous?.body?.includes(`Source: ${sha}`)));
+            core.setOutput('changed', String(context.eventName === 'workflow_dispatch' || !previous?.body?.includes(`Source: ${sha}`)));
             core.setOutput('tag', `offline-${new Date().toISOString().slice(0,10)}-${context.runNumber}`);
             core.setOutput('version', `0.2.${context.runNumber}`);
             core.setOutput('sha', sha);
@@ -100,6 +97,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: installers-${{ matrix.name }}
+          retention-days: 1
           if-no-files-found: error
           path: |
             src-tauri/target/release/bundle/**/*.deb
@@ -141,6 +139,10 @@ jobs:
         with:
           name: offline-web
           path: desktop-dist
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          prefix-key: android
       - name: Build APK
         shell: bash
         env:
@@ -171,7 +173,7 @@ jobs:
           BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
           while IFS= read -r -d '' apk; do
             output="android-signed/$(basename "$apk" | sed 's/-unsigned//')"
-            "$BUILD_TOOLS/zipalign" -f -p 4 "$apk" "$RUNNER_TEMP/aligned.apk"
+            "$BUILD_TOOLS/zipalign" -f -P 16 4 "$apk" "$RUNNER_TEMP/aligned.apk"
             "$BUILD_TOOLS/apksigner" sign --ks "$RUNNER_TEMP/quran-release.jks" --ks-key-alias "$ANDROID_KEY_ALIAS" --ks-pass env:ANDROID_KEYSTORE_PASSWORD --key-pass env:ANDROID_KEY_PASSWORD --out "$output" "$RUNNER_TEMP/aligned.apk"
             "$BUILD_TOOLS/apksigner" verify "$output"
           done < <(find src-tauri/gen/android/app/build/outputs/apk -name '*unsigned.apk' -print0)
@@ -182,12 +184,14 @@ jobs:
         if: steps.sign.outputs.signed == 'true'
         with:
           name: installers-android
+          retention-days: 1
           path: android-signed/*.apk
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: steps.sign.outputs.signed != 'true'
         with:
           name: android-unsigned-not-installable
+          retention-days: 1
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
   publish:
@@ -196,6 +200,7 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           pattern: installers-*
@@ -208,14 +213,4 @@ jobs:
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
           RELEASE_SHA: ${{ needs.prepare.outputs.sha }}
-        run: |
-          cd installers
-          sha256sum * > SHA256SUMS.txt
-          cat > release-notes.md <<EOF_NOTES
-          Offline Quran Mubarak installers. Quran text, fonts, translations and search data are included; no server is required.
-
-          Source: $RELEASE_SHA
-
-          Windows and macOS packages are currently unsigned (macOS is not notarized). Android APKs appear only after the permanent signing key is configured. iOS distribution requires separate Apple signing and is not included.
-          EOF_NOTES
-          gh release create "$RELEASE_TAG" --target "$RELEASE_SHA" --title "Quran Mubarak $RELEASE_TAG" --notes-file release-notes.md --latest --repo "$GH_REPO" ./*.deb ./*.rpm ./*.AppImage ./*.exe ./*.msi ./*.dmg SHA256SUMS.txt $(find . -maxdepth 1 -name '*.apk' -print)
+        run: bash scripts/publish-native.sh

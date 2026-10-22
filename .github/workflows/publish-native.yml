@@ -1,0 +1,54 @@
+name: Publish previously built installers
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Successful native build run whose publishing step needs retrying
+        required: true
+        type: string
+  push:
+    tags: ['publish-native-*']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: native-artifact-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - id: source
+        uses: actions/github-script@v7
+        env:
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+        with:
+          script: |
+            const raw = process.env.INPUT_RUN_ID || context.ref.replace('refs/tags/publish-native-', '');
+            if (!/^\d+$/.test(raw)) throw new Error('Expected a numeric workflow run ID');
+            const run_id = Number(raw);
+            const {data: run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id});
+            if (run.path !== '.github/workflows/releases.yml' || run.head_branch !== 'main') throw new Error('Expected the main-branch offline release workflow');
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {...context.repo, run_id, per_page: 100});
+            const desktop = jobs.filter(j => j.name.startsWith('desktop ('));
+            if (desktop.length !== 4 || desktop.some(j => j.conclusion !== 'success')) throw new Error('All four desktop builds must have succeeded');
+            for (const name of ['web', 'android']) if (!jobs.some(j => j.name === name && j.conclusion === 'success')) throw new Error(`${name} did not succeed`);
+            core.setOutput('run_id', raw);
+            core.setOutput('sha', run.head_sha);
+            core.setOutput('tag', `offline-${run.created_at.slice(0,10)}-${run.run_number}`);
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.source.outputs.run_id }}
+          pattern: installers-*
+          merge-multiple: true
+          path: installers
+      - name: Publish verified installers without recompiling
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.source.outputs.tag }}
+          RELEASE_SHA: ${{ steps.source.outputs.sha }}
+        run: bash scripts/publish-native.sh

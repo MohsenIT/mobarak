@@ -16,7 +16,7 @@ The source is in `src-tauri`, with identifier `app.quranmubarak.reader`. Do not 
 
 ## Daily GitHub Releases
 
-`.github/workflows/releases.yml` runs at 02:30 UTC (06:00 Iran), on manual workflow dispatch, and when the release workflow itself is changed on main (to bootstrap it). It compares the source commit with the last offline release and does nothing when unchanged. Tests and the static client build run before the platform builds. Native outputs are built on their own OS, then published together with SHA-256 checksums. Failed required jobs prevent publication. Version numbers use `0.2.<GitHub run number>` and release tags include the date and run number.
+`.github/workflows/releases.yml` runs at 02:30 UTC (06:00 Iran) and on manual workflow dispatch. Scheduled runs compare the source commit with the last offline release and do nothing when unchanged. Manual dispatch always rebuilds, including when only the Android signing secrets have changed. The initial bootstrap run was triggered by the workflow commit; ordinary pushes no longer publish installers. Tests and the static client build run before the platform builds. Native outputs are built on their own OS, then published together with SHA-256 checksums. Failed required jobs prevent publication. Version numbers use `0.2.<GitHub run number>` and release tags include the date and run number.
 
 Outputs:
 
@@ -36,7 +36,7 @@ Repository Actions secrets:
 - Optional `ANDROID_KEY_ALIAS` (default `quran-mubarak`).
 - Optional `ANDROID_KEY_PASSWORD` (defaults to the keystore password).
 
-The workflow aligns the APK, signs with Android `apksigner`, and verifies the signature before upload. Keep an independent private backup of the keystore and password. Never commit the keystore, its base64 value, or passwords to this public repository. A private key has been prepared outside the checkout; it is not part of these source files.
+The workflow aligns the APK for 16 KB page sizes, signs with Android `apksigner`, and verifies the signature before upload. Rust dependencies are cached per platform, including Android. Temporary installer artifacts are kept for one day; published GitHub Release assets remain available. Keep an independent private backup of the keystore and password. Never commit the keystore, its base64 value, or passwords to this public repository. A private key has been prepared outside the checkout; it is not part of these source files.
 
 With GitHub API access and permission to manage repository secrets, an authorized maintainer can register the two prepared values without printing them:
 
@@ -47,7 +47,7 @@ gh secret set ANDROID_KEYSTORE_PASSWORD --repo MohsenIT/quran-vajeh < /path/to/A
 
 ## Validation so far
 
-The exported client was served from a plain static file server in a fresh browser context with all external network requests blocked. First launch, Quran reading, selected-verse navigation, Persian translation, and global root search worked with zero API calls and zero external requests. The 70 library tests passed. This is client/offline-data validation; it does not establish that native installers build or run on real devices. Those require the platform jobs and device testing.
+The exported client was served from a plain static file server in a fresh browser context with all external network requests blocked. First launch, Quran reading, selected-verse navigation, Persian translation, and global root search worked with zero API calls and zero external requests. The 70 library tests passed. This is client/offline-data validation; it does not establish that native installers build or run on real devices. The first GitHub run has now built all desktop installers and unsigned Android APKs; real-device interaction testing remains to be done.
 
 ## Continuation checkpoint (2026-10-22)
 
@@ -58,3 +58,5 @@ Request to resume: «ادامهٔ ریلیز چندسکویی قرآن؛ ثبت 
 - `gh` is installed and `GH_TOKEN` is present, but the request to `api.github.com/repos/MohsenIT/quran-vajeh/actions/secrets/public-key` was blocked by the environment network policy. Git push and reading public GitHub web pages work; these do not establish API permission.
 - Adding `api.github.com` to the allowed domains was proposed, preserving all existing domains, but the environment draft save returned `stale_base`. No network change was confirmed. The transferable proposal is `/workspace/artifacts/github-api-network-request.json`. A fresh environment setup chat must reconcile the current draft before saving that change; do not keep retrying the stale draft.
 - When API access works, verify secret-management permission, then register the two existing signing values through `gh secret set` with stdin. The user explicitly authorized doing this without asking them to copy values manually. The user postponed store accounts and submission; GitHub Releases is the publication destination.
+
+Publication can be retried without recompiling through `.github/workflows/publish-native.yml`: dispatch with the original successful build run ID, or push a tag `publish-native-<run_id>`. The workflow verifies all platform build conclusions and the main-branch source, downloads only installer artifacts, flattens their bundle subdirectories, generates checksums, and publishes against the original source commit. The initial run completed all builds but its publication step failed on nested artifact directories; `scripts/publish-native.sh` fixes that layout.

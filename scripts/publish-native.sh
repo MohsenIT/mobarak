@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+: "${RELEASE_TAG:?}" "${RELEASE_SHA:?}" "${GH_REPO:?}" "${GH_TOKEN:?}"
+# upload-artifact preserves bundle subdirectories; flatten only installer files.
+mkdir -p release-files
+find installers -type f \( -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' -o -name '*.exe' -o -name '*.msi' -o -name '*.dmg' -o -name '*.apk' \) -exec cp '{}' release-files/ \;
+cd release-files
+shopt -s nullglob
+assets=(./*.deb ./*.rpm ./*.AppImage ./*.exe ./*.msi ./*.dmg ./*.apk)
+if [ "${#assets[@]}" -eq 0 ]; then echo 'No verified installers were downloaded.' >&2; exit 1; fi
+sha256sum "${assets[@]}" > SHA256SUMS.txt
+cat > release-notes.md <<EOF_NOTES
+Offline Quran Mubarak installers. Quran text, fonts, translations and search data are included; no server is required.
+
+Source: $RELEASE_SHA
+
+Windows and macOS packages are currently unsigned (macOS is not notarized). Android APKs appear only after the permanent signing key is configured. iOS distribution requires separate Apple signing and is not included.
+EOF_NOTES
+if body=$(gh release view "$RELEASE_TAG" --repo "$GH_REPO" --json body --jq .body 2>/dev/null); then
+  if [[ "$body" != *"Source: $RELEASE_SHA"* ]]; then echo 'Existing release has a different source commit.' >&2; exit 1; fi
+  gh release upload "$RELEASE_TAG" --repo "$GH_REPO" --clobber "${assets[@]}" SHA256SUMS.txt
+else
+  gh release create "$RELEASE_TAG" --target "$RELEASE_SHA" --title "Quran Mubarak $RELEASE_TAG" --notes-file release-notes.md --latest --repo "$GH_REPO" "${assets[@]}" SHA256SUMS.txt
+fi
