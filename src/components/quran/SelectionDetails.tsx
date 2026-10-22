@@ -5,6 +5,7 @@ import type { Translator, SurahData, Translations } from '@/lib/quran'
 import { morphologyLabel, formName, toFa } from '@/lib/quran'
 import { analysisOccurrences, type AnalysisSelection, type AnalysisTab } from '@/lib/analysis'
 import { lexicalKey } from '@/lib/word-parts'
+import VerseActions from './VerseActions'
 import SourceReference from './SourceReference'
 import { AnalysisSection, STAT_OPTIONS, useAnalysisPreferences } from './AnalysisSections'
 
@@ -51,6 +52,7 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
   const hasMeaning = (tab === 'form' && showMeaning('morphology') && !!selection.form) || (tab === 'word' && showMeaning('lemma')) || (tab === 'verse' && showMeaning('translation') && !!translation)
   return (
     <div className="analysis-section-stack">
+      {tab === 'verse' && verse && <VerseActions key={`${surah.n}:${verse.n}:${translator}`} surah={surah} verse={verse} translation={translation} />}
       {hasMeaning && <AnalysisSection tab={tab} kind="meaning">
       {tab === 'form' && showMeaning('morphology') && (
         <div className="rounded-xl border p-3 mb-3 text-sm" style={{ borderColor: 'var(--line)' }}>
