@@ -1,8 +1,14 @@
 'use client'
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Meta } from '@/lib/quran'
 
-export default function SurahShortcuts({ meta, pinned, recent, onGo }: { meta: Meta; pinned: number[]; recent: number[]; onGo: (n: number) => void }) {
+export default function SurahShortcuts({ meta, pinned, recent, onGo, onUnpin }: { meta: Meta; pinned: number[]; recent: number[]; onGo: (n: number) => void; onUnpin: (n: number) => void }) {
+  const hold = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pointer = useRef<{ x: number; y: number } | null>(null)
+  const held = useRef(false)
+  const [status, setStatus] = useState('')
+  const cancelHold = () => { if (hold.current) clearTimeout(hold.current); hold.current = null; pointer.current = null }
+  useEffect(() => () => { if (hold.current) clearTimeout(hold.current) }, [])
   const [expanded, setExpanded] = useState(false)
   const [count, setCount] = useState(1)
   const row = useRef<HTMLDivElement>(null)
@@ -24,7 +30,7 @@ export default function SurahShortcuts({ meta, pinned, recent, onGo }: { meta: M
       let used = 0, next = 0
       for (const width of widths) {
         const cost = width + (next ? gap : 0)
-        if (used + cost > Math.max(0, available * 0.8 - 32)) break
+        if (used + cost > Math.max(0, available * 0.96 - 40)) break
         used += cost; next++
       }
       setCount(Math.max(1, next))
@@ -38,9 +44,17 @@ export default function SurahShortcuts({ meta, pinned, recent, onGo }: { meta: M
   if (!shortcuts.length) return null
   return <>
     <div ref={row} className="drawer-recent-shortcuts" aria-label="میان‌بر سوره‌ها">
-      {shortcuts.slice(0, expanded ? undefined : count).map(n => <button type="button" key={n} className="chip" data-pinned={pinned.includes(n) || undefined} onClick={() => onGo(n)} title={pinned.includes(n) ? 'سورهٔ سنجاق‌شده' : 'اخیراً خوانده‌اید'}>{meta.surahs[n - 1]?.fa}</button>)}
+      {shortcuts.slice(0, expanded ? undefined : count).map(n => <button type="button" key={n} className="chip" data-pinned={pinned.includes(n) || undefined} onPointerDown={event => {
+        cancelHold(); held.current = false
+        if (!pinned.includes(n) || !event.isPrimary || event.button !== 0) return
+        pointer.current = { x:event.clientX, y:event.clientY }
+        hold.current = setTimeout(() => { held.current = true; onUnpin(n); setStatus(`سنجاق ${meta.surahs[n - 1]?.fa} برداشته شد.`); cancelHold() }, 550)
+      }} onPointerMove={event => { if (pointer.current && Math.hypot(event.clientX-pointer.current.x,event.clientY-pointer.current.y)>8) { held.current = true; cancelHold() } }} onPointerUp={cancelHold} onPointerCancel={cancelHold} onPointerLeave={cancelHold}
+      onContextMenu={event => { event.preventDefault(); if (held.current) return; cancelHold(); if (pinned.includes(n)) { held.current = true; onUnpin(n); setStatus(`سنجاق ${meta.surahs[n - 1]?.fa} برداشته شد.`) } }}
+      onClick={() => { if (held.current) { held.current = false; return } onGo(n) }} title={pinned.includes(n) ? 'برای برداشتن سنجاق نگه دارید' : 'اخیراً خوانده‌اید'}>{meta.surahs[n - 1]?.fa}</button>)}
       {shortcuts.length > count && <button type="button" aria-label={expanded ? 'نمایش کمتر سوره‌ها' : 'نمایش همهٔ میان‌برها'} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'کمتر' : '…'}</button>}
     </div>
+    <span className="sr-only" role="status">{status}</span>
     <div ref={measure} className="drawer-recent-shortcuts" aria-hidden="true" inert style={{ position:'fixed', visibility:'hidden', width:'max-content', pointerEvents:'none', top:0, left:0 }}>
       {shortcuts.map(n => <button key={n} type="button" tabIndex={-1} className="chip" data-pinned={pinned.includes(n) || undefined}>{meta.surahs[n - 1]?.fa}</button>)}
     </div>

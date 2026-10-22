@@ -68,7 +68,7 @@ export default function Home() {
   const [searchStart, setSearchStart] = useState<SearchStart | null>(null)
   const [occurrenceSearch, setOccurrenceSearch] = useState<AnalysisSelection | null>(null)
   const [returnToSearch, setReturnToSearch] = useState(false)
-  const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number } | null>(null)
+  const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number; align?: 'start' } | null>(null)
   const [sel, setSel] = useState<Selection | null>(null)
   const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
   const [flash, setFlash] = useState<{ s: number; a: number; pos: number } | null>(null)
@@ -241,7 +241,7 @@ export default function Home() {
       writeVerseAddress(target)
       setSurah(first.s)
       setFlash(target)
-      setSearchTarget(target)
+      setSearchTarget({ ...target, align: 'start' })
     } else requestMushafPage(destination)
     setSel(null)
     setComparisonRoot(null)
@@ -274,7 +274,7 @@ export default function Home() {
     else setSurah(nn)
   }, [meta, mode, goPage])
 
-  const goVerse = useCallback((s: number, a: number, pos = 1) => {
+  const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start') => {
     pullArrival.current = null
     loadSurah(s).then(d => {
       const v = d.v[a - 1]
@@ -283,7 +283,7 @@ export default function Home() {
         else setSurah(s)
         writeVerseAddress({ s, a, pos })
         setFlash({ s, a, pos })
-        setSearchTarget({ s, a, pos })
+        setSearchTarget({ s, a, pos, align })
       }
     })
   }, [mode, requestMushafPage])
@@ -321,9 +321,12 @@ export default function Home() {
     const word = reading?.querySelector<HTMLElement>(`[data-surah="${searchTarget.s}"][data-ayah="${searchTarget.a}"][data-pos="${searchTarget.pos}"]`)
     if (!main || !word) return
     const scroll = main.querySelector<HTMLElement>('[data-reading-scroll]') ?? main
-    const top = scroll.scrollTop + word.getBoundingClientRect().top - scroll.getBoundingClientRect().top - scroll.clientHeight * 0.35
-    scroll.scrollTo({ top: Math.max(0, top), behavior: quickSearchOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
-    setSearchTarget(null)
+    const frame = requestAnimationFrame(() => {
+      const top = scroll.scrollTop + word.getBoundingClientRect().top - scroll.getBoundingClientRect().top - (searchTarget.align === 'start' ? 12 : scroll.clientHeight * 0.35)
+      scroll.scrollTo({ top: Math.max(0, top), behavior: searchTarget.align === 'start' || quickSearchOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+      setSearchTarget(null)
+    })
+    return () => cancelAnimationFrame(frame)
   }, [searchTarget, quickSearchOpen, loadingPage, mode, page, surah, flowSurah?.n, pageData, mushafContentRevision])
 
   // panel jump: keep panel open, highlight target
@@ -599,7 +602,7 @@ export default function Home() {
           onClose={() => setDrawerOpen(false)}
           onGoPage={goPage}
           onGoSurah={goSurah}
-          onGoVerse={(s, a) => goVerse(s, a)}
+          onGoVerse={(s, a) => goVerse(s, a, 1, 'start')}
           onRemoveBookmark={p => setBookmarks(b => b.filter(x => x !== p))}
           onTheme={setTheme}
           onTranslator={setTranslator}

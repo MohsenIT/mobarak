@@ -143,7 +143,7 @@ export default function NavDrawer(props: Props) {
         {suggestions.length > 0 && <div className="drawer-destination-options" aria-label="مقصدهای پیشنهادی">
           {suggestions.map((item, index) => <button key={index} type="button" onClick={() => goTo(item.destination)}>{toFa(item.label)}</button>)}
         </div>}
-        {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onGo={s => goTo({ kind: 'surah', s })} />}
+        {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onUnpin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
