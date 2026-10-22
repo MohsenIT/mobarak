@@ -10,7 +10,7 @@ permissions:
   contents: read
 concurrency:
   group: offline-release
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   prepare:
     runs-on: ubuntu-22.04
@@ -130,6 +130,7 @@ jobs:
           if ! "$SDKMANAGER" 'platform-tools' 'ndk;27.2.12479018' 2>&1 | tee "$RUNNER_TEMP/android-sdk.log"; then
             echo '### Android SDK setup failed' >> "$GITHUB_STEP_SUMMARY"
             tail -c 12000 "$RUNNER_TEMP/android-sdk.log" >> "$GITHUB_STEP_SUMMARY"
+            node -e 'const fs=require("fs"); const text=fs.readFileSync(process.env.RUNNER_TEMP+"/android-sdk.log","utf8").slice(-3000).replaceAll("%","%25").replaceAll("\r","%0D").replaceAll("\n","%0A"); console.log("::error title=Android SDK setup::"+text)'
             exit 1
           fi
       - uses: dtolnay/rust-toolchain@1.90.0
