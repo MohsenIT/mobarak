@@ -82,7 +82,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const facets = { lemmas, forms }
   const formLabels = searchFormLabels(rawResults)
   const results = filterSearchFacets(rawResults, facets)
-  useEffect(() => { if (initialSearch) { setQuery(initialSearch.query); setMode(initialSearch.mode); setSurahs(initialSearch.surahs); setIncludeRoots(false); setIncludeNear(false); setIncludePartial(true) } }, [initialSearch])
+  useEffect(() => { if (initialSearch) { setQuery(initialSearch.query); setMode(initialSearch.mode); setSurahs(initialSearch.surahs); setIncludeRoots(true); setIncludeNear(false); setIncludePartial(true) } }, [initialSearch])
   useEffect(() => { setLemmas([]); setForms([]) }, [query, mode, includeRoots, occurrenceFilter, surahs.join(',')])
   const valid = !!occurrenceFilter || normalizeQuranSearch(query).replace(/\s/g, '').length >= 2
   const scopeKey = surahs.join(',')
