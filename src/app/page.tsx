@@ -1,5 +1,5 @@
 'use client'
-import { readVerseAddress, writeVerseAddress } from '@/lib/verse-link'
+import { readVerseAddress, writeVerseAddress, readSurahNumber, readPageNumber, readingUrl } from '@/lib/verse-link'
 import { wordTarget } from '@/lib/word-parts'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -41,20 +41,18 @@ export default function Home() {
   const [meta, setMeta] = useState<Meta | null>(null)
   const [page, setPage] = useState(() => {
     if (typeof window === 'undefined') return LS.get('mushaf.page', 1)
-    const q = new URLSearchParams(window.location.search).get('p')
-    const fromUrl = q ? parseInt(q, 10) : NaN
+    const fromUrl = readPageNumber(window.location.search, window.location.pathname) ?? NaN
     return clamp(Number.isFinite(fromUrl) ? fromUrl : LS.get('mushaf.page', 1), 1, 604)
   })
   const [mode, setMode] = useState<'mushaf' | 'flow'>(() => {
     if (typeof window !== 'undefined') {
-      const query = new URLSearchParams(window.location.search)
-      if (query.has('s')) return 'flow'
-      if (query.has('p')) return 'mushaf'
+      if (readSurahNumber(window.location.search, window.location.pathname)) return 'flow'
+      if (readPageNumber(window.location.search, window.location.pathname)) return 'mushaf'
     }
     return LS.get('mushaf.mode', 'flow')
   })
   const [surah, setSurah] = useState(() => {
-    const value = typeof window !== 'undefined' ? Number(new URLSearchParams(window.location.search).get('s')) : NaN
+    const value = typeof window !== 'undefined' ? readSurahNumber(window.location.search, window.location.pathname) ?? NaN : NaN
     return Number.isInteger(value) && value >= 1 && value <= 114 ? value : LS.get('mushaf.surah', 1)
   })
   const [showTrans, setShowTrans] = useState(() => LS.get('mushaf.showTrans', false))
@@ -147,11 +145,8 @@ export default function Home() {
   }, [theme, startupComplete])
   useEffect(() => {
     LS.set('mushaf.page', page)
-    const url = new URL(window.location.href)
-    if (url.searchParams.get('s') !== String(surah) || mode === 'mushaf') { url.searchParams.delete('a'); url.searchParams.delete('w') }
-    url.searchParams.delete(mode === 'flow' ? 'p' : 's')
-    url.searchParams.set(mode === 'flow' ? 's' : 'p', String(mode === 'flow' ? surah : page))
-    window.history.replaceState(null, '', url.toString())
+    const url = readingUrl(window.location.href, mode, surah, page, process.env.NEXT_PUBLIC_DESKTOP === '1')
+    window.history.replaceState(window.history.state, '', url.toString())
   }, [page, mode, surah])
   useEffect(() => { LS.set('mushaf.mode', mode) }, [mode])
   useEffect(() => { LS.set('mushaf.surah', surah) }, [surah])
@@ -285,7 +280,7 @@ export default function Home() {
 
   useEffect(() => {
     const restore = () => {
-      const target = readVerseAddress(window.location.search)
+      const target = readVerseAddress(window.location.search, window.location.pathname)
       if (target) {
         setMode('flow')
         setSurah(target.s)
@@ -298,8 +293,7 @@ export default function Home() {
           setSearchTarget({ ...target, pos })
         })
       } else {
-        const q = new URLSearchParams(window.location.search)
-        const s = Number(q.get('s')), p = Number(q.get('p'))
+        const s = readSurahNumber(window.location.search, window.location.pathname) ?? 0, p = readPageNumber(window.location.search, window.location.pathname) ?? 0
         setSel(null); setFlash(null)
         if (s >= 1 && s <= 114) { setMode('flow'); setSurah(s) }
         else if (p >= 1 && p <= 604) { setMode('mushaf'); requestMushafPage(p) }
@@ -324,6 +318,7 @@ export default function Home() {
 
   // panel jump: keep panel open, highlight target
   const panelJump = useCallback((s: number, a: number, pos: number, p: number) => {
+    writeVerseAddress({ s, a, pos })
     if (mode === 'mushaf') requestMushafPage(p)
     else setSurah(s)
     setFlash({ s, a, pos })

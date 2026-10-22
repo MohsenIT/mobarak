@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Copy, Link, Share2 } from 'lucide-react'
 import type { SurahData, Verse } from '@/lib/quran'
+import { versePath } from '@/lib/verse-link'
 import { toFa } from '@/lib/quran'
 
 async function copyText(text: string) {
@@ -27,7 +28,7 @@ export default function VerseActions({ surah, verse, translation }: { surah: Sur
   const reference = `سورهٔ ${surah.fa}، آیهٔ ${toFa(verse.n)}`
   // Preserve the source text, including connected prefixes and Quranic signs.
   const arabic = verse.w.map(word => word.t).join(' ')
-  const link = () => { const url = new URL(process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app/' : window.location.href); url.search = new URLSearchParams({ s: String(surah.n), a: String(verse.n) }).toString(); url.hash = ''; return url.href }
+  const link = () => new URL(versePath({ s: surah.n, a: verse.n, pos: 1 }), process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app/' : window.location.origin).href
   const copy = async (text: string, message: string) => {
     try { await copyText(text); setStatus(message) } catch { setStatus('کپی انجام نشد؛ دوباره تلاش کنید.') }
   }

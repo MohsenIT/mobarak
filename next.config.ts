@@ -7,7 +7,14 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [{ source: '/s=:surah(\\d+)', destination: '/?s=:surah', permanent: false }]
   },
-  /* config options here */
+  async rewrites() {
+    return [
+      { source: '/surah/:s(\\d+)/ayah/:a(\\d+)/word/:w(\\d+)', destination: '/' },
+      { source: '/surah/:s(\\d+)/ayah/:a(\\d+)', destination: '/' },
+      { source: '/surah/:s(\\d+)', destination: '/' },
+      { source: '/page/:p(\\d+)', destination: '/' },
+    ]
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

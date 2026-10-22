@@ -1,15 +1,48 @@
 export type VerseAddress = { s: number; a: number; pos: number }
-export function readVerseAddress(search: string): VerseAddress | null {
+const integer = (value: string | null | undefined, max: number) => {
+  const n = Number(value)
+  return Number.isInteger(n) && n >= 1 && n <= max ? n : null
+}
+export function readSurahNumber(search: string, pathname = '/'): number | null {
+  const path = pathname.match(/^\/surah\/(\d+)(?:\/|$)/)
+  return integer(path?.[1] ?? new URLSearchParams(search).get('s'), 114)
+}
+export function readPageNumber(search: string, pathname = '/'): number | null {
+  const path = pathname.match(/^\/page\/(\d+)\/?$/)
+  return integer(path?.[1] ?? new URLSearchParams(search).get('p'), 604)
+}
+export function readVerseAddress(search: string, pathname = '/'): VerseAddress | null {
+  const path = pathname.match(/^\/surah\/(\d+)\/ayah\/(\d+)(?:\/word\/(\d+))?\/?$/)
   const q = new URLSearchParams(search)
-  const s = Number(q.get('s')), a = Number(q.get('a')), pos = q.has('w') ? Number(q.get('w')) : 1
-  return Number.isInteger(s) && s >= 1 && s <= 114 && Number.isInteger(a) && a >= 1 && a <= 286 && Number.isInteger(pos) && pos >= 1 && pos <= 500 ? { s, a, pos } : null
+  const s = integer(path?.[1] ?? q.get('s'), 114)
+  const a = integer(path?.[2] ?? q.get('a'), 286)
+  const pos = integer(path ? path[3] ?? '1' : q.get('w') ?? '1', 500)
+  return s && a && pos ? { s, a, pos } : null
+}
+export function versePath({ s, a, pos }: VerseAddress): string {
+  return `/surah/${s}/ayah/${a}${pos > 1 ? `/word/${pos}` : ''}`
+}
+/** The refresh token is only for requesting a fresh document, never a reading address. */
+export function readingUrl(current: string, mode: 'flow' | 'mushaf', surah: number, page: number, native = false): URL {
+  const url = new URL(current)
+  const target = readVerseAddress(url.search, url.pathname)
+  for (const name of ['s', 'a', 'w', 'p', '_refresh']) url.searchParams.delete(name)
+  url.pathname = native ? '/' : mode === 'mushaf' ? `/page/${page}` : target?.s === surah ? versePath(target) : `/surah/${surah}`
+  if (native) {
+    url.searchParams.set(mode === 'flow' ? 's' : 'p', String(mode === 'flow' ? surah : page))
+    if (mode === 'flow' && target?.s === surah) {
+      url.searchParams.set('a', String(target.a))
+      if (target.pos > 1) url.searchParams.set('w', String(target.pos))
+    }
+  }
+  return url
 }
 export function writeVerseAddress(address: VerseAddress, replace = false) {
-  const url = new URL(window.location.href)
-  url.searchParams.delete('p')
-  url.searchParams.set('s', String(address.s))
-  url.searchParams.set('a', String(address.a))
-  if (address.pos > 1) url.searchParams.set('w', String(address.pos))
-  else url.searchParams.delete('w')
+  const url = readingUrl(window.location.href, 'flow', address.s, 1, process.env.NEXT_PUBLIC_DESKTOP === '1')
+  if (process.env.NEXT_PUBLIC_DESKTOP === '1') {
+    url.searchParams.set('a', String(address.a))
+    if (address.pos > 1) url.searchParams.set('w', String(address.pos))
+    else url.searchParams.delete('w')
+  } else url.pathname = versePath(address)
   if (url.href !== window.location.href) window.history[replace ? 'replaceState' : 'pushState'](window.history.state, '', url)
 }
