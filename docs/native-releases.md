@@ -48,3 +48,13 @@ gh secret set ANDROID_KEYSTORE_PASSWORD --repo MohsenIT/quran-vajeh < /path/to/A
 ## Validation so far
 
 The exported client was served from a plain static file server in a fresh browser context with all external network requests blocked. First launch, Quran reading, selected-verse navigation, Persian translation, and global root search worked with zero API calls and zero external requests. The 70 library tests passed. This is client/offline-data validation; it does not establish that native installers build or run on real devices. Those require the platform jobs and device testing.
+
+## Continuation checkpoint (2026-10-22)
+
+Request to resume: «ادامهٔ ریلیز چندسکویی قرآن؛ ثبت کلید امضای اندروید در GitHub Secrets مانده بود.»
+
+- Release build: https://github.com/MohsenIT/quran-vajeh/actions/runs/39726995697 (source `c4d62ded938b66a5410e500d48003e44ddc91fb8`). Linux DEB/RPM/AppImage, Windows EXE/MSI, and both macOS DMGs have built and uploaded successfully. Check the run for final publication status.
+- Android release signing values were generated outside the public checkout. The private backup is `/workspace/artifacts/quran-android-signing-PRIVATE.zip`; individual values are in `/workspace/artifacts/android-signing/`. Never print or commit those files. Reuse this key once any signed release has shipped.
+- `gh` is installed and `GH_TOKEN` is present, but the request to `api.github.com/repos/MohsenIT/quran-vajeh/actions/secrets/public-key` was blocked by the environment network policy. Git push and reading public GitHub web pages work; these do not establish API permission.
+- Adding `api.github.com` to the allowed domains was proposed, preserving all existing domains, but the environment draft save returned `stale_base`. No network change was confirmed. The transferable proposal is `/workspace/artifacts/github-api-network-request.json`. A fresh environment setup chat must reconcile the current draft before saving that change; do not keep retrying the stale draft.
+- When API access works, verify secret-management permission, then register the two existing signing values through `gh secret set` with stdin. The user explicitly authorized doing this without asking them to copy values manually. The user postponed store accounts and submission; GitHub Releases is the publication destination.
