@@ -15,7 +15,11 @@ trap report_failure ERR
 : "${RELEASE_TAG:?}" "${RELEASE_SHA:?}" "${GH_REPO:?}" "${GH_TOKEN:?}"
 # upload-artifact preserves bundle subdirectories; flatten only installer files.
 mkdir -p release-files
-find installers -type f \( -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' -o -name '*.exe' -o -name '*.msi' -o -name '*.dmg' -o -name '*.apk' \) -exec cp '{}' release-files/ \;
+while IFS= read -r -d '' installer; do
+  name=$(basename "$installer")
+  # GitHub normalizes spaces in release asset names to periods.
+  cp "$installer" "release-files/${name// /.}"
+done < <(find installers -type f \( -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' -o -name '*.exe' -o -name '*.msi' -o -name '*.dmg' -o -name '*.apk' \) -print0)
 cd release-files
 shopt -s nullglob
 assets=(./*.deb ./*.rpm ./*.AppImage ./*.exe ./*.msi ./*.dmg ./*.apk)
