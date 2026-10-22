@@ -4,15 +4,15 @@ const integer = (value: string | null | undefined, max: number) => {
   return Number.isInteger(n) && n >= 1 && n <= max ? n : null
 }
 export function readSurahNumber(search: string, pathname = '/'): number | null {
-  const path = pathname.match(/^\/surah\/(\d+)(?:\/|$)/)
+  const path = pathname.match(/^\/(?:s|surah)\/(\d+)(?:\/|$)/)
   return integer(path?.[1] ?? new URLSearchParams(search).get('s'), 114)
 }
 export function readPageNumber(search: string, pathname = '/'): number | null {
-  const path = pathname.match(/^\/page\/(\d+)\/?$/)
+  const path = pathname.match(/^\/(?:p|page)\/(\d+)\/?$/)
   return integer(path?.[1] ?? new URLSearchParams(search).get('p'), 604)
 }
 export function readVerseAddress(search: string, pathname = '/'): VerseAddress | null {
-  const path = pathname.match(/^\/surah\/(\d+)\/ayah\/(\d+)(?:\/word\/(\d+))?\/?$/)
+  const path = pathname.match(/^\/(?:s|surah)\/(\d+)\/(?:a|ayah)\/(\d+)(?:\/(?:w|word)\/(\d+))?\/?$/)
   const q = new URLSearchParams(search)
   const s = integer(path?.[1] ?? q.get('s'), 114)
   const a = integer(path?.[2] ?? q.get('a'), 286)
@@ -20,14 +20,14 @@ export function readVerseAddress(search: string, pathname = '/'): VerseAddress |
   return s && a && pos ? { s, a, pos } : null
 }
 export function versePath({ s, a, pos }: VerseAddress): string {
-  return `/surah/${s}/ayah/${a}${pos > 1 ? `/word/${pos}` : ''}`
+  return `/s/${s}/a/${a}${pos > 1 ? `/w/${pos}` : ''}`
 }
 /** The refresh token is only for requesting a fresh document, never a reading address. */
 export function readingUrl(current: string, mode: 'flow' | 'mushaf', surah: number, page: number, native = false): URL {
   const url = new URL(current)
   const target = readVerseAddress(url.search, url.pathname)
   for (const name of ['s', 'a', 'w', 'p', '_refresh']) url.searchParams.delete(name)
-  url.pathname = native ? '/' : mode === 'mushaf' ? `/page/${page}` : target?.s === surah ? versePath(target) : `/surah/${surah}`
+  url.pathname = native ? '/' : mode === 'mushaf' ? `/p/${page}` : target?.s === surah ? versePath(target) : `/s/${surah}`
   if (native) {
     url.searchParams.set(mode === 'flow' ? 's' : 'p', String(mode === 'flow' ? surah : page))
     if (mode === 'flow' && target?.s === surah) {

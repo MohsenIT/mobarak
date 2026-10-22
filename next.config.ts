@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      { source: '/s/:s(\\d+)/a/:a(\\d+)/w/:w(\\d+)', destination: '/' },
+      { source: '/s/:s(\\d+)/a/:a(\\d+)', destination: '/' },
+      { source: '/s/:s(\\d+)', destination: '/' },
+      { source: '/p/:p(\\d+)', destination: '/' },
       { source: '/surah/:s(\\d+)/ayah/:a(\\d+)/word/:w(\\d+)', destination: '/' },
       { source: '/surah/:s(\\d+)/ayah/:a(\\d+)', destination: '/' },
       { source: '/surah/:s(\\d+)', destination: '/' },
