@@ -1375,9 +1375,9 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .drawer-advanced-search > span:last-child { margin-inline-start: auto; font-size: 10px; color: var(--ink-soft); }
 .drawer-destination-options { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 16px 12px; }
 .drawer-destination-options button { border: 1px solid var(--line); border-radius: 12px; padding: 7px 10px; font-size: 12px; }
-.drawer-recent-shortcuts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 0 16px 10px; font-size: 11px; }
+.drawer-recent-shortcuts { display: flex; flex-wrap: nowrap; overflow-x:auto; white-space:nowrap; gap: 6px; align-items: center; padding: 0 16px 10px; font-size: 11px; }
 .drawer-recent-shortcuts > span { color: var(--ink-soft); }
-.drawer-recent-shortcuts button { padding: 5px 9px; border-radius: 12px; background: var(--word-active); }
+.drawer-recent-shortcuts button { flex-shrink:0; height:36px; padding: 5px 9px; border-radius: 12px; background: var(--word-active); }
 .drawer-recent-heading { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 12px; }
 .drawer-recent-heading button { font-size: 10px; color: var(--ink-soft); padding: 6px; }
 .drawer-legacy-bookmarks { margin-top: 18px; font-size: 12px; color: var(--ink-soft); }

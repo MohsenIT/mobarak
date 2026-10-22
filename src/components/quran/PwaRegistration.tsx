@@ -6,6 +6,7 @@ import { RefreshCw } from 'lucide-react'
 export default function PwaRegistration() {
   const [available, setAvailable] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [updateError, setUpdateError] = useState(false)
   const dismissed = useRef<string | null>(null)
 
   useEffect(() => {
@@ -42,11 +43,11 @@ export default function PwaRegistration() {
   if (!available) return null
   return <div className="app-update-notice" role="status" aria-live="polite">
     <div className="flex-1 min-w-0">
-      <p className="app-update-title">نسخهٔ جدید آماده است</p>
+      <p className="app-update-title">{updateError ? 'دریافت نسخه انجام نشد؛ دوباره تلاش کنید.' : 'نسخهٔ جدید آماده است'}</p>
     </div>
-    <button type="button" className="app-update-button" disabled={refreshing} aria-busy={refreshing} aria-label={refreshing ? 'در حال به‌روزرسانی' : 'به‌روزرسانی'} onClick={() => {
-      setRefreshing(true)
-      refreshApplication()
+    <button type="button" className="app-update-button" disabled={refreshing} aria-busy={refreshing} aria-label={refreshing ? 'در حال به‌روزرسانی' : 'به‌روزرسانی'} onClick={async () => {
+      setRefreshing(true); setUpdateError(false)
+      try { await refreshApplication() } catch { setRefreshing(false); setUpdateError(true) }
     }}><RefreshCw size={14} aria-hidden="true" className={refreshing ? 'app-update-spinner' : undefined} /><span className="app-update-label"><span className="app-update-label-space" aria-hidden="true">در حال به‌روزرسانی…</span><span>{refreshing ? 'در حال به‌روزرسانی…' : 'به‌روزرسانی'}</span></span></button>
     <button type="button" className="icon-btn sm" aria-label="بستن اعلان به‌روزرسانی" onClick={() => {
       dismissed.current = available; setAvailable(null)
