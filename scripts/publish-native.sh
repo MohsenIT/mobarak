@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
+publish_log=$(mktemp)
+exec > >(tee "$publish_log") 2>&1
+report_failure() {
+  local status=$?
+  LOG_PATH="$publish_log" node <<'JS'
+const fs = require('fs');
+const text = fs.readFileSync(process.env.LOG_PATH, 'utf8').slice(-3000).replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A');
+console.log('::error title=Installer publication failed::' + text);
+JS
+  exit "$status"
+}
+trap report_failure ERR
 : "${RELEASE_TAG:?}" "${RELEASE_SHA:?}" "${GH_REPO:?}" "${GH_TOKEN:?}"
 # upload-artifact preserves bundle subdirectories; flatten only installer files.
 mkdir -p release-files
