@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { APP_NAME } from "@/lib/branding";
+import { ReadingScreenProvider } from "@/components/quran/ReadingScreen";
 import PwaRegistration from "@/components/quran/PwaRegistration";
 
 export const metadata: Metadata = {
@@ -22,8 +23,10 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <body className="antialiased" style={{ background: "var(--paper)", color: "var(--ink)" }}>
-        {children}
-        <PwaRegistration />
+        <ReadingScreenProvider>
+          {children}
+          <PwaRegistration />
+        </ReadingScreenProvider>
       </body>
     </html>
   );

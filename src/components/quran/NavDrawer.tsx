@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import ReadingScreenSettings from './ReadingScreen'
 import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
 import SurahShortcuts from './SurahShortcuts'
@@ -247,6 +248,7 @@ export default function NavDrawer(props: Props) {
 
           {tab === 'settings' && (
             <div className="p-4 flex flex-col gap-6">
+              <ReadingScreenSettings />
               <UpdateSettings />
               <OfflineSettings />
               <section>
