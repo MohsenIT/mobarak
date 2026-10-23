@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import { downloadOffline } from './OfflineSettings'
 import { refreshApplication } from './UpdateSettings'
 import { RefreshCw } from 'lucide-react'
 
@@ -14,6 +15,13 @@ export default function PwaRegistration() {
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {
       // Reading remains available when the browser disables installation support.
     })
+    const download = () => {
+      let optional: string[] = []
+      try { optional = JSON.parse(localStorage.getItem('offline-optional-books') || '[]') } catch {}
+      void downloadOffline(['core', 'tahqiq', ...optional]).catch(() => {})
+    }
+    if ('serviceWorker' in navigator) void navigator.serviceWorker.ready.then(download)
+    window.addEventListener('online', download)
     let live = true
     let pending = false
     const controller = new AbortController()
@@ -34,6 +42,7 @@ export default function PwaRegistration() {
     window.addEventListener('focus', check)
     document.addEventListener('visibilitychange', check)
     return () => {
+      window.removeEventListener('online', download)
       live = false; controller.abort(); clearInterval(timer)
       window.removeEventListener('focus', check)
       document.removeEventListener('visibilitychange', check)

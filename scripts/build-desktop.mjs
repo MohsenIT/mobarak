@@ -4,10 +4,13 @@ import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const manifestBuild = spawnSync(process.execPath, [path.join(root, 'scripts/build-offline-manifest.mjs')], { cwd: root, stdio: 'inherit' })
+if (manifestBuild.status !== 0) process.exit(manifestBuild.status ?? 1)
 const stage = path.join(root, '.desktop-build')
 await rm(stage, { recursive: true, force: true })
 await mkdir(stage, { recursive: true })
 for (const file of ['src', 'public', 'package.json', 'tsconfig.json', 'postcss.config.mjs']) await cp(path.join(root, file), path.join(stage, file), { recursive: true })
+for (const book of ['maqayis', 'ishtiqaqi']) await rm(path.join(stage, 'public/data', book), { recursive: true, force: true })
 await rm(path.join(stage, 'src/app/api'), { recursive: true, force: true })
 const { readFile } = await import('node:fs/promises')
 const manifest = path.join(stage, 'src/app/manifest.ts')
@@ -24,4 +27,4 @@ const result = spawnSync(process.execPath, [path.join(root, 'node_modules/next/d
 if (result.status !== 0) process.exit(result.status ?? 1)
 await rm(path.join(root, 'desktop-dist'), { recursive: true, force: true })
 await cp(path.join(stage, 'out'), path.join(root, 'desktop-dist'), { recursive: true })
-console.log('Offline client ready in desktop-dist (all public data included).')
+console.log('Offline client ready in desktop-dist (Quran, translations, Tahqiq and summaries bundled; other books downloaded on demand).')

@@ -21,7 +21,7 @@ const cache = new Map<string, Promise<Definition | null>>()
 function load(root: string) {
   index ??= fetch('/data/ishtiqaqi-index.json').then(r => { if (!r.ok) throw new Error('index'); return r.json() })
   if (!cache.has(root)) cache.set(root, index.then(data => data.matchedRoots.includes(root)
-    ? fetch(`/data/ishtiqaqi/${encodeURIComponent(root)}.json`).then(r => { if (!r.ok) throw new Error('entry'); return r.json() }) : null))
+    ? fetch(`/data/ishtiqaqi/${encodeURIComponent(root)}.json`).then(r => { if (!r.ok) throw new Error('entry'); return r.json() }) : null).catch(error => { cache.delete(root); throw error }))
   return cache.get(root)!
 }
 
@@ -39,6 +39,8 @@ function ArabicText({ text }: { text: string }) {
 
 export default function IshtiqaqiMeaning({ root }: { root: string }) {
   const [state, setState] = useState<{ root: string; data?: Definition | null; error?: boolean }>({ root })
+  const [preview, setPreview] = useState<{root: string; text: string} | null>(null)
+  useEffect(() => { let live = true; fetch('/data/ishtiqaqi-summaries.json').then(r => r.json()).then(rows => { if (live) setPreview({root, text: rows[root]?.summary || ''}) }).catch(() => {}); return () => { live = false } }, [root])
   const [expanded, setExpanded] = useState(false)
   useEffect(() => {
     let live = true
@@ -49,9 +51,9 @@ export default function IshtiqaqiMeaning({ root }: { root: string }) {
   const data = state.root === root ? state.data : undefined
   const summary = data?.entries.find(entry => entry.translation?.summary)?.translation?.summary
   return <section aria-label="معنای ریشه در المعجم الاشتقاقی" className="rounded-xl border p-3 mb-4 text-sm leading-7" style={{ borderColor: 'var(--line)' }}>
-    <RootBookHeading book="ishtiqaqi" expanded={expanded} summary={summary || (data ? 'برای دیدن شرح ریشه باز کنید.' : undefined)}
+    <RootBookHeading book="ishtiqaqi" expanded={expanded} summary={summary || (preview?.root === root ? preview.text : '') || (data ? 'برای دیدن شرح ریشه باز کنید.' : undefined)}
       source={data?.entries[0] ? ishtiqaqiSource(data.entries[0]) : undefined} onToggle={() => setExpanded(value => !value)} />
-    {state.error && state.root === root ? <p role="alert" className="text-xs">شرح ریشه بارگیری نشد.</p>
+    {state.error && state.root === root ? expanded && <p className="text-xs">برای دریافت شرح کامل به اینترنت متصل شوید یا کتاب را از تنظیمات دانلود کنید.</p>
       : data === undefined ? <p role="status" className="text-xs">در حال بارگیری…</p>
         : data === null ? <p className="text-xs" style={{ color: 'var(--ink-soft)' }}>مدخل این ریشه هنوز تطبیق داده نشده است.</p>
           : expanded && <div>

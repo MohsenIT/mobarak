@@ -24,12 +24,14 @@ function load(root: string) {
       ...entry,
       summary: summaries.map(item => item.summary || 'متن این مدخل نیازمند بازبینی است.').join(' ') || 'برای دیدن شرح ریشه باز کنید.',
     }))
-  }))
+  }).catch(error => { cache.delete(root); throw error }))
   return cache.get(root)!
 }
 
 export default function MaqayisMeaning({ root }: { root: string }) {
   const [state, setState] = useState<{ root: string; entry?: Entry | null; error?: boolean }>({ root })
+  const [preview, setPreview] = useState<{root: string; text: string} | null>(null)
+  useEffect(() => { let live = true; rootSummaries('maqayis', root).then(rows => { if (live) setPreview({root, text: rows.map(row => row.summary).filter(Boolean).join(' ')}) }).catch(() => {}); return () => { live = false } }, [root])
   const [expanded, setExpanded] = useState(false)
   const [arabic, setArabic] = useState(false)
   useEffect(() => {
@@ -72,6 +74,6 @@ export default function MaqayisMeaning({ root }: { root: string }) {
         </button>
         {arabic && <p dir="rtl" lang="ar" className="mt-2 whitespace-pre-wrap break-words text-justify">{entry.ar}</p>}
       </div>}
-    </> : <p><strong>مقاییس: </strong><span className="text-xs" style={{ color: 'var(--ink-soft)' }}>{state.error && state.root === root ? 'شرح ریشه بارگیری نشد.' : entry === null ? unavailable.has(root) ? 'در نسخهٔ موجود، مدخل مستقلی برای این صورت ریشه با اطمینان تطبیق داده نشد.' : 'ترجمهٔ این مدخل هنوز آماده نشده است.' : 'در حال بارگیری…'}</span></p>}
+    </> : state.error && preview?.root === root ? <><RootBookHeading book="maqayis" expanded={expanded} summary={preview.text} onToggle={() => setExpanded(value => !value)} />{expanded && <p className="text-xs">برای دریافت شرح کامل به اینترنت متصل شوید یا کتاب را از تنظیمات دانلود کنید.</p>}</> : <p><strong>مقاییس: </strong><span className="text-xs" style={{ color: 'var(--ink-soft)' }}>{state.error && state.root === root ? 'شرح ریشه بارگیری نشد.' : entry === null ? unavailable.has(root) ? 'در نسخهٔ موجود، مدخل مستقلی برای این صورت ریشه با اطمینان تطبیق داده نشد.' : 'ترجمهٔ این مدخل هنوز آماده نشده است.' : 'در حال بارگیری…'}</span></p>}
   </section>
 }

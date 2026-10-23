@@ -4,6 +4,9 @@ import { randomUUID } from "node:crypto";
 const nextConfig: NextConfig = {
   output: "standalone",
   env: { NEXT_PUBLIC_APP_VERSION: process.env.VERCEL_GIT_COMMIT_SHA || randomUUID() },
+  async headers() {
+    return ['/data/:path*', '/offline-manifest.json'].map(source => ({ source, headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }] }))
+  },
   async redirects() {
     return [{ source: '/s=:surah(\\d+)', destination: '/?s=:surah', permanent: false }]
   },
