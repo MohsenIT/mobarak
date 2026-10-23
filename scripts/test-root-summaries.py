@@ -23,3 +23,6 @@ a=json.loads((ROOT/'public/data/tahqiq-summaries.json').read_text())['entries']
 assert a['نسي'][0]['summary']=='غفلت شخص از چیزی که به خاطر داشته است.'
 assert a['وجد'][0]['summary']=='ادراک و دریافتن چیزی در حالتی حادث.'
 assert 'در برابر سعادت قرار می‌گیرد' in a['شقو'][0]['summary']
+
+b=json.loads((ROOT/'public/data/maqayis-summaries.json').read_text())['entries']
+assert b['شقو'][0]['summary']=='رنج و دشواری، در برابر آسانی و سعادت.'
