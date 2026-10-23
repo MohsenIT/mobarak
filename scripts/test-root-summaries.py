@@ -25,4 +25,4 @@ assert a['وجد'][0]['summary']=='ادراک و دریافتن چیزی در ح
 assert 'در برابر سعادت قرار می‌گیرد' in a['شقو'][0]['summary']
 
 b=json.loads((ROOT/'public/data/maqayis-summaries.json').read_text())['entries']
-assert b['شقو'][0]['summary']=='رنج و دشواری، در برابر آسانی و سعادت.'
+assert b['شقو'][0]['summary']=='رنج و خلافِ آسانی و خوشبختی.'
