@@ -30,3 +30,5 @@ assert b['شقو'][0]['summary']=='رنج و خلافِ آسانی و خوشبخ
 assert b['قول'][0]['summary']=='گفتار از نطق.'
 source=json.loads((ROOT/'public/data/tahqiq/ضحو.json').read_text())['entries'][0]['fa']
 assert a['ضحو'][0]['summary']==source.removeprefix('اصل واحد، ').split('.',1)[0]+'.'
+
+assert a['خرج'][0]['summary']=='بیرون آمدن از چیزی.'
