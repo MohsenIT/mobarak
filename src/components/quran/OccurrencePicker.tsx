@@ -1,7 +1,7 @@
 'use client'
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
 import { Arrow as PopoverArrow } from '@radix-ui/react-popover'
-import { List, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type { SurahData } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
@@ -10,10 +10,10 @@ import { groupOccurrencesByAyah, occurrenceTokens, occurrenceWindow, type Contex
 import { AyahMarker } from './Ornaments'
 import QuranText from './QuranText'
 
-export default function OccurrencePicker({ open, onOpenChange, items, index, surah, groupKey, label, title, onSelect, onFull, fullLabel = 'نمایش در کل قرآن' }: {
+export default function OccurrencePicker({ open, onOpenChange, items, index, surah, groupKey, label, title, onSelect, onFull }: {
   open: boolean; onOpenChange: (open: boolean) => void; items: AnalysisLocation[]; index: number
   surah: SurahData | null; groupKey: string; label: string; title: ReactNode
-  onSelect: (location: AnalysisLocation) => void; onFull?: () => void; fullLabel?: string
+  onSelect: (location: AnalysisLocation) => void; onFull?: (scope: 'surah' | 'quran') => void
 }) {
   const list = useRef<HTMLDivElement>(null)
   const memory = useRef<{ group: string; top: number | null }>({ group: groupKey, top: null })
@@ -33,7 +33,10 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
         })
       }}>
       <div className="occurrence-picker-heading"><p>تکرارها در این سوره</p><div>
-        {onFull && <button type="button" aria-label={fullLabel} title={fullLabel} onClick={() => { onOpenChange(false); onFull() }}><List size={17} /><span>{fullLabel}</span></button>}
+        {onFull && <>
+          <button type="button" title="نمایش کامل در جست‌وجوی پیشرفتهٔ همین سوره" onClick={() => { onOpenChange(false); onFull('surah') }}>همین سوره</button>
+          <button type="button" title="نمایش در جست‌وجوی پیشرفتهٔ کل قرآن" onClick={() => { onOpenChange(false); onFull('quran') }}>کل قرآن</button>
+        </>}
         <button type="button" aria-label="بستن فهرست تکرارها" onClick={() => onOpenChange(false)}><X size={18} /></button>
       </div></div>
       <div ref={list} className="occurrence-picker-list nice-scroll" onScroll={event => { memory.current.top = event.currentTarget.scrollTop }}>

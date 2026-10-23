@@ -90,7 +90,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
 
   useEffect(() => {
     if (occurrenceFilter) {
-      setIncludeNear(false); setSurahs([]); setIncludeRoots(occurrenceFilter.tab === 'root'); setQuery('')
+      setIncludeNear(false); setIncludeRoots(occurrenceFilter.tab === 'root'); setQuery('')
     }
   }, [occurrenceFilter])
   useEffect(() => () => worker.current?.terminate(), [])

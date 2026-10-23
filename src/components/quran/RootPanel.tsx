@@ -19,7 +19,7 @@ import { readAnalysisView, saveAnalysisView } from '@/lib/analysis-view'
 import { IconClose, IconMaximize, IconRestore } from './Ornaments'
 
 interface Props {
-  onOpenOccurrences: (selection: AnalysisSelection) => void
+  onOpenOccurrences: (selection: AnalysisSelection, scope: 'surah' | 'quran') => void
   comparisonRange?: { s: number; from: number; to: number } | null
   onCompareContext: (s: number, from: number, to: number) => void
   onSelectionChange: (selection: AnalysisSelection) => void
@@ -212,7 +212,7 @@ function RootPanelContent({
   const nextUnitTitle = unitTitle(nextUnit)
   const currentUnitTitle = tab === 'root' ? root ? root : '—' : tab === 'form' ? selectedForm ? morphologyLabel(selectedForm) : 'باب' : tab === 'word' ? sel.text : tab === 'verse' ? `آیه ${toFa(sel.a)}` : selectedContext ? `آیات ${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : 'سیاق'
   const unitQuranFont = tab === 'root' || tab === 'word'
-  const positionTitle = <><span className={`analysis-position-title${tab === 'context' ? ' analysis-position-range' : ''}${unitQuranFont ? ' font-quran' : ''}`}>{tab === 'context' && selectedContext ? <>آیات <bdi dir="ltr">{toFa(selectedContext.from)}–{toFa(selectedContext.to)}</bdi></> : <QuranText text={currentUnitTitle} />}</span><span className="analysis-position-count" dir="ltr">{index >= 0 ? `${toFa(index + 1)}/${toFa(items.length)}` : '—'}</span></>
+  const positionTitle = <><span className={`analysis-position-title${tab === 'context' ? ' analysis-position-range' : ''}${unitQuranFont ? ' font-quran' : ''}`}>{tab === 'context' && selectedContext ? <>آیات <bdi dir="ltr">{toFa(selectedContext.from)}–{toFa(selectedContext.to)}</bdi></> : <QuranText text={currentUnitTitle} />}</span><span className="analysis-position-count" dir="rtl">{index >= 0 ? tab === 'verse' ? `از ${toFa(items.length)}` : `${toFa(index + 1)} از ${toFa(items.length)}` : '—'}</span></>
   const navigateUnit = (direction: number) => {
     const target = direction < 0 ? previousUnit : nextUnit
     if (target) selectTarget(...target)
@@ -324,7 +324,7 @@ function RootPanelContent({
             groupKey={`${tab}:${sel.s}:${tab === 'root' ? root : tab === 'form' ? `${root}:${selectedForm}` : surah?.n === sel.s ? lexicalKey(surah.v[sel.a - 1].w[sel.pos - 1], sel.part) : sel.text}`}
             title={positionTitle}
             label={`تکرار ${toFa(index + 1)} از ${toFa(items.length)}؛ انتخاب تکرار`}
-            onSelect={location => selectTarget(...location)} fullLabel={sel.root ? 'این ریشه در کل قرآن' : 'نمایش در کل قرآن'} onFull={() => onOpenOccurrences({ ...sel, tab: sel.root ? 'root' : tab, form: selectedForm })} /> : <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+            onSelect={location => selectTarget(...location)} onFull={scope => onOpenOccurrences({ ...sel, tab: scope === 'quran' && sel.root ? 'root' : tab, form: selectedForm }, scope)} /> : <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
             <PopoverTrigger asChild>
               <button className="analysis-position-button" disabled={index < 0 || !items.length}
                 aria-label={`${hasRepetitions ? 'تکرار' : noun} ${toFa(index + 1)} از ${toFa(items.length)}؛ انتخاب ${hasRepetitions ? 'تکرار' : noun}`}>
