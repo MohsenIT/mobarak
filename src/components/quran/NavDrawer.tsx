@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Pin, PinOff } from 'lucide-react'
 import UpdateSettings from './UpdateSettings'
 import SurahShortcuts from './SurahShortcuts'
 import { APP_NAME } from '@/lib/branding'
@@ -70,7 +69,6 @@ export default function NavDrawer(props: Props) {
   // already filtering — let them see the filtered list from the top).
   useEffect(() => {
     if (tab !== 'surah' || q.trim()) return
-    if (props.pinnedSurahs.length) { if (contentRef.current) contentRef.current.scrollTop = 0; return }
     if (!activeSurahRef.current) return
     // Use a tiny timeout to let the drawer's slide-in animation start first,
     // otherwise scrollIntoView happens before the layout settles.
@@ -79,14 +77,9 @@ export default function NavDrawer(props: Props) {
       if (pane && row) pane.scrollTop = Math.max(0, pane.scrollTop + row.getBoundingClientRect().top - pane.getBoundingClientRect().top - (pane.clientHeight - row.clientHeight) / 2)
     }, 50)
     return () => clearTimeout(t)
-  }, [tab, q, props.pinnedSurahs.length])
+  }, [tab, q])
 
-  const surahs = useMemo(() => {
-    const results = searchSurahs(meta, q)
-    if (q.trim()) return results
-    const rank = (n: number) => { const i = props.pinnedSurahs.indexOf(n); return i < 0 ? props.pinnedSurahs.length : i }
-    return [...results].sort((a, b) => rank(a.n) - rank(b.n) || a.n - b.n)
-  }, [q, meta, props.pinnedSurahs])
+  const surahs = useMemo(() => searchSurahs(meta, q), [q, meta])
   const suggestions = useMemo(() => destinationSuggestions(meta, pageInput, currentSurah), [meta, pageInput, currentSurah])
 
   const juzList = useMemo(() =>
@@ -143,7 +136,7 @@ export default function NavDrawer(props: Props) {
         {suggestions.length > 0 && <div className="drawer-destination-options" aria-label="مقصدهای پیشنهادی">
           {suggestions.map((item, index) => <button key={index} type="button" onClick={() => goTo(item.destination)}>{toFa(item.label)}</button>)}
         </div>}
-        {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onUnpin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
+        {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onTogglePin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
@@ -160,11 +153,10 @@ export default function NavDrawer(props: Props) {
                 {surahs.map(s => {
                   const isActive = s.n === currentSurah
                   return (
-                    <div key={s.n} className="flex items-center">
                     <button
-
+                      key={s.n}
                       ref={isActive ? activeSurahRef : null}
-                      className="nav-surah-row flex-1 min-w-0"
+                      className="nav-surah-row"
                       data-active={isActive || undefined}
                       style={isActive ? {
                         background: 'var(--word-root)',
@@ -191,8 +183,6 @@ export default function NavDrawer(props: Props) {
                         </span>
                       </span>
                     </button>
-                    <button type="button" className="icon-btn" aria-label={`${props.pinnedSurahs.includes(s.n) ? 'برداشتن سنجاق' : 'سنجاق'} ${s.fa}`} aria-pressed={props.pinnedSurahs.includes(s.n)} onClick={() => props.onTogglePin(s.n)}>{props.pinnedSurahs.includes(s.n) ? <PinOff size={17} /> : <Pin size={17} />}</button>
-                    </div>
                   )
                 })}
               </div>

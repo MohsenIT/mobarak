@@ -2,7 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Meta } from '@/lib/quran'
 
-export default function SurahShortcuts({ meta, pinned, recent, onGo, onUnpin }: { meta: Meta; pinned: number[]; recent: number[]; onGo: (n: number) => void; onUnpin: (n: number) => void }) {
+export default function SurahShortcuts({ meta, pinned, recent, onGo, onTogglePin }: { meta: Meta; pinned: number[]; recent: number[]; onGo: (n: number) => void; onTogglePin: (n: number) => void }) {
   const hold = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pointer = useRef<{ x: number; y: number } | null>(null)
   const held = useRef(false)
@@ -46,12 +46,12 @@ export default function SurahShortcuts({ meta, pinned, recent, onGo, onUnpin }: 
     <div ref={row} className="drawer-recent-shortcuts" aria-label="میان‌بر سوره‌ها">
       {shortcuts.slice(0, expanded ? undefined : count).map(n => <button type="button" key={n} className="chip" data-pinned={pinned.includes(n) || undefined} onPointerDown={event => {
         cancelHold(); held.current = false
-        if (!pinned.includes(n) || !event.isPrimary || event.button !== 0) return
+        if (!event.isPrimary || event.button !== 0) return
         pointer.current = { x:event.clientX, y:event.clientY }
-        hold.current = setTimeout(() => { held.current = true; onUnpin(n); setStatus(`سنجاق ${meta.surahs[n - 1]?.fa} برداشته شد.`); cancelHold() }, 550)
+        hold.current = setTimeout(() => { held.current = true; onTogglePin(n); setStatus(pinned.includes(n) ? `سنجاق ${meta.surahs[n - 1]?.fa} برداشته شد.` : `${meta.surahs[n - 1]?.fa} سنجاق شد.`); cancelHold() }, 550)
       }} onPointerMove={event => { if (pointer.current && Math.hypot(event.clientX-pointer.current.x,event.clientY-pointer.current.y)>8) { held.current = true; cancelHold() } }} onPointerUp={cancelHold} onPointerCancel={cancelHold} onPointerLeave={cancelHold}
-      onContextMenu={event => { event.preventDefault(); if (held.current) return; cancelHold(); if (pinned.includes(n)) { held.current = true; onUnpin(n); setStatus(`سنجاق ${meta.surahs[n - 1]?.fa} برداشته شد.`) } }}
-      onClick={() => { if (held.current) { held.current = false; return } onGo(n) }} title={pinned.includes(n) ? 'برای برداشتن سنجاق نگه دارید' : 'اخیراً خوانده‌اید'}>{meta.surahs[n - 1]?.fa}</button>)}
+      onContextMenu={event => { event.preventDefault(); if (held.current) return; cancelHold(); held.current = true; onTogglePin(n); setStatus(pinned.includes(n) ? `سنجاق ${meta.surahs[n - 1]?.fa} برداشته شد.` : `${meta.surahs[n - 1]?.fa} سنجاق شد.`) }}
+      onClick={() => { if (held.current) { held.current = false; return } onGo(n) }} title={pinned.includes(n) ? 'برای برداشتن سنجاق نگه دارید' : 'برای سنجاق‌کردن نگه دارید'}>{meta.surahs[n - 1]?.fa}</button>)}
       {shortcuts.length > count && <button type="button" aria-label={expanded ? 'نمایش کمتر سوره‌ها' : 'نمایش همهٔ میان‌برها'} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? 'کمتر' : '…'}</button>}
     </div>
     <span className="sr-only" role="status">{status}</span>
