@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { occurrenceTokens, occurrenceWindow } from './occurrence-context'
+import { groupOccurrencesByAyah, occurrenceTokens, occurrenceWindow } from './occurrence-context'
 import type { SurahData } from './quran'
 import taha from '../../public/data/surah/20.json'
 const surah: SurahData = { ...taha, ri: {} }
@@ -24,4 +24,13 @@ test('waw and stem targets stay distinct, and surah edges do not wrap', () => {
   const first = occurrenceWindow(tokens, 1, 1)
   expect(first.target).toBe(0)
   expect(first.tokens.some(t => t.a === surah.vc)).toBe(false)
+})
+
+test('three occurrences in Taha 72 occupy one ayah row without losing locations', () => {
+  const occurrences: [number, number][] = surah.v.flatMap(verse => verse.w.flatMap((word, i): [number, number][] => word.r === 'قضي' ? [[verse.n, i + 1]] : []))
+  const groups = groupOccurrencesByAyah(occurrences)
+  expect(occurrences).toEqual([[72, 11], [72, 14], [72, 16], [114, 11]])
+  expect(groups.map(group => [group.a, group.locations.length])).toEqual([[72, 3], [114, 1]])
+  expect(groups[0].indexes).toEqual([0, 1, 2])
+  expect(groups[0].locations).toEqual(occurrences.slice(0, 3))
 })

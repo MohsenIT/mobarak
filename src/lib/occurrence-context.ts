@@ -1,3 +1,4 @@
+import type { AnalysisLocation } from './analysis'
 import type { SurahData } from './quran'
 import { splitWord, type WordPart } from './word-parts'
 
@@ -19,4 +20,16 @@ export function occurrenceWindow(tokens: ContextToken[], a: number, pos: number,
   while (end < tokens.length && tokens[end].a === a) end++
   const from = Math.max(0, start - 8)
   return { tokens: tokens.slice(from, Math.min(tokens.length, end + 8)), target: target - from }
+}
+
+/** Keep occurrence navigation intact while showing each matching ayah once. */
+export function groupOccurrencesByAyah(items: AnalysisLocation[]) {
+  const groups = new Map<number, { a: number; locations: AnalysisLocation[]; indexes: number[] }>()
+  items.forEach((location, index) => {
+    const a = location[0]
+    if (!groups.has(a)) groups.set(a, { a, locations: [], indexes: [] })
+    groups.get(a)!.locations.push(location)
+    groups.get(a)!.indexes.push(index)
+  })
+  return [...groups.values()]
 }

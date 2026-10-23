@@ -543,7 +543,7 @@ export default function Home() {
         {sel && (showIndex || showComparison
           ? createPortal(
               <RootPanel
-            onOpenOccurrences={selection => { setOccurrenceSearch(selection); setSearchOpen(true) }}
+            onOpenOccurrences={selection => { setSearchStart({ query: selection.root || selection.text, mode: selection.tab === 'root' ? 'root' : 'text', surahs: [], revision: Date.now() }); setOccurrenceSearch(selection); setSearchOpen(true) }}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}
@@ -563,7 +563,7 @@ export default function Home() {
           />, document.body)
           : (
               <RootPanel
-            onOpenOccurrences={selection => { setOccurrenceSearch(selection); setSearchOpen(true) }}
+            onOpenOccurrences={selection => { setSearchStart({ query: selection.root || selection.text, mode: selection.tab === 'root' ? 'root' : 'text', surahs: [], revision: Date.now() }); setOccurrenceSearch(selection); setSearchOpen(true) }}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}
