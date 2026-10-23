@@ -1,7 +1,7 @@
 'use client'
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
 import { Arrow as PopoverArrow } from '@radix-ui/react-popover'
-import { X } from 'lucide-react'
+import { List, Search, X } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type { SurahData } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
@@ -32,10 +32,10 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
           else selected?.scrollIntoView({ block: 'nearest' })
         })
       }}>
-      <div className="occurrence-picker-heading"><p>تکرارها در این سوره</p><div>
+      <div className="occurrence-picker-heading"><p className="sr-only">تکرارها در این سوره</p><div>
         {onFull && <>
-          <button type="button" title="نمایش کامل در جست‌وجوی پیشرفتهٔ همین سوره" onClick={() => { onOpenChange(false); onFull('surah') }}>همین سوره</button>
-          <button type="button" title="نمایش در جست‌وجوی پیشرفتهٔ کل قرآن" onClick={() => { onOpenChange(false); onFull('quran') }}>کل قرآن</button>
+          <button type="button" className="occurrence-search-shortcut" title="نمایش کامل در جست‌وجوی پیشرفتهٔ همین سوره" onClick={() => { onOpenChange(false); onFull('surah') }}><List size={14} aria-hidden="true" /><span>نتایج این سوره</span></button>
+          <button type="button" className="occurrence-search-shortcut" title="نمایش در جست‌وجوی پیشرفتهٔ کل قرآن" onClick={() => { onOpenChange(false); onFull('quran') }}><Search size={14} aria-hidden="true" /><span>جست‌وجو در قرآن</span></button>
         </>}
         <button type="button" aria-label="بستن فهرست تکرارها" onClick={() => onOpenChange(false)}><X size={18} /></button>
       </div></div>
