@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { rootSummaries } from '@/lib/root-summaries'
 import { toFa } from '@/lib/quran'
 import TahqiqText from './TahqiqText'
 import SourceReference from './SourceReference'
@@ -9,8 +10,8 @@ import MaqayisMeaning from './MaqayisMeaning'
 import IshtiqaqiMeaning from './IshtiqaqiMeaning'
 import { AnalysisSection, ROOT_BOOKS, useAnalysisPreferences } from './AnalysisSections'
 
-type Entry = { word: string; ar: string; fa: string; provenance?: { kind: string; translator: string; volume: number; page: number; pageEnd: number; heading: string }; examples?: { s: number; a: number; text: string; surahName: string }[] }
-type Definition = { root: string; entries: Entry[] }
+type Entry = { summarySourceWarning?: string; word: string; ar: string; fa: string; provenance?: { kind: string; translator: string; volume: number; page: number; pageEnd: number; heading: string }; examples?: { s: number; a: number; text: string; surahName: string }[] }
+type Definition = { root: string; entries: Entry[]; preview?: string }
 type Index = { matchedRoots: string[]; source: { title: string; author: string; translator: string } }
 let indexPromise: Promise<Index> | undefined
 const cache = new Map<string, Promise<Definition | null>>()
@@ -18,7 +19,15 @@ function load(root: string) {
   if (!indexPromise) indexPromise = fetch('/data/tahqiq-index.json').then(r => { if (!r.ok) throw new Error('index'); return r.json() })
   if (!cache.has(root)) cache.set(root, indexPromise.then(index => {
     if (!index.matchedRoots.includes(root)) return null
-    return fetch(`/data/tahqiq/${encodeURIComponent(root)}.json`).then(r => { if (!r.ok) throw new Error('entry'); return r.json() })
+    const entry = fetch(`/data/tahqiq/${encodeURIComponent(root)}.json`).then(r => {
+      if (!r.ok) throw new Error('entry')
+      return r.json() as Promise<Definition>
+    })
+    return Promise.all([entry, rootSummaries('tahqiq', root).catch(() => [])]).then(([data, summaries]) => ({
+      ...data,
+      entries: data.entries.map((entry, i) => ({ ...entry, summarySourceWarning: summaries[i]?.sourceWarning })),
+      preview: summaries.map(item => item.summary || 'متن این مدخل نیازمند بازبینی است.').join(' '),
+    }))
   }))
   return cache.get(root)!
 }
@@ -63,7 +72,7 @@ function TahqiqMeaning({ root }: { root: string }) {
   const ready = state.root === root
   return <section className="rounded-xl border p-3 mb-4 text-sm leading-7" aria-label="معنای ریشه در التحقیق" style={{ borderColor: 'var(--line)' }}>
     <button type="button" className="flex w-full items-start gap-2 text-right cursor-pointer" aria-expanded={expanded} onClick={() => setOpenRoot(expanded ? null : root)}>
-      <span className={expanded ? 'font-bold' : 'line-clamp-2'}><strong>التحقیق{!expanded && ready && state.data && ': '}</strong>{!expanded && ready && state.data && state.data.entries[0].fa.split(/[.\n]/)[0]}</span>
+      <span className={expanded ? 'font-bold' : 'block'}><strong>التحقیق{!expanded && ready && state.data && ': '}</strong>{!expanded && ready && state.data && (state.data.preview || 'برای دیدن شرح ریشه باز کنید.')}</span>
       <ChevronDown aria-hidden="true" size={16} className={`shrink-0 mt-1 mr-auto transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
     </button>
     {!ready || state.data === undefined && !state.error ? <p role="status" className="text-xs">در حال بارگیری شرح ریشه…</p>
@@ -92,7 +101,7 @@ function MeaningEntry({ entry, ambiguous }: { entry: Entry; ambiguous: boolean }
         { label: 'مأخذ دیجیتال', value: 'اپ التّحقیق (فارسی)، فایل ارسالی' },
       ]),
     ],
-    notes: [entry.provenance ? 'شرح فارسی این مدخل، ترجمه و تلخیص با کمک هوش مصنوعی از متن عربی است؛ ترجمهٔ چاپی کتاب نیست.' : 'انتساب ترجمه طبق معرفی اپ است؛ شمارهٔ جلد، صفحه و تاریخ انتشار در دادهٔ اپ موجود نیست.'],
+    notes: [...(entry.summarySourceWarning ? [entry.summarySourceWarning] : []), 'خلاصهٔ نمایشی با کمک هوش مصنوعی تهیه و با متن مأخذ تطبیق داده شده است.', entry.provenance ? 'شرح فارسی این مدخل، ترجمه و تلخیص با کمک هوش مصنوعی از متن عربی است؛ ترجمهٔ چاپی کتاب نیست.' : 'انتساب ترجمه طبق معرفی اپ است؛ شمارهٔ جلد، صفحه و تاریخ انتشار در دادهٔ اپ موجود نیست.'],
   }
 
   return <div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { rootSummaries } from '@/lib/root-summaries'
 import { toFa } from '@/lib/quran'
 import SourceReference from './SourceReference'
 import TahqiqText from './TahqiqText'
@@ -14,8 +15,15 @@ function load(root: string) {
   index ??= fetch('/data/maqayis-index.json').then(r => { if (!r.ok) throw new Error('index'); return r.json() })
   if (!cache.has(root)) cache.set(root, index.then(data => {
     if (data.unavailableRoots?.[root]) unavailable.set(root, data.unavailableRoots[root])
-    return data.translatedRoots.includes(root)
-      ? fetch(`/data/maqayis/${encodeURIComponent(root)}.json`).then(r => { if (!r.ok) throw new Error('entry'); return r.json() }) : null
+    if (!data.translatedRoots.includes(root)) return null
+    const entry = fetch(`/data/maqayis/${encodeURIComponent(root)}.json`).then(r => {
+      if (!r.ok) throw new Error('entry')
+      return r.json() as Promise<Entry>
+    })
+    return Promise.all([entry, rootSummaries('maqayis', root).catch(() => [])]).then(([entry, summaries]) => ({
+      ...entry,
+      summary: summaries.map(item => item.summary || 'متن این مدخل نیازمند بازبینی است.').join(' ') || 'برای دیدن شرح ریشه باز کنید.',
+    }))
   }))
   return cache.get(root)!
 }
@@ -54,7 +62,7 @@ export default function MaqayisMeaning({ root }: { root: string }) {
   return <section aria-label="معنای ریشه در مقاییس" className="rounded-xl border p-3 mb-4 text-sm leading-7" style={{ borderColor: 'var(--line)' }}>
     {entry ? <>
       <button type="button" className="flex w-full items-start gap-2 text-right cursor-pointer" aria-expanded={expanded} onClick={() => { setExpanded(value => !value); setArabic(false) }}>
-        <span className={expanded ? 'font-bold' : 'line-clamp-2'}><strong>مقاییس{!expanded && ': '}</strong>{!expanded && entry.summary}</span>
+        <span className={expanded ? 'font-bold' : 'block'}><strong>مقاییس{!expanded && ': '}</strong>{!expanded && entry.summary}</span>
         <ChevronDown aria-hidden="true" size={16} className={`shrink-0 mt-1 mr-auto transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
       </button>
       {expanded && <div>
