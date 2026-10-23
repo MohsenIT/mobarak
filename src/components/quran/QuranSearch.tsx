@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Search, X, LoaderCircle, ArrowRight, SlidersHorizontal, Languages, BookOpen, MoreHorizontal } from 'lucide-react'
+import { Search, X, LoaderCircle, ArrowRight, SlidersHorizontal, Languages, BookOpen, MoreHorizontal, Link, Check } from 'lucide-react'
 import type { Meta, Translator, Translations } from '@/lib/quran'
 import { loadTrans, toFa, morphologyLabel } from '@/lib/quran'
 import { type AnalysisSelection } from '@/lib/analysis'
@@ -12,10 +12,12 @@ import { splitWord } from '@/lib/word-parts'
 import type { SearchMode } from '@/lib/quran-search-session'
 import { lemmaDisplay } from '@/lib/lemma-display'
 import { searchFormLabels } from '@/lib/search-form-labels'
+import { searchLink, type SearchLinkState } from '@/lib/search-link'
 import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
-export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number }
+export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number; state?: SearchLinkState }
 
 interface Props {
+  onStateChange?: (state: SearchLinkState) => void
   initialSearch?: SearchStart | null
   occurrenceFilter?: AnalysisSelection | null
   onClearOccurrenceFilter?: () => void
@@ -49,20 +51,22 @@ function snippet(result: QuranSearchResult, full = false) {
 }
 const labels = { exact: 'تطبیق دقیق', partial: 'شامل عبارت', near: 'نزدیک از نظر نوشتار', root: 'هم‌ریشه‌ها' }
 
-export default function QuranSearch({ open, onOpenChange, meta, currentSurah, onPick, occurrenceFilter, onClearOccurrenceFilter, translator, initialSearch }: Props) {
-  const [query, setQuery] = useState('')
-  const [mode, setMode] = useState<SearchMode>('text')
+export default function QuranSearch({ open, onOpenChange, meta, currentSurah, onPick, occurrenceFilter, onClearOccurrenceFilter, translator, initialSearch, onStateChange }: Props) {
+  const restored = initialSearch?.state
+  const [copyStatus, setCopyStatus] = useState('')
+  const [query, setQuery] = useState(restored?.query ?? initialSearch?.query ?? '')
+  const [mode, setMode] = useState<SearchMode>(restored?.mode ?? initialSearch?.mode ?? 'text')
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [completionOpen, setCompletionOpen] = useState(false)
   const [completionIndex, setCompletionIndex] = useState(-1)
-  const [lemmas, setLemmas] = useState<string[]>([])
-  const [forms, setForms] = useState<string[]>([])
-  const [includePartial, setIncludePartial] = useState(true)
-  const [includeNear, setIncludeNear] = useState(false)
-  const [includeRoots, setIncludeRoots] = useState(true)
-  const [surahs, setSurahs] = useState<number[]>([])
+  const [lemmas, setLemmas] = useState<string[]>(restored?.lemmas ?? [])
+  const [forms, setForms] = useState<string[]>(restored?.forms ?? [])
+  const [includePartial, setIncludePartial] = useState(restored?.includePartial ?? true)
+  const [includeNear, setIncludeNear] = useState(restored?.includeNear ?? false)
+  const [includeRoots, setIncludeRoots] = useState(restored?.includeRoots ?? true)
+  const [surahs, setSurahs] = useState<number[]>(restored?.surahs ?? initialSearch?.surahs ?? [])
   const [surahQuery, setSurahQuery] = useState('')
-  const [showTranslation, setShowTranslation] = useState(false)
+  const [showTranslation, setShowTranslation] = useState(restored?.showTranslation ?? false)
   const [translations, setTranslations] = useState<Record<number, Translations>>({})
   const [translationErrors, setTranslationErrors] = useState<number[]>([])
   const [translationRetry, setTranslationRetry] = useState(0)
@@ -82,14 +86,21 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const facets = { lemmas, forms }
   const formLabels = searchFormLabels(rawResults)
   const results = filterSearchFacets(rawResults, facets)
-  useEffect(() => { if (initialSearch) { setQuery(initialSearch.query); setMode(initialSearch.mode); setSurahs(initialSearch.surahs); setIncludeRoots(true); setIncludeNear(false); setIncludePartial(true) } }, [initialSearch])
-  useEffect(() => { setLemmas([]); setForms([]) }, [query, mode, includeRoots, occurrenceFilter, surahs.join(',')])
+  const facetIdentity = JSON.stringify([query, mode, includeRoots, occurrenceFilter, surahs])
+  const previousFacetIdentity = useRef(facetIdentity)
+  useEffect(() => {
+    if (previousFacetIdentity.current !== facetIdentity) { setLemmas([]); setForms([]); previousFacetIdentity.current = facetIdentity }
+  }, [facetIdentity])
+  const linkState: SearchLinkState = { query, mode, surahs, lemmas, forms, includeRoots, includePartial, includeNear, showTranslation, translator, occurrence: occurrenceFilter ?? null }
+  const linkStateKey = JSON.stringify(linkState)
+  useEffect(() => { if (open) { onStateChange?.(JSON.parse(linkStateKey)); setCopyStatus('') } }, [open, linkStateKey, onStateChange])
+
   const valid = !!occurrenceFilter || normalizeQuranSearch(query).replace(/\s/g, '').length >= 2
   const scopeKey = surahs.join(',')
   const canExpandRoots = occurrenceFilter ? !!occurrenceFilter.root && occurrenceFilter.part !== 'prefix' : !normalizeQuranSearch(query).includes(' ')
 
   useEffect(() => {
-    if (occurrenceFilter) {
+    if (occurrenceFilter && !restored) {
       setIncludeNear(false); setIncludeRoots(occurrenceFilter.tab === 'root'); setQuery('')
     }
   }, [occurrenceFilter])
@@ -179,6 +190,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
             {query && <button type="button" aria-label="پاک کردن عبارت" onClick={() => { setQuery(''); input.current?.focus({ preventScroll: true }) }}><X size={15} /></button>}
             {completionOpen && !busy && suggestions.length > 0 && !occurrenceFilter && <div id="search-completions" className="search-completion-menu" role="listbox" aria-label="پیشنهادهای جست‌وجو">{suggestions.map((value, i) => <button type="button" role="option" id={`search-completion-${i}`} aria-selected={completionIndex === i} key={value} onMouseDown={event => event.preventDefault()} onClick={() => { setQuery(value); setCompletionOpen(false); input.current?.blur() }}><Search size={14} /><QuranText text={value} /><span aria-hidden="true">↖</span></button>)}</div>}
           </div>
+          <button type="button" className="icon-btn" aria-label={copyStatus || 'کپی لینک جست‌وجو'} title={copyStatus || 'کپی لینک جست‌وجو'} onClick={async () => {
+            try { await navigator.clipboard.writeText(searchLink(process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app' : window.location.href, linkState).href); setCopyStatus('لینک کپی شد') }
+            catch { setCopyStatus('کپی انجام نشد؛ دوباره تلاش کنید') }
+          }}>{copyStatus === 'لینک کپی شد' ? <Check size={18} /> : <Link size={18} />}</button>
           <button type="button" className="icon-btn search-translation-toggle" aria-label="ترجمه" title="نمایش یا پنهان‌کردن ترجمه" aria-pressed={showTranslation} onClick={() => setShowTranslation(value => !value)}><Languages size={20} /></button>
         </div>
         <div className="search-controls-row">

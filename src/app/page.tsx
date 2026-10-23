@@ -1,5 +1,6 @@
 'use client'
 import { readVerseAddress, writeVerseAddress, readSurahNumber, readPageNumber, readingUrl } from '@/lib/verse-link'
+import { readSearchLink, searchLink, type SearchLinkState } from '@/lib/search-link'
 import { wordTarget } from '@/lib/word-parts'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -67,6 +68,23 @@ export default function Home() {
   const [quickSearchOpen, setQuickSearchOpen] = useState(false)
   const [searchStart, setSearchStart] = useState<SearchStart | null>(null)
   const [occurrenceSearch, setOccurrenceSearch] = useState<AnalysisSelection | null>(null)
+  const readingBeforeSearch = useRef<string | null>(null)
+  const lastSearchUrl = useRef<string | null>(null)
+  const writeSearchState = useCallback((state: SearchLinkState) => {
+    const current = window.location.href
+    const entering = !readSearchLink(current)
+    if (entering) readingBeforeSearch.current = current
+    const url = searchLink(current, state, process.env.NEXT_PUBLIC_DESKTOP === '1')
+    lastSearchUrl.current = url.href
+    if (url.href !== current) window.history[entering ? 'pushState' : 'replaceState'](entering ? { ...window.history.state, quranSearchEntry: true } : window.history.state, '', url)
+  }, [])
+  const changeSearchOpen = (open: boolean) => {
+    setSearchOpen(open)
+    if (!open && readSearchLink(window.location.href)) {
+      if (window.history.state?.quranSearchEntry) window.history.back()
+      else window.history.replaceState(window.history.state, '', readingBeforeSearch.current || readingUrl(new URL('/', window.location.href).href, mode, surah, page, process.env.NEXT_PUBLIC_DESKTOP === '1'))
+    }
+  }
   const [returnToSearch, setReturnToSearch] = useState(false)
   const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number; align?: 'start' } | null>(null)
   const [sel, setSel] = useState<Selection | null>(null)
@@ -146,6 +164,7 @@ export default function Home() {
   }, [theme, startupComplete])
   useEffect(() => {
     LS.set('mushaf.page', page)
+    if (readSearchLink(window.location.href)) return
     const url = readingUrl(window.location.href, mode, surah, page, process.env.NEXT_PUBLIC_DESKTOP === '1')
     window.history.replaceState(window.history.state, '', url.toString())
   }, [page, mode, surah])
@@ -290,6 +309,14 @@ export default function Home() {
 
   useEffect(() => {
     const restore = () => {
+      const search = readSearchLink(window.location.href)
+      if (search) {
+        if (lastSearchUrl.current === window.location.href) { setTranslator(search.translator); setSearchOpen(true); return }
+        setSearchStart({ query: search.query, mode: search.mode, surahs: search.surahs, revision: Date.now(), state: search })
+        setOccurrenceSearch(search.occurrence); setTranslator(search.translator); setSearchOpen(true)
+        return
+      }
+      setSearchOpen(false)
       const target = readVerseAddress(window.location.search, window.location.pathname)
       if (target) {
         setMode('flow')
@@ -427,7 +454,7 @@ export default function Home() {
     {meta && <div className={`h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 
-      <QuranSearch initialSearch={searchStart} occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={setSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
+      <QuranSearch key={searchStart?.revision ?? 0} onStateChange={writeSearchState} initialSearch={searchStart} occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
         setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); setComparisonRoot(null); goVerse(s, a, pos)
       }} />
 

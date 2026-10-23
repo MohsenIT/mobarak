@@ -25,6 +25,7 @@ export function versePath({ s, a, pos }: VerseAddress): string {
 /** The refresh token is only for requesting a fresh document, never a reading address. */
 export function readingUrl(current: string, mode: 'flow' | 'mushaf', surah: number, page: number, native = false): URL {
   const url = new URL(current)
+  if (/^\/(q|search)\/?$/.test(url.pathname) || url.searchParams.get('search') === '1') { url.search = ''; url.hash = '' }
   const target = readVerseAddress(url.search, url.pathname)
   for (const name of ['s', 'a', 'w', 'p', '_refresh']) url.searchParams.delete(name)
   url.pathname = native ? '/' : mode === 'mushaf' ? `/p/${page}` : target?.s === surah ? versePath(target) : `/s/${surah}`
