@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import RootBookHeading, { ROOT_BOOK_TITLES } from './RootBookHeading'
 import { rootSummaries } from '@/lib/root-summaries'
 import { toFa } from '@/lib/quran'
-import SourceReference from './SourceReference'
 import TahqiqText from './TahqiqText'
 
 type Entry = { root: string; word: string; ar: string; fa: string; summary: string; provenance: { volume?: number; page?: number; pageEnd?: number; translationNote: string; sourceKind?: string; sourceUrl?: string; translationScope?: string; translationKind?: string } }
@@ -40,7 +40,7 @@ export default function MaqayisMeaning({ root }: { root: string }) {
   }, [root])
   const entry = state.root === root ? state.entry : undefined
   const source = entry ? {
-    title: 'مقاييس اللغة',
+    title: ROOT_BOOK_TITLES.maqayis.full,
     description: 'فرهنگ ریشه‌های عربی؛ بررسی اصول معنایی هر ریشه با شواهد و کاربردهای زبانی.',
     fields: [
       { label: 'نویسنده', value: 'احمد بن فارس بن زکریا؛ قرن چهارم هجری' },
@@ -61,12 +61,9 @@ export default function MaqayisMeaning({ root }: { root: string }) {
 
   return <section aria-label="معنای ریشه در مقاییس" className="rounded-xl border p-3 mb-4 text-sm leading-7" style={{ borderColor: 'var(--line)' }}>
     {entry ? <>
-      <button type="button" className="flex w-full items-start gap-2 text-right cursor-pointer" aria-expanded={expanded} onClick={() => { setExpanded(value => !value); setArabic(false) }}>
-        <span className={expanded ? 'font-bold' : 'block'}><strong>مقاییس{!expanded && ': '}</strong>{!expanded && entry.summary}</span>
-        <ChevronDown aria-hidden="true" size={16} className={`shrink-0 mt-1 mr-auto transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
-      </button>
+      <RootBookHeading book="maqayis" expanded={expanded} summary={entry.summary} source={source}
+        onToggle={() => { setExpanded(value => !value); setArabic(false) }} />
       {expanded && <div>
-        <div className="mt-2"><SourceReference source={source} /></div>
         {entry.provenance.translationScope === 'author-and-editorial' && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>این نسخه متن مؤلف و حواشی مرجع را با هم دارد؛ حواشی ممکن است به صفحه یا مدخل مجاور مربوط باشند.</p>}
         {entry.provenance.translationKind === 'partial-reference-entry' && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>مأخذ این مدخل افتادگی یا ابهام دارد؛ توضیح آن را در منبع ببینید.</p>}
         <TahqiqText text={entry.fa} />

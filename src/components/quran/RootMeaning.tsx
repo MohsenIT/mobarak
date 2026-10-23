@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import RootBookHeading, { ROOT_BOOK_TITLES } from './RootBookHeading'
 import { rootSummaries } from '@/lib/root-summaries'
 import { toFa } from '@/lib/quran'
 import TahqiqText from './TahqiqText'
@@ -71,13 +72,9 @@ function TahqiqMeaning({ root }: { root: string }) {
   const expanded = openRoot === root
   const ready = state.root === root
   return <section className="rounded-xl border p-3 mb-4 text-sm leading-7" aria-label="معنای ریشه در التحقیق" style={{ borderColor: 'var(--line)' }}>
-    <div className="flex items-start gap-2" data-tahqiq-heading>
-      <button type="button" className="flex flex-1 min-w-0 items-start gap-2 text-right cursor-pointer" aria-expanded={expanded} onClick={() => setOpenRoot(expanded ? null : root)}>
-        <span className={expanded ? 'min-w-0 truncate font-bold' : 'block'} title={expanded ? 'التحقیق فی کلمات القرآن الکریم' : undefined}><strong>{expanded ? 'التحقیق فی کلمات القرآن الکریم' : 'التحقیق'}{!expanded && ready && state.data && ': '}</strong>{!expanded && ready && state.data && (state.data.preview || 'برای دیدن شرح ریشه باز کنید.')}</span>
-        <ChevronDown aria-hidden="true" size={16} className={`shrink-0 mt-1 mr-auto transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
-      </button>
-      {expanded && ready && state.data?.entries[0] && <span className="shrink-0"><SourceReference source={tahqiqSource(state.data.entries[0])} /></span>}
-    </div>
+    <RootBookHeading book="tahqiq" expanded={expanded} onToggle={() => setOpenRoot(expanded ? null : root)}
+      summary={ready && state.data ? state.data.preview || 'برای دیدن شرح ریشه باز کنید.' : undefined}
+      source={ready && state.data?.entries[0] ? tahqiqSource(state.data.entries[0]) : undefined} />
     {!ready || state.data === undefined && !state.error ? <p role="status" className="text-xs">در حال بارگیری شرح ریشه…</p>
       : state.error ? <p role="alert" className="text-xs">شرح ریشه بارگیری نشد.</p>
         : !state.data ? <p className="text-xs" style={{ color: 'var(--ink-soft)' }}>برای این ریشه مدخل منطبق در نسخهٔ ارسالی پیدا نشد.</p>
@@ -90,7 +87,7 @@ function TahqiqMeaning({ root }: { root: string }) {
 
 function tahqiqSource(entry: Entry) {
   return {
-    title: 'التحقیق فی کلمات القرآن الکریم',
+    title: ROOT_BOOK_TITLES.tahqiq.full,
     description: 'واژه‌پژوهی قرآن با تمرکز بر معنای محوری ریشه‌ها و کاربردهای قرآنی آن‌ها.',
     fields: [
       { label: 'نویسنده', value: 'علامه حسن مصطفوی' },

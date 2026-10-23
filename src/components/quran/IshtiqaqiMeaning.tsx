@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { toFa } from '@/lib/quran'
 import SourceReference from './SourceReference'
+import RootBookHeading, { ROOT_BOOK_TITLES } from './RootBookHeading'
 import TahqiqText from './TahqiqText'
 
 type Reference = { volume: number; printed_page: number; page_id: number; url: string }
@@ -48,10 +49,8 @@ export default function IshtiqaqiMeaning({ root }: { root: string }) {
   const data = state.root === root ? state.data : undefined
   const summary = data?.entries.find(entry => entry.translation?.summary)?.translation?.summary
   return <section aria-label="معنای ریشه در المعجم الاشتقاقی" className="rounded-xl border p-3 mb-4 text-sm leading-7" style={{ borderColor: 'var(--line)' }}>
-    <button type="button" className="flex w-full items-start gap-2 text-right cursor-pointer" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>
-      <span className={expanded ? 'font-bold' : 'line-clamp-2'}><strong>المعجم الاشتقاقی{!expanded && summary && ': '}</strong>{!expanded && summary}</span>
-      <ChevronDown aria-hidden="true" size={16} className={`shrink-0 mt-1 mr-auto transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
-    </button>
+    <RootBookHeading book="ishtiqaqi" expanded={expanded} summary={summary || (data ? 'برای دیدن شرح ریشه باز کنید.' : undefined)}
+      source={data?.entries[0] ? ishtiqaqiSource(data.entries[0]) : undefined} onToggle={() => setExpanded(value => !value)} />
     {state.error && state.root === root ? <p role="alert" className="text-xs">شرح ریشه بارگیری نشد.</p>
       : data === undefined ? <p role="status" className="text-xs">در حال بارگیری…</p>
         : data === null ? <p className="text-xs" style={{ color: 'var(--ink-soft)' }}>مدخل این ریشه هنوز تطبیق داده نشده است.</p>
@@ -62,11 +61,10 @@ export default function IshtiqaqiMeaning({ root }: { root: string }) {
   </section>
 }
 
-function EntryMeaning({ entry, multiple }: { entry: Entry; multiple: boolean }) {
-  const [arabic, setArabic] = useState(false)
+function ishtiqaqiSource(entry: Entry) {
   const translation = entry.translation
-  const source = {
-    title: 'المعجم الاشتقاقي المؤصل لألفاظ القرآن الكريم',
+  return {
+    title: ROOT_BOOK_TITLES.ishtiqaqi.full,
     description: 'فرهنگ اشتقاقی واژگان قرآن با تأکید بر معنای محوری و پیوند واژه‌های هم‌ریشه.',
     fields: [
       { label: 'نویسنده', value: 'دکتر محمد حسن حسن جبل' },
@@ -78,10 +76,16 @@ function EntryMeaning({ entry, multiple }: { entry: Entry; multiple: boolean }) 
     notes: [translation ? translation.faFull ? 'متن مدخل نویسنده ترجمه شده؛ پاورقی‌ها و شرح مشترک فصل در ترجمه وارد نشده‌اند.' : 'فقط خلاصهٔ معنای محوری به فارسی آماده است؛ ترجمهٔ کامل هنوز آماده نیست.' : 'متن عربی از فایل ارسالی است؛ ترجمهٔ فارسی هنوز آماده نیست.'],
     links: [{ label: 'متن مأخذ در شامله', href: entry.references[0]?.url ?? 'https://shamela.ws/book/21017' }],
   }
+}
+
+function EntryMeaning({ entry, multiple }: { entry: Entry; multiple: boolean }) {
+  const [arabic, setArabic] = useState(false)
+  const translation = entry.translation
+
 
   return <div className="mt-2">
     {multiple && <h4 className="font-bold">{entry.heading}{entry.isSupplement && ' · مستدرک'}</h4>}
-    <SourceReference source={source} />
+    {multiple && <SourceReference source={ishtiqaqiSource(entry)} />}
     {translation?.faFull ? <TahqiqText text={translation.faFull} />
       : <div className="mt-2">
         {translation?.summary && <p className="text-justify">{translation.summary}</p>}
@@ -94,10 +98,10 @@ function EntryMeaning({ entry, multiple }: { entry: Entry; multiple: boolean }) 
       <ArabicText text={entry.ar} />
       {entry.footnotes.length > 0 && <details className="mt-3 text-xs"><summary className="cursor-pointer">پاورقی‌های صفحات منبع</summary>
         <p style={{ color: 'var(--ink-soft)' }}>این پاورقی‌ها متعلق به صفحه‌اند و ممکن است به مدخل‌های دیگر همان صفحه هم مربوط باشند.</p>
-        {entry.footnotes.map((note, i) => <div key={i} className="mt-2"><SourceReference label="صفحهٔ منبع" source={{ title: source.title, fields: [{ label: 'نویسنده', value: 'محمد حسن حسن جبل' }, { label: 'ارجاع', value: citation(note.source) }], notes: ['پاورقی این صفحه ممکن است به مدخل‌های دیگر همان صفحه مربوط باشد.'], links: [{ label: 'مشاهدهٔ صفحه', href: note.source.url }] }} /><ArabicText text={note.text} /></div>)}
+        {entry.footnotes.map((note, i) => <div key={i} className="mt-2"><SourceReference label="صفحهٔ منبع" source={{ title: ROOT_BOOK_TITLES.ishtiqaqi.full, fields: [{ label: 'نویسنده', value: 'محمد حسن حسن جبل' }, { label: 'ارجاع', value: citation(note.source) }], notes: ['پاورقی این صفحه ممکن است به مدخل‌های دیگر همان صفحه مربوط باشد.'], links: [{ label: 'مشاهدهٔ صفحه', href: note.source.url }] }} /><ArabicText text={note.text} /></div>)}
       </details>}
       {entry.commonMeanings.length > 0 && <details className="mt-3 text-xs"><summary className="cursor-pointer">معنای مشترک فصل</summary>
-        {entry.commonMeanings.map(common => <div key={common.id} className="mt-2"><SourceReference source={{ title: source.title, fields: [{ label: 'بخش', value: common.heading }, ...common.references.map(ref => ({ label: 'ارجاع', value: citation(ref) }))], links: common.references.map(ref => ({ label: `صفحهٔ ${toFa(ref.printed_page)}`, href: ref.url })) }} /><ArabicText text={common.ar} /></div>)}
+        {entry.commonMeanings.map(common => <div key={common.id} className="mt-2"><SourceReference source={{ title: ROOT_BOOK_TITLES.ishtiqaqi.full, fields: [{ label: 'بخش', value: common.heading }, ...common.references.map(ref => ({ label: 'ارجاع', value: citation(ref) }))], links: common.references.map(ref => ({ label: `صفحهٔ ${toFa(ref.printed_page)}`, href: ref.url })) }} /><ArabicText text={common.ar} /></div>)}
       </details>}
     </div>}
   </div>
