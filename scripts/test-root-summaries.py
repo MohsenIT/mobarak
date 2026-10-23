@@ -26,3 +26,7 @@ assert 'در برابر سعادت قرار می‌گیرد' in a['شقو'][0]['
 
 b=json.loads((ROOT/'public/data/maqayis-summaries.json').read_text())['entries']
 assert b['شقو'][0]['summary']=='رنج و خلافِ آسانی و خوشبختی.'
+
+assert b['قول'][0]['summary']=='گفتار از نطق.'
+source=json.loads((ROOT/'public/data/tahqiq/ضحو.json').read_text())['entries'][0]['fa']
+assert a['ضحو'][0]['summary']==source.removeprefix('اصل واحد، ').split('.',1)[0]+'.'

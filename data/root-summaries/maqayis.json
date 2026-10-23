@@ -11290,13 +11290,14 @@
     },
     "قول:0": {
       "id": "قول:0",
-      "summary": "نطق و گفتار.",
+      "summary": "گفتار از نطق.",
       "needsReview": false,
-      "note": "",
+      "note": "برداشت وفادار از عبارت موجود؛ الفاظ، قیدها و رابطهٔ معنایی مأخذ حفظ شده‌اند.",
       "sourceSha256": "14eff557f04b261d6e48a5da63c34137d8843b1bd290560b94f8ee8239bd86d2",
       "word": "قول",
       "root": "قول",
-      "reviewModel": "gemini-3.1-flash-lite"
+      "reviewModel": "gemini-3.1-flash-lite",
+      "editMethod": "source-excerpt"
     },
     "قوم:0": {
       "id": "قوم:0",
