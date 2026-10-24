@@ -3,7 +3,7 @@ import type { SearchMode } from './quran-search-session'
 import type { Translator } from './quran'
 
 export type SearchLinkState = {
-  query: string; mode: SearchMode; surahs: number[]; lemmas: string[]; forms: string[]
+  query: string; mode: SearchMode; contextSurah?: number; surahs: number[]; lemmas: string[]; forms: string[]
   includeRoots: boolean; includePartial: boolean; includeNear: boolean
   showTranslation: boolean; translator: Translator; occurrence: AnalysisSelection | null
 }
@@ -22,6 +22,7 @@ export function readSearchLink(href: string): SearchLinkState | null {
     ...(p.get('f') ? { form: p.get('f')!.slice(0, 20) } : {}), ...(p.get('px') === '1' ? { part: 'prefix' as const } : {}),
   } : null
   return {
+    ...(bounded(p.get('at')??undefined,114)?{contextSurah:Number(p.get('at'))}:{}),
     query: (p.get('q') || '').slice(0, 160), mode: p.get('m') === 'r' ? 'root' : p.get('m') === 'l' ? 'lemma' : 'text',
     surahs: [...new Set((p.get('s') || '').split(',').map(value => bounded(value, 114)).filter(Boolean))].sort((a,b) => a-b),
     lemmas: values('l'), forms: values('b'), includeRoots: p.get('h') !== '0', includePartial: p.get('p') !== '0', includeNear: p.get('n') === '1',
@@ -34,6 +35,7 @@ export function searchLink(current: string, state: SearchLinkState, native = fal
   const p = url.searchParams
   if (native) p.set('search', '1')
   if (state.query) p.set('q', state.query)
+  if (state.contextSurah) p.set('at', String(state.contextSurah))
   if (state.mode !== 'text') p.set('m', state.mode === 'root' ? 'r' : 'l')
   if (state.surahs.length) p.set('s', [...new Set(state.surahs)].sort((a,b) => a-b).join(','))
   for (const lemma of [...new Set(state.lemmas)].sort()) p.append('l', lemma)

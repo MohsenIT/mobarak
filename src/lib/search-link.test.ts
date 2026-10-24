@@ -26,3 +26,7 @@ test('invalid destinations are ignored and reading links shed search state', () 
   const reader = readingUrl(searchLink('https://example.com', base).href, 'flow', 20, 1)
   expect(reader.pathname).toBe('/s/20'); expect(reader.search).toBe('')
 })
+test('relative navigation commands keep their surah context when shared',()=>{
+  const state:SearchLinkState={...base,query:'ق۶',mode:'text',contextSurah:20}
+  expect(readSearchLink(searchLink('https://example.com',state).href)).toEqual(state)
+})

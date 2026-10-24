@@ -1,6 +1,7 @@
 'use client'
 import { readVerseAddress, writeVerseAddress, readSurahNumber, readPageNumber, readingUrl } from '@/lib/verse-link'
 import { readSearchLink, searchLink, type SearchLinkState } from '@/lib/search-link'
+import type { Destination } from '@/lib/navigation'
 import { wordTarget } from '@/lib/word-parts'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -308,6 +309,19 @@ export default function Home() {
     })
   }, [mode, requestMushafPage])
 
+  const navigateDestination = (destination: Destination) => {
+    setQuickSearchOpen(false);setSel(null)
+    if(searchOpen){setReturnToSearch(true);setSearchOpen(false)}
+    if(destination.kind==='page') {
+      if(mode==='mushaf') {
+        const url=readingUrl(window.location.href,'mushaf',surah,destination.p,process.env.NEXT_PUBLIC_DESKTOP==='1')
+        if(url.href!==window.location.href)window.history.pushState(window.history.state,'',url)
+      }
+      goPage(destination.p)
+    }
+    else goVerse(destination.s,destination.kind==='surah'?1:destination.kind==='context'?destination.from:destination.a,1,'start')
+  }
+
   useEffect(() => {
     const restore = () => {
       const search = readSearchLink(window.location.href)
@@ -455,7 +469,7 @@ export default function Home() {
     {meta && <div className={`h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
       <PatternBG />
 
-      <QuranSearch key={searchStart?.revision ?? 0} onStateChange={writeSearchState} initialSearch={searchStart} occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
+      <QuranSearch onNavigate={navigateDestination} key={searchStart?.revision ?? 0} onStateChange={writeSearchState} initialSearch={searchStart} occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
         setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); setComparisonRoot(null); goVerse(s, a, pos)
       }} />
 
@@ -468,7 +482,7 @@ export default function Home() {
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
           backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
         }}>
-        {quickSearchOpen ? <QuickSurahSearch surah={meta.surahs[curSurahN - 1]} onClose={() => setQuickSearchOpen(false)}
+        {quickSearchOpen ? <QuickSurahSearch meta={meta} onNavigate={navigateDestination} surah={meta.surahs[curSurahN - 1]} onClose={() => setQuickSearchOpen(false)}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos) }}
           onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label="منوی برنامه" title="منوی برنامه"><MoreHorizontal size={22} /></button>

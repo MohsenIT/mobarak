@@ -55,3 +55,33 @@ test('alternate names and opening phrases support Persian/Arabic spelling and ve
   expect(resolveDestination(meta, 'verse', 'توحید:۳', 20)).toEqual({ kind:'verse', s:112, a:3 })
   expect(resolveDestination(meta, 'surah', 'سوره حمد', 20)).toEqual({ kind:'surah', s:1 })
 })
+
+test('compact commands accept attached or spaced Persian, Arabic and Latin digits', async () => {
+  const {destinationSuggestions}=await import('./navigation')
+  for(const text of ['ص۶','ص ۶','ص٦','ص6','صفحه۶','صفحه ۶'])expect(destinationSuggestions(meta,text,20)[0]?.destination).toEqual({kind:'page',p:6})
+  for(const text of ['س۲۰','س ۲۰','س٢٠','س20','سوره۲۰','سورة٢٠'])expect(destinationSuggestions(meta,text,1)[0]?.destination).toEqual({kind:'surah',s:20})
+  for(const text of ['آ۶','ا۶','آیه۶','آية٦'])expect(destinationSuggestions(meta,text,20)[0]?.destination).toEqual({kind:'verse',s:20,a:6})
+  for(const text of ['ج۶','ج ۶','جزء۶'])expect(destinationSuggestions(meta,text,20)[0]?.destination).toEqual({kind:'verse',s:meta.juz['6'][0],a:meta.juz['6'][1]})
+})
+test('context commands use the recorded ranges and keep first and last alefs distinct', async()=>{
+  const {destinationSuggestions}=await import('./navigation')
+  const first={kind:'context' as const,s:20,index:1,from:1,to:8},last={kind:'context' as const,s:20,index:9,from:127,to:135}
+  for(const input of ['ق۶','ق ۶','سیاق۶','سیاق ۶','سياق٦'])expect(destinationSuggestions(meta,input,20)[0]?.destination).toEqual({kind:'context',s:20,index:6,from:80,to:98})
+  for(const input of ['ق ا','ق اول','قا'])expect(destinationSuggestions(meta,input,20)[0]?.destination).toEqual(first)
+  for(const input of ['ق آ','ق آخر','ق اخر','قآ','ق ا\u0653'])expect(destinationSuggestions(meta,input,20)[0]?.destination).toEqual(last)
+  for(const input of ['ق۰','ق۱۰','سیاق ۹۹۹'])expect(destinationSuggestions(meta,input,20)).toEqual([])
+  expect(destinationSuggestions(meta,'ق',20)[0]?.destination).toEqual({kind:'surah',s:50})
+})
+test('explicit cross-surah context/verse references and edge destinations are bounded',()=>{
+  for(const input of ['ق۲۰:۶','سیاق طه:۶','س۲۰ ق۶'])expect(resolveDestination(meta,'surah',input,1)).toEqual({kind:'context',s:20,index:6,from:80,to:98})
+  expect(resolveDestination(meta,'surah','س۲۰ آ۷۲',1)).toEqual({kind:'verse',s:20,a:72})
+  expect(resolveDestination(meta,'surah','ص آ',20)).toEqual({kind:'page',p:604})
+  expect(resolveDestination(meta,'surah','س آ',20)).toEqual({kind:'surah',s:114})
+  expect(resolveDestination(meta,'surah','آ آ',20)).toEqual({kind:'verse',s:20,a:135})
+  expect(resolveDestination(meta,'surah','س۹۹۹',20)).toBeNull()
+})
+test('search navigation never intercepts ordinary words or standalone surah initials',async()=>{
+  const {searchDestinations}=await import('./navigation')
+  for(const value of ['علم','ق','س','طه','صالح'])expect(searchDestinations(meta,value,20)).toEqual([])
+  expect(searchDestinations(meta,'ق۶',20)[0].destination.kind).toBe('context')
+})

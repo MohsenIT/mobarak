@@ -12,11 +12,13 @@ import { splitWord } from '@/lib/word-parts'
 import type { SearchMode } from '@/lib/quran-search-session'
 import { lemmaDisplay } from '@/lib/lemma-display'
 import { searchFormLabels } from '@/lib/search-form-labels'
+import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
 import { searchLink, type SearchLinkState } from '@/lib/search-link'
 import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
 export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number; state?: SearchLinkState }
 
 interface Props {
+  onNavigate?: (destination: Destination) => void
   onStateChange?: (state: SearchLinkState) => void
   initialSearch?: SearchStart | null
   occurrenceFilter?: AnalysisSelection | null
@@ -51,7 +53,7 @@ function snippet(result: QuranSearchResult, full = false) {
 }
 const labels = { exact: 'تطبیق دقیق', partial: 'شامل عبارت', near: 'نزدیک از نظر نوشتار', root: 'هم‌ریشه‌ها' }
 
-export default function QuranSearch({ open, onOpenChange, meta, currentSurah, onPick, occurrenceFilter, onClearOccurrenceFilter, translator, initialSearch, onStateChange }: Props) {
+export default function QuranSearch({ open, onOpenChange, meta, currentSurah, onPick, occurrenceFilter, onClearOccurrenceFilter, translator, initialSearch, onStateChange, onNavigate }: Props) {
   const restored = initialSearch?.state
   const [copyStatus, setCopyStatus] = useState('')
   const [query, setQuery] = useState(restored?.query ?? initialSearch?.query ?? '')
@@ -91,7 +93,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   useEffect(() => {
     if (previousFacetIdentity.current !== facetIdentity) { setLemmas([]); setForms([]); previousFacetIdentity.current = facetIdentity }
   }, [facetIdentity])
-  const linkState: SearchLinkState = { query, mode, surahs, lemmas, forms, includeRoots, includePartial, includeNear, showTranslation, translator, occurrence: occurrenceFilter ?? null }
+  const linkState: SearchLinkState = { query, mode, ...(isNavigationInput(query)?{contextSurah:restored?.contextSurah??currentSurah}:{}), surahs, lemmas, forms, includeRoots, includePartial, includeNear, showTranslation, translator, occurrence: occurrenceFilter ?? null }
   const linkStateKey = JSON.stringify(linkState)
   useEffect(() => { if (open) { onStateChange?.(JSON.parse(linkStateKey)); setCopyStatus('') } }, [open, linkStateKey, onStateChange])
 
@@ -167,6 +169,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     setter(current => current.includes(value) ? current.filter(x => x !== value) : [...current, value]); setVisible(20); scroll.current = 0; if (list.current) list.current.scrollTop = 0
   }
   const setScope = (s: number, checked: boolean) => setSurahs(current => checked ? [...current, s].sort((a, b) => a - b) : current.filter(n => n !== s))
+  const destinations = mode === 'text' && !occurrenceFilter ? searchDestinations(meta,query,restored?.contextSurah??currentSurah) : []
   const scopeLabel = surahs.length === 0 ? 'همهٔ قرآن' : surahs.length === 1 ? `سورهٔ ${meta.surahs[surahs[0] - 1]?.fa}` : `${toFa(surahs.length)} سوره`
   if (!open) return null
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir="rtl" aria-label="جست‌وجو در قرآن" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
@@ -183,7 +186,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
               onKeyDown={event => {
                 if (event.key === 'ArrowDown' && !busy && suggestions.length) { event.preventDefault(); setCompletionOpen(true); setCompletionIndex(i => (i + 1) % suggestions.length) }
                 else if (event.key === 'ArrowUp' && !busy && suggestions.length) { event.preventDefault(); setCompletionOpen(true); setCompletionIndex(i => (i - 1 + suggestions.length) % suggestions.length) }
-                else if (event.key === 'Enter') { event.preventDefault(); if (completionOpen && completionIndex >= 0) setQuery(suggestions[completionIndex]); setCompletionOpen(false); input.current?.blur() }
+                else if (event.key === 'Enter') { event.preventDefault(); if (destinations.length===1&&onNavigate) onNavigate(destinations[0].destination); else if (completionOpen && completionIndex >= 0) setQuery(suggestions[completionIndex]); setCompletionOpen(false); input.current?.blur() }
                 else if (event.key === 'Escape' && completionOpen) { event.preventDefault(); event.stopPropagation(); setCompletionOpen(false) }
               }}
               aria-label={mode === 'root' ? 'جست‌وجوی ریشه' : mode === 'lemma' ? 'جست‌وجوی بُن‌واژه' : 'عبارت جست‌وجو در متن قرآن'} placeholder={occurrenceFilter ? 'جست‌وجوی تازه…' : mode === 'root' ? 'ریشه؛ مثلاً علم' : mode === 'lemma' ? 'بُن‌واژه…' : 'واژه یا عبارت…'} autoComplete="off" autoCorrect="off" spellCheck={false} />
@@ -210,6 +213,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         {includeNear && mode === 'text' && <button type="button" className="search-active-filter" aria-label="غیرفعال‌کردن خطای املایی" onClick={() => setIncludeNear(false)}>خطای املایی فعال است <X size={12} /></button>}
         {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? `ریشهٔ ${occurrenceFilter.root ?? ''}` : occurrenceFilter.tab === 'form' ? `باب ${occurrenceFilter.form} · ${occurrenceFilter.root ?? ''}` : `بن‌واژهٔ ${occurrenceFilter.text}`}</span><button type="button" aria-label="حذف فیلتر تکرارها" onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
       </header>
+      {onNavigate&&destinations.length>0&&<div className="search-jump-options" aria-label="مقصد پیمایش">{destinations.map((item,i)=><button type="button" key={i} onClick={()=>onNavigate(item.destination)}>رفتن به {toFa(item.label)} ←</button>)}</div>}
       <div className="search-results-summary" role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />در حال جست‌وجو…</span> : !valid ? 'اعراب و تفاوت «ک» و «ی» فارسی و عربی مانع جست‌وجو نیست.' : error ? 'بارگیری جست‌وجو انجام نشد.' : `${toFa(results.length)} آیه · ${toFa(results.reduce((sum, r) => sum + r.positions.length, 0))} تطبیق`}</div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label="نتایج جست‌وجو" aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
         {!busy && rawResults.length > 0 && <div className="search-facets-inline" aria-label="فیلتر نتایج">

@@ -8,7 +8,7 @@ import SurahShortcuts from './SurahShortcuts'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
-import { destinationSuggestions, resolveDestination, normalizeSearch, searchSurahs, type Destination } from '@/lib/navigation'
+import { destinationSuggestions, resolveDestination, normalizeSearch, NAVIGATION_HELP, searchSurahs, type Destination } from '@/lib/navigation'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate } from './Ornaments'
 
 export type { Translator } from '@/lib/quran'
@@ -94,7 +94,7 @@ export default function NavDrawer(props: Props) {
   const goTo = (destination: Destination) => {
     if (destination.kind === 'page') onGoPage(destination.p)
     else if (destination.kind === 'surah') onGoSurah(destination.s)
-    else onGoVerse(destination.s, destination.a)
+    else onGoVerse(destination.s, destination.kind === 'context' ? destination.from : destination.a)
     onClose()
   }
   const submitPage = (e: React.FormEvent) => {
@@ -118,6 +118,9 @@ export default function NavDrawer(props: Props) {
 
         {props.view === 'tools' && <>
         <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>جست‌وجوی پیشرفته</span><span>در متن، ریشه و بُن‌واژه ←</span></button>
+        {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onTogglePin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
+        </>}
+        {props.view !== 'tools' && <>
         <form onSubmit={submitPage} className="flex items-center gap-2 px-4 pb-3">
           <input
             value={pageInput}
@@ -126,7 +129,7 @@ export default function NavDrawer(props: Props) {
             aria-invalid={pageError}
             aria-describedby={pageError ? 'page-jump-error' : undefined}
             inputMode="text"
-            placeholder="برو به… طه، ۲۰:۱۴، صفحه ۵۰"
+            placeholder="برو به… س۲۰، ص۶، ق۶، طه:۱۴"
             className="flex-1 min-w-0 rounded-xl border px-3 py-2.5 text-sm bg-transparent outline-none"
             style={{ borderColor: 'var(--line-strong)', color: 'var(--ink)' }}
           />
@@ -135,14 +138,13 @@ export default function NavDrawer(props: Props) {
             برو
           </button>
         </form>
-        {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">مقصد را از پیشنهادها انتخاب کنید یا دقیق‌تر بنویسید؛ مثلاً «طه:۱۴» یا «صفحه ۵۰».</p>}
+        {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">مقصد را از پیشنهادها انتخاب کنید یا دقیق‌تر بنویسید؛ مثلاً «ص۶»، «س۲۰»، «ق۶» یا «طه:۱۴».</p>}
 
         {suggestions.length > 0 && <div className="drawer-destination-options" aria-label="مقصدهای پیشنهادی">
           {suggestions.map((item, index) => <button key={index} type="button" onClick={() => goTo(item.destination)}>{toFa(item.label)}</button>)}
         </div>}
-        {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onTogglePin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
+        <details className="px-4 pb-3 text-xs leading-7"><summary>راهنمای «برو»</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{kind}</dt><dd>{examples}</dd></div>)}</dl><p>«ا» یعنی اول و «آ» یعنی آخر. آیه و سیاق، بدون نام سوره، به سورهٔ فعلی مربوط‌اند. عددِ تنها چند مقصد پیشنهادی دارد.</p></details>
         </>}
-        {props.view !== 'tools' && tab === 'surah' && <div className="px-4 pb-3"><input type="search" aria-label="یافتن سوره" placeholder="نام یا شمارهٔ سوره" value={pageInput} onChange={event=>setPageInput(event.target.value)} className="w-full rounded-xl border px-3 py-2.5 text-sm bg-transparent" style={{borderColor:'var(--line-strong)'}} /></div>}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'settings' : t.id === 'surah' || t.id === 'juz').map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
