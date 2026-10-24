@@ -1399,8 +1399,3 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 /* Reading navigation and the full settings/analysis workspace have separate entries. */
 .reader-surah-link { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 36px; border-radius: 10px; padding: 4px 8px; border: 1px solid var(--line); }
 .reader-surah-link svg { flex-shrink: 0; color: var(--ink-soft); }
-.app-tools-page { position: fixed; inset: 0; z-index: 42; display: flex; flex-direction: column; background: var(--paper); padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
-.tools-card { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); padding: 16px; border-radius: 14px; text-align: right; min-height: 72px; }
-.tools-card > svg { flex-shrink: 0; color: var(--sage); }
-.tools-card b { display: block; font-size: 14px; }
-.tools-card small { display: block; font-size: 11px; line-height: 1.9; color: var(--ink-soft); }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowRight, BookOpenText, GitCompareArrows, Settings } from 'lucide-react'
 import ReadingScreenSettings from './ReadingScreen'
 import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
@@ -16,8 +15,6 @@ export type { Translator } from '@/lib/quran'
 
 interface Props {
   view?: 'navigation' | 'tools'
-  onShowKeywords?: () => void
-  onCompare?: () => void
   meta: Meta
   bookmarks: number[]
   recentSurahs: number[]
@@ -48,9 +45,8 @@ const TABS = [
   { id: 'surah', label: 'سوره‌ها' },
   { id: 'juz', label: 'اجزاء' },
   { id: 'recent', label: 'اخیر' },
+  { id: 'settings', label: 'تنظیمات' },
 ] as const
-
-const TOOL_TABS = [{ id: 'tools', label: 'تحلیل‌ها' }, { id: 'settings', label: 'تنظیمات' }] as const
 
 const TRANSLATORS: { id: Translator; name: string }[] = [
   { id: 's', name: 'سید محمدرضا صفوی (مبتنی بر المیزان)' },
@@ -61,7 +57,7 @@ const TRANSLATORS: { id: Translator; name: string }[] = [
 
 export default function NavDrawer(props: Props) {
   const { meta, onClose, onGoPage, onGoSurah, onGoVerse, currentSurah } = props
-  const [tab, setTab] = useState<(typeof TABS)[number]['id'] | (typeof TOOL_TABS)[number]['id']>(props.view === 'tools' ? 'tools' : 'surah')
+  const [tab, setTab] = useState<(typeof TABS)[number]['id']>(props.view === 'tools' ? 'settings' : 'surah')
   const [pageInput, setPageInput] = useState('')
   const q = pageInput
   const contentRef = useRef<HTMLDivElement>(null)
@@ -111,16 +107,16 @@ export default function NavDrawer(props: Props) {
   return (
     <>
       <div className="sheet-backdrop" onClick={onClose} />
-      <aside className={props.view === 'tools' ? 'app-tools-page' : 'drawer'} role="dialog" aria-label={props.view === 'tools' ? 'ابزارها و تنظیمات' : 'فهرست سوره‌ها'}>
+      <aside className="drawer" role="dialog" aria-label={props.view === 'tools' ? 'منوی برنامه' : 'فهرست سوره‌ها'}>
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <img src="/icons/logo-5-192.png" width="34" height="34" alt="" className="shrink-0 rounded-full" />
-            <h2 className="font-bold text-lg" style={{ color: 'var(--ink)' }}>{props.view === 'tools' ? tab === 'settings' ? 'تنظیمات' : 'امکانات قرآن' : APP_NAME}</h2>
+            <h2 className="font-bold text-lg" style={{ color: 'var(--ink)' }}>{APP_NAME}</h2>
           </div>
-          <button className="icon-btn" onClick={() => props.view === 'tools' && tab === 'settings' ? setTab('tools') : onClose()} aria-label={props.view === 'tools' && tab === 'settings' ? 'بازگشت به امکانات' : 'بستن'}>{props.view === 'tools' ? <ArrowRight size={20}/> : <IconClose />}</button>
+          <button className="icon-btn" onClick={onClose} aria-label="بستن"><IconClose /></button>
         </div>
 
-        {props.view !== 'tools' && <>
+        {props.view === 'tools' && <>
         <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>جست‌وجوی پیشرفته</span><span>در متن، ریشه و بُن‌واژه ←</span></button>
         <form onSubmit={submitPage} className="flex items-center gap-2 px-4 pb-3">
           <input
@@ -146,13 +142,14 @@ export default function NavDrawer(props: Props) {
         </div>}
         {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onTogglePin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
         </>}
-        {props.view !== 'tools' && <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
-          {TABS.map(t => (
+        {props.view !== 'tools' && tab === 'surah' && <div className="px-4 pb-3"><input type="search" aria-label="یافتن سوره" placeholder="نام یا شمارهٔ سوره" value={pageInput} onChange={event=>setPageInput(event.target.value)} className="w-full rounded-xl border px-3 py-2.5 text-sm bg-transparent" style={{borderColor:'var(--line-strong)'}} /></div>}
+        <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
+          {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'settings' : t.id === 'surah' || t.id === 'juz').map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
               {t.label}
             </button>
           ))}
-        </div>}
+        </div>
 
         <div ref={contentRef} className="flex-1 overflow-y-auto nice-scroll">
           {tab === 'surah' && (
@@ -253,15 +250,8 @@ export default function NavDrawer(props: Props) {
             </div>
           )}
 
-          {tab === 'tools' && <div className="p-4 flex flex-col gap-3 max-w-2xl w-full mx-auto">
-            <h3 className="text-sm font-bold mt-2">تنظیمات</h3>
-            <button type="button" className="tools-card" onClick={()=>{setTab('settings');contentRef.current?.scrollTo({top:0})}}><Settings size={22}/><span><b>تنظیمات</b><small>نمایش، ترجمه، آفلاین و روشن ماندن صفحه</small></span></button>
-            <h3 className="text-sm font-bold mt-4">تحلیل درون سوره</h3>
-            <button type="button" className="tools-card" onClick={props.onShowKeywords}><BookOpenText size={22}/><span><b>کلیدواژه‌های سوره</b><small>ریشه‌ها و واژه‌های برجستهٔ سورهٔ جاری</small></span></button>
-            <button type="button" className="tools-card" onClick={props.onCompare}><GitCompareArrows size={22}/><span><b>مقایسهٔ بازه‌های آیات</b><small>اشتراک ریشه‌ها در دو بخش از یک سوره</small></span></button>
-          </div>}
           {tab === 'settings' && (
-            <div className="p-4 flex flex-col gap-6 max-w-2xl w-full mx-auto">
+            <div className="p-4 flex flex-col gap-6">
               <ReadingScreenSettings />
               <UpdateSettings />
               <OfflineSettings />

@@ -471,7 +471,7 @@ export default function Home() {
         {quickSearchOpen ? <QuickSurahSearch surah={meta.surahs[curSurahN - 1]} onClose={() => setQuickSearchOpen(false)}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos) }}
           onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
-        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label="ابزارها و تنظیمات" title="ابزارها و تنظیمات"><MoreHorizontal size={22} /></button>
+        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label="منوی برنامه" title="منوی برنامه"><MoreHorizontal size={22} /></button>
 
         <button className="reader-surah-link flex-1 min-w-0" aria-label="بازکردن فهرست سوره‌ها" aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
           <span className="font-bold text-[14px] sm:text-[15px] truncate" style={{ color: 'var(--ink)' }}>
@@ -480,6 +480,15 @@ export default function Home() {
         </button>
 
         <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setSel(null); setQuickSearchOpen(true) }}><Search size={20} /></button>
+
+        {/* surah keyword index — opens the sorted-keywords page */}
+        <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
+          <IconSortIndex />
+        </button>
+        <button className="icon-btn" onClick={() => { setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }} aria-label="ارتباط ریشه‌ای بازه آیات" title="ارتباط ریشه‌ای بازه آیات">
+          <GitCompareArrows size={20} />
+        </button>
+
 
           <button className="icon-btn" aria-label="نمایش ترجمه"
             title="ترجمه"
@@ -606,8 +615,6 @@ export default function Home() {
       {/* ===== Drawer ===== */}
       {drawerOpen && (
         <NavDrawer key={drawerView} view={drawerView}
-          onShowKeywords={() => { setDrawerOpen(false); setShowIndex(true) }}
-          onCompare={() => { setDrawerOpen(false); setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }}
           meta={meta}
           bookmarks={bookmarks}
           recentSurahs={recentSurahs}
