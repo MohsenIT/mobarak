@@ -1395,3 +1395,12 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .verse-share-options { position:absolute; top:100%; right:0; z-index:2; padding:12px; width:220px; border:1px solid var(--line); border-radius:12px; background:var(--sheet); box-shadow:0 8px 24px #0004; }
 .verse-share-footer { border-top:1px solid var(--line); padding-top:10px; padding-bottom:env(safe-area-inset-bottom); }
 @media(max-width:600px) { .verse-share-dialog { inset:auto 0 0; transform:none; width:100%; max-height:92dvh; border-radius:20px 20px 0 0; } }
+
+/* Reading navigation and the full settings/analysis workspace have separate entries. */
+.reader-surah-link { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 36px; border-radius: 10px; padding: 4px 8px; border: 1px solid var(--line); }
+.reader-surah-link svg { flex-shrink: 0; color: var(--ink-soft); }
+.app-tools-page { position: fixed; inset: 0; z-index: 42; display: flex; flex-direction: column; background: var(--paper); padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+.tools-card { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); padding: 16px; border-radius: 14px; text-align: right; min-height: 72px; }
+.tools-card > svg { flex-shrink: 0; color: var(--sage); }
+.tools-card b { display: block; font-size: 14px; }
+.tools-card small { display: block; font-size: 11px; line-height: 1.9; color: var(--ink-soft); }

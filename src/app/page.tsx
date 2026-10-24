@@ -20,7 +20,7 @@ import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, GitCompareArrows, Search } from 'lucide-react'
+import { ArrowRight, GitCompareArrows, Search, MoreHorizontal, ChevronDown } from 'lucide-react'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import {
@@ -63,6 +63,7 @@ export default function Home() {
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
   const [pinnedSurahs, setPinnedSurahs] = useState<number[]>(() => LS.get('mushaf.pinned-surahs', []))
   const [recentSurahs, setRecentSurahs] = useState<number[]>(() => LS.get('mushaf.recent-surahs', []))
+  const [drawerView, setDrawerView] = useState<'navigation' | 'tools'>('navigation')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [quickSearchOpen, setQuickSearchOpen] = useState(false)
@@ -470,25 +471,15 @@ export default function Home() {
         {quickSearchOpen ? <QuickSurahSearch surah={meta.surahs[curSurahN - 1]} onClose={() => setQuickSearchOpen(false)}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos) }}
           onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
-        <button className="icon-btn" onClick={() => setDrawerOpen(true)} aria-label="فهرست"><IconMenu /></button>
+        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label="ابزارها و تنظیمات" title="ابزارها و تنظیمات"><MoreHorizontal size={22} /></button>
 
-        <button className="flex-1 min-w-0 text-center" aria-label="بازکردن فهرست سوره‌ها" onClick={() => setDrawerOpen(true)}>
-          <p className="font-bold text-[14px] sm:text-[15px] truncate" style={{ color: 'var(--ink)' }}>
+        <button className="reader-surah-link flex-1 min-w-0" aria-label="بازکردن فهرست سوره‌ها" aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
+          <span className="font-bold text-[14px] sm:text-[15px] truncate" style={{ color: 'var(--ink)' }}>
             {mode === 'mushaf' ? pageInfo.names : meta.surahs[surah - 1]?.ar}
-          </p>
+          </span><ChevronDown size={16} aria-hidden="true" />
         </button>
 
         <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setSel(null); setQuickSearchOpen(true) }}><Search size={20} /></button>
-
-
-        {/* surah keyword index — opens the sorted-keywords page */}
-        <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
-          <IconSortIndex />
-        </button>
-        <button className="icon-btn" onClick={() => { setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }} aria-label="ارتباط ریشه‌ای بازه آیات" title="ارتباط ریشه‌ای بازه آیات">
-          <GitCompareArrows size={20} />
-        </button>
-
 
           <button className="icon-btn" aria-label="نمایش ترجمه"
             title="ترجمه"
@@ -497,6 +488,8 @@ export default function Home() {
             onClick={() => setShowTrans(v => !v)}>
             <IconTranslate />
           </button>
+
+
         </>}
       </header>
 
@@ -529,7 +522,7 @@ export default function Home() {
               selection={sel ? analysisSelection ?? sel : null}
               highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
               analysisSelection={sel ? analysisSelection : null} comparisonRange={comparisonRange}
-              comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots} flash={flash} onOpenSurahs={() => setDrawerOpen(true)} onWordTap={tapWord} />
+              comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots} flash={flash} onOpenSurahs={() => { setDrawerView('navigation'); setDrawerOpen(true) }} onWordTap={tapWord} />
           ) : (
             <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs} fontSize={flowFont} showTrans={showTrans} translator={translator}
               ready={!loadingPage && flowSurah?.n === surah}
@@ -559,7 +552,7 @@ export default function Home() {
                     comparisonRange={comparisonRange}
                     comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots}
                     flash={flash}
-                    onOpenSurahs={() => setDrawerOpen(true)} onWordTap={tapWord}
+                    onOpenSurahs={() => { setDrawerView('navigation'); setDrawerOpen(true) }} onWordTap={tapWord}
                   />
                 )}
               </FlowSurface>
@@ -612,7 +605,9 @@ export default function Home() {
 
       {/* ===== Drawer ===== */}
       {drawerOpen && (
-        <NavDrawer
+        <NavDrawer key={drawerView} view={drawerView}
+          onShowKeywords={() => { setDrawerOpen(false); setShowIndex(true) }}
+          onCompare={() => { setDrawerOpen(false); setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }}
           meta={meta}
           bookmarks={bookmarks}
           recentSurahs={recentSurahs}
