@@ -9,10 +9,10 @@ import { toFa } from '@/lib/quran'
 import { RECITER, RECITERS, nextRecitation, type PlaybackPosition } from '@/lib/recitation'
 import { audioDownloadStatus, cleanAudioCache, deleteRecitation, downloadRecitation, getVerseAudio } from '@/lib/recitation-storage'
 
-interface Props { open: boolean; surah: SurahMeta; startAyah: number; onClose: () => void; onFollow: (s: number, a: number) => void; selectedAyah?: number | null; onPlaying: (s: number,a: number) => void; onNextSurah: (s:number,a?:number) => void; previousSurahVerses?: number }
+interface Props { controlsVisible?: boolean; open: boolean; surah: SurahMeta; startAyah: number; onClose: () => void; onFollow: (s: number, a: number) => void; selectedAyah?: number | null; onPlaying: (s: number,a: number) => void; onNextSurah: (s:number,a?:number) => void; previousSurahVerses?: number }
 const initial = (ayah: number): PlaybackPosition => ({ ayah, verseRound: 1, surahRound: 1 })
 const repeatOptions = [1,2,3,5,10,0]
-export default function RecitationPlayer({ open, surah, startAyah, onClose, onFollow, selectedAyah, onPlaying, onNextSurah, previousSurahVerses }: Props) {
+export default function RecitationPlayer({ controlsVisible=true, open, surah, startAyah, onClose, onFollow, selectedAyah, onPlaying, onNextSurah, previousSurahVerses }: Props) {
   const audio = useRef<HTMLAudioElement>(null)
   const [reciterId,setReciterId]=useState<string>(RECITER.id)
   const reciter=RECITERS.find(item=>item.id===reciterId)??RECITER
@@ -38,6 +38,7 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
   const [progress, setProgress] = useState<number | null>(null)
   const download = useRef<AbortController | null>(null)
   const intent = useRef(false)
+  const wasOpen = useRef(false)
   const source = useRef('')
   const current = useRef({ position, verseRepeats, surahRepeats, total: surah.vc, follow, onFollow, onPlaying, onNextSurah, surah: surah.n })
   current.current = { position, verseRepeats, surahRepeats, total: surah.vc, follow, onFollow, onPlaying, onNextSurah, surah: surah.n }
@@ -62,8 +63,10 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
   }
   useEffect(() => { if (audio.current) audio.current.playbackRate = speed }, [speed])
   useEffect(() => {
+    const starting=open && !wasOpen.current
+    wasOpen.current=open
     const continuing=open && pendingSurah.current===surah.n
-    intent.current=continuing && pendingAutoplay.current && (background || !document.hidden);pendingSurah.current=null; audio.current?.pause(); setPlaying(false); setSettings(false); setError(''); setNotice('')
+    intent.current=(starting || continuing && pendingAutoplay.current) && (background || !document.hidden);pendingSurah.current=null; audio.current?.pause(); setPlaying(false); setSettings(false); setError(''); setNotice('')
     setPosition(initial(continuing?pendingAyah.current:Math.max(1, Math.min(surah.vc, start.current))))
     setPositionSurah(surah.n)
     download.current?.abort(); download.current = null; setProgress(null); setDownloaded(false); setSavedParts(0); setSavedBytes(0)
@@ -164,7 +167,7 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
       const c=current.current;c.onPlaying(c.surah,c.position.ayah); if(c.follow) c.onFollow(c.surah,c.position.ayah)
     }} onPause={() => setPlaying(false)} onError={() => { if(source.current) { intent.current=false;setPlaying(false);setError('فایل صوتی قابل پخش نیست؛ دوباره امتحان کنید.') } }} />
 
-    {open && <div className="recitation-bar" role="region" aria-label="پخش تلاوت">
+    {open && controlsVisible && <div className="recitation-bar" role="region" aria-label="پخش تلاوت">
       <button type="button" className="recitation-location" onClick={() => onFollow(surah.n,position.ayah)} title="رفتن به آیهٔ در حال پخش">{surah.fa} · آیهٔ {toFa(position.ayah)}<small>{reciter.name}</small></button>
       <div className="recitation-controls" dir="ltr">
         <button type="button" className="icon-btn sm" aria-label="آیهٔ قبلی" disabled={position.ayah<=1 && surah.n===1} onClick={skipPrevious}><SkipBack size={17} /></button>
