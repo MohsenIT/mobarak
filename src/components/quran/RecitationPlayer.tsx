@@ -6,7 +6,7 @@ import { useRecitationMediaSession } from './useRecitationMediaSession'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import type { SurahMeta } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
-import { RECITER, nextRecitation, type PlaybackPosition } from '@/lib/recitation'
+import { RECITER, RECITERS, nextRecitation, type PlaybackPosition } from '@/lib/recitation'
 import { audioDownloadStatus, cleanAudioCache, deleteRecitation, downloadRecitation, getVerseAudio } from '@/lib/recitation-storage'
 
 interface Props { open: boolean; surah: SurahMeta; startAyah: number; onClose: () => void; onFollow: (s: number, a: number) => void; selectedAyah?: number | null; onPlaying: (s: number,a: number) => void; onNextSurah: (s:number,a?:number) => void; previousSurahVerses?: number }
@@ -14,6 +14,9 @@ const initial = (ayah: number): PlaybackPosition => ({ ayah, verseRound: 1, sura
 const repeatOptions = [1,2,3,5,10,0]
 export default function RecitationPlayer({ open, surah, startAyah, onClose, onFollow, selectedAyah, onPlaying, onNextSurah, previousSurahVerses }: Props) {
   const audio = useRef<HTMLAudioElement>(null)
+  const [reciterId,setReciterId]=useState<string>(RECITER.id)
+  const reciter=RECITERS.find(item=>item.id===reciterId)??RECITER
+  const activeAudio=useRef({s:surah.n,id:reciter.id});activeAudio.current={s:surah.n,id:reciter.id}
   const [position, setPosition] = useState(() => initial(startAyah))
   const [positionSurah, setPositionSurah] = useState(surah.n)
   const pendingSurah = useRef<number | null>(null)
@@ -49,11 +52,12 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
       if ([0.75,1,1.25,1.5,2].includes(saved.speed)) setSpeed(saved.speed)
       if (typeof saved.follow === 'boolean') setFollow(saved.follow)
       if (typeof saved.background === 'boolean') setBackground(saved.background)
+      if(RECITERS.some(item=>item.id===saved.reciter))setReciterId(saved.reciter)
     } catch {}
     void cleanAudioCache().catch(() => {})
     return () => download.current?.abort()
   }, [])
-  const saveSetting = (key: string, value: number | boolean) => {
+  const saveSetting = (key: string, value: number | boolean | string) => {
     try { const saved = JSON.parse(localStorage.getItem('quran-recitation-settings') || '{}'); localStorage.setItem('quran-recitation-settings', JSON.stringify({ ...saved, [key]: value })) } catch {}
   }
   useEffect(() => { if (audio.current) audio.current.playbackRate = speed }, [speed])
@@ -63,12 +67,14 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
     setPosition(initial(continuing?pendingAyah.current:Math.max(1, Math.min(surah.vc, start.current))))
     setPositionSurah(surah.n)
     download.current?.abort(); download.current = null; setProgress(null); setDownloaded(false); setSavedParts(0); setSavedBytes(0)
-    if (open) {
-      let live = true
-      audioDownloadStatus(surah.n,surah.vc).then(value => { if (live) { setDownloaded(value.complete);setSavedParts(value.count);setSavedBytes(value.bytes) } }).catch(() => {})
-      return () => { live = false }
-    }
   }, [open, surah.n, surah.vc])
+  useEffect(()=>{
+    download.current?.abort();download.current=null;setProgress(null);setDownloaded(false);setSavedParts(0);setSavedBytes(0);setNotice('')
+    if(!open)return
+    let live=true
+    audioDownloadStatus(surah.n,surah.vc,reciter).then(value=>{if(live){setDownloaded(value.complete);setSavedParts(value.count);setSavedBytes(value.bytes)}}).catch(()=>{})
+    return()=>{live=false;download.current?.abort()}
+  },[open,surah.n,surah.vc,reciter.id])
 
   useEffect(() => {
     const element = audio.current
@@ -76,7 +82,7 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
     const controller = new AbortController()
     setReady(false); setError(''); element.pause(); setPlaying(false)
     let objectUrl = ''
-    getVerseAudio(surah.n,position.ayah,controller.signal).then(result => {
+    getVerseAudio(surah.n,position.ayah,controller.signal,false,reciter).then(result => {
       if (controller.signal.aborted) return
       objectUrl = URL.createObjectURL(result.blob); source.current = objectUrl
       element.src = objectUrl; element.playbackRate = currentSpeed.current; setReady(true)
@@ -86,7 +92,7 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
       if (!controller.signal.aborted) { intent.current = false; setError('صوت دریافت نشد؛ اتصال اینترنت را بررسی و دوباره امتحان کنید.') }
     })
     return () => { controller.abort(); element.pause(); element.removeAttribute('src'); element.load(); if (objectUrl) URL.revokeObjectURL(objectUrl); source.current = '' }
-  }, [open, surah.n, positionSurah, position.ayah, retry])
+  }, [open, surah.n, positionSurah, position.ayah, retry,reciter.id])
   const currentSpeed = useRef(speed); currentSpeed.current = speed
   // Same verse repeats do not reload or download its audio.
   const ended = () => {
@@ -141,15 +147,15 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
     document.addEventListener('visibilitychange',visibility);visibility()
     return()=>document.removeEventListener('visibilitychange',visibility)
   },[background])
-  useRecitationMediaSession({audio,active:open,playing,title:`سورهٔ ${surah.fa} · آیهٔ ${toFa(position.ayah)}`,artist:RECITER.name,
+  useRecitationMediaSession({audio,active:open,playing,title:`سورهٔ ${surah.fa} · آیهٔ ${toFa(position.ayah)}`,artist:reciter.name,
     onPlay:resume,onPause:pause,onNext:skipNext,onPrevious:skipPrevious,onStop:()=>{pause();onClose()}})
   const startDownload = async () => {
     const controller = new AbortController(); download.current = controller; setProgress(0); setError('')
     try {
-      await downloadRecitation(surah.n,surah.vc,controller.signal,setProgress)
+      await downloadRecitation(surah.n,surah.vc,controller.signal,setProgress,reciter)
       if (!controller.signal.aborted) { setDownloaded(true); setNotice('صوت این سوره برای استفادهٔ آفلاین ذخیره شد.') }
     } catch { if (!controller.signal.aborted) setError('دانلود کامل نشد؛ اتصال یا فضای خالی را بررسی کنید. با تلاش دوباره از ادامه دریافت می‌شود.') }
-    finally { if (download.current === controller) { download.current = null; setProgress(null); void audioDownloadStatus(surah.n,surah.vc).then(value=>{setDownloaded(value.complete);setSavedParts(value.count);setSavedBytes(value.bytes)}).catch(()=>{}) } }
+    finally { if (download.current === controller) { download.current = null; setProgress(null); void audioDownloadStatus(surah.n,surah.vc,reciter).then(value=>{if(activeAudio.current.s!==surah.n||activeAudio.current.id!==reciter.id)return;setDownloaded(value.complete);setSavedParts(value.count);setSavedBytes(value.bytes)}).catch(()=>{}) } }
   }
   return <>
     <audio ref={audio} preload="none" onEnded={ended} onPlay={() => {
@@ -159,7 +165,7 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
     }} onPause={() => setPlaying(false)} onError={() => { if(source.current) { intent.current=false;setPlaying(false);setError('فایل صوتی قابل پخش نیست؛ دوباره امتحان کنید.') } }} />
 
     {open && <div className="recitation-bar" role="region" aria-label="پخش تلاوت">
-      <button type="button" className="recitation-location" onClick={() => onFollow(surah.n,position.ayah)} title="رفتن به آیهٔ در حال پخش">{surah.fa} · آیهٔ {toFa(position.ayah)}<small>{RECITER.name}</small></button>
+      <button type="button" className="recitation-location" onClick={() => onFollow(surah.n,position.ayah)} title="رفتن به آیهٔ در حال پخش">{surah.fa} · آیهٔ {toFa(position.ayah)}<small>{reciter.name}</small></button>
       <div className="recitation-controls" dir="ltr">
         <button type="button" className="icon-btn sm" aria-label="آیهٔ قبلی" disabled={position.ayah<=1 && surah.n===1} onClick={skipPrevious}><SkipBack size={17} /></button>
         <button type="button" className="icon-btn sm recitation-play" aria-label={playing?'مکث تلاوت':'پخش تلاوت'} disabled={!ready} onClick={toggle}>{!ready&&!error?<LoaderCircle size={19} className="animate-spin" />:playing?<Pause size={19}/>:<Play size={19}/>}</button>
@@ -170,7 +176,8 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
       {error && <div className="recitation-error" role="status">{error} <button type="button" onClick={() => { intent.current=false;setRetry(v=>v+1) }}>تلاش دوباره</button></div>}
     </div>}
     <Dialog open={open&&settings} onOpenChange={setSettings}><DialogContent className="recitation-settings" dir="rtl">
-      <DialogHeader><DialogTitle>تلاوت {surah.fa}</DialogTitle><DialogDescription>{RECITER.name} · ترتیل</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>تلاوت {surah.fa}</DialogTitle><DialogDescription>{reciter.name} · ترتیل</DialogDescription></DialogHeader>
+      <label>قاری<select aria-label="قاری" value={reciter.id} onChange={e=>{setReciterId(e.target.value);saveSetting('reciter',e.target.value)}}>{RECITERS.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       <label>شروع از آیه<select aria-label="شروع از آیه" value={position.ayah} onChange={e=>move(Number(e.target.value))}>{Array.from({length:surah.vc},(_,i)=><option key={i+1} value={i+1}>{toFa(i+1)}</option>)}</select></label>
       <label>سرعت پخش<select aria-label="سرعت پخش" value={speed} onChange={e=>{const n=Number(e.target.value);setSpeed(n);saveSetting('speed',n)}}>{[0.75,1,1.25,1.5,2].map(n=><option key={n} value={n}>{toFa(n)}×</option>)}</select></label>
       <label>تکرار هر آیه<select aria-label="تکرار هر آیه" value={verseRepeats} onChange={e=>{const n=Number(e.target.value);setVerseRepeats(n);saveSetting('verseRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n?`${toFa(n)} بار`:'تا توقف'}</option>)}</select></label>
@@ -180,11 +187,11 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
       <div className="recitation-download">
         {savedParts>0&&<small>{toFa(savedParts)} آیه ذخیره‌شده · {toFa(Math.round(savedBytes/1024/1024*10)/10)} مگابایت</small>}
         {progress!==null?<><p role="status">دریافت آیهٔ {toFa(progress)} از {toFa(surah.vc)}</p><progress value={progress} max={surah.vc}/><button type="button" className="chip" onClick={()=>download.current?.abort()}>توقف دانلود</button></>:downloaded?<><p><Check size={16}/>آمادهٔ پخش آفلاین</p></>:<button type="button" className="chip" onClick={()=>void startDownload()}><Download size={16}/>دانلود صوت این سوره</button>}
-        {savedParts>0&&progress===null&&<button type="button" className="chip" onClick={()=>void deleteRecitation(surah.n).then(()=>{setDownloaded(false);setSavedParts(0);setSavedBytes(0)}).catch(()=>setError('حذف صوت ممکن نشد.'))}><Trash2 size={15}/>حذف صوت ذخیره‌شدهٔ این سوره</button>}
+        {savedParts>0&&progress===null&&<button type="button" className="chip" onClick={()=>void deleteRecitation(surah.n,reciter).then(()=>{setDownloaded(false);setSavedParts(0);setSavedBytes(0)}).catch(()=>setError('حذف صوت ممکن نشد.'))}><Trash2 size={15}/>حذف صوت ذخیره‌شدهٔ این سوره</button>}
         <small>آیات پخش‌شده تا ۷ روز، حداکثر ۴۰ مگابایت کش می‌شوند. دانلود کامل سوره جدا نگه داشته می‌شود؛ پاک‌کردن داده‌های برنامه آن را هم حذف می‌کند.</small>
         {notice&&<p role="status">{notice}</p>}
       </div>
-      <a href="https://quran.com/" target="_blank" rel="noreferrer" className="recitation-source">منبع صوت: Quran.com</a>
+      <a href={reciter.sourcePage} target="_blank" rel="noreferrer" className="recitation-source">منبع صوت: {reciter.source}</a>
     </DialogContent></Dialog>
   </>
 }

@@ -118,7 +118,6 @@ export default function NavDrawer(props: Props) {
 
         {props.view === 'tools' && <>
         <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>جست‌وجوی پیشرفته</span><span>در متن، ریشه و بُن‌واژه ←</span></button>
-        {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onTogglePin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
         </>}
         {props.view !== 'tools' && <>
         <form onSubmit={submitPage} className="flex items-center gap-2 px-4 pb-3">
@@ -138,6 +137,7 @@ export default function NavDrawer(props: Props) {
             برو
           </button>
         </form>
+        {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onTogglePin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
         {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">مقصد را از پیشنهادها انتخاب کنید یا دقیق‌تر بنویسید؛ مثلاً «ص۶»، «س۲۰»، «ق۶» یا «طه:۱۴».</p>}
 
         {suggestions.length > 0 && <div className="drawer-destination-options" aria-label="مقصدهای پیشنهادی">

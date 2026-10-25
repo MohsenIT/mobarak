@@ -1,9 +1,13 @@
 import { describe, expect, test } from 'bun:test'
-import { nextRecitation, recitationUrl } from './recitation'
+import { nextRecitation, recitationUrl, recitationSourceUrl, RECITERS } from './recitation'
 describe('recitation playback',()=>{
   test('uses Minshawi verse URLs supplied by provider',()=>{
     expect(recitationUrl(20,72)).toBe('https://verses.quran.com/Minshawi/Murattal/mp3/020072.mp3')
     expect(()=>recitationUrl(0,1)).toThrow();expect(()=>recitationUrl(20,0)).toThrow()
+  })
+  test('Parhizgar uses Tanzil source and the download-safe endpoint',()=>{
+    expect(recitationSourceUrl(20,72,RECITERS[1])).toBe('https://tanzil.net/res/audio/parhizgar/020072.mp3')
+    expect(recitationUrl(20,72,RECITERS[1])).toBe('/api/recitation?r=parhizgar&s=20&a=72')
   })
   test('repeats each verse three times and the whole surah twice, then stops',()=>{
     let p={ayah:1,verseRound:1,surahRound:1};const played:number[]=[]
