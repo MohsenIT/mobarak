@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 import { displayWordText, lexicalKey, wordTarget, type WordPart } from '@/lib/word-parts'
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -43,7 +44,7 @@ interface Props {
   stackedOverIndex?: boolean
 }
 
-const TABS = [['root', 'ریشه'], ['form', 'باب'], ['word', 'بُن‌واژه'], ['verse', 'آیه'], ['context', 'سیاق']] as const
+const TABS = [['root', t("ui.eecfc08eb8")], ['form', t("ui.12706fd406")], ['word', t("ui.8d5e58ddd8")], ['verse', t("ui.b1b168c791")], ['context', t("ui.16836d5471")]] as const
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
@@ -192,7 +193,7 @@ function RootPanelContent({
   const selectTarget = (a: number, pos: number, part?: WordPart) => selectTargetFor(tab, a, pos, part)
 
   const nav = useMemo(() => surah?.n === sel.s ? analysisNavigation(surah, { ...sel, tab, form: selectedForm }) : null, [surah, sel, tab, selectedForm])
-  const noun = tab === 'context' ? 'سیاق' : tab === 'verse' ? 'آیه' : tab === 'word' ? 'واژه' : tab === 'form' ? 'باب' : 'ریشه'
+  const noun = tab === 'context' ? t("ui.16836d5471") : tab === 'verse' ? t("ui.b1b168c791") : tab === 'word' ? t("ui.9f06b558df") : tab === 'form' ? t("ui.12706fd406") : t("ui.eecfc08eb8")
   const items = nav?.repetitions ?? []
   const index = nav?.repetitionIndex ?? -1
   const hasRepetitions = nav?.hasRepetitions ?? (tab !== 'verse' && tab !== 'context')
@@ -216,15 +217,15 @@ function RootPanelContent({
     if (tab === 'root') return word.r ? word.r : '—'
     if (tab === 'form') return word.form ? morphologyLabel(word.form) : '—'
     if (tab === 'word') return wordTarget(word, part).text
-    if (tab === 'verse') return `آیه ${toFa(a)}`
+    if (tab === 'verse') return t("ui.91e40f6b9f",{p0:(toFa(a))})
     const range = getContext(sel.s, a)
-    return range ? `آیات ${toFa(range.from)}–${toFa(range.to)}` : `آیه ${toFa(a)}`
+    return range ? t("ui.38a59f34c0",{p0:(toFa(range.from)),p1:(toFa(range.to))}) : t("ui.91e40f6b9f",{p0:(toFa(a))})
   }
   const previousUnitTitle = unitTitle(previousUnit)
   const nextUnitTitle = unitTitle(nextUnit)
-  const currentUnitTitle = tab === 'root' ? root ? root : '—' : tab === 'form' ? selectedForm ? morphologyLabel(selectedForm) : 'باب' : tab === 'word' ? sel.text : tab === 'verse' ? `آیه ${toFa(sel.a)}` : selectedContext ? `آیات ${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : 'سیاق'
+  const currentUnitTitle = tab === 'root' ? root ? root : '—' : tab === 'form' ? selectedForm ? morphologyLabel(selectedForm) : t("ui.12706fd406") : tab === 'word' ? sel.text : tab === 'verse' ? t("ui.91e40f6b9f",{p0:(toFa(sel.a))}) : selectedContext ? t("ui.38a59f34c0",{p0:(toFa(selectedContext.from)),p1:(toFa(selectedContext.to))}) : t("ui.16836d5471")
   const unitQuranFont = tab === 'root' || tab === 'word'
-  const positionTitle = <><span className={`analysis-position-title${tab === 'context' ? ' analysis-position-range' : ''}${unitQuranFont ? ' font-quran' : ''}`}>{tab === 'context' && selectedContext ? <>آیات <bdi dir="ltr">{toFa(selectedContext.from)}–{toFa(selectedContext.to)}</bdi></> : <QuranText text={currentUnitTitle} />}</span><span className="analysis-position-count" dir="rtl">{index >= 0 ? tab === 'verse' ? `از ${toFa(items.length)}` : `${toFa(index + 1)} از ${toFa(items.length)}` : '—'}</span></>
+  const positionTitle = <><span className={`analysis-position-title${tab === 'context' ? ' analysis-position-range' : ''}${unitQuranFont ? ' font-quran' : ''}`}>{tab === 'context' && selectedContext ? <>{t("ui.d83f4af983")}{' '}<bdi dir="ltr">{toFa(selectedContext.from)}–{toFa(selectedContext.to)}</bdi></> : <QuranText text={currentUnitTitle} />}</span><span className="analysis-position-count" dir="rtl">{index >= 0 ? tab === 'verse' ? t("ui.5e5b087595",{p0:(toFa(items.length))}) : t("ui.53b89ec77a",{p0:(toFa(index + 1)),p1:(toFa(items.length))}) : '—'}</span></>
   const navigateUnit = (direction: number) => {
     const target = direction < 0 ? previousUnit : nextUnit
     if (target) selectTarget(...target)
@@ -277,12 +278,12 @@ function RootPanelContent({
         ref={panelRef}
         className={panelClass}
         role="dialog"
-        aria-label="تحلیل ریشه کلمه"
+        aria-label={t("ui.b603cb8ff2")}
         style={{ touchAction: 'pan-y', ['--sheet-min-height' as string]: `${minimumHeight}px`, ...(!maximized ? { ['--sheet-h' as string]: `${sheetH}dvh` } : {}) }}
       >
         <div className="panel-handle" role="slider" tabIndex={maximized ? -1 : 0}
-          aria-label="ارتفاع باتم‌شیت" aria-orientation="vertical" aria-valuemin={Math.ceil(minimumPercent)} aria-valuemax={88}
-          aria-valuenow={Math.round(minimized ? minimumPercent : sheetH)} aria-valuetext={minimized ? 'کمینه؛ تا پایان نویگیشن' : `${toFa(Math.round(sheetH))} درصد صفحه`}
+          aria-label={t("ui.703fe8d1bc")} aria-orientation="vertical" aria-valuemin={Math.ceil(minimumPercent)} aria-valuemax={88}
+          aria-valuenow={Math.round(minimized ? minimumPercent : sheetH)} aria-valuetext={minimized ? t("ui.f7a50fd14e") : t("ui.d916f90539",{p0:(toFa(Math.round(sheetH)))})}
           onPointerDown={onHandleDown} onPointerMove={onHandleMove} onPointerUp={onHandleEnd}
           onPointerCancel={onHandleEnd} onLostPointerCapture={onHandleEnd}
           onKeyDown={event => {
@@ -294,57 +295,57 @@ function RootPanelContent({
         <div className="panel-header" style={{ borderColor: 'var(--line)' }}>
           <div className="panel-selection">
             <span className={`font-quran panel-word${headingPreview ? ' panel-word-preview' : ''}`} dir="rtl" title={`${headingText}${headingHasMore ? '…' : ''}`}>{headingPreview ? <><span className="panel-preview-text"><QuranText text={headingText} /></span>{headingHasMore && <span className="panel-preview-ellipsis">…</span>}</> : <QuranText text={headingText} />}</span>
-            <span className="chip panel-reference" title={`سورهٔ ${meta.surahs[sel.s - 1]?.fa} · ${tab === 'context' ? 'آیات' : 'آیه'} ${headingReference}`}>
+            <span className="chip panel-reference" title={t("ui.408d79b89b",{p0:(meta.surahs[sel.s - 1]?.fa),p1:(tab === 'context' ? t("ui.d83f4af983") : t("ui.b1b168c791")),p2:(headingReference)})}>
               <span className="panel-reference-surah">{meta.surahs[sel.s - 1]?.fa}</span><span>· {headingReference}</span>
             </span>
           </div>
           <div className="panel-actions">
             {surah?.n === sel.s && surah.v.find(v => v.n === sel.a) && <VerseActions key={`${sel.s}:${sel.a}`} surah={surah} verse={surah.v.find(v => v.n === sel.a)!} translator={translator} />}
             <AnalysisSettings tab={tab} />
-            <button className="icon-btn sm" onClick={minimize} aria-label={minimized ? 'بازگرداندن اندازهٔ باتم‌شیت' : 'کمینه‌کردن باتم‌شیت'} title={minimized ? 'بازگرداندن اندازه' : 'کمینه'}>
+            <button className="icon-btn sm" onClick={minimize} aria-label={minimized ? t("ui.b9228a4d01") : t("ui.c516d98418")} title={minimized ? t("ui.f3429230a3") : t("ui.71cf3491e7")}>
               {minimized ? <IconRestore /> : <Minus size={18} />}
             </button>
-            <button className="icon-btn sm" onClick={() => { setMinimized(false); onToggleMax() }} aria-label={maximized ? 'بازگرداندن به نیم‌صفحه' : 'تمام‌صفحه'}
-              title={maximized ? 'بازگرداندن به نیم‌صفحه' : 'تمام‌صفحه'}>
+            <button className="icon-btn sm" onClick={() => { setMinimized(false); onToggleMax() }} aria-label={maximized ? t("ui.9499dae92d") : t("ui.5c3a293ccf")}
+              title={maximized ? t("ui.9499dae92d") : t("ui.5c3a293ccf")}>
               {maximized ? <IconRestore /> : <IconMaximize />}
             </button>
-            <button className="icon-btn sm" onClick={onClose} aria-label="بستن" title="بستن">
+            <button className="icon-btn sm" onClick={onClose} aria-label={t("ui.313cbecb4d")} title={t("ui.313cbecb4d")}>
               <IconClose />
             </button>
           </div>
         </div>
 
-        <div ref={tabStrip} className="analysis-tab-strip flex border-b px-2" role="tablist" aria-label="نوع تحلیل" style={{ borderColor: 'var(--line)' }}>
+        <div ref={tabStrip} className="analysis-tab-strip flex border-b px-2" role="tablist" aria-label={t("ui.b8d7d4a720")} style={{ borderColor: 'var(--line)' }}>
           {TABS.map(([key, label]) => (
             <button key={key} role="tab" id={`analysis-tab-${key}`} aria-controls={`analysis-panel-${key}`} aria-selected={tab === key}
               disabled={(key === 'form' && !formAvailable) || (key === 'root' && !rootAvailable)}
-              title={key === 'root' && !rootAvailable ? 'برای این واژه ریشه ثبت نشده است' : key === 'form' && !formAvailable ? (formAvailable === null ? 'در حال بارگیری باب واژه' : 'برای این واژه باب ثبت نشده است') : undefined}
-              className={`tab-btn flex-1${tab === key ? ' active' : ''}`} onClick={() => switchTab(key)}>{label}</button>
+              title={key === 'root' && !rootAvailable ? t("ui.193af3aadc") : key === 'form' && !formAvailable ? (formAvailable === null ? t("ui.0fbe48d291") : t("ui.2cd99b4a99")) : undefined}
+              className={`tab-btn flex-1${tab === key ? ' active' : ''}`} onClick={() => switchTab(key)}>{t(label)}</button>
           ))}
           <div ref={indicatorTrack} className="analysis-tab-indicator-track" aria-hidden="true"><span ref={indicator} /><span ref={indicatorCopy} /></div>
         </div>
-        <nav ref={navigationRef} className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={`پیمایش ${noun}`}>
-          <button className="analysis-unit-button" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={`${noun} قبل`} title={`${noun} قبل: ${previousUnitTitle}`}>
+        <nav ref={navigationRef} className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={t("ui.90c50672b6",{p0:(noun)})}>
+          <button className="analysis-unit-button" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={t("ui.17017bfab8",{p0:(noun)})} title={t("ui.04529abbdc",{p0:(noun),p1:(previousUnitTitle)})}>
             {hasRepetitions ? <ChevronsRight size={15} aria-hidden="true" /> : <ChevronRight size={15} aria-hidden="true" />}
             <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={previousUnitTitle} /></span>
           </button>
           {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(-1)} disabled={index <= 0}
-            aria-label="تکرار قبل" title={`${toFa(Math.max(0, index))} تکرار قبل`}>
-            <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))} تکرار</span>
+            aria-label={t("ui.018f4cd57b")} title={t("ui.3f6b25ba14",{p0:(toFa(Math.max(0, index)))})}>
+            <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))}{' '}{t("ui.61cf4e03c8")}</span>
           </button>}
           {hasRepetitions ? <OccurrencePicker open={pickerOpen} onOpenChange={setPickerOpen} items={items} index={index} surah={surah}
             groupKey={`${tab}:${sel.s}:${tab === 'root' ? root : tab === 'form' ? `${root}:${selectedForm}` : surah?.n === sel.s ? lexicalKey(surah.v[sel.a - 1].w[sel.pos - 1], sel.part) : sel.text}`}
             title={positionTitle}
-            label={`تکرار ${toFa(index + 1)} از ${toFa(items.length)}؛ انتخاب تکرار`}
+            label={t("ui.f511eddde8",{p0:(toFa(index + 1)),p1:(toFa(items.length))})}
             onSelect={location => selectTarget(...location)} onFull={scope => onOpenOccurrences({ ...sel, tab: scope === 'quran' && sel.root ? 'root' : tab, form: selectedForm }, scope)} /> : <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
             <PopoverTrigger asChild>
               <button className="analysis-position-button" disabled={index < 0 || !items.length}
-                aria-label={`${hasRepetitions ? 'تکرار' : noun} ${toFa(index + 1)} از ${toFa(items.length)}؛ انتخاب ${hasRepetitions ? 'تکرار' : noun}`}>
+                aria-label={t("ui.66f35797f5",{p0:(hasRepetitions ? t("ui.61cf4e03c8") : noun),p1:(toFa(index + 1)),p2:(toFa(items.length)),p3:(hasRepetitions ? t("ui.61cf4e03c8") : noun)})}>
                 {positionTitle}
               </button>
             </PopoverTrigger>
             <PopoverContent className="analysis-position-picker" dir="rtl" data-analysis-picker
-              aria-label={hasRepetitions ? 'فهرست تکرارها' : `فهرست ${noun}‌ها`}
+              aria-label={hasRepetitions ? t("ui.b55272cf13") : t("ui.9aa27a3098",{p0:(noun)})}
               onOpenAutoFocus={event => {
                 event.preventDefault()
                 requestAnimationFrame(() => {
@@ -352,18 +353,18 @@ function RootPanelContent({
                   selected?.focus({ preventScroll: true }); selected?.scrollIntoView({ block: 'nearest' })
                 })
               }}>
-              <p className="text-xs font-bold px-3 py-2">{hasRepetitions ? 'تکرارها در این سوره' : `${noun}‌های این سوره`}</p>
+              <p className="text-xs font-bold px-3 py-2">{hasRepetitions ? t("ui.ace85fd091") : t("ui.92ad094faf",{p0:(noun)})}</p>
               {items.map(([a, pos, part], i) => <button key={`${a}:${pos}:${part ?? 'stem'}`} className={`analysis-position-option${hasRepetitions ? ' has-excerpt' : ''}`} aria-current={i === index ? 'true' : undefined}
                 onClick={() => { selectTarget(a, pos, part); setPickerOpen(false) }}>
-                <span className="analysis-occurrence-reference">{toFa(i + 1)} · {tab === 'context' ? (() => { const range = getContext(sel.s, a); return range ? `آیات ${toFa(range.from)} تا ${toFa(range.to)}` : `آیه ${toFa(a)}` })() : `آیه ${toFa(a)}`}</span>
+                <span className="analysis-occurrence-reference">{toFa(i + 1)} · {tab === 'context' ? (() => { const range = getContext(sel.s, a); return range ? t("ui.0dd91a4fc6",{p0:(toFa(range.from)),p1:(toFa(range.to))}) : t("ui.91e40f6b9f",{p0:(toFa(a))}) })() : t("ui.91e40f6b9f",{p0:(toFa(a))})}</span>
               </button>)}
             </PopoverContent>
           </Popover>}
           {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(1)} disabled={index < 0 || index >= items.length - 1}
-            aria-label="تکرار بعد" title={`${toFa(Math.max(0, items.length - index - 1))} تکرار بعد`}>
-            <span>{toFa(Math.max(0, items.length - index - 1))} تکرار</span><ChevronLeft size={17} aria-hidden="true" />
+            aria-label={t("ui.672f6aee92")} title={t("ui.ce8844aa99",{p0:(toFa(Math.max(0, items.length - index - 1)))})}>
+            <span>{toFa(Math.max(0, items.length - index - 1))}{' '}{t("ui.61cf4e03c8")}</span><ChevronLeft size={17} aria-hidden="true" />
           </button>}
-          <button className="analysis-unit-button" onClick={() => navigateUnit(1)} disabled={!canUnitNext} aria-label={`${noun} بعد`} title={`${noun} بعد: ${nextUnitTitle}`}>
+          <button className="analysis-unit-button" onClick={() => navigateUnit(1)} disabled={!canUnitNext} aria-label={t("ui.56d11bcaf2",{p0:(noun)})} title={t("ui.55c52eb6d5",{p0:(noun),p1:(nextUnitTitle)})}>
             <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={nextUnitTitle} /></span>
             {hasRepetitions ? <ChevronsLeft size={15} aria-hidden="true" /> : <ChevronLeft size={15} aria-hidden="true" />}
           </button>

@@ -1,11 +1,12 @@
 'use client'
+import {t} from '@/lib/i18n'
 import { ChevronDown } from 'lucide-react'
 import SourceReference, { type SourceInfo } from './SourceReference'
 
 export const ROOT_BOOK_TITLES = {
-  tahqiq: { short: 'التحقیق', full: 'التحقیق فی کلمات القرآن الکریم' },
-  maqayis: { short: 'مقاییس', full: 'معجم مقاييس اللغة' },
-  ishtiqaqi: { short: 'المعجم الاشتقاقی', full: 'المعجم الاشتقاقي المؤصل لألفاظ القرآن الكريم' },
+  tahqiq: { short: t("ui.486f5d9141"), full: t("ui.df7eaafe0c") },
+  maqayis: { short: t("ui.4c3a424943"), full: t("ui.9c1717f2f2") },
+  ishtiqaqi: { short: t("ui.1da653b2f3"), full: t("ui.21e5e1b857") },
 } as const
 
 /** RTL order: title/preview, source chip, disclosure arrow at the far left.
@@ -22,7 +23,7 @@ export default function RootBookHeading({ book, expanded, summary, source, onTog
       </span>
     </button>
     {expanded && source && <span className="shrink-0"><SourceReference sourceId={`book:${book}`} source={source} /></span>}
-    <button type="button" className="shrink-0 mt-1 cursor-pointer" aria-expanded={expanded} aria-label={`${expanded ? 'بستن' : 'بازکردن'} شرح ${title.short}`} onClick={onToggle}>
+    <button type="button" className="shrink-0 mt-1 cursor-pointer" aria-expanded={expanded} aria-label={t("ui.fde1fab404",{p0:(expanded ? t("ui.313cbecb4d") : t("ui.592c8cbd7f")),p1:(title.short)})} onClick={onToggle}>
       <ChevronDown aria-hidden="true" size={16} className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
     </button>
   </div>

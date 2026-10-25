@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 import { downloadNativeOffline } from '@/lib/native-offline'
 import { useEffect, useState } from 'react'
 
@@ -25,19 +26,19 @@ export default function OfflineSettings() {
   const [selected, setSelected] = useState<string[]>([])
   useEffect(() => { try { setSelected(JSON.parse(localStorage.getItem('offline-optional-books') || '[]')) } catch {} }, [])
   async function download() {
-    setBusy(true); setMessage('در حال آماده‌سازی…')
+    setBusy(true); setMessage(t("ui.069a6fab08"))
     try {
-      await downloadOffline(['core', 'tahqiq', ...selected], (done, total) => setMessage(`دریافت فایل‌ها: ${done.toLocaleString('fa')} از ${total.toLocaleString('fa')}`))
+      await downloadOffline(['core', 'tahqiq', ...selected], (done, total) => setMessage(t("ui.b33ecce1c3",{p0:(done.toLocaleString('fa')),p1:(total.toLocaleString('fa'))})))
       localStorage.setItem('offline-optional-books', JSON.stringify(selected))
-      setMessage('داده‌های انتخاب‌شده برای استفادهٔ آفلاین آماده‌اند.')
-    } catch { setMessage('دریافت کامل نشد؛ با اتصال اینترنت دوباره تلاش کنید. فایل‌های دریافت‌شده حفظ می‌شوند.') }
+      setMessage(t("ui.026091c23f"))
+    } catch { setMessage(t("ui.d5455de594")) }
     finally { setBusy(false) }
   }
-  return <section aria-label="دسترسی آفلاین">
-    <h3 className="text-sm font-bold mb-3">دسترسی آفلاین</h3>
-    <p className="text-xs leading-6 mb-2">قرآن، ترجمه‌ها، جست‌وجو، خلاصه‌ها و التحقیق به‌صورت پیش‌فرض دریافت می‌شوند. کتاب‌های دیگر بدون دانلود هم آنلاین در دسترس‌اند.</p>
-    {([['maqayis', 'مقاییس'], ['ishtiqaqi', 'المعجم الاشتقاقی']] as const).map(([id, label]) => <label key={id} className="flex gap-2 items-center min-h-11 text-sm"><input type="checkbox" checked={selected.includes(id)} disabled={busy} onChange={event => setSelected(event.target.checked ? [...selected, id] : selected.filter(item => item !== id))} />{label}</label>)}
-    <button className="chip min-h-11 px-3" disabled={busy} onClick={download}>{busy ? 'در حال دریافت…' : 'دریافت / به‌روزرسانی داده‌های آفلاین'}</button>
+  return <section aria-label={t("ui.995bf8fa6b")}>
+    <h3 className="text-sm font-bold mb-3">{t("ui.995bf8fa6b")}</h3>
+    <p className="text-xs leading-6 mb-2">{t("ui.12968b2a6b")}</p>
+    {([['maqayis', t("ui.4c3a424943")], ['ishtiqaqi', t("ui.1da653b2f3")]] as const).map(([id, label]) => <label key={id} className="flex gap-2 items-center min-h-11 text-sm"><input type="checkbox" checked={selected.includes(id)} disabled={busy} onChange={event => setSelected(event.target.checked ? [...selected, id] : selected.filter(item => item !== id))} />{label}</label>)}
+    <button className="chip min-h-11 px-3" disabled={busy} onClick={download}>{busy ? t("ui.80516c4adb") : t("ui.bdc6549d51")}</button>
     <p role="status" className="text-xs leading-6 mt-2">{message}</p>
   </section>
 }

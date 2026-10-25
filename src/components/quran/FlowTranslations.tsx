@@ -1,4 +1,6 @@
 'use client'
+import {translationDirection,translationLanguage} from '@/lib/translations'
+import {t} from '@/lib/i18n'
 
 import { useLayoutEffect, useRef, useState, type RefObject } from 'react'
 import type { SurahData, Translations, Translator } from '@/lib/quran'
@@ -34,7 +36,7 @@ export default function FlowTranslations({ container, surah, trans, translator, 
           else { line.left = Math.min(line.left, rect.left); line.right = Math.max(line.right, rect.right); line.bottom = Math.max(line.bottom, rect.bottom) }
         }
         const translation = trans?.[String(verse.n)]?.[translator]
-        const words = (translation === '' ? 'متن ترجمهٔ این آیه در منبع انتخاب‌شده موجود نیست.' : translation ?? 'در حال بارگیری ترجمه…').split(/\s+/)
+        const words = (translation === '' ? t("ui.24cd4b7b61") : translation ?? t('translation.unavailable')).split(/\s+/)
         let offset = 0
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i]
@@ -61,6 +63,6 @@ export default function FlowTranslations({ container, surah, trans, translator, 
     measure()
     return () => { live = false; observer.disconnect(); cancelAnimationFrame(frame); root.style.lineHeight = '2.05'; root.style.paddingBottom = '' }
   }, [container, surah, trans, translator, fontSize])
-  return <><span ref={anchor} hidden aria-hidden="true" />{fragments.map((f, i) => <span key={i} className="verse-translation" data-translation-verse={f.verse}
+  return <><span ref={anchor} hidden aria-hidden="true" />{fragments.map((f, i) => <span key={i} className="verse-translation" dir={translationDirection(translator)} lang={translationLanguage(translator)} data-translation-verse={f.verse}
     style={{ left: f.left, top: f.top, width: f.width, fontSize: f.fontSize }}>{f.text}</span>)}</>
 }

@@ -1,3 +1,4 @@
+import {t} from '@/lib/i18n'
 import { toFa, type SurahMeta } from '@/lib/quran'
 
 export function AyahMarker({ n }: { n: number }) {
@@ -18,19 +19,19 @@ function RevelationIcon({ makki }: { makki: boolean }) {
 
 export function SurahBand({ sm, onNavigate }: { sm: SurahMeta; onNavigate?: () => void }) {
   const Tag = onNavigate ? 'button' : 'div'
-  const revelation = sm.rev === 'makkah' ? 'مکی' : sm.rev === 'madinah' ? 'مدنی' : null
+  const revelation = sm.rev === 'makkah' ? t("ui.039e791597") : sm.rev === 'madinah' ? t("ui.40f14b2806") : null
   return (
-    <Tag onClick={onNavigate} type={onNavigate ? 'button' : undefined} className="surah-band" dir="rtl" role={onNavigate ? undefined : 'group'} aria-label={`سورهٔ ${sm.ar}، شمارهٔ ${toFa(sm.n)}، ${toFa(sm.vc)} آیه${revelation ? `، ${revelation}` : ''}`}>
+    <Tag onClick={onNavigate} type={onNavigate ? 'button' : undefined} className="surah-band" dir="rtl" role={onNavigate ? undefined : 'group'} aria-label={t("ui.5953d591c3",{p0:(sm.ar),p1:(toFa(sm.n)),p2:(toFa(sm.vc)),p3:(revelation ? `، ${revelation}` : '')})}>
       <span className="band-side">
-        <span className="band-meta band-number">سورهٔ {toFa(sm.n)}</span>
+        <span className="band-meta band-number">{t("ui.53376bea8f")}{' '}{toFa(sm.n)}</span>
         <span className="band-line" />
       </span>
       <span className="band-name">
-        {revelation && <span className="band-revelation" title={`سورهٔ ${revelation}`} aria-label={revelation}><RevelationIcon makki={sm.rev === 'makkah'} /></span>}
-        <span className="band-title">سُورَةُ {sm.ar}</span>
+        {revelation && <span className="band-revelation" title={t("ui.0eb0a3f03f",{p0:(revelation)})} aria-label={revelation}><RevelationIcon makki={sm.rev === 'makkah'} /></span>}
+        <span className="band-title">{t("ui.4ac1f68065")}{' '}{sm.ar}</span>
       </span>
       <span className="band-side">
-        <span className="band-meta band-info">{toFa(sm.vc)} آیه</span>
+        <span className="band-meta band-info">{toFa(sm.vc)}{' '}{t("ui.b1b168c791")}</span>
         <span className="band-line" />
       </span>
     </Tag>
@@ -39,9 +40,7 @@ export function SurahBand({ sm, onNavigate }: { sm: SurahMeta; onNavigate?: () =
 
 export function Bismillah({ size = '1em' }: { size?: string }) {
   return (
-    <div className="bismillah-line" style={{ fontSize: size }}>
-      بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-    </div>
+    <div className="bismillah-line" style={{ fontSize: size }}>{t("ui.2ff6d6265e")}</div>
   )
 }
 

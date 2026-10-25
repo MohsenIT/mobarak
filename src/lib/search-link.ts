@@ -1,6 +1,7 @@
 import type { AnalysisSelection } from './analysis'
 import type { SearchMode } from './quran-search-session'
 import type { Translator } from './quran'
+import {isTranslator} from './translations'
 
 export type SearchLinkState = {
   query: string; mode: SearchMode; contextSurah?: number; surahs: number[]; lemmas: string[]; forms: string[]
@@ -26,7 +27,7 @@ export function readSearchLink(href: string): SearchLinkState | null {
     query: (p.get('q') || '').slice(0, 160), mode: p.get('m') === 'r' ? 'root' : p.get('m') === 'l' ? 'lemma' : 'text',
     surahs: [...new Set((p.get('s') || '').split(',').map(value => bounded(value, 114)).filter(Boolean))].sort((a,b) => a-b),
     lemmas: values('l'), forms: values('b'), includeRoots: p.get('h') !== '0', includePartial: p.get('p') !== '0', includeNear: p.get('n') === '1',
-    showTranslation: p.get('t') === '1', translator: ['s','a','f','m'].includes(p.get('tr') || '') ? p.get('tr') as Translator : 's', occurrence,
+    showTranslation: p.get('t') === '1', translator: isTranslator(p.get('tr')) ? p.get('tr') as Translator : 's', occurrence,
   }
 }
 export function searchLink(current: string, state: SearchLinkState, native = false): URL {

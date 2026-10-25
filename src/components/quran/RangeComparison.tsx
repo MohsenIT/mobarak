@@ -1,4 +1,5 @@
 'use client'
+import {t,uiDirection} from '@/lib/i18n'
 
 import { useEffect, useMemo, useState } from 'react'
 import type { Meta, SurahData } from '@/lib/quran'
@@ -66,18 +67,18 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
   return (
     <>
       <div className="sheet-backdrop" onClick={onClose} />
-      <section className="surah-index-drawer" role="dialog" aria-modal="true" aria-label="ارتباط ریشه‌ای بازه آیات" dir="rtl">
+      <section className="surah-index-drawer" role="dialog" aria-modal="true" aria-label={t("ui.1f253d9ad1")} dir={uiDirection()}>
         <div className="flex items-center gap-3 px-4 pt-4 pb-3">
           <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-sm">ارتباط ریشه‌ای · {meta.surahs[surahN - 1].fa}</h2>
-            <p className="text-xs mt-1" style={{ color: 'var(--ink-soft)' }}>هر ریشهٔ مشترک با رنگی ثابت در کل سوره؛ زیرخط پیوسته در بازه و خط‌چین بیرون آن</p>
+            <h2 className="font-bold text-sm">{t("ui.8d88976a1f")}{' '}{meta.surahs[surahN - 1].fa}</h2>
+            <p className="text-xs mt-1" style={{ color: 'var(--ink-soft)' }}>{t("ui.0818c8d564")}</p>
           </div>
-          <button className="icon-btn" onClick={onClose} aria-label="بستن مقایسه"><IconClose /></button>
+          <button className="icon-btn" onClick={onClose} aria-label={t("ui.5248483502")}><IconClose /></button>
         </div>
         <div className="px-4 pb-3 flex gap-3">
           {[
-            { label: 'از آیه', value: fromText, change: setFromText },
-            { label: 'تا آیه', value: toText, change: setToText },
+            { label: t("ui.b8efcc0229"), value: fromText, change: setFromText },
+            { label: t("ui.d754a5658e"), value: toText, change: setToText },
           ].map(field => (
             <label key={field.label} className="flex-1 min-w-0 text-xs">
               {field.label}
@@ -88,47 +89,46 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
           ))}
         </div>
         <div className="px-4 pb-3">
-          <p className="text-xs mb-2" style={{ color: 'var(--ink-soft)' }}>پر کردن سریع با سیاق</p>
-          <div role="group" aria-label="سیاق‌های مقایسه" className="flex gap-2 overflow-x-auto nice-scroll pb-1">
+          <p className="text-xs mb-2" style={{ color: 'var(--ink-soft)' }}>{t("ui.d5dd708148")}</p>
+          <div role="group" aria-label={t("ui.9fb079d3da")} className="flex gap-2 overflow-x-auto nice-scroll pb-1">
             {contexts.map(range => <button key={range.id} type="button"
               aria-pressed={selectedContext?.id === range.id}
-              aria-label={`سیاق ${toFa(range.id)} · آیات ${toFa(range.from)} تا ${toFa(range.to)}`}
+              aria-label={t("ui.9187e771c5",{p0:(toFa(range.id)),p1:(toFa(range.from)),p2:(toFa(range.to))})}
               className="chip flex-none min-h-[36px]"
               style={{ borderColor: selectedContext?.id === range.id ? 'var(--sage)' : 'var(--line-strong)', background: selectedContext?.id === range.id ? 'var(--word-root)' : 'var(--paper)' }}
-              onClick={() => { setFromText(String(range.from)); setToText(String(range.to)) }}>
-              سیاق {toFa(range.id)} · آیات {toFa(range.from)} تا {toFa(range.to)}
+              onClick={() => { setFromText(String(range.from)); setToText(String(range.to)) }}>{t("ui.16836d5471")}{toFa(range.id)}{' '}{t("ui.69a4606f3f")}{' '}{toFa(range.from)}{' '}{t("ui.b1e000640d")}{' '}{toFa(range.to)}
             </button>)}
           </div>
         </div>
         <div className="px-4 pb-3 text-xs leading-6" style={{ color: 'var(--ink-soft)' }}>
-          {!valid ? <p role="alert">بازه باید بین ۱ و {toFa(vc)} باشد؛ آیهٔ شروع نباید از پایان بزرگ‌تر باشد.</p>
-            : whole ? <p role="status">برای مقایسه، دست‌کم یک آیه باید بیرون بازه بماند.</p>
-              : <p aria-live="polite">آیات {toFa(from)} تا {toFa(to)} در برابر {toFa(vc - (to - from + 1))} آیهٔ باقی‌مانده · {toFa(rows.length)} ریشهٔ مشترک</p>}
+          {!valid ? <p role="alert">{t("ui.0c6869f553")}{' '}{toFa(vc)}{' '}{t("ui.64a726a962")}</p>
+            : whole ? <p role="status">{t("ui.c4ed354a4c")}</p>
+              : <p aria-live="polite">{t("ui.d83f4af983")}{' '}{toFa(from)}{' '}{t("ui.b1e000640d")}{' '}{toFa(to)}{' '}{t("ui.07f0283e87")}{' '}{toFa(vc - (to - from + 1))}{' '}{t("ui.c07b97f990")}{' '}{toFa(rows.length)}{' '}{t("ui.895d03a002")}</p>}
           <details className="mt-1">
-            <summary className="cursor-pointer">رتبه‌ها چطور محاسبه می‌شوند؟</summary>
-            <p>قدرت ارتباط از میانگین هندسی شاخص کلیدواژگی در دو بخش به دست می‌آید؛ طول هر بخش و تکرار ریشه در کل قرآن لحاظ می‌شود. تکرار مشترک، کمینهٔ تعداد کاربرد در دو بخش است. کلیدواژگی سوره همان شاخص فهرست ریشه‌هاست. این مقایسه، اشتراک واژگانی را نشان می‌دهد و اثبات ارتباط معنایی نیست.</p>
+            <summary className="cursor-pointer">{t("ui.727214f3ae")}</summary>
+            <p>{t("ui.f344475e2e")}</p>
           </details>
         </div>
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
-          {([['connection', 'قدرت ارتباط'], ['frequency', 'تکرار مشترک'], ['keyword', 'کلیدواژگی سوره']] as const).map(([key, label]) => (
+          {([['connection', t("ui.009549d93e")], ['frequency', t("ui.c5e1b1d4f5")], ['keyword', t("ui.e0fcdd0d87")]] as const).map(([key, label]) => (
             <button key={key} className={`tab-btn${sort === key ? ' active' : ''}`} onClick={() => setSort(key)}>{label}</button>
           ))}
         </div>
         <div className="flex-1 overflow-y-auto nice-scroll p-3">
-          {error ? <p role="alert" className="text-center py-6">داده‌ها بارگیری نشدند. ابزار را ببندید و دوباره باز کنید.</p>
-            : !surah || !roots ? <p role="status" className="text-center py-6">در حال بارگیری…</p>
-              : valid && !whole && !rows.length ? <p className="text-center py-6 text-sm">ریشهٔ مشترکی بین این بازه و باقی سوره پیدا نشد.</p>
+          {error ? <p role="alert" className="text-center py-6">{t("ui.95ceec00b6")}</p>
+            : !surah || !roots ? <p role="status" className="text-center py-6">{t("ui.0cfb741f7a")}</p>
+              : valid && !whole && !rows.length ? <p className="text-center py-6 text-sm">{t("ui.33be2b63d7")}</p>
                 : rows.map((row, index) => (
                   <button key={row.root} className="w-full text-right rounded-xl border p-3 mb-2"
                     style={{ borderColor: 'var(--line)' }} onClick={() => onPickRoot(row.root)}>
                     <div className="flex items-center gap-3">
                       <span className="comparison-color-key rounded px-2 py-1 text-xs" style={rootColorStyle(rootHue(row.root))}>{toFa(index + 1)}</span>
                       <b className="font-quran text-xl flex-1">{row.root}</b>
-                      <span className="text-xs">ارتباط {toFa(Math.round(row.connection * 100))}٪</span>
+                      <span className="text-xs">{t("ui.cdc6fcf112")}{' '}{toFa(Math.round(row.connection * 100))}٪</span>
                     </div>
                     <div className="dist-track my-2"><div className="dist-fill cur" style={{ width: `${row.connection * 100}%`, height: '100%' }} /></div>
-                    <p className="text-xs leading-6">در بازه: {toFa(row.inside)} بار · بیرون: {toFa(row.outside)} بار · کلیدواژگی سوره: {toFa(Math.round(row.keyword * 100))}٪</p>
-                    <p className="text-xs leading-6" style={{ color: 'var(--ink-soft)' }}>آیات بازه: {row.insideAyahs.map(toFa).join('، ')}<br />آیات بیرون: {row.outsideAyahs.map(toFa).join('، ')}</p>
+                    <p className="text-xs leading-6">{t("ui.6ef0a02025")}{' '}{toFa(row.inside)}{' '}{t("ui.5313016e63")}{' '}{toFa(row.outside)}{' '}{t("ui.0886e42967")}{' '}{toFa(Math.round(row.keyword * 100))}٪</p>
+                    <p className="text-xs leading-6" style={{ color: 'var(--ink-soft)' }}>{t("ui.7386dc56bf")}{' '}{row.insideAyahs.map(toFa).join('، ')}<br />{t("ui.645771cd23")}{' '}{row.outsideAyahs.map(toFa).join('، ')}</p>
                   </button>
                 ))}
         </div>

@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 
 import { useEffect, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
@@ -22,7 +23,7 @@ function load(root: string) {
     })
     return Promise.all([entry, rootSummaries('maqayis', root).catch(() => [])]).then(([entry, summaries]) => ({
       ...entry,
-      summary: summaries.map(item => item.summary || 'متن این مدخل نیازمند بازبینی است.').join(' ') || 'برای دیدن شرح ریشه باز کنید.',
+      summary: summaries.map(item => item.summary || t("ui.5145a3cd1a")).join(' ') || t("ui.62d9d3f5e8"),
     }))
   }).catch(error => { cache.delete(root); throw error }))
   return cache.get(root)!
@@ -44,37 +45,37 @@ export default function MaqayisMeaning({ root }: { root: string }) {
   const source = entry ? {
     resourceId:'book:maqayis',
     title: ROOT_BOOK_TITLES.maqayis.full,
-    description: 'فرهنگ ریشه‌های عربی؛ بررسی اصول معنایی هر ریشه با شواهد و کاربردهای زبانی.',
+    description: t("ui.a563cd186a"),
     fields: [
-      { label: 'نویسنده', value: 'احمد بن فارس بن زکریا؛ قرن چهارم هجری' },
+      { label: t("ui.f72a3d8543"), value: t("ui.85a2949c23") },
       ...(entry.provenance.sourceKind === 'independent-reference' ? [
-        { label: 'مأخذ دیجیتال', value: 'نسخهٔ متنی بازنشرشده در مخزن mojam' },
-        { label: 'نسخهٔ چاپی', value: 'جلد و صفحهٔ چاپی برای این مأخذ احراز نشده است' },
+        { label: t("ui.f45417f62d"), value: t("ui.5083b63e8d") },
+        { label: t("ui.3073612fe6"), value: t("ui.4f36d60b68") },
       ] : [
-        { label: 'محقق', value: 'عبدالسلام محمد هارون' },
-        { label: 'چاپ ارسالی', value: 'مکتب الإعلام الإسلامي؛ ۱۴۰۴ قمری' },
-        ...(entry.provenance.volume && entry.provenance.page ? [{ label: 'ارجاع', value: `جلد ${toFa(entry.provenance.volume)}، صفحهٔ ${toFa(entry.provenance.page)}${(entry.provenance.pageEnd ?? 0) > entry.provenance.page ? ` تا ${toFa(entry.provenance.pageEnd!)}` : ''}` }] : []),
+        { label: t("ui.014cd6c9d5"), value: t("ui.9bfdcedae1") },
+        { label: t("ui.ef7127f26a"), value: t("ui.17e06468f0") },
+        ...(entry.provenance.volume && entry.provenance.page ? [{ label: t("ui.2cc6a9014c"), value: t("ui.f7cff9c45a",{p0:(toFa(entry.provenance.volume)),p1:(toFa(entry.provenance.page)),p2:((entry.provenance.pageEnd ?? 0) > entry.provenance.page ? ` ${t('ui.b1e000640d')} ${toFa(entry.provenance.pageEnd!)}` : '')}) }] : []),
       ]),
-      { label: 'مدخل', value: entry.word },
+      { label: t("ui.21f1a03e36"), value: entry.word },
     ],
-    notes: ['شرح فارسی و خلاصه با کمک هوش مصنوعی تهیه شده‌اند؛ این فرایند بازبینی انسانی نیست.', ...(entry.provenance.translationScope === 'author-and-editorial' ? ['این مأخذ متن مؤلف و حواشی را در کنار هم دارد؛ حواشی ممکن است به مدخل مجاور مربوط باشند.'] : []), ...(entry.provenance.translationKind === 'partial-reference-entry' ? ['مأخذ دارای افتادگی یا ابهام ثبت‌شده است.'] : [])],
+    notes: [t("ui.5e3c5fe7ac"), ...(entry.provenance.translationScope === 'author-and-editorial' ? [t("ui.c82904d830")] : []), ...(entry.provenance.translationKind === 'partial-reference-entry' ? [t("ui.f4d0599de5")] : [])],
     details: entry.provenance.translationNote,
-    links: entry.provenance.sourceUrl ? [{ label: 'نسخهٔ متنی مأخذ', href: entry.provenance.sourceUrl }] : [],
+    links: entry.provenance.sourceUrl ? [{ label: t("ui.1ede69cce3"), href: entry.provenance.sourceUrl }] : [],
   } : undefined
 
-  return <section aria-label="معنای ریشه در مقاییس" className="rounded-xl border p-3 mb-4 text-sm leading-7" style={{ borderColor: 'var(--line)' }}>
+  return <section aria-label={t("ui.25622dd345")} className="rounded-xl border p-3 mb-4 text-sm leading-7" style={{ borderColor: 'var(--line)' }}>
     {entry ? <>
       <RootBookHeading book="maqayis" expanded={expanded} summary={entry.summary} source={source}
         onToggle={() => { setExpanded(value => !value); setArabic(false) }} />
       {expanded && <div>
-        {entry.provenance.translationScope === 'author-and-editorial' && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>این نسخه متن مؤلف و حواشی مرجع را با هم دارد؛ حواشی ممکن است به صفحه یا مدخل مجاور مربوط باشند.</p>}
-        {entry.provenance.translationKind === 'partial-reference-entry' && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>مأخذ این مدخل افتادگی یا ابهام دارد؛ توضیح آن را در منبع ببینید.</p>}
+        {entry.provenance.translationScope === 'author-and-editorial' && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>{t("ui.a9f13320d9")}</p>}
+        {entry.provenance.translationKind === 'partial-reference-entry' && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>{t("ui.8f62241adf")}</p>}
         <TahqiqText text={entry.fa} />
         <button type="button" aria-expanded={arabic} className="inline-flex items-center gap-1 text-xs py-2 mt-2 cursor-pointer" onClick={() => setArabic(value => !value)}>
-          {arabic ? 'بستن اصل عربی' : 'دیدن اصل عربی'}<ChevronDown aria-hidden="true" size={16} className={`transition-transform duration-200 ${arabic ? 'rotate-180' : ''}`} />
+          {arabic ? t("ui.cc9729c600") : t("ui.4cf44c4f5c")}<ChevronDown aria-hidden="true" size={16} className={`transition-transform duration-200 ${arabic ? 'rotate-180' : ''}`} />
         </button>
         {arabic && <p dir="rtl" lang="ar" className="mt-2 whitespace-pre-wrap break-words text-justify">{entry.ar}</p>}
       </div>}
-    </> : state.error && preview?.root === root ? <><RootBookHeading book="maqayis" expanded={expanded} summary={preview.text} onToggle={() => setExpanded(value => !value)} />{expanded && <p className="text-xs">برای دریافت شرح کامل به اینترنت متصل شوید یا کتاب را از تنظیمات دانلود کنید.</p>}</> : <p><strong>مقاییس: </strong><span className="text-xs" style={{ color: 'var(--ink-soft)' }}>{state.error && state.root === root ? 'شرح ریشه بارگیری نشد.' : entry === null ? unavailable.has(root) ? 'در نسخهٔ موجود، مدخل مستقلی برای این صورت ریشه با اطمینان تطبیق داده نشد.' : 'ترجمهٔ این مدخل هنوز آماده نشده است.' : 'در حال بارگیری…'}</span></p>}
+    </> : state.error && preview?.root === root ? <><RootBookHeading book="maqayis" expanded={expanded} summary={preview.text} onToggle={() => setExpanded(value => !value)} />{expanded && <p className="text-xs">{t("ui.84557ada04")}</p>}</> : <p><strong>{t("ui.5ac12abae1")}{' '}</strong><span className="text-xs" style={{ color: 'var(--ink-soft)' }}>{state.error && state.root === root ? t("ui.921e6df6ca") : entry === null ? unavailable.has(root) ? t("ui.d8d0c75ad5") : t("ui.be62721bd3") : t("ui.0cfb741f7a")}</span></p>}
   </section>
 }

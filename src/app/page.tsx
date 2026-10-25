@@ -1,4 +1,7 @@
 'use client'
+import {t,useUiLanguage} from '@/lib/i18n'
+import {isTranslator} from '@/lib/translations'
+import {LanguageOnboarding} from '@/components/quran/LanguageSettings'
 import { readVerseAddress, writeVerseAddress, readSurahNumber, readPageNumber, readingUrl } from '@/lib/verse-link'
 import { readSearchLink, searchLink, type SearchLinkState } from '@/lib/search-link'
 import type { Destination } from '@/lib/navigation'
@@ -41,6 +44,7 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 const round05 = (v: number) => Math.round(v * 20) / 20
 
 export default function Home() {
+  useUiLanguage()
   const [meta, setMeta] = useState<Meta | null>(null)
   const [page, setPage] = useState(() => {
     if (typeof window === 'undefined') return LS.get('mushaf.page', 1)
@@ -60,7 +64,7 @@ export default function Home() {
   })
   const [showTrans, setShowTrans] = useState(() => LS.get('mushaf.showTrans', false))
   const [theme, setTheme] = useState<'paper' | 'night'>(() => LS.get('mushaf.theme', 'paper'))
-  const [translator, setTranslator] = useState<Translator>(() => LS.get('mushaf.safavi-default.v1', false) ? LS.get('mushaf.tr', 's') : 's')
+  const [translator, setTranslator] = useState<Translator>(() => LS.get('mushaf.safavi-default.v1', false) && isTranslator(LS.get('mushaf.tr', 's')) ? LS.get('mushaf.tr', 's') : 's')
   const [scale, setScale] = useState(() => LS.get('mushaf.scale', 1))
   const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
   const [pinnedSurahs, setPinnedSurahs] = useState<number[]>(() => LS.get('mushaf.pinned-surahs', []))
@@ -208,21 +212,26 @@ export default function Home() {
     return () => { live = false }
   }, [meta, page, segs, mode])
 
-  // flow mode: load current surah (+ translation)
+  // Quran navigation stays independent of translation downloads and failures.
   useEffect(() => {
     if (mode !== 'flow' || flowSurah?.n === surah) return
-    let live = true
+    let live=true
     setLoadingPage(true)
-    Promise.all([loadSurah(surah), loadTrans(surah)]).then(([d, translations]) => {
-      if (!live) return
-      setFlowSurah(d)
-      setFlowTrans(translations)
-      setLoadingPage(false)
-      const pg = d.v[0]?.p
-      if (pg) setPage(pg)
-    })
-    return () => { live = false }
-  }, [mode, surah])
+    loadSurah(surah).then(data=>{
+      if(!live)return
+      setFlowSurah(data);setLoadingPage(false)
+      const pg=data.v[0]?.p
+      if(pg)setPage(pg)
+    }).catch(()=>{if(live)setLoadingPage(false)})
+    return()=>{live=false}
+  },[mode,surah])
+  useEffect(()=>{
+    if(mode!=='flow')return
+    let live=true
+    setFlowTrans(null)
+    loadTrans(surah,translator).then(data=>{if(live)setFlowTrans(data)}).catch(()=>{if(live)setFlowTrans({})})
+    return()=>{live=false}
+  },[mode,surah,translator])
 
   useEffect(() => {
     if (!startupHeld && !startupComplete && startupMinimumElapsed && meta && !loadingPage && (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))) setStartupLeaving(true)
@@ -494,29 +503,29 @@ export default function Home() {
         {quickSearchOpen ? <QuickSurahSearch meta={meta} onNavigate={navigateDestination} surah={meta.surahs[curSurahN - 1]} onClose={() => setQuickSearchOpen(false)}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos) }}
           onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
-        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label="منوی برنامه" title="منوی برنامه"><MoreHorizontal size={22} /></button>
+        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><MoreHorizontal size={22} /></button>
 
-        <button className="reader-surah-link flex-1 min-w-0" aria-label="بازکردن فهرست سوره‌ها" aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
+        <button className="reader-surah-link flex-1 min-w-0" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
           <span className="font-bold text-[14px] sm:text-[15px] truncate" style={{ color: 'var(--ink)' }}>
             {mode === 'mushaf' ? pageInfo.names : meta.surahs[surah - 1]?.ar}
           </span><ChevronDown size={16} aria-hidden="true" />
         </button>
 
-        <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setSel(null); setQuickSearchOpen(true) }}><Search size={20} /></button>
+        <button className="icon-btn" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { setSel(null); setQuickSearchOpen(true) }}><Search size={20} /></button>
 
-        <button className="icon-btn" aria-label={!audioOpen?'پخش تلاوت از آیهٔ فعلی':audioControlsVisible?'جمع‌کردن کنترل‌های تلاوت':audioStatus==='playing'?'نمایش کنترل‌های تلاوت':'بازکردن نوار و ادامهٔ تلاوت'} title={!audioOpen?'پخش تلاوت':audioControlsVisible?'جمع‌کردن نوار پخش':'بازکردن نوار پخش'} aria-expanded={audioOpen&&audioControlsVisible} aria-busy={audioStatus==='loading'} style={audioOpen?{color:'var(--sage)',background:'var(--word-root)'}:undefined} onClick={()=>{if(!audioOpen){setAudioControlsVisible(true);setAudioOpen(true)}else if(audioControlsVisible)setAudioControlsVisible(false);else{setAudioControlsVisible(true);if(audioStatus!=='loading')setAudioPlayRequest(value=>value+1)}}}>{audioStatus==='playing'&&audioOpen?<span className="recitation-activity" aria-hidden="true">{[0,1,2,3,4].map(i=><i key={i} style={{animationDelay:`${i*0.12}s`}}/>)}</span>:audioStatus==='loading'&&audioOpen?<LoaderCircle size={20} className="recitation-start-spinner animate-spin"/>:audioOpen&&audioControlsVisible?<AudioLines size={20}/>:<Play size={20} fill="currentColor"/>}</button>
+        <button className="icon-btn" aria-label={!audioOpen?t("ui.facfd50c31"):audioControlsVisible?t("ui.feabb65c6a"):audioStatus==='playing'?t("ui.7851ddb1df"):t("ui.f432f383bf")} title={!audioOpen?t("ui.1f7cc9473a"):audioControlsVisible?t("ui.0b17cf0f81"):t("ui.0884ec3e62")} aria-expanded={audioOpen&&audioControlsVisible} aria-busy={audioStatus==='loading'} style={audioOpen?{color:'var(--sage)',background:'var(--word-root)'}:undefined} onClick={()=>{if(!audioOpen){setAudioControlsVisible(true);setAudioOpen(true)}else if(audioControlsVisible)setAudioControlsVisible(false);else{setAudioControlsVisible(true);if(audioStatus!=='loading')setAudioPlayRequest(value=>value+1)}}}>{audioStatus==='playing'&&audioOpen?<span className="recitation-activity" aria-hidden="true">{[0,1,2,3,4].map(i=><i key={i} style={{animationDelay:`${i*0.12}s`}}/>)}</span>:audioStatus==='loading'&&audioOpen?<LoaderCircle size={20} className="recitation-start-spinner animate-spin"/>:audioOpen&&audioControlsVisible?<AudioLines size={20}/>:<Play size={20} fill="currentColor"/>}</button>
 
         {/* surah keyword index — opens the sorted-keywords page */}
-        <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
+        <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label={t("ui.cc9c59a2c4")} title={t("ui.cc9c59a2c4")}>
           <IconSortIndex />
         </button>
-        <button className="icon-btn" onClick={() => { setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }} aria-label="ارتباط ریشه‌ای بازه آیات" title="ارتباط ریشه‌ای بازه آیات">
+        <button className="icon-btn" onClick={() => { setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }} aria-label={t("ui.1f253d9ad1")} title={t("ui.1f253d9ad1")}>
           <GitCompareArrows size={20} />
         </button>
 
 
-          <button className="icon-btn" aria-label="نمایش ترجمه"
-            title="ترجمه"
+          <button className="icon-btn" aria-label={t("ui.2d6258b160")}
+            title={t("ui.37e2fdb79c")}
             aria-pressed={showTrans}
             style={{ color: showTrans ? 'var(--sage)' : undefined, background: showTrans ? 'var(--word-root)' : undefined }}
             onClick={() => setShowTrans(v => !v)}>
@@ -527,25 +536,25 @@ export default function Home() {
         </>}
       </header>
 
+      <LanguageOnboarding onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
       <RecitationPlayer playRequest={audioPlayRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
 
       {returnToSearch && !searchOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
           <button type="button" className="chip gap-1.5 py-1.5" onClick={() => { setSel(null); setSearchOpen(true) }}>
-            <ArrowRight size={14} aria-hidden="true" /> بازگشت به نتایج جست‌وجو
-          </button>
-          <button type="button" className="icon-btn sm" aria-label="بستن نوار بازگشت به جست‌وجو" onClick={() => setReturnToSearch(false)}>×</button>
+            <ArrowRight size={14} aria-hidden="true" />{t("ui.15868c5aa7")}</button>
+          <button type="button" className="icon-btn sm" aria-label={t("ui.4d21d96f48")} onClick={() => setReturnToSearch(false)}>×</button>
         </div>
       )}
 
       {!showComparison && comparisonRange?.s === curSurahN && (contextComparison || Object.keys(comparisonRoots).length > 0) && (
         <div className="relative z-10 flex flex-wrap items-center gap-2 px-3 py-2 text-xs" style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
-          <span className="comparison-range-band rounded px-2 py-1">درون بازه {toFa(comparisonRange.from)}–{toFa(comparisonRange.to)}</span>
-          {soloComparisonRoot ? <button className="chip" aria-label="نمایش همهٔ ریشه‌ها" onClick={() => { setSoloComparisonRoot(null); setHiddenComparisonRoots(new Set()) }}>فقط {soloComparisonRoot.split('').join(' ')} ×</button>
-            : hiddenComparisonRoots.size > 0 ? <button className="chip" aria-label="روشن کردن همهٔ ریشه‌ها" onClick={() => setHiddenComparisonRoots(new Set())}>{toFa(hiddenComparisonRoots.size)} ریشه پنهان · بازنشانی</button> : <span>هر ریشه یک رنگ</span>}
-          <span className="basis-full" style={{ color: 'var(--ink-soft)' }}>تپ: خاموش/روشن · نگه‌داشتن: فقط این ریشه</span>
-          <button className="underline mr-auto" onClick={() => setShowComparison(true)}>بازگشت به مقایسه</button>
-          <button aria-label="پاک کردن هایلایت مقایسه" onClick={() => { setContextComparison(false); setComparisonRoot(null); setComparisonRoots({}); setComparisonRange(null); setSel(null) }}>×</button>
+          <span className="comparison-range-band rounded px-2 py-1">{t("ui.6f0ffd5c13")}{' '}{toFa(comparisonRange.from)}–{toFa(comparisonRange.to)}</span>
+          {soloComparisonRoot ? <button className="chip" aria-label={t("ui.8ecef9ea93")} onClick={() => { setSoloComparisonRoot(null); setHiddenComparisonRoots(new Set()) }}>{t("ui.52a86c5c98")}{' '}{soloComparisonRoot.split('').join(' ')} ×</button>
+            : hiddenComparisonRoots.size > 0 ? <button className="chip" aria-label={t("ui.e0b2c3ffe6")} onClick={() => setHiddenComparisonRoots(new Set())}>{toFa(hiddenComparisonRoots.size)}{' '}{t("ui.5277283f26")}</button> : <span>{t("ui.fbd767126d")}</span>}
+          <span className="basis-full" style={{ color: 'var(--ink-soft)' }}>{t("ui.a8b5fe8641")}</span>
+          <button className="underline mr-auto" onClick={() => setShowComparison(true)}>{t("ui.e5d9ee962d")}</button>
+          <button aria-label={t("ui.36fdc8888e")} onClick={() => { setContextComparison(false); setComparisonRoot(null); setComparisonRoots({}); setComparisonRange(null); setSel(null) }}>×</button>
         </div>
       )}
       {/* ===== Main + side root panel ===== */}
@@ -566,7 +575,7 @@ export default function Home() {
               arriveAtEnd={pullArrival.current?.s === surah && pullArrival.current.end}
               onNavigate={async (n, end) => {
                 // Keep the completed preview visible until all destination data is ready.
-                const [data, translations] = await Promise.all([loadSurah(n), loadTrans(n), document.fonts.ready])
+                const [data, translations] = await Promise.all([loadSurah(n), loadTrans(n,translator), document.fonts.ready])
                 pullArrival.current = { s: n, end }
                 setFlowSurah(data); setFlowTrans(translations); setLoadingPage(false)
                 setPage(data.v[0].p); setFlash(null); setSel(null); setSurah(n)

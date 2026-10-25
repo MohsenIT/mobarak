@@ -1,7 +1,7 @@
-export const APP_NAME = 'قرآن مبارک'
-
-// Sad 38:29 in standard Arabic spelling for a clear splash without recitation marks.
-export const STARTUP_VERSE = 'كِتَابٌ أَنْزَلْنَاهُ إِلَيْكَ مُبَارَكٌ لِيَدَّبَّرُوا آيَاتِهِ وَلِيَتَذَكَّرَ أُولُو الْأَلْبَابِ'
-export const STARTUP_VERSE_REFERENCE = 'ص · ۲۹'
-
-export const STARTUP_VERSE_TRANSLATION = "این کتابی است که آن را به تو مبارک نازل کردیم تا در آیاتش تدبر کنند و صاحبان خرد متذکر شوند."
+import branding from '../../public/data/branding.json'
+export const APP_NAME = branding.APP_NAME
+export const STARTUP_VERSE = branding.STARTUP_VERSE
+export const STARTUP_VERSE_REFERENCE = branding.STARTUP_VERSE_REFERENCE
+export const STARTUP_VERSE_TRANSLATION = branding.STARTUP_VERSE_TRANSLATION
+export const BISMILLAH = branding.BISMILLAH
+export const STARTUP_TRANSLATION_EMPHASIS = branding.STARTUP_TRANSLATION_EMPHASIS

@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
 import { Arrow as PopoverArrow } from '@radix-ui/react-popover'
 import { List, Search, X } from 'lucide-react'
@@ -23,7 +24,7 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
   return <Popover open={open} onOpenChange={onOpenChange}>
     <PopoverTrigger asChild><button className="analysis-position-button" disabled={index < 0 || !items.length} aria-label={label}>{title}</button></PopoverTrigger>
     <PopoverContent className="analysis-position-picker" dir="rtl" data-analysis-picker side="top" sideOffset={9}
-      aria-label="فهرست تکرارها" onOpenAutoFocus={event => {
+      aria-label={t("ui.b55272cf13")} onOpenAutoFocus={event => {
         event.preventDefault()
         requestAnimationFrame(() => {
           const selected = list.current?.querySelector<HTMLButtonElement>('[aria-current="true"]')
@@ -32,12 +33,12 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
           else selected?.scrollIntoView({ block: 'nearest' })
         })
       }}>
-      <div className="occurrence-picker-heading"><p className="sr-only">تکرارها در این سوره</p><div>
+      <div className="occurrence-picker-heading"><p className="sr-only">{t("ui.ace85fd091")}</p><div>
         {onFull && <>
-          <button type="button" className="occurrence-search-shortcut" title="نمایش کامل در جست‌وجوی پیشرفتهٔ همین سوره" onClick={() => { onOpenChange(false); onFull('surah') }}><List size={14} aria-hidden="true" /><span>نتایج این سوره</span></button>
-          <button type="button" className="occurrence-search-shortcut" title="نمایش در جست‌وجوی پیشرفتهٔ کل قرآن" onClick={() => { onOpenChange(false); onFull('quran') }}><Search size={14} aria-hidden="true" /><span>جست‌وجو در قرآن</span></button>
+          <button type="button" className="occurrence-search-shortcut" title={t("ui.a6e697e2b2")} onClick={() => { onOpenChange(false); onFull('surah') }}><List size={14} aria-hidden="true" /><span>{t("ui.9918f2233f")}</span></button>
+          <button type="button" className="occurrence-search-shortcut" title={t("ui.6a85b3a2ca")} onClick={() => { onOpenChange(false); onFull('quran') }}><Search size={14} aria-hidden="true" /><span>{t("ui.cd32ebbeba")}</span></button>
         </>}
-        <button type="button" aria-label="بستن فهرست تکرارها" onClick={() => onOpenChange(false)}><X size={18} /></button>
+        <button type="button" aria-label={t("ui.510fc4baec")} onClick={() => onOpenChange(false)}><X size={18} /></button>
       </div></div>
       <div ref={list} className="occurrence-picker-list nice-scroll" onScroll={event => { memory.current.top = event.currentTarget.scrollTop }}>
         {groups.map(group => {
@@ -76,8 +77,8 @@ function OccurrenceRow({ tokens, a, pos, part, locations, selected, onPick }: {
     if (Date.now() < suppressClick.current) { event.preventDefault(); return }
     onPick()
   }}>
-    <span className="analysis-occurrence-reference">آیه {toFa(a)}{locations.length > 1 && ` (${toFa(locations.length)} تکرار)`}</span>
-    <span ref={viewport} className="occurrence-pan font-quran" dir="rtl" title="برای خواندن ادامه، به دو طرف بکشید"
+    <span className="analysis-occurrence-reference">{t("ui.b1b168c791")}{' '}{toFa(a)}{locations.length > 1 && t("ui.afc417e2c0",{p0:(toFa(locations.length))})}</span>
+    <span ref={viewport} className="occurrence-pan font-quran" dir="rtl" title={t("ui.8df9ff79ae")}
       onPointerDown={event => { if (event.isPrimary && event.button === 0) drag.current = { x: event.clientX, y: event.clientY, left: event.currentTarget.scrollLeft, locked: false } }}
       onPointerMove={event => {
         const start = drag.current

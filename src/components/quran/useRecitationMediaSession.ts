@@ -1,4 +1,5 @@
 'use client'
+import {APP_NAME} from '@/lib/branding'
 import { useEffect, useRef, type RefObject } from 'react'
 
 interface Options {
@@ -37,7 +38,7 @@ export function useRecitationMediaSession(options: Options) {
   useEffect(()=>{
     if(!options.active||!('mediaSession' in navigator))return
     if(typeof MediaMetadata!=='undefined')navigator.mediaSession.metadata=new MediaMetadata({
-      title:options.title,artist:options.artist,album:'قرآن مبارک',
+      title:options.title,artist:options.artist,album:APP_NAME,
       artwork:[192,512].map(size=>({src:new URL(`/icons/app-logo-v3-any-${size}.png`,location.href).href,sizes:`${size}x${size}`,type:'image/png'})),
     })
     navigator.mediaSession.playbackState=options.playing?'playing':'paused'

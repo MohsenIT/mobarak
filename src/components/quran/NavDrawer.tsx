@@ -1,6 +1,9 @@
 'use client'
+import {t,t as tText} from '@/lib/i18n'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import LanguageSettings from './LanguageSettings'
+import {TRANSLATION_IDS} from '@/lib/translations'
 import ResourcePicker from './ResourcePicker'
 import {RESOURCES} from '@/lib/resources'
 import ReadingScreenSettings from './ReadingScreen'
@@ -44,10 +47,10 @@ interface Props {
 }
 
 const TABS = [
-  { id: 'surah', label: 'سوره‌ها' },
-  { id: 'juz', label: 'اجزاء' },
-  { id: 'recent', label: 'اخیر' },
-  { id: 'settings', label: 'تنظیمات' },
+  { id: 'surah', label: t("ui.a1e320e16e") },
+  { id: 'juz', label: t("ui.87453fc867") },
+  { id: 'recent', label: t("ui.c6bdd72afe") },
+  { id: 'settings', label: t("ui.6badcac8c1") },
 ] as const
 
 
@@ -103,48 +106,46 @@ export default function NavDrawer(props: Props) {
   return (
     <>
       <div className="sheet-backdrop" onClick={onClose} />
-      <aside className="drawer" role="dialog" aria-label={props.view === 'tools' ? 'منوی برنامه' : 'فهرست سوره‌ها'}>
+      <aside className="drawer" role="dialog" aria-label={props.view === 'tools' ? t("ui.b563f0690c") : t("ui.38a1e75271")}>
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <img src="/icons/logo-5-192.png" width="34" height="34" alt="" className="shrink-0 rounded-full" />
             <h2 className="font-bold text-lg" style={{ color: 'var(--ink)' }}>{APP_NAME}</h2>
           </div>
-          <button className="icon-btn" onClick={onClose} aria-label="بستن"><IconClose /></button>
+          <button className="icon-btn" onClick={onClose} aria-label={t("ui.313cbecb4d")}><IconClose /></button>
         </div>
 
         {props.view === 'tools' && <>
-        <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>جست‌وجوی پیشرفته</span><span>در متن، ریشه و بُن‌واژه ←</span></button>
+        <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>{t("ui.c51349274d")}</span><span>{t("ui.b390c6bcd0")}</span></button>
         </>}
         {props.view !== 'tools' && <>
         <form onSubmit={submitPage} className="flex items-center gap-2 px-4 pb-3">
           <input
             value={pageInput}
             onChange={e => { setPageInput(e.target.value); setPageError(false) }}
-            aria-label="جستجو و رفتن به مقصد"
+            aria-label={t("ui.54778fcf78")}
             aria-invalid={pageError}
             aria-describedby={pageError ? 'page-jump-error' : undefined}
             inputMode="text"
-            placeholder="برو به… س۲۰، ص۶، ق۶، طه:۱۴"
+            placeholder={t("ui.5bb212ac5e")}
             className="flex-1 min-w-0 rounded-xl border px-3 py-2.5 text-sm bg-transparent outline-none"
             style={{ borderColor: 'var(--line-strong)', color: 'var(--ink)' }}
           />
           <button type="submit" className="rounded-xl px-4 py-2.5 text-sm font-bold text-white flex-none"
-            style={{ background: 'var(--sage)' }}>
-            برو
-          </button>
+            style={{ background: 'var(--sage)' }}>{t("ui.f06ccf3d9b")}</button>
         </form>
         {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onTogglePin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
-        {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">مقصد را از پیشنهادها انتخاب کنید یا دقیق‌تر بنویسید؛ مثلاً «ص۶»، «س۲۰»، «ق۶» یا «طه:۱۴».</p>}
+        {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">{t("ui.c8cc160d0c")}</p>}
 
-        {suggestions.length > 0 && <div className="drawer-destination-options" aria-label="مقصدهای پیشنهادی">
+        {suggestions.length > 0 && <div className="drawer-destination-options" aria-label={t("ui.6d7a6c7a7e")}>
           {suggestions.map((item, index) => <button key={index} type="button" onClick={() => goTo(item.destination)}>{toFa(item.label)}</button>)}
         </div>}
-        <details className="px-4 pb-3 text-xs leading-7"><summary>راهنمای «برو»</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{kind}</dt><dd>{examples}</dd></div>)}</dl><p>«ا» یعنی اول و «آ» یعنی آخر. آیه و سیاق، بدون نام سوره، به سورهٔ فعلی مربوط‌اند. عددِ تنها چند مقصد پیشنهادی دارد.</p></details>
+        <details className="px-4 pb-3 text-xs leading-7"><summary>{t("ui.f4bf9b146f")}</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl><p>{t("ui.a8175202e6")}</p></details>
         </>}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'settings' : t.id === 'surah' || t.id === 'juz').map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
-              {t.label}
+              {tText(t.label)}
             </button>
           ))}
         </div>
@@ -152,7 +153,7 @@ export default function NavDrawer(props: Props) {
         <div ref={contentRef} className="flex-1 overflow-y-auto nice-scroll">
           {tab === 'surah' && (
             <div className="p-3">
-              {surahs.length === 0 && !suggestions.length && <p role="status" className="text-center py-4 text-sm">مقصدی با این نام یا شماره پیدا نشد.</p>}
+              {surahs.length === 0 && !suggestions.length && <p role="status" className="text-center py-4 text-sm">{t("ui.68f830ec5c")}</p>}
               <div ref={surahListRef} className="flex flex-col">
                 {surahs.map(s => {
                   const isActive = s.n === currentSurah
@@ -183,7 +184,7 @@ export default function NavDrawer(props: Props) {
                       <span className="flex-1">
                         <span className="block font-bold text-[15px] font-quran" style={{ color: 'var(--ink)' }}>{s.ar}</span>
                         <span className="block text-xs mt-0.5" style={{ color: 'var(--ink-faint)' }}>
-                          {s.fa} · {toFa(s.vc)} آیه · {s.rev === 'makkah' ? 'مکی' : 'مدنی'}
+                          {s.fa} · {toFa(s.vc)}{' '}{t("ui.d9959426df")}{' '}{s.rev === 'makkah' ? t("ui.039e791597") : t("ui.40f14b2806")}
                         </span>
                       </span>
                     </button>
@@ -203,9 +204,9 @@ export default function NavDrawer(props: Props) {
                   onMouseEnter={e => (e.currentTarget.style.background = 'var(--word-hover)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <span className="block font-bold" style={{ color: 'var(--ink)' }}>جزء {toFa(j.j)}</span>
+                  <span className="block font-bold" style={{ color: 'var(--ink)' }}>{t("ui.f74f9b04c7")}{' '}{toFa(j.j)}</span>
                   <span className="block text-xs mt-1" style={{ color: 'var(--ink-faint)' }}>
-                    {j.surahFa} · آیه {toFa(j.a)}
+                    {j.surahFa}{' '}{t("ui.2f2dd77fbd")}{' '}{toFa(j.a)}
                   </span>
                 </button>
               ))}
@@ -214,16 +215,13 @@ export default function NavDrawer(props: Props) {
 
           {tab === 'recent' && (
             <div className="p-3">
-              <div className="drawer-recent-heading"><h3>سوره‌های اخیر</h3>{props.recentSurahs.length > 0 && <button type="button" onClick={props.onClearRecent}>پاک‌کردن سابقه</button>}</div>
-              {props.recentSurahs.length === 0 && <p className="text-xs py-4" style={{ color: 'var(--ink-soft)' }}>هنوز سابقه‌ای ثبت نشده است.</p>}
-              {props.recentSurahs.map(n => <button type="button" className="nav-surah-row" key={n} onClick={() => goTo({ kind: 'surah', s: n })}><span>{toFa(n)} · {meta.surahs[n - 1]?.fa}</span>{n === currentSurah && <small>سورهٔ جاری</small>}</button>)}
-              <details className="drawer-legacy-bookmarks"><summary>نشان‌های قبلی · {toFa(props.bookmarks.length)}</summary>
+              <div className="drawer-recent-heading"><h3>{t("ui.d8c76d09ca")}</h3>{props.recentSurahs.length > 0 && <button type="button" onClick={props.onClearRecent}>{t("ui.abea5beb42")}</button>}</div>
+              {props.recentSurahs.length === 0 && <p className="text-xs py-4" style={{ color: 'var(--ink-soft)' }}>{t("ui.462e4fca97")}</p>}
+              {props.recentSurahs.map(n => <button type="button" className="nav-surah-row" key={n} onClick={() => goTo({ kind: 'surah', s: n })}><span>{toFa(n)} · {meta.surahs[n - 1]?.fa}</span>{n === currentSurah && <small>{t("ui.bd95a7445e")}</small>}</button>)}
+              <details className="drawer-legacy-bookmarks"><summary>{t("ui.59d0d8997c")}{' '}{toFa(props.bookmarks.length)}</summary>
               {props.bookmarks.length === 0 ? (
                 <div className="text-center py-12 text-sm" style={{ color: 'var(--ink-faint)' }}>
-                  <div className="flex justify-center mb-3 opacity-60"><IconStar /></div>
-                  هنوز صفحه‌ای نشان نکرده‌اید.
-                  <br />نشان‌های ذخیره‌شدهٔ قبلی اینجا نگه داشته می‌شوند.
-                </div>
+                  <div className="flex justify-center mb-3 opacity-60"><IconStar /></div>{t("ui.934788992f")}<br />{t("ui.53cb090124")}</div>
               ) : (
                 <div className="flex flex-col gap-2">
                   {[...props.bookmarks].sort((a, b) => a - b).map(p => {
@@ -232,11 +230,11 @@ export default function NavDrawer(props: Props) {
                       <div key={p} className="flex items-center gap-2 rounded-xl border px-3 py-2.5"
                         style={{ borderColor: 'var(--line)' }}>
                         <button className="flex-1 text-right" onClick={() => { onGoPage(p); onClose() }}>
-                          <span className="block font-bold text-sm" style={{ color: 'var(--ink)' }}>صفحه {toFa(p)}</span>
+                          <span className="block font-bold text-sm" style={{ color: 'var(--ink)' }}>{t("ui.0572e8936c")}{' '}{toFa(p)}</span>
                           <span className="block text-xs mt-0.5" style={{ color: 'var(--ink-faint)' }}>{names}</span>
                         </button>
                         <button className="icon-btn sm" style={{ color: 'var(--ink-faint)' }}
-                          onClick={() => props.onRemoveBookmark(p)} aria-label="حذف نشان">
+                          onClick={() => props.onRemoveBookmark(p)} aria-label={t("ui.2b762b50db")}>
                           <IconClose />
                         </button>
                       </div>
@@ -250,24 +248,24 @@ export default function NavDrawer(props: Props) {
 
           {tab === 'settings' && (
             <div className="p-4 flex flex-col gap-6">
+              <LanguageSettings translator={props.translator}/>
               <ReadingScreenSettings />
               <UpdateSettings />
               <OfflineSettings />
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
-                  {props.theme === 'night' ? <IconMoon /> : <IconSun />} پوسته
-                </h3>
+                  {props.theme === 'night' ? <IconMoon /> : <IconSun />}{t("ui.90ec529f45")}</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {(['paper', 'night'] as const).map(t => (
-                    <button key={t}
+                  {(['paper', 'night'] as const).map(theme => (
+                    <button key={theme}
                       className="rounded-xl border py-3 text-sm font-medium transition-all"
                       style={{
-                        borderColor: props.theme === t ? 'var(--sage)' : 'var(--line)',
-                        background: props.theme === t ? 'var(--word-root)' : 'transparent',
+                        borderColor: props.theme === theme ? 'var(--sage)' : 'var(--line)',
+                        background: props.theme === theme ? 'var(--word-root)' : 'transparent',
                         color: 'var(--ink)',
                       }}
-                      onClick={() => props.onTheme(t)}>
-                      {t === 'paper' ? 'کاغذی روشن' : 'شب‌خوان'}
+                      onClick={() => props.onTheme(theme)}>
+                      {theme === 'paper' ? t("ui.a97a005a42") : t("ui.95b1ddc4a1")}
                     </button>
                   ))}
                 </div>
@@ -275,25 +273,23 @@ export default function NavDrawer(props: Props) {
 
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
-                  <IconTranslate /> مترجم
-                </h3>
-                <ResourcePicker label="ترجمه" ids={['translation:s','translation:f','translation:a','translation:m']} value={`translation:${props.translator}`} onChange={id=>props.onTranslator(id.replace(/^translation:/,'') as Translator)}/>
+                  <IconTranslate />{t("ui.52baa2cbee")}</h3>
+                <ResourcePicker label={t("ui.37e2fdb79c")} ids={TRANSLATION_IDS.map(id=>`translation:${id}`)} value={`translation:${props.translator}`} onChange={id=>props.onTranslator(id.replace(/^translation:/,'') as Translator)}/>
               </section>
 
-              <section><h3 className="text-sm font-bold mb-3" style={{color:'var(--ink)'}}>منابع برنامه</h3><ResourcePicker browse label="منبع" ids={RESOURCES.map(r=>r.id)} value="" onChange={()=>{}}/></section>
+              <section><h3 className="text-sm font-bold mb-3" style={{color:'var(--ink)'}}>{t("ui.b6a850cc59")}</h3><ResourcePicker browse label={t("ui.8a52f7bc3f")} ids={RESOURCES.map(r=>r.id)} value="" onChange={()=>{}}/></section>
 
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
-                  <IconBook /> اندازهٔ خط قرآن
-                </h3>
-                <div className="flex items-center justify-center gap-3 mb-3" role="group" aria-label="بزرگ‌نمایی">
-                  <button className="icon-btn" aria-label="بزرگ‌نمایی"
+                  <IconBook />{t("ui.1fe7007e7e")}</h3>
+                <div className="flex items-center justify-center gap-3 mb-3" role="group" aria-label={t("ui.8b885c6faa")}>
+                  <button className="icon-btn" aria-label={t("ui.8b885c6faa")}
                     disabled={props.scale >= 1.9}
                     onClick={() => props.onScale(Math.round(Math.min(1.9, props.scale + 0.15) * 20) / 20)}>
                     <span className="text-lg font-bold">+</span>
                   </button>
                   <span className="text-sm" style={{ color: 'var(--ink)' }}>{toFa(Math.round(props.scale * 100))}٪</span>
-                  <button className="icon-btn" aria-label="کوچک‌نمایی"
+                  <button className="icon-btn" aria-label={t("ui.2e81f56c3d")}
                     disabled={props.scale <= 0.55}
                     onClick={() => props.onScale(Math.round(Math.max(0.55, props.scale - 0.15) * 20) / 20)}>
                     <span className="text-lg font-bold">−</span>
@@ -304,15 +300,14 @@ export default function NavDrawer(props: Props) {
                   style={{ ['--fill' as string]: `${((props.scale - 0.55) / 1.35) * 100}%` }}
                   onChange={e => props.onScale(+e.target.value)} />
                 <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--ink-faint)' }}>
-                  <span>ریز</span><span>{toFa(Math.round(props.scale * 100))}٪</span><span>درشت</span>
+                  <span>{t("ui.ad78cda0dc")}</span><span>{toFa(Math.round(props.scale * 100))}٪</span><span>{t("ui.053b14047d")}</span>
                 </div>
               </section>
 
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
-                  <IconBook /> حالت نمایش
-                </h3>
-                <div className="grid grid-cols-2 gap-2" role="group" aria-label="حالت نمایش">
+                  <IconBook />{t("ui.88619bd189")}</h3>
+                <div className="grid grid-cols-2 gap-2" role="group" aria-label={t("ui.88619bd189")}>
                   {(['flow', 'mushaf'] as const).map(mode => (
                     <button key={mode}
                       className="rounded-xl border py-3 text-sm font-medium transition-all"
@@ -323,16 +318,13 @@ export default function NavDrawer(props: Props) {
                         color: 'var(--ink)',
                       }}
                       onClick={() => props.onMode(mode)}>
-                      {mode === 'mushaf' ? 'مصحف' : 'پیوسته'}
+                      {mode === 'mushaf' ? t("ui.f7c7ba28bb") : t("ui.8fef24ffc4")}
                     </button>
                   ))}
                 </div>
               </section>
 
-              <p className="text-xs leading-6 pt-2 border-t" style={{ color: 'var(--ink-faint)', borderColor: 'var(--line)' }}>
-                متن عثمانی مصحف مدینه (خط عثمان‌طه) · ریشه‌شناسی واژگان بر پایهٔ Quranic Arabic Corpus ·
-                ترجمه‌ها از تنزیل. نشان‌ها و تنظیمات فقط در همین مرورگر ذخیره می‌شوند.
-              </p>
+              <p className="text-xs leading-6 pt-2 border-t" style={{ color: 'var(--ink-faint)', borderColor: 'var(--line)' }}>{t("ui.9f4b86895b")}</p>
             </div>
           )}
         </div>

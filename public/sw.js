@@ -43,12 +43,11 @@ self.addEventListener('fetch', event => {
 })
 
 // Each verified file is committed independently, so interrupted downloads resume.
-let syncing
+let syncing = Promise.resolve()
 self.addEventListener('message', event => {
   if (event.data?.type !== 'DOWNLOAD_PACKS') return
   const port = event.ports[0]
-  if (syncing) { port?.postMessage({ error: 'busy' }); return }
-  syncing = (async () => {
+  const task = syncing.then(async () => {
     const response = await fetch('/offline-manifest.json', { cache: 'no-store' })
     if (!response.ok) throw new Error('manifest')
     const manifest = await response.json()
@@ -76,6 +75,28 @@ self.addEventListener('message', event => {
     }))
     if (results.some(result => result.status === 'rejected')) throw new Error('download')
     port?.postMessage({ complete: true, total: files.length })
-  })().catch(() => port?.postMessage({ error: 'download' })).finally(() => { syncing = null })
-  event.waitUntil(syncing)
+  }).catch(() => port?.postMessage({ error: 'download' }))
+  syncing = task
+  event.waitUntil(task)
+})
+
+// First visits may finish loading before this worker controls the document.
+// Preserve that reader shell and the UI chunks already loaded by its selected locale.
+self.addEventListener('message',event=>{
+  if(event.data?.type!=='CACHE_READER')return
+  event.waitUntil((async()=>{
+    const documentUrl=new URL(event.data.document,self.location.origin)
+    if(documentUrl.origin!==self.location.origin)return
+    const cache=await caches.open(CACHE)
+    const response=await fetch(documentUrl.href,{cache:'no-store'})
+    if(response.ok&&response.headers.get('content-type')?.includes('text/html'))await cache.put(SHELL,response)
+    const assets=[...new Set(Array.isArray(event.data.assets)?event.data.assets:[])].slice(0,150)
+    await Promise.allSettled(assets.map(async value=>{
+      const url=new URL(value,self.location.origin)
+      if(url.origin!==self.location.origin||!url.pathname.startsWith('/_next/static/'))return
+      if(await cache.match(url.href))return
+      const response=await fetch(url.href)
+      if(response.ok)await cache.put(url.href,response)
+    }))
+  })().catch(()=>{}))
 })

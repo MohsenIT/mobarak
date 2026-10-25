@@ -1,3 +1,4 @@
+import {t} from './i18n'
 import type { Meta, SurahMeta } from './quran'
 import { getSurahContexts } from './contexts'
 import { SURAH_ALIASES } from './surah-aliases'
@@ -90,22 +91,22 @@ export type DestinationSuggestion = { destination: Destination; label: string }
 export function destinationSuggestions(meta: Meta, input: string, currentSurah: number): DestinationSuggestion[] {
   const value = input.trim()
   if (!value) return []
-  const label = (d: Destination) => d.kind==='context'?`سیاق ${d.index} سورهٔ ${meta.surahs[d.s-1]?.fa} · آیات ${d.from} تا ${d.to}`:d.kind==='surah'?`سورهٔ ${meta.surahs[d.s-1]?.fa}`:d.kind==='page'?`صفحهٔ ${d.p}`:`${meta.surahs[d.s-1]?.fa} · آیهٔ ${d.a}`
+  const label = (d: Destination) => d.kind==='context'?t('ui.6aa4f95889',{p0:(d.index),p1:(meta.surahs[d.s-1]?.fa),p2:(d.from),p3:(d.to)}):d.kind==='surah'?t('ui.0eb0a3f03f',{p0:(meta.surahs[d.s-1]?.fa)}):d.kind==='page'?t('ui.f9119fddb7',{p0:(d.p)}):t('ui.fde7db4d85',{p0:(meta.surahs[d.s-1]?.fa),p1:(d.a)})
   const command=jumpCommand(value)
   if (command || /[:：/]/.test(value)) {
     const destination = resolveDestination(meta, /[:：/]/.test(value) ? 'verse' : 'surah', value, currentSurah)
     const juz=command?.kind==='juz'?indexNumber(command.value,30):undefined
-    return destination?[{destination,label:juz?`جزء ${juz}`:label(destination)}]:[]
+    return destination?[{destination,label:juz?t('ui.6668c797a2',{p0:(juz)}):label(destination)}]:[]
   }
   if (/^\d+$/.test(normalizeSearch(value))) {
     return (['surah', 'verse', 'page', 'juz', 'context'] as const).flatMap(kind => {
       const destination = resolveDestination(meta, kind, value, currentSurah)
-      return destination ? [{ destination, label: kind === 'juz' ? `جزء ${normalizeSearch(value)}` : label(destination) }] : []
+      return destination ? [{ destination, label: kind === 'juz' ? t('ui.6668c797a2',{p0:(normalizeSearch(value))}) : label(destination) }] : []
     })
   }
   return searchSurahs(meta, value).slice(0, 6).map(s => {
     const alias = SURAH_ALIASES[s.n]?.find(alias => nameKey(alias) === nameKey(value))
-    return { destination: { kind: 'surah' as const, s: s.n }, label: alias ? `سورهٔ ${s.fa} (${alias})` : `سورهٔ ${s.fa}` }
+    return { destination: { kind: 'surah' as const, s: s.n }, label: alias ? t('ui.3ebf05ab85',{p0:(s.fa),p1:(alias)}) : t('ui.0eb0a3f03f',{p0:(s.fa)}) }
   })
 }
 /** Search bars expose explicit jump commands without stealing ordinary word searches. */
@@ -114,10 +115,10 @@ export function searchDestinations(meta:Meta,input:string,currentSurah:number) {
 }
 
 export const NAVIGATION_HELP = [
-  ['سوره','س۲۰، سوره ۲۰، طه، حمد، توحید'],
-  ['صفحه','ص۶، صفحه ۶'],
-  ['جزء','ج۶، جزء ۶'],
-  ['آیه','آ۶، ا۶، آیه ۶؛ طه:۶، ۲۰:۶، س۲۰ آ۶'],
-  ['سیاق','ق۶، سیاق ۶؛ ق۲۰:۶، سیاق طه:۶، س۲۰ ق۶'],
-  ['اول و آخر','ق ا / ق آ؛ همین الگو برای س، ص، ج و آ هم کار می‌کند.'],
+  [t('ui.a37a87553b'),t('ui.d15067bd76')],
+  [t('ui.0572e8936c'),t('ui.6e4089e128')],
+  [t('ui.f74f9b04c7'),t('ui.4fbb13b53f')],
+  [t('ui.b1b168c791'),t('ui.46557d11e9')],
+  [t('ui.16836d5471'),t('ui.5f4cceae00')],
+  [t('ui.14fc761c35'),t('ui.eb0e3d84a2')],
 ] as const

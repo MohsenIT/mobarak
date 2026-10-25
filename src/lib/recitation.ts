@@ -1,8 +1,6 @@
+import sources from '../../public/data/recitation-sources.json'
 /** Verified ayah sources; each recording keeps its own cache identity. */
-export const RECITERS = [
-  { id:'minshawi-murattal',name:'محمد صدیق منشاوی',source:'Quran.com',sourcePage:'https://quran.com/' },
-  { id:'parhizgar',name:'شهریار پرهیزگار',source:'تنزیل',sourcePage:'https://tanzil.net/' },
-] as const
+export const RECITERS=sources as {id:'minshawi-murattal'|'parhizgar';name:string;source:string;sourcePage:string}[]
 export type Reciter = typeof RECITERS[number]
 export const RECITER: Reciter = RECITERS[0]
 export const AUDIO_ORIGIN = 'https://verses.quran.com'

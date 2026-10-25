@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Meta, SurahData } from '@/lib/quran'
@@ -25,10 +26,10 @@ interface Props {
 type SortKey = 'score' | 'count' | 'alpha' | 'spread'
 
 const SORT_LABELS: Record<SortKey, string> = {
-  score: 'کلیدواژگی',
-  count: 'فراوانی',
-  alpha: 'الفبا',
-  spread: 'پراکندگی',
+  score: t("ui.f34eb913af"),
+  count: t("ui.d8184fb34e"),
+  alpha: t("ui.86a8a30f4b"),
+  spread: t("ui.0d5fe88e5d"),
 }
 
 export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRoot }: Props) {
@@ -103,17 +104,16 @@ export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRo
     <>
       {/* backdrop — clicking it dismisses the index entirely */}
       <div className="sheet-backdrop" onClick={onClose} />
-      <aside className="surah-index-drawer" role="dialog" aria-label="فهرست کلیدواژه‌های سوره">
+      <aside className="surah-index-drawer" role="dialog" aria-label={t("ui.cc9c59a2c4")}>
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <div>
-            <p className="font-bold text-base" style={{ color: 'var(--ink)' }}>
-              فهرست کلیدواژه‌های سوره {sm?.fa}
+            <p className="font-bold text-base" style={{ color: 'var(--ink)' }}>{t("ui.cc9c59a2c4")}{sm?.fa}
             </p>
             <p className="text-xs mt-0.5" style={{ color: 'var(--ink-faint)' }}>
-              {toFa(rows.length)} ریشه · مرتب بر اساس {SORT_LABELS[sort]}
+              {toFa(rows.length)}{' '}{t("ui.142ea1f41f")}{' '}{t(SORT_LABELS[sort])}
             </p>
           </div>
-          <button className="icon-btn" onClick={onClose} aria-label="بستن"><IconClose /></button>
+          <button className="icon-btn" onClick={onClose} aria-label={t("ui.313cbecb4d")}><IconClose /></button>
         </div>
 
         {/* controls */}
@@ -124,7 +124,7 @@ export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRo
             <input
               value={q}
               onChange={e => setQ(e.target.value)}
-              placeholder="جستجوی ریشه…"
+              placeholder={t("ui.cadb0da2e6")}
               className="bg-transparent outline-none w-full text-sm"
               style={{ color: 'var(--ink)' }}
             />
@@ -133,7 +133,7 @@ export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRo
         <div className="flex border-b px-2 mb-2" style={{ borderColor: 'var(--line)' }}>
           {(Object.keys(SORT_LABELS) as SortKey[]).map(k => (
             <button key={k} className={`tab-btn${sort === k ? ' active' : ''}`} onClick={() => setSort(k)}>
-              {SORT_LABELS[k]}
+              {t(SORT_LABELS[k])}
             </button>
           ))}
         </div>
@@ -163,10 +163,10 @@ export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRo
                         <span className="idx-bar-fill" style={{ width: `${(r.inSurah / maxCount) * 100}%` }} />
                       </span>
                       <span className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--ink-faint)' }}>
-                        <span>{toFa(r.inSurah)} بار در {toFa(r.ayahs)} آیه</span>
+                        <span>{toFa(r.inSurah)}{' '}{t("ui.f22ce71891")}{' '}{toFa(r.ayahs)}{' '}{t("ui.b1b168c791")}</span>
                         <span>·</span>
-                        <span>{toFa(r.total)} در کل قرآن</span>
-                        {r.df <= 5 && <span className="chip" style={{ borderColor: 'var(--sage)', color: 'var(--sage)', fontSize: 10 }}>اختصاصی</span>}
+                        <span>{toFa(r.total)}{' '}{t("ui.48dbdddb5f")}</span>
+                        {r.df <= 5 && <span className="chip" style={{ borderColor: 'var(--sage)', color: 'var(--sage)', fontSize: 10 }}>{t("ui.da2d9f5e0c")}</span>}
                       </span>
                     </span>
                     {/* keyword score mini-gauge */}
@@ -180,7 +180,7 @@ export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRo
                           : 'var(--ink-faint)',
                         fontWeight: r.tier.tier === 'core' || r.tier.tier === 'key' ? 700 : 400,
                       }}>
-                        {r.tier.label}
+                        {t(r.tier.label)}
                       </span>
                     </span>
                   </button>
@@ -193,7 +193,7 @@ export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRo
         {/* footer with hint */}
         <div className="px-4 py-2.5 border-t text-[11px] flex items-center gap-2" style={{ borderColor: 'var(--line)', color: 'var(--ink-faint)' }}>
           <IconInfo />
-          <span>روی هر ریشه بزنید تا واژه‌های هم‌ریشه در پنل کنار باز شود. فهرست باز می‌ماند تا جایگاه تمرین‌تان حفظ شود.</span>
+          <span>{t("ui.6d2052087b")}</span>
         </div>
       </aside>
     </>

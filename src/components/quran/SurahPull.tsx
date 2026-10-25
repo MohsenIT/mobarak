@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 
 import { memo, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { loadSurah, loadTrans, type SurahData, type SurahMeta, type Translations, type Translator } from '@/lib/quran'
@@ -59,10 +60,10 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
     if (!showTrans) return
     let live = true
     for (const n of [surah - 1, surah + 1].filter(n => n >= 1 && n <= 114)) {
-      loadTrans(n).then(data => { if (live) setTranslations(current => ({ ...current, [n]: data })) }).catch(() => {})
+      loadTrans(n,translator).then(data => { if (live) setTranslations(current => ({ ...current, [n]: data })) }).catch(() => {})
     }
     return () => { live = false }
-  }, [surah, showTrans])
+  }, [surah, showTrans, translator])
   useEffect(() => {
     const element = scrollRef.current
     if (!element || !enabled || !ready) return
@@ -146,8 +147,8 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
         </div>
         <div className="surah-pull-hint" style={{ fontSize: fontSize * 0.55 }}>
           {progress >= 1
-            ? `برای رفتن به سورهٔ ${meta[n - 1].fa} رها کنید`
-            : `برای دیدن سورهٔ ${meta[n - 1].fa} ${isPrevious ? 'بیشتر پایین' : 'بیشتر بالا'} بکشید`}
+            ? t("ui.1313d854c5",{p0:(meta[n - 1].fa)})
+            : t("ui.bd26cfdea8",{p0:(meta[n - 1].fa),p1:(isPrevious ? t("ui.b1d7b0f9bf") : t("ui.fbb761bf5f"))})}
         </div>
       </div>
     })}

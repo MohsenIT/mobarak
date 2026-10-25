@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 import { useState } from 'react'
 import { RefreshCw } from 'lucide-react'
 import { APP_RELEASES,CURRENT_RELEASE,checkAppUpdate,compareRelease,type AppUpdate } from '@/lib/app-releases'
@@ -29,12 +30,12 @@ export default function UpdateSettings() {
     catch{setState('error')}
   }
   const history:AppUpdate={build:process.env.NEXT_PUBLIC_APP_VERSION||'local',releases:APP_RELEASES,latest:APP_RELEASES[0]}
-  return <section aria-label="به‌روزرسانی برنامه">
-    <h3 className="text-sm font-bold mb-3">به‌روزرسانی برنامه</h3>
-    <p className="text-xs mb-3" style={{color:'var(--ink-soft)'}}>نسخهٔ فعلی: {toFa(CURRENT_RELEASE)} · <button type="button" className="underline" onClick={()=>setNotes('history')}>تاریخچهٔ نسخه‌ها</button></p>
-    {process.env.NEXT_PUBLIC_DESKTOP==='1'?<a className="chip inline-flex min-h-11 items-center" href="https://github.com/MohsenIT/quran-vajeh/releases/latest" target="_blank" rel="noreferrer">دریافت نسخهٔ جدید</a>:<>
-      <div className="flex flex-wrap items-center gap-3"><button className="chip inline-flex min-h-11 items-center gap-2" disabled={state==='checking'||state==='refreshing'} onClick={state==='available'?()=>void refresh():()=>void check()}><RefreshCw size={16} className={state==='checking'||state==='refreshing'?'animate-spin':''}/>{state==='checking'?'در حال بررسی…':state==='available'?'دریافت نسخهٔ جدید':state==='refreshing'?'در حال به‌روزرسانی…':'بررسی به‌روزرسانی'}</button>{state==='available'&&<button type="button" className="underline text-xs" onClick={()=>setNotes('changes')}>دیدن تغییرات</button>}</div>
-      <p role="status" className="text-xs leading-6 mt-2" style={{color:'var(--ink-soft)'}}>{state==='latest'?'برنامه به‌روز است.':state==='available'?`نسخهٔ ${info?.latest?toFa(info.latest.version):'جدید'} آمادهٔ دریافت است.`:state==='error'?'بررسی یا دریافت انجام نشد؛ اتصال را بررسی و دوباره تلاش کنید.':''}</p>
+  return <section aria-label={t("ui.f0857df27f")}>
+    <h3 className="text-sm font-bold mb-3">{t("ui.f0857df27f")}</h3>
+    <p className="text-xs mb-3" style={{color:'var(--ink-soft)'}}>{t("ui.0f2d214015")}{' '}{toFa(CURRENT_RELEASE)} · <button type="button" className="underline" onClick={()=>setNotes('history')}>{t("ui.3a0967fbbe")}</button></p>
+    {process.env.NEXT_PUBLIC_DESKTOP==='1'?<a className="chip inline-flex min-h-11 items-center" href="https://github.com/MohsenIT/quran-vajeh/releases/latest" target="_blank" rel="noreferrer">{t("ui.c5462f5130")}</a>:<>
+      <div className="flex flex-wrap items-center gap-3"><button className="chip inline-flex min-h-11 items-center gap-2" disabled={state==='checking'||state==='refreshing'} onClick={state==='available'?()=>void refresh():()=>void check()}><RefreshCw size={16} className={state==='checking'||state==='refreshing'?'animate-spin':''}/>{state==='checking'?t("ui.25384e5227"):state==='available'?t("ui.c5462f5130"):state==='refreshing'?t("ui.15f33a75a4"):t("ui.20b05bf19a")}</button>{state==='available'&&<button type="button" className="underline text-xs" onClick={()=>setNotes('changes')}>{t("ui.3234f424d7")}</button>}</div>
+      <p role="status" className="text-xs leading-6 mt-2" style={{color:'var(--ink-soft)'}}>{state==='latest'?t("ui.e7ae3ec09b"):state==='available'?t("ui.98e493291d",{p0:(info?.latest?toFa(info.latest.version):t("ui.7b2b35c950"))}):state==='error'?t("ui.3da752b258"):''}</p>
     </>}
     <ReleaseNotesDialog open={notes!==null} onOpenChange={open=>{if(!open)setNotes(null)}} update={notes==='history'?history:info} history={notes==='history'} onUpdate={notes==='changes'&&state!=='latest'?()=>void refresh():undefined} busy={state==='refreshing'} error={notes==='changes'&&state==='error'}/>
   </section>

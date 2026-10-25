@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 
 import { useEffect, useState } from 'react'
 import RootBookHeading, { ROOT_BOOK_TITLES } from './RootBookHeading'
@@ -27,7 +28,7 @@ function load(root: string) {
     return Promise.all([entry, rootSummaries('tahqiq', root).catch(() => [])]).then(([data, summaries]) => ({
       ...data,
       entries: data.entries.map((entry, i) => ({ ...entry, summarySourceWarning: summaries[i]?.sourceWarning })),
-      preview: summaries.map(item => item.summary || 'متن این مدخل نیازمند بازبینی است.').join(' '),
+      preview: summaries.map(item => item.summary || t("ui.5145a3cd1a")).join(' '),
     }))
   }))
   return cache.get(root)!
@@ -54,7 +55,7 @@ export default function RootMeaning({ root }: { root: string }) {
     return () => { live = false }
   }, [])
   const books = ROOT_BOOKS.filter(book => enabled('root', 'meaning', book.id) && indexes?.[book.id]?.includes(root))
-  if (!books.length) return failed && ROOT_BOOKS.some(book => enabled('root', 'meaning', book.id)) ? <p role="alert" className="text-xs">فهرست منابع بارگیری نشد؛ دوباره بخش تحلیل را باز کنید.</p> : null
+  if (!books.length) return failed && ROOT_BOOKS.some(book => enabled('root', 'meaning', book.id)) ? <p role="alert" className="text-xs">{t("ui.b51461903e")}</p> : null
   return <AnalysisSection tab="root" kind="meaning">{books.map(book => {
     const Component = bookComponents[book.id]
     return <Component key={`${book.id}:${root}`} root={root} />
@@ -71,15 +72,15 @@ function TahqiqMeaning({ root }: { root: string }) {
   const [openRoot, setOpenRoot] = useState<string | null>(null)
   const expanded = openRoot === root
   const ready = state.root === root
-  return <section className="rounded-xl border p-3 mb-4 text-sm leading-7" aria-label="معنای ریشه در التحقیق" style={{ borderColor: 'var(--line)' }}>
+  return <section className="rounded-xl border p-3 mb-4 text-sm leading-7" aria-label={t("ui.fb65d57afe")} style={{ borderColor: 'var(--line)' }}>
     <RootBookHeading book="tahqiq" expanded={expanded} onToggle={() => setOpenRoot(expanded ? null : root)}
-      summary={ready && state.data ? state.data.preview || 'برای دیدن شرح ریشه باز کنید.' : undefined}
+      summary={ready && state.data ? state.data.preview || t("ui.62d9d3f5e8") : undefined}
       source={ready && state.data?.entries[0] ? tahqiqSource(state.data.entries[0]) : undefined} />
-    {!ready || state.data === undefined && !state.error ? <p role="status" className="text-xs">در حال بارگیری شرح ریشه…</p>
-      : state.error ? <p role="alert" className="text-xs">شرح ریشه بارگیری نشد.</p>
-        : !state.data ? <p className="text-xs" style={{ color: 'var(--ink-soft)' }}>برای این ریشه مدخل منطبق در نسخهٔ ارسالی پیدا نشد.</p>
+    {!ready || state.data === undefined && !state.error ? <p role="status" className="text-xs">{t("ui.82d30beedd")}</p>
+      : state.error ? <p role="alert" className="text-xs">{t("ui.921e6df6ca")}</p>
+        : !state.data ? <p className="text-xs" style={{ color: 'var(--ink-soft)' }}>{t("ui.de392efb74")}</p>
           : <>
-            {expanded && state.data.entries.length > 1 && <p className="text-xs" style={{ color: 'var(--ink-soft)' }}>چند مدخل با نوشتار نزدیک وجود دارد؛ عنوان اصلی هر مدخل برای تشخیص معنای مورد نظر حفظ شده است.</p>}
+            {expanded && state.data.entries.length > 1 && <p className="text-xs" style={{ color: 'var(--ink-soft)' }}>{t("ui.62115ceb91")}</p>}
             {expanded && state.data.entries.map(entry => <MeaningEntry key={`${root}:${entry.word}`} entry={entry} ambiguous={state.data!.entries.length > 1} />)}
           </>}
   </section>
@@ -89,19 +90,19 @@ function tahqiqSource(entry: Entry) {
   return {
     resourceId:'book:tahqiq',
     title: ROOT_BOOK_TITLES.tahqiq.full,
-    description: 'واژه‌پژوهی قرآن با تمرکز بر معنای محوری ریشه‌ها و کاربردهای قرآنی آن‌ها.',
+    description: t("ui.85fc86d95e"),
     fields: [
-      { label: 'نویسنده', value: 'علامه حسن مصطفوی' },
+      { label: t("ui.f72a3d8543"), value: t("ui.5c1ce6c22d") },
       ...(entry.provenance ? [
-        { label: 'نسخهٔ عربی', value: 'چاپ سوم؛ دار الکتب العلمیة ـ مرکز نشر آثار علامه مصطفوی؛ مجموعهٔ ۱۴ جلدی ارسالی' },
-        { label: 'ارجاع', value: `جلد ${toFa(entry.provenance.volume)}، صفحهٔ ${toFa(entry.provenance.page)}${entry.provenance.pageEnd > entry.provenance.page ? ` تا ${toFa(entry.provenance.pageEnd)}` : ''}` },
-        { label: 'مدخل مأخذ', value: entry.provenance.heading },
+        { label: t("ui.af8cf777b5"), value: t("ui.a18c680965") },
+        { label: t("ui.2cc6a9014c"), value: t("ui.f7cff9c45a",{p0:(toFa(entry.provenance.volume)),p1:(toFa(entry.provenance.page)),p2:(entry.provenance.pageEnd > entry.provenance.page ? ` ${t('ui.b1e000640d')} ${toFa(entry.provenance.pageEnd)}` : '')}) },
+        { label: t("ui.261e287eb1"), value: entry.provenance.heading },
       ] : [
-        { label: 'شرح فارسی', value: 'صادق عباسی و مجموعهٔ مدارس دانشجویی قرآن و عترت دانشگاه تهران' },
-        { label: 'مأخذ دیجیتال', value: 'اپ التّحقیق (فارسی)، فایل ارسالی' },
+        { label: t("ui.01f2ad2bc8"), value: t("ui.feaa124276") },
+        { label: t("ui.f45417f62d"), value: t("ui.d3d669e851") },
       ]),
     ],
-    notes: [...(entry.summarySourceWarning ? [entry.summarySourceWarning] : []), 'خلاصهٔ نمایشی با کمک هوش مصنوعی تهیه و با متن مأخذ تطبیق داده شده است.', entry.provenance ? 'شرح فارسی این مدخل، ترجمه و تلخیص با کمک هوش مصنوعی از متن عربی است؛ ترجمهٔ چاپی کتاب نیست.' : 'انتساب ترجمه طبق معرفی اپ است؛ شمارهٔ جلد، صفحه و تاریخ انتشار در دادهٔ اپ موجود نیست.'],
+    notes: [...(entry.summarySourceWarning ? [entry.summarySourceWarning] : []), t("ui.dcdb47133b"), entry.provenance ? t("ui.09dc3571b1") : t("ui.ee5c6d1595")],
   }
 }
 
@@ -110,15 +111,15 @@ function MeaningEntry({ entry, ambiguous }: { entry: Entry; ambiguous: boolean }
 
 
   return <div>
-    {ambiguous && <div className="flex items-center justify-between gap-2 mt-2"><h4 className="font-bold">مدخل «{entry.word}»</h4><SourceReference source={tahqiqSource(entry)} /></div>}
+    {ambiguous && <div className="flex items-center justify-between gap-2 mt-2"><h4 className="font-bold">{t("ui.1f2aabce53")}{entry.word}»</h4><SourceReference source={tahqiqSource(entry)} /></div>}
     <div>
       <TahqiqText text={entry.fa} />
       {entry.examples && <div className="mt-3 text-xs leading-7">
-        <p className="font-bold">نمونهٔ کاربرد در قرآن</p>
-        {entry.examples.map(example => <p key={`${example.s}:${example.a}`}><span className="font-quran tahqiq-example" lang="ar">«{example.text}»</span>{' '}<SourceReference label="نشانی آیه" text={`سورهٔ ${example.surahName}، آیهٔ ${toFa(example.a)}`} /></p>)}
+        <p className="font-bold">{t("ui.5be0ee3544")}</p>
+        {entry.examples.map(example => <p key={`${example.s}:${example.a}`}><span className="font-quran tahqiq-example" lang="ar">«{example.text}»</span>{' '}<SourceReference label={t("ui.217283c5b6")} text={t("ui.744dccc20d",{p0:(example.surahName),p1:(toFa(example.a))})} /></p>)}
       </div>}
       <button type="button" className="inline-flex items-center gap-1 text-xs cursor-pointer py-2 mt-2" aria-expanded={arabic} onClick={() => setArabic(value => !value)}>
-        {arabic ? 'بستن متن عربی' : 'دیدن متن اصلی عربی'}
+        {arabic ? t("ui.14610c10b7") : t("ui.799cadfb8d")}
         <ChevronDown aria-hidden="true" size={16} className={`transition-transform duration-200 ${arabic ? 'rotate-180' : ''}`} />
       </button>
       {arabic && <p lang="ar" dir="rtl" className="mt-2 whitespace-pre-wrap text-justify break-words">{entry.ar}</p>}

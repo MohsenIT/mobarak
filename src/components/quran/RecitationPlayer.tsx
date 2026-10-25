@@ -1,4 +1,5 @@
 'use client'
+import {t,uiDirection} from '@/lib/i18n'
 
 import { useEffect, useRef, useState } from 'react'
 import { Pause, Play, SkipBack, SkipForward, SlidersHorizontal, X, Download, Check, LoaderCircle, Trash2 } from 'lucide-react'
@@ -94,10 +95,10 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
       if (controller.signal.aborted) return
       objectUrl = URL.createObjectURL(result.blob); source.current = objectUrl
       element.src = objectUrl; element.playbackRate = currentSpeed.current; setReady(true)
-      if (!result.saved) setNotice('فضای ذخیره‌سازی در دسترس نیست؛ کش این آیه ذخیره نشد.')
-      if (intent.current) void element.play().catch(() => { if (!controller.signal.aborted) { intent.current = false; setError('برای ادامه، پخش را بزنید.') } })
+      if (!result.saved) setNotice(t("ui.dfc48e5fbf"))
+      if (intent.current) void element.play().catch(() => { if (!controller.signal.aborted) { intent.current = false; setError(t("ui.4a08c7828a")) } })
     }).catch(() => {
-      if (!controller.signal.aborted) { intent.current = false; setError('صوت دریافت نشد؛ اتصال اینترنت را بررسی و دوباره امتحان کنید.') }
+      if (!controller.signal.aborted) { intent.current = false; setError(t("ui.823d089129")) }
     })
     return () => { controller.abort(); element.pause(); element.removeAttribute('src'); element.load(); if (objectUrl) URL.revokeObjectURL(objectUrl); source.current = '' }
   }, [open, surah.n, positionSurah, position.ayah, retry,reciter.id])
@@ -115,7 +116,7 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
     setPosition(next)
     if (next.ayah === c.position.ayah && audio.current) {
       audio.current.currentTime = 0
-      void audio.current.play().catch(() => { intent.current = false; setError('برای ادامه، پخش را بزنید.') })
+      void audio.current.play().catch(() => { intent.current = false; setError(t("ui.4a08c7828a")) })
     }
   }
   const toggle = () => {
@@ -127,7 +128,7 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
     onPlaying(surah.n,target)
     if(target!==position.ayah){setPosition(initial(target));return}
     if (element.ended) { element.currentTime = 0; setPosition(initial(position.ayah)) }
-    void element.play().catch(() => { intent.current = false; setError('پخش ممکن نشد؛ دوباره امتحان کنید.') })
+    void element.play().catch(() => { intent.current = false; setError(t("ui.e3832a276d")) })
   }
   const move = (a: number) => {
     if (a < 1 || a > surah.vc) return
@@ -140,7 +141,7 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
     if(!background && document.hidden)return
     intent.current=true;setError('')
     if(audio.current?.ended){audio.current.currentTime=0;setPosition(initial(position.ayah))}
-    if(ready && audio.current)void audio.current.play().catch(()=>{intent.current=false;setError('برای ادامه، پخش را بزنید.')})
+    if(ready && audio.current)void audio.current.play().catch(()=>{intent.current=false;setError(t("ui.4a08c7828a"))})
   }
   const skipNext = () => {
     if(position.ayah<surah.vc)move(position.ayah+1)
@@ -162,14 +163,14 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
     if(!ready||error){intent.current=true;setError('');setRetry(value=>value+1)}
     else if(audio.current?.paused)toggle()
   },[playRequest,open,ready,error])
-  useRecitationMediaSession({audio,active:open,playing,title:`سورهٔ ${surah.fa} · آیهٔ ${toFa(position.ayah)}`,artist:reciter.name,
+  useRecitationMediaSession({audio,active:open,playing,title:t("ui.cb282cb444",{p0:(surah.fa),p1:(toFa(position.ayah))}),artist:reciter.name,
     onPlay:resume,onPause:pause,onNext:skipNext,onPrevious:skipPrevious,onStop:()=>{pause();onClose()}})
   const startDownload = async () => {
     const controller = new AbortController(); download.current = controller; setProgress(0); setError('')
     try {
       await downloadRecitation(surah.n,surah.vc,controller.signal,setProgress,reciter)
-      if (!controller.signal.aborted) { setDownloaded(true); setNotice('صوت این سوره برای استفادهٔ آفلاین ذخیره شد.') }
-    } catch { if (!controller.signal.aborted) setError('دانلود کامل نشد؛ اتصال یا فضای خالی را بررسی کنید. با تلاش دوباره از ادامه دریافت می‌شود.') }
+      if (!controller.signal.aborted) { setDownloaded(true); setNotice(t("ui.f77fdf433a")) }
+    } catch { if (!controller.signal.aborted) setError(t("ui.3d82b884ee")) }
     finally { if (download.current === controller) { download.current = null; setProgress(null); void audioDownloadStatus(surah.n,surah.vc,reciter).then(value=>{if(activeAudio.current.s!==surah.n||activeAudio.current.id!==reciter.id)return;setDownloaded(value.complete);setSavedParts(value.count);setSavedBytes(value.bytes)}).catch(()=>{}) } }
   }
   return <>
@@ -177,36 +178,36 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
       if(!background && document.hidden){intent.current=false;audio.current?.pause();return}
       setPlaying(true)
       const c=current.current;c.onPlaying(c.surah,c.position.ayah); if(c.follow) c.onFollow(c.surah,c.position.ayah)
-    }} onPause={() => setPlaying(false)} onError={() => { if(source.current) { intent.current=false;setPlaying(false);setError('فایل صوتی قابل پخش نیست؛ دوباره امتحان کنید.') } }} />
+    }} onPause={() => setPlaying(false)} onError={() => { if(source.current) { intent.current=false;setPlaying(false);setError(t("ui.69833552b5")) } }} />
 
-    {open && controlsVisible && <div className="recitation-bar" role="region" aria-label="پخش تلاوت">
-      <button type="button" className="recitation-location" onClick={() => onFollow(surah.n,position.ayah)} title="رفتن به آیهٔ در حال پخش">{surah.fa} · آیهٔ {toFa(position.ayah)}<small>{reciter.name}</small></button>
+    {open && controlsVisible && <div className="recitation-bar" role="region" aria-label={t("ui.1f7cc9473a")}>
+      <button type="button" className="recitation-location" onClick={() => onFollow(surah.n,position.ayah)} title={t("ui.edcffc5849")}>{surah.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(position.ayah)}<small>{reciter.name}</small></button>
       <div className="recitation-controls" dir="ltr">
-        <button type="button" className="icon-btn sm" aria-label="آیهٔ قبلی" disabled={position.ayah<=1 && surah.n===1} onClick={skipPrevious}><SkipBack size={17} /></button>
-        <button type="button" className="icon-btn sm recitation-play" aria-label={playing?'مکث تلاوت':'پخش تلاوت'} disabled={!ready} onClick={toggle}>{!ready&&!error?<LoaderCircle size={19} className="animate-spin" />:playing?<Pause size={19}/>:<Play size={19}/>}</button>
-        <button type="button" className="icon-btn sm" aria-label="آیهٔ بعدی" disabled={position.ayah>=surah.vc && surah.n===114} onClick={skipNext}><SkipForward size={17}/></button>
+        <button type="button" className="icon-btn sm" aria-label={t("ui.a8ca409b79")} disabled={position.ayah<=1 && surah.n===1} onClick={skipPrevious}><SkipBack size={17} /></button>
+        <button type="button" className="icon-btn sm recitation-play" aria-label={playing?t("ui.fe2e1906b8"):t("ui.1f7cc9473a")} disabled={!ready} onClick={toggle}>{!ready&&!error?<LoaderCircle size={19} className="animate-spin" />:playing?<Pause size={19}/>:<Play size={19}/>}</button>
+        <button type="button" className="icon-btn sm" aria-label={t("ui.add1e314a2")} disabled={position.ayah>=surah.vc && surah.n===114} onClick={skipNext}><SkipForward size={17}/></button>
       </div>
-      <button type="button" className="icon-btn sm" aria-label="تنظیمات تلاوت و دانلود" onClick={() => setSettings(true)}><SlidersHorizontal size={18}/></button>
-      <button type="button" className="icon-btn sm" aria-label="بستن پخش تلاوت" onClick={() => { intent.current=false;audio.current?.pause();onClose() }}><X size={18}/></button>
-      {error && <div className="recitation-error" role="status">{error} <button type="button" onClick={() => { intent.current=false;setRetry(v=>v+1) }}>تلاش دوباره</button></div>}
+      <button type="button" className="icon-btn sm" aria-label={t("ui.d2ac810b00")} onClick={() => setSettings(true)}><SlidersHorizontal size={18}/></button>
+      <button type="button" className="icon-btn sm" aria-label={t("ui.2c65036980")} onClick={() => { intent.current=false;audio.current?.pause();onClose() }}><X size={18}/></button>
+      {error && <div className="recitation-error" role="status">{error} <button type="button" onClick={() => { intent.current=false;setRetry(v=>v+1) }}>{t("ui.be9b8b4f2b")}</button></div>}
     </div>}
-    <Dialog open={open&&settings} onOpenChange={setSettings}><DialogContent className="recitation-settings" dir="rtl">
-      <DialogHeader><DialogTitle>تلاوت {surah.fa}</DialogTitle><DialogDescription>{reciter.name} · ترتیل</DialogDescription></DialogHeader>
-      <div><span className="text-xs">قاری</span><ResourcePicker label="قاری" ids={RECITERS.map(item=>`reciter:${item.id}`)} value={`reciter:${reciter.id}`} onChange={id=>{const value=id.replace(/^reciter:/,'');setReciterId(value);saveSetting('reciter',value)}}/></div>
-      <label>شروع از آیه<select aria-label="شروع از آیه" value={position.ayah} onChange={e=>move(Number(e.target.value))}>{Array.from({length:surah.vc},(_,i)=><option key={i+1} value={i+1}>{toFa(i+1)}</option>)}</select></label>
-      <label>سرعت پخش<select aria-label="سرعت پخش" value={speed} onChange={e=>{const n=Number(e.target.value);setSpeed(n);saveSetting('speed',n)}}>{[0.75,1,1.25,1.5,2].map(n=><option key={n} value={n}>{toFa(n)}×</option>)}</select></label>
-      <label>تکرار هر آیه<select aria-label="تکرار هر آیه" value={verseRepeats} onChange={e=>{const n=Number(e.target.value);setVerseRepeats(n);saveSetting('verseRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n?`${toFa(n)} بار`:'تا توقف'}</option>)}</select></label>
-      <label>تکرار کل سوره<select aria-label="تکرار کل سوره" value={surahRepeats} onChange={e=>{const n=Number(e.target.value);setSurahRepeats(n);saveSetting('surahRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n?`${toFa(n)} بار`:'تا توقف'}</option>)}</select></label>
-      <label className="recitation-follow"><input type="checkbox" checked={follow} onChange={e=>{setFollow(e.target.checked);saveSetting('follow',e.target.checked)}}/>دنبال‌کردن آیه روی صفحه</label>
-      <label className="recitation-follow"><input type="checkbox" checked={background} onChange={e=>{setBackground(e.target.checked);saveSetting('background',e.target.checked)}}/>ادامهٔ پخش در پس‌زمینه</label>
+    <Dialog open={open&&settings} onOpenChange={setSettings}><DialogContent className="recitation-settings" dir={uiDirection()}>
+      <DialogHeader><DialogTitle>{t("ui.2ea8f68e72")}{' '}{surah.fa}</DialogTitle><DialogDescription>{reciter.name}{' '}{t("ui.328fa816d6")}</DialogDescription></DialogHeader>
+      <div><span className="text-xs">{t("ui.48288575ed")}</span><ResourcePicker label={t("ui.48288575ed")} ids={RECITERS.map(item=>`reciter:${item.id}`)} value={`reciter:${reciter.id}`} onChange={id=>{const value=id.replace(/^reciter:/,'');setReciterId(value);saveSetting('reciter',value)}}/></div>
+      <label>{t("ui.1dde68b6a8")}<select aria-label={t("ui.1dde68b6a8")} value={position.ayah} onChange={e=>move(Number(e.target.value))}>{Array.from({length:surah.vc},(_,i)=><option key={i+1} value={i+1}>{toFa(i+1)}</option>)}</select></label>
+      <label>{t("ui.991d782fda")}<select aria-label={t("ui.991d782fda")} value={speed} onChange={e=>{const n=Number(e.target.value);setSpeed(n);saveSetting('speed',n)}}>{[0.75,1,1.25,1.5,2].map(n=><option key={n} value={n}>{toFa(n)}×</option>)}</select></label>
+      <label>{t("ui.9645b5c54f")}<select aria-label={t("ui.9645b5c54f")} value={verseRepeats} onChange={e=>{const n=Number(e.target.value);setVerseRepeats(n);saveSetting('verseRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n?t("ui.d303a8c08f",{p0:(toFa(n))}):t("ui.12fab10c2c")}</option>)}</select></label>
+      <label>{t("ui.2cfa25518d")}<select aria-label={t("ui.2cfa25518d")} value={surahRepeats} onChange={e=>{const n=Number(e.target.value);setSurahRepeats(n);saveSetting('surahRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n?t("ui.d303a8c08f",{p0:(toFa(n))}):t("ui.12fab10c2c")}</option>)}</select></label>
+      <label className="recitation-follow"><input type="checkbox" checked={follow} onChange={e=>{setFollow(e.target.checked);saveSetting('follow',e.target.checked)}}/>{t("ui.e3bdacb9c9")}</label>
+      <label className="recitation-follow"><input type="checkbox" checked={background} onChange={e=>{setBackground(e.target.checked);saveSetting('background',e.target.checked)}}/>{t("ui.f357dd405c")}</label>
       <div className="recitation-download">
-        {savedParts>0&&<small>{toFa(savedParts)} آیه ذخیره‌شده · {toFa(Math.round(savedBytes/1024/1024*10)/10)} مگابایت</small>}
-        {progress!==null?<><p role="status">دریافت آیهٔ {toFa(progress)} از {toFa(surah.vc)}</p><progress value={progress} max={surah.vc}/><button type="button" className="chip" onClick={()=>download.current?.abort()}>توقف دانلود</button></>:downloaded?<><p><Check size={16}/>آمادهٔ پخش آفلاین</p></>:<button type="button" className="chip" onClick={()=>void startDownload()}><Download size={16}/>دانلود صوت این سوره</button>}
-        {savedParts>0&&progress===null&&<button type="button" className="chip" onClick={()=>void deleteRecitation(surah.n,reciter).then(()=>{setDownloaded(false);setSavedParts(0);setSavedBytes(0)}).catch(()=>setError('حذف صوت ممکن نشد.'))}><Trash2 size={15}/>حذف صوت ذخیره‌شدهٔ این سوره</button>}
-        <small>آیات پخش‌شده تا ۷ روز، حداکثر ۴۰ مگابایت کش می‌شوند. دانلود کامل سوره جدا نگه داشته می‌شود؛ پاک‌کردن داده‌های برنامه آن را هم حذف می‌کند.</small>
+        {savedParts>0&&<small>{toFa(savedParts)}{' '}{t("ui.e1448c3b31")}{' '}{toFa(Math.round(savedBytes/1024/1024*10)/10)}{' '}{t("ui.9a29784b98")}</small>}
+        {progress!==null?<><p role="status">{t("ui.0c77df7fdd")}{' '}{toFa(progress)}{' '}{t("ui.77e7a9224b")}{' '}{toFa(surah.vc)}</p><progress value={progress} max={surah.vc}/><button type="button" className="chip" onClick={()=>download.current?.abort()}>{t("ui.f8960d4ff6")}</button></>:downloaded?<><p><Check size={16}/>{t("ui.ac3db18411")}</p></>:<button type="button" className="chip" onClick={()=>void startDownload()}><Download size={16}/>{t("ui.4078092b65")}</button>}
+        {savedParts>0&&progress===null&&<button type="button" className="chip" onClick={()=>void deleteRecitation(surah.n,reciter).then(()=>{setDownloaded(false);setSavedParts(0);setSavedBytes(0)}).catch(()=>setError(t("ui.398f681786")))}><Trash2 size={15}/>{t("ui.e2188fd0aa")}</button>}
+        <small>{t("ui.27e353abc8")}</small>
         {notice&&<p role="status">{notice}</p>}
       </div>
-      <a href={reciter.sourcePage} target="_blank" rel="noreferrer" className="recitation-source">منبع صوت: {reciter.source}</a>
+      <a href={reciter.sourcePage} target="_blank" rel="noreferrer" className="recitation-source">{t("ui.bb4cb4db3d")}{' '}{reciter.source}</a>
     </DialogContent></Dialog>
   </>
 }

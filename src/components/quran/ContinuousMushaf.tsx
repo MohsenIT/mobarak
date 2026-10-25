@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentProps } from 'react'
 import { loadSurah, loadTrans, toFa, type Meta, type SurahData, type Translations, type Translator } from '@/lib/quran'
@@ -15,7 +16,7 @@ function PageContent({ meta, page, showTrans, translator, fontSize, flowFont, pa
   meta: Meta; page: number; showTrans: boolean; translator: Translator; fontSize: number; flowFont: number; pageHeight: number
   onReady: () => void; onMeasure: (page: number, height: number) => void
 }) {
-  const key = `${page}:${showTrans}`
+  const key = `${page}:${showTrans}:${translator}`
   const [bundle, setBundle] = useState<Bundle | null>(() => bundles.get(key) ?? null)
   const [error, setError] = useState(false)
   const [retry, setRetry] = useState(0)
@@ -27,7 +28,7 @@ function PageContent({ meta, page, showTrans, translator, fontSize, flowFont, pa
     if (cached) { setBundle(cached); onReady(); return }
     setBundle(null)
     const surahs = [...new Set(meta.pages[page - 1].map(seg => seg.s))]
-    Promise.all(surahs.map(async s => [s, await loadSurah(s), showTrans ? await loadTrans(s) : null] as const))
+    Promise.all(surahs.map(async s => [s, await loadSurah(s), showTrans ? await loadTrans(s,translator) : null] as const))
       .then(entries => {
         const next = { data: new Map(entries.map(([s, data]) => [s, data])), translations: new Map(entries.flatMap(([s, , trans]) => trans ? [[s, trans] as const] : [])) }
         bundles.set(key, next)
@@ -44,8 +45,8 @@ function PageContent({ meta, page, showTrans, translator, fontSize, flowFont, pa
   const ready = bundle && (!showTrans || bundle.translations.size > 0)
   return <div ref={ref} className="mushaf-frame continuous-mushaf-page" style={{ minHeight: pageHeight + 44 }}>
     {!ready ? <div className="flex items-center justify-center" style={{ minHeight: pageHeight }}>
-      {error ? <button className="chip" onClick={() => setRetry(n => n + 1)}>بارگیری صفحه ناموفق بود · تلاش دوباره</button>
-        : <p className="text-xs" role="status" style={{ color: 'var(--ink-faint)' }}>در حال بارگیری صفحهٔ {toFa(page)}…</p>}
+      {error ? <button className="chip" onClick={() => setRetry(n => n + 1)}>{t("ui.34bee90de8")}</button>
+        : <p className="text-xs" role="status" style={{ color: 'var(--ink-faint)' }}>{t("ui.d588c14502")}{' '}{toFa(page)}…</p>}
     </div> : showTrans ? <div className="px-3 py-4" style={{ minHeight: pageHeight }}>
       {meta.pages[page - 1].map(seg => {
         const data = bundle.data.get(seg.s)!
@@ -56,8 +57,8 @@ function PageContent({ meta, page, showTrans, translator, fontSize, flowFont, pa
     </div> : <div style={{ height: pageHeight }}>
       <MushafPage meta={meta} page={page} pageData={bundle.data} fontSize={fontSize} {...reading} />
     </div>}
-    <div className="mushaf-page-divider" aria-label={`شمارهٔ صفحهٔ ${toFa(page)}`}>
-      <span>صفحهٔ {toFa(page)}</span>
+    <div className="mushaf-page-divider" aria-label={t("ui.562b3acae1",{p0:(toFa(page))})}>
+      <span>{t("ui.d2ef137028")}{' '}{toFa(page)}</span>
     </div>
   </div>
 }
@@ -130,7 +131,7 @@ export default function ContinuousMushaf({ meta, page, navigationRevision, onPag
     {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => {
       const visible = p >= range.from && p <= range.to
       return <section key={p} ref={el => { if (el) sections.current.set(p, el); else sections.current.delete(p) }}
-        data-mushaf-page={p} aria-label={`صفحهٔ ${toFa(p)}`} className="relative w-full max-w-[640px] mx-auto"
+        data-mushaf-page={p} aria-label={t("ui.f9119fddb7",{p0:(toFa(p))})} className="relative w-full max-w-[640px] mx-auto"
         style={{ minHeight: visible ? rowHeight : heights.current.get(p) ?? rowHeight, paddingBottom: PAGE_GAP }}>
         {visible && <PageContent key={`${p}:${showTrans}`} meta={meta} page={p} showTrans={showTrans} translator={translator}
           fontSize={fontSize} flowFont={22 * scale} pageHeight={pageHeight} onReady={onContentReady} onMeasure={measure} {...reading} />}

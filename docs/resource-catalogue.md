@@ -1,7 +1,8 @@
 # External resource catalogue
 
-`src/lib/resources.ts` is the metadata registry shared by source profiles and
-resource pickers. IDs are stable and separate from providers (`reciter:*`,
+`public/data/resources.json` contains editable resource metadata;
+`src/lib/resources.ts` combines it with the translation catalogue for source profiles
+and resource pickers. Interface labels come from `src/messages/<language>.json`. IDs are stable and separate from providers (`reciter:*`,
 `translation:*`, `book:*`, `quran:*`, `corpus:*`). Current resources are the two
 available reciters, four bundled translators, three dictionaries, Tanzil text and
 the morphology corpus. Tafsir is a supported category; no unavailable tafsir is

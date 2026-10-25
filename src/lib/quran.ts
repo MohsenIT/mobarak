@@ -1,3 +1,6 @@
+import {t,currentLanguage} from './i18n'
+import {EXTRA_TRANSLATIONS,type Translator} from './translations'
+export type {Translator} from './translations'
 import formNames from '../../public/data/form-names.json'
 // Data layer: lazy-loading + caching for quran datasets
 
@@ -44,7 +47,6 @@ export interface Meta {
   juz: Record<string, [number, number]>
 }
 
-export type Translator = 'a' | 'f' | 'm' | 's'
 export type Translations = Record<string, Record<Translator, string>>
 
 let metaPromise: Promise<Meta> | null = null
@@ -60,11 +62,27 @@ export function loadSurah(n: number): Promise<SurahData> {
   return surahCache.get(n)!
 }
 
-const transCache = new Map<number, Promise<Translations>>()
-export function loadTrans(n: number): Promise<Translations> {
-  if (!transCache.has(n))
-    transCache.set(n, fetch(`/data/trans/${n}.json`).then(r => r.json()))
-  return transCache.get(n)!
+const transCache = new Map<string, Promise<Translations>>()
+const extraTransCache = new Map<string,Promise<string[]>>()
+export function loadTrans(n: number,translator:Translator='s'): Promise<Translations> {
+  const key=`${n}:${translator}`
+  if (!transCache.has(key)) transCache.set(key,(async()=>{
+    const response=await fetch(`/data/trans/${n}.json`)
+    if(!response.ok)throw new Error('translation-unavailable')
+    const base:Translations=await response.json()
+    if(!EXTRA_TRANSLATIONS.some(item=>item.id===translator))return base
+    if(!extraTransCache.has(translator))extraTransCache.set(translator,fetch(`/data/translations/${translator}.json`).then(async response=>{
+      if(!response.ok)throw new Error('translation-unavailable')
+      const rows=await response.json()
+      if(!Array.isArray(rows)||rows.length!==6236||rows.some(row=>typeof row!=='string'))throw new Error('invalid-translation')
+      return rows as string[]
+    }).catch(error=>{extraTransCache.delete(translator);throw error}))
+    const [rows,meta]=await Promise.all([extraTransCache.get(translator)!,loadMeta()])
+    const offset=meta.surahs.slice(0,n-1).reduce((sum,surah)=>sum+surah.vc,0)
+    for(let a=1;a<=meta.surahs[n-1].vc;a++)base[String(a)]={...base[String(a)],[translator]:rows[offset+a-1]}
+    return base
+  })().catch(error=>{transCache.delete(key);throw error}))
+  return transCache.get(key)!
 }
 
 let rootsPromise: Promise<Record<string, Record<string, number>>> | null = null
@@ -75,17 +93,18 @@ export function loadGlobalRoots(): Promise<Record<string, Record<string, number>
 
 const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹'
 export function toFa(n: number | string): string {
-  return String(n).replace(/[0-9]/g, d => FA_DIGITS[+d])
+  const digits=new Intl.NumberFormat(currentLanguage(),{useGrouping:false})
+  return String(n).replace(/[0-9]/g, d => digits.format(+d))
 }
 
 const FORM_LABELS: Record<string, string> = {
-  I: 'ثلاثی مجرد', II: 'تفعیل', III: 'مفاعله', IV: 'افعال',
-  V: 'تفعّل', VI: 'تفاعل', VII: 'انفعال', VIII: 'افتعال',
-  IX: 'افعلال', X: 'استفعال',
+  I: t('ui.3d29181eea'), II: t('ui.d46524e04b'), III: t('ui.649e0a9bb4'), IV: t('ui.e591828577'),
+  V: t('ui.c099990a07'), VI: t('ui.69ff4ac820'), VII: t('ui.4de6639f67'), VIII: t('ui.bcc3453cd1'),
+  IX: t('ui.7f19f4ebb1'), X: t('ui.9e60775066'),
 }
 
 export function morphologyLabel(form: string): string {
-  return FORM_LABELS[form] ?? `ساخت ${form}`
+  return (FORM_LABELS[form]?t(FORM_LABELS[form]):undefined) ?? t('ui.683d7fb1b2',{p0:(form)})
 }
 
 export function formName(root: string | null, form?: string): string | undefined {
@@ -213,10 +232,10 @@ export function keywordScore(s: RootSignals): number {
 // رحم in Maryam = 1.0 (core), ورث = 0.60 (core), عتو = 0.37 (key),
 // وعد = 0.35 (key), عهد = 0.31 (key), hapax ≈ 0.23 (related).
 export function keywordTier(score: number): { label: string; tier: 'core' | 'key' | 'related' | 'edge' } {
-  if (score >= 0.50) return { label: 'کلیدواژهٔ محوری این سوره', tier: 'core' }
-  if (score >= 0.30) return { label: 'کلیدواژهٔ مهم', tier: 'key' }
-  if (score >= 0.15) return { label: 'واژهٔ مرتبط', tier: 'related' }
-  return { label: 'حاشیه‌ای', tier: 'edge' }
+  if (score >= 0.50) return { label: t('ui.dc1cdc6695'), tier: 'core' }
+  if (score >= 0.30) return { label: t('ui.4f53cf3fad'), tier: 'key' }
+  if (score >= 0.15) return { label: t('ui.159535aa24'), tier: 'related' }
+  return { label: t('ui.743938a57c'), tier: 'edge' }
 }
 
 // ----------------------------------------------------------------------------

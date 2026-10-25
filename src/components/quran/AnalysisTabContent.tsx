@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 import { useEffect, useMemo, useState } from 'react'
 import type { Translator, SurahData, Translations, Meta } from '@/lib/quran'
 import { loadGlobalRoots, loadSurah, loadTrans, keywordScore, keywordTier, toFa } from '@/lib/quran'
@@ -25,10 +26,10 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
   const [globalRoots, setGlobalRoots] = useState<Record<string, Record<string, number>> | null>(null)
   useEffect(() => {
     let live = true
-    Promise.all([loadSurah(sel.s), tab === 'root' || tab === 'context' ? Promise.resolve(null) : loadTrans(sel.s)]).then(([surah, trans]) => { if (live) setData({ surah, trans }) })
+    Promise.all([loadSurah(sel.s), tab === 'root' || tab === 'context' ? Promise.resolve(null) : loadTrans(sel.s,translator).catch(()=>({}))]).then(([surah, trans]) => { if (live) setData({ surah, trans }) })
     if (tab === 'root') loadGlobalRoots().then(data => { if (live) setGlobalRoots(data) })
     return () => { live = false }
-  }, [sel.s, tab])
+  }, [sel.s, tab, translator])
   const root = sel.root
   const stats = useMemo(() => {
     if (!root || !surah || !globalRoots) return null
@@ -56,10 +57,10 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
 
   const selectedForm = sel.part !== 'prefix' && surah?.n === sel.s ? surah.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form : undefined
 
-  return <>          {tab !== 'root' ? (surah?.n !== sel.s ? <p role="status">در حال بارگیری…</p> : tab === 'context' ? <ContextDetails selection={sel} surah={surah} onPick={selectTarget} onCompare={onCompareContext} /> : trans ? <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} /> : <p role="status">در حال بارگیری…</p>) : <>
+  return <>          {tab !== 'root' ? (surah?.n !== sel.s ? <p role="status">{t("ui.0cfb741f7a")}</p> : tab === 'context' ? <ContextDetails selection={sel} surah={surah} onPick={selectTarget} onCompare={onCompareContext} /> : trans ? <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} /> : <p role="status">{t("ui.0cfb741f7a")}</p>) : <>
           {!root ? (
             <div className="text-center py-6" style={{ color: 'var(--ink-soft)' }}>
-              <p className="text-sm leading-8">این واژه حرف یا ضمیر است و ریشهٔ مستقلی ندارد.</p>
+              <p className="text-sm leading-8">{t("ui.8686dec293")}</p>
             </div>
           ) : (
             <div className="analysis-section-stack">
@@ -69,11 +70,11 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                   <div className="flex gap-2 mb-4" hidden={!(['surahCount', 'total', 'hosts'].some(showStat))}>
                     <div className="stat" hidden={!showStat('surahCount')}>
                       <b>{toFa(stats.inSurah)}</b>
-                      <span>بار در این سوره</span>
+                      <span>{t("ui.2ad117fe49")}</span>
                     </div>
                     <div className="stat" hidden={!showStat('total')}>
                       <b>{toFa(stats.total)}</b>
-                      <span>بار در کل قرآن</span>
+                      <span>{t("ui.337a72ddb2")}</span>
                     </div>
                     <div className="stat" hidden={!showStat('hosts')}>
                       {/* Host surahs: "df / 114" where df = number of surahs
@@ -87,7 +88,7 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                           Reading RTL: "۱۱۴ / count" — i.e. "out of 114 surahs,
                           this many host this root". */}
                       <b>۱۱۴ / {toFa(stats.df)}</b>
-                      <span>سوره میزبان</span>
+                      <span>{t("ui.637842efc1")}</span>
                     </div>
                   </div>
 
@@ -98,20 +99,20 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                       right (low end, "حاشیه‌ای") toward the left (high end,
                       "محوری"). At score=1.0 the entire bar is filled. */}
                   <div className="mb-1 flex items-center justify-between text-[11px]" style={{ color: 'var(--ink-faint)' }}>
-                    <span>حاشیه‌ای</span>
-                    <span className="font-medium" style={{ color: 'var(--ink-soft)' }}>شاخص کلیدواژگی در این سوره</span>
-                    <span>محوری</span>
+                    <span>{t("ui.743938a57c")}</span>
+                    <span className="font-medium" style={{ color: 'var(--ink-soft)' }}>{t("ui.2907d0355e")}</span>
+                    <span>{t("ui.8b753a8452")}</span>
                   </div>
                   <div className="gauge gauge-keyword mb-1.5">
                     <div className="gauge-fill" style={{ width: `${stats.score * 100}%` }} />
                   </div>
-                  <p className="text-xs mb-4 text-center" style={{ color: 'var(--ink-soft)' }}>{stats.tier.label}</p>
+                  <p className="text-xs mb-4 text-center" style={{ color: 'var(--ink-soft)' }}>{t(stats.tier.label)}</p>
 
                   </div>
                   {/* share of this surah */}
                   <div hidden={!showStat('share')} className="rounded-xl border px-3 py-2.5 mb-4" style={{ borderColor: 'var(--line)' }}>
                     <div className="flex justify-between text-xs mb-2" style={{ color: 'var(--ink-soft)' }}>
-                      <span>سهم این سوره از همهٔ کاربردهای ریشه</span>
+                      <span>{t("ui.6eee111ecb")}</span>
                       <b style={{ color: 'var(--ink)' }}>{toFa(Math.round(stats.share * 100))}٪</b>
                     </div>
                     <div className="dist-track">
@@ -121,9 +122,7 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
 
                   <div hidden={!showStat('distribution')}>
                   {/* distribution across surahs */}
-                  <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--ink-faint)' }}>
-                    پراکندگی ریشه در قرآن — برای پرش لمس کنید
-                  </p>
+                  <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--ink-faint)' }}>{t("ui.41fdda1a1a")}</p>
                   <div className="flex flex-col mb-4">
                     {stats.top.map(d => (
                       <button key={d.s} className="dist-row" onClick={() => { loadSurah(d.s).then(data => { const occurrence = data.ri[root]?.[0]; if (!occurrence) return; const [a, pos] = occurrence; const w = data.v[a - 1].w[pos - 1]; onRootTarget({ s: d.s, a, pos, ...wordTarget(w), root }, data.v[a - 1].p) }) }}>

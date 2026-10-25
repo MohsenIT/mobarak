@@ -10,10 +10,11 @@ export function installNativeOffline() {
     if (url.origin !== window.location.origin || !url.pathname.startsWith('/data/') || (init?.method || (input instanceof Request ? input.method : 'GET')) !== 'GET') return original!(input, init)
     const cache = await caches.open(CACHE).catch(() => null)
     const saved = await cache?.match(url.href)
-    if (saved) return saved
-    try { const local = await original!(input, init); if (local.ok) return local } catch {}
+    const valid=(response:Response)=>response.ok&&(!url.pathname.endsWith('.json')||/json/i.test(response.headers.get('content-type')??''))
+    if (saved&&valid(saved)) return saved
+    try { const local = await original!(input, init); if (valid(local)) return local } catch {}
     const remote = await original!(ORIGIN + url.pathname, init)
-    if (remote.ok) await cache?.put(url.href, remote.clone()).catch(() => {})
+    if (valid(remote)) await cache?.put(url.href, remote.clone()).catch(() => {})
     return remote
   }) as typeof window.fetch
 }

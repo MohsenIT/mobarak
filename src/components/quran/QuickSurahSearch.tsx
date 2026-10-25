@@ -1,4 +1,5 @@
 'use client'
+import {t} from '@/lib/i18n'
 import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
@@ -67,14 +68,14 @@ export default function QuickSurahSearch({ surah, meta, onNavigate, onClose, onP
     return () => { clearTimeout(timer); request.current++ }
   }, [query, mode, surah.n, surah.vc, engine])
   const expand = (all: boolean) => onAdvanced({ query, mode, surahs: all ? [] : [surah.n] })
-  return <div className="quick-surah-search" aria-label="جست‌وجوی سریع در سوره">
+  return <div className="quick-surah-search" aria-label={t("ui.a1edc5936b")}>
     <form onSubmit={event => { event.preventDefault(); if(destinations.length===1)onNavigate(destinations[0].destination); else if (results.length) jump(results, (index + 1) % results.length) }}>
-      <button type="button" className="icon-btn" aria-label="بستن جست‌وجوی سریع" onClick={onClose}><ArrowRight size={20} /></button>
-      <input ref={input} type="search" value={query} maxLength={160} onChange={event => setQuery(event.target.value)} aria-label="جست‌وجو در همین سوره" placeholder="واژه، آیه یا میان‌بر؛ مثلاً ق۶…" autoComplete="off" spellCheck={false} onKeyDown={event => { if (event.key === 'Escape') onClose() }} />
-      {query && <button type="button" className="icon-btn" aria-label="پاک‌کردن جست‌وجوی سریع" onClick={() => { setQuery(''); input.current?.focus({ preventScroll: true }) }}><X size={18} /></button>}
+      <button type="button" className="icon-btn" aria-label={t("ui.8b070f0497")} onClick={onClose}><ArrowRight size={20} /></button>
+      <input ref={input} type="search" value={query} maxLength={160} onChange={event => setQuery(event.target.value)} aria-label={t("ui.26fa3c1923")} placeholder={t("ui.a2897ec32a")} autoComplete="off" spellCheck={false} onKeyDown={event => { if (event.key === 'Escape') onClose() }} />
+      {query && <button type="button" className="icon-btn" aria-label={t("ui.b091494ed6")} onClick={() => { setQuery(''); input.current?.focus({ preventScroll: true }) }}><X size={18} /></button>}
     </form>
-    {destinations.length>0&&<div className="quick-jump-options" aria-label="مقصد پیمایش">{destinations.map((item,i)=><button type="button" key={i} onClick={()=>onNavigate(item.destination)}>رفتن به {toFa(item.label)} ←</button>)}</div>}
-    <div className="quick-search-status"><span>در سورهٔ {surah.fa}</span><span role="status" aria-live="polite">{destinations.length ? 'آمادهٔ رفتن' : busy ? 'در حال جست‌وجو…' : error ? 'بارگیری انجام نشد' : results.length ? `${toFa(index + 1)} از ${toFa(results.length)}` : query.trim().length >= 2 ? 'نتیجه‌ای نیست' : 'متن یا شمارهٔ آیه'}</span><button type="button" disabled={!results.length || busy} aria-label="نتیجهٔ قبلی در سوره" onClick={() => jump(results, (index - 1 + results.length) % results.length)}><ChevronRight size={18} /></button><button type="button" disabled={!results.length || busy} aria-label="نتیجهٔ بعدی در سوره" onClick={() => jump(results, (index + 1) % results.length)}><ChevronLeft size={18} /></button></div>
-    <div className="quick-search-actions"><div role="group" aria-label="روش جست‌وجوی سریع">{([['text', 'متن'], ['root', 'ریشه'], ['lemma', 'بُن‌واژه']] as const).map(([key, title]) => <button type="button" key={key} aria-pressed={key === mode} onClick={() => setMode(key)}>{title}</button>)}</div><button type="button" onClick={() => expand(false)}>پیشرفته</button><button type="button" onClick={() => expand(true)}>کل قرآن ←</button></div>
+    {destinations.length>0&&<div className="quick-jump-options" aria-label={t("ui.d289fa208b")}>{destinations.map((item,i)=><button type="button" key={i} onClick={()=>onNavigate(item.destination)}>{t("ui.b7b6972c78")}{' '}{toFa(item.label)} ←</button>)}</div>}
+    <div className="quick-search-status"><span>{t("ui.ec5841b226")}{' '}{surah.fa}</span><span role="status" aria-live="polite">{destinations.length ? t("ui.4f981a291d") : busy ? t("ui.63509f3da4") : error ? t("ui.e5d91b8562") : results.length ? t("ui.53b89ec77a",{p0:(toFa(index + 1)),p1:(toFa(results.length))}) : query.trim().length >= 2 ? t("ui.292cf63931") : t("ui.d1400e3d47")}</span><button type="button" disabled={!results.length || busy} aria-label={t("ui.1cfdb521b9")} onClick={() => jump(results, (index - 1 + results.length) % results.length)}><ChevronRight size={18} /></button><button type="button" disabled={!results.length || busy} aria-label={t("ui.3c9bb58eee")} onClick={() => jump(results, (index + 1) % results.length)}><ChevronLeft size={18} /></button></div>
+    <div className="quick-search-actions"><div role="group" aria-label={t("ui.5e4040c150")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, title]) => <button type="button" key={key} aria-pressed={key === mode} onClick={() => setMode(key)}>{title}</button>)}</div><button type="button" onClick={() => expand(false)}>{t("ui.9617b95709")}</button><button type="button" onClick={() => expand(true)}>{t("ui.2e069c079a")}</button></div>
   </div>
 }
