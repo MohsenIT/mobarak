@@ -14,6 +14,7 @@ import FlowPage, { FlowSurface } from '@/components/quran/FlowPage'
 import SurahPull from '@/components/quran/SurahPull'
 import RootPanel from '@/components/quran/RootPanel'
 import StartupSplash from '@/components/quran/StartupSplash'
+import RecitationPlayer from '@/components/quran/RecitationPlayer'
 import { rootHue } from '@/lib/comparison-colors'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
@@ -21,7 +22,7 @@ import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, GitCompareArrows, Search, MoreHorizontal, ChevronDown } from 'lucide-react'
+import { ArrowRight, GitCompareArrows, Search, MoreHorizontal, ChevronDown, Headphones } from 'lucide-react'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import {
@@ -109,6 +110,7 @@ export default function Home() {
   const [mushafNavigationRevision, setMushafNavigationRevision] = useState(0)
   const [mushafContentRevision, setMushafContentRevision] = useState(0)
   const onMushafContentReady = useCallback(() => setMushafContentRevision(n => n + 1), [])
+  const [audioOpen, setAudioOpen] = useState(false)
   const [panelMax, setPanelMax] = useState(false)
   const [sheetH, setSheetH] = useState(46)
   const [showIndex, setShowIndex] = useState(false)
@@ -477,7 +479,7 @@ export default function Home() {
           Removed the prev/next-surah chevrons (< >) — user said the
           constant-surah-jumping UX was weird. Surah switching now happens
           via the drawer (tap the title) or the slider in the drawer. */}
-      <header className="relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
+      <header className="reader-toolbar relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
         style={{
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
           backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
@@ -494,6 +496,8 @@ export default function Home() {
         </button>
 
         <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setSel(null); setQuickSearchOpen(true) }}><Search size={20} /></button>
+
+        <button className="icon-btn" aria-label="تلاوت سوره" title="تلاوت سوره" aria-pressed={audioOpen} onClick={() => setAudioOpen(v => !v)}><Headphones size={20} /></button>
 
         {/* surah keyword index — opens the sorted-keywords page */}
         <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
@@ -515,6 +519,8 @@ export default function Home() {
 
         </>}
       </header>
+
+      <RecitationPlayer open={audioOpen} surah={meta.surahs[curSurahN-1]} startAyah={sel?.s===curSurahN?sel.a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
 
       {returnToSearch && !searchOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>

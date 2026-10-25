@@ -1402,3 +1402,28 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 
 .quick-jump-options, .search-jump-options { display:flex; flex-wrap:wrap; gap:6px; padding:6px 12px; }
 .quick-jump-options button, .search-jump-options button { border:1px solid var(--line); border-radius:10px; padding:6px 10px; font-size:11px; min-height:36px; color:var(--ink); background:var(--word-root); }
+
+/* Audio occupies its own small row above the reading surface, never the sheet. */
+.recitation-bar { position:relative; z-index:11; flex-shrink:0; display:flex; align-items:center; gap:3px; padding:4px 8px; background:var(--paper); border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.recitation-location { text-align:right; min-width:0; flex:1; font-size:12px; color:var(--ink); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.recitation-location small { display:block; font-size:10px; color:var(--ink-soft); }
+.recitation-controls { display:flex; align-items:center; gap:2px; }
+.recitation-bar .icon-btn { min-width:32px; width:32px; height:34px; }
+.recitation-play { background:var(--word-root); color:var(--sage); }
+.recitation-bar button:disabled { opacity:.4; }
+.recitation-error { flex-basis:100%; font-size:11px; color:var(--ink-soft); }
+.recitation-error button { text-decoration:underline; margin-inline-start:5px; }
+.recitation-settings { color:var(--ink); background:var(--paper); border-color:var(--line); max-height:85dvh; overflow:auto; }
+.recitation-settings>label { display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:13px; }
+.recitation-settings select { min-width:92px; border:1px solid var(--line); padding:6px; border-radius:8px; background:var(--paper); color:var(--ink); }
+.recitation-settings .recitation-follow { justify-content:flex-start; }
+.recitation-download { border-top:1px solid var(--line); padding-top:12px; display:grid; gap:10px; font-size:12px; }
+.recitation-download p { display:flex; gap:6px; align-items:center; }
+.recitation-download small,.recitation-source { font-size:11px; color:var(--ink-soft); line-height:1.8; }
+.recitation-download progress { width:100%; accent-color:var(--sage); }
+.recitation-download .chip { justify-self:start; min-height:36px; display:flex; align-items:center; gap:6px; padding:6px 10px; }
+.recitation-source { text-decoration:underline; }
+@media (max-width:360px) {
+  .reader-toolbar { gap:2px; }
+  .reader-toolbar > .icon-btn { width:32px; min-width:32px; padding:0; }
+}
