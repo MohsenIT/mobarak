@@ -1107,8 +1107,8 @@ input[type='range'].page-slider::-moz-range-thumb {
 
 @media (prefers-reduced-motion: reduce) { .swipe-tab-page { transition: none !important; } }
 
-.app-update-notice { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 12px; right: 12px; width: auto; max-width: 600px; margin-inline: auto; z-index: 120; display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--line-strong); border-radius: 16px; background: var(--sheet); color: var(--ink); box-shadow: 0 8px 28px #0003; }
-.app-update-title { font-size: 12px; font-weight: 700; white-space: nowrap; }
+.app-update-notice { position:fixed; top:0; left:0; right:0; z-index:200; display:flex; align-items:center; gap:8px; padding:4px 12px; padding-top:calc(4px + env(safe-area-inset-top, 0px)); border-bottom:1px solid var(--line-strong); background:var(--sheet); color:var(--ink); }
+.app-update-title { font-size:12px; font-weight:500; line-height:1.5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .app-update-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; flex-shrink: 0; border: 1px solid var(--sage); border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--ink); background: var(--word-root); }
 .app-update-button:disabled { opacity: .6; }
 
@@ -1157,7 +1157,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 .app-update-spinner { animation: app-update-spin 1s linear infinite; }
 @keyframes app-update-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .app-update-spinner { animation: none; } }
-@media (max-width: 360px) { .app-update-notice { gap: 6px; padding: 10px 8px; } .app-update-button { padding: 8px 6px; } }
+@media (max-width: 360px) { .app-update-notice { gap:6px; padding-inline:8px; } .app-update-button { padding: 8px 6px; } }
 
 .startup-verse strong { font-weight: 700; color: #284b34; }
 
@@ -1427,3 +1427,29 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
   .reader-toolbar { gap:2px; }
   .reader-toolbar > .icon-btn { width:32px; min-width:32px; padding:0; }
 }
+
+/* Update notice reserves its own slim strip instead of covering reader controls. */
+.reader-app { margin-top:var(--app-update-height, 0px); height:calc(100dvh - var(--app-update-height, 0px)); }
+.app-update-later { flex-shrink:0; min-width:28px; font-size:20px; line-height:1; padding:7px 5px; color:var(--ink-soft); }
+.app-update-later:disabled { opacity:.6; }
+html[data-app-update] .drawer,html[data-app-update] .surah-index-drawer { inset-block-start:var(--app-update-height); }
+html[data-app-update] .quran-search-page { top:var(--app-update-height); height:calc(100dvh - var(--app-update-height)); }
+@media (max-width:1023px) { html[data-app-update] .root-panel.maximized { top:var(--app-update-height); height:calc(100dvh - var(--app-update-height)); max-height:calc(100dvh - var(--app-update-height)); } }
+@media (min-width:1024px) { html[data-app-update] .root-panel.maximized { top:calc((100dvh + var(--app-update-height)) / 2); height:min(94dvh, calc(100dvh - var(--app-update-height) - 16px), 820px); max-height:min(94dvh, calc(100dvh - var(--app-update-height) - 16px), 820px); } }
+
+.app-update-version { text-decoration:underline; text-underline-offset:3px; font-weight:700; }
+.release-notes-dialog { background:var(--paper); color:var(--ink); border-color:var(--line); display:flex; flex-direction:column; max-height:min(85dvh, calc(100dvh - var(--app-update-height, 0px) - 24px)); top:calc((100dvh + var(--app-update-height, 0px)) / 2); }
+.release-notes-list { min-height:0; overflow-y:auto; padding-inline:2px; }
+.release-notes-list section+section { border-top:1px solid var(--line); margin-top:18px; padding-top:18px; }
+.release-notes-list h3 { font-weight:700; font-size:14px; }
+.release-notes-list h3 small { font-weight:400; font-size:10px; color:var(--ink-soft); margin-inline-start:6px; }
+.release-notes-list section>p { font-size:12px; margin-block:5px; color:var(--ink-soft); }
+.release-notes-list ul { list-style:disc; padding-inline-start:18px; font-size:12px; line-height:1.9; }
+.release-notes-list li+li { margin-top:5px; }
+.release-notes-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-shrink:0; padding-top:8px; border-top:1px solid var(--line); }
+.release-notes-actions .chip { min-height:36px; padding:6px 12px; }
+
+html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
+
+.app-update-notice > .app-update-button { margin-inline-start:auto; }
+@media (max-width:300px) { .app-update-notice .app-update-title { display:none; } }

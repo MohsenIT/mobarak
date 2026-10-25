@@ -1,0 +1,30 @@
+export interface AppRelease { version:string; date:string; title:string; changes:string[] }
+/** Newest first. Append a versioned entry for each user-facing release; retain history. */
+export const APP_RELEASES:AppRelease[]=[{
+  version:'0.3.0',date:'2026-10-25',title:'تلاوت، پیمایش و به‌روزرسانی روشن‌تر',changes:[
+    'تلاوت آیه‌به‌آیه با منشاوی و پرهیزگار، تنظیم سرعت، تکرار و دانلود سوره برای پخش آفلاین.',
+    'شروع تلاوت با یک لمس، هایلایت یکپارچهٔ آیه و هماهنگی ترجمه و آمار در تب آیه.',
+    'کنترل‌های رسانهٔ سیستم و امکان ادامهٔ پخش در پس‌زمینه در مرورگرهای پشتیبانی‌شده.',
+    'انتقال «برو» و چیپ‌های سوره‌های اخیر و سنجاق‌شده به فهرست سوره‌ها؛ پیمایش کوتاهِ صفحه، جزء و سیاق.',
+    'لینک قابل اشتراک برای جست‌وجو و فیلترهای آن؛ آیکن قیف برای انتخاب سوره‌ها.',
+    'اعلان باریک به‌روزرسانی و نمایش تغییرات نسخه‌های جدید پیش از دریافت.',
+  ],
+}]
+export const CURRENT_RELEASE=APP_RELEASES[0].version
+const parts=(s:string)=>/^\d+\.\d+\.\d+$/.test(s)?s.split('.').map(Number):null
+export function compareRelease(a:string,b:string){const x=parts(a),y=parts(b);if(!x||!y)return 0;for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]>y[i]?1:-1;return 0}
+export function missedReleases(releases:AppRelease[],installed:string){return releases.filter(r=>compareRelease(r.version,installed)>0).sort((a,b)=>compareRelease(b.version,a.version))}
+export interface AppUpdate { build:string; releases:AppRelease[]; latest?:AppRelease }
+export function parseAppUpdate(value:unknown):AppUpdate {
+  const data=value as {version?:unknown;releases?:unknown}
+  if(typeof data?.version!=='string'||!data.version)throw new Error('invalid-version')
+  const releases:AppRelease[]=[];const seen=new Set<string>()
+  if(Array.isArray(data.releases))for(const raw of data.releases.slice(0,200)){
+    const r=raw as AppRelease
+    if(!r||typeof r.version!=='string'||!parts(r.version)||seen.has(r.version)||typeof r.title!=='string'||typeof r.date!=='string'||!Array.isArray(r.changes)||!r.changes.every(c=>typeof c==='string'))continue
+    seen.add(r.version);releases.push({version:r.version,title:r.title.slice(0,200),date:r.date.slice(0,30),changes:r.changes.slice(0,30).map(c=>c.slice(0,1000))})
+  }
+  releases.sort((a,b)=>compareRelease(b.version,a.version))
+  return {build:data.version,releases,latest:releases[0]}
+}
+export async function checkAppUpdate(signal?:AbortSignal){const response=await fetch('/api/version',{cache:'no-store',signal:signal??AbortSignal.timeout(10000)});if(!response.ok)throw new Error('version');return parseAppUpdate(await response.json())}
