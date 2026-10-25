@@ -56,7 +56,7 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
         <div className="rounded-xl border p-3 mb-3 text-sm" style={{ borderColor: 'var(--line)' }}>
           <p>{formName(selection.root, selection.form) && <b>{formName(selection.root, selection.form)} · </b>}باب / ساخت صرفی: <b>{morphologyLabel(selection.form!)}</b> <span dir="ltr">({selection.form})</span></p>
           <p className="text-xs leading-6 mt-1">واژه‌های همین ریشه در همین باب انتخاب شده‌اند.</p>
-          <div className="mt-2"><SourceReference label="منبع صرف و باب" source={{
+          <div className="mt-2"><SourceReference sourceId="corpus:qac" label="منبع صرف و باب" source={{
             title: 'Quranic Arabic Corpus',
             description: 'پیکرهٔ برچسب‌گذاری صرفی و نحوی قرآن؛ مأخذ باب و ساخت صرفی واژه‌ها در این سایت.',
             fields: [{ label: 'پدیدآورنده', value: 'Kais Dukes' }, { label: 'نسخه', value: 'داده‌های صرفی ۰٫۴ · ۲۰۱۱ میلادی' }, { label: 'متن پایه', value: 'متن عثمانی تنزیل، نسخهٔ ۱٫۰٫۲' }, { label: 'مجوز', value: 'داده‌های پیکره: GNU GPL؛ متن تنزیل: CC BY-ND 3.0' }],

@@ -66,7 +66,7 @@ export default function IshtiqaqiMeaning({ root }: { root: string }) {
 function ishtiqaqiSource(entry: Entry) {
   const translation = entry.translation
   return {
-    title: ROOT_BOOK_TITLES.ishtiqaqi.full,
+    resourceId:'book:ishtiqaqi',title: ROOT_BOOK_TITLES.ishtiqaqi.full,
     description: 'فرهنگ اشتقاقی واژگان قرآن با تأکید بر معنای محوری و پیوند واژه‌های هم‌ریشه.',
     fields: [
       { label: 'نویسنده', value: 'دکتر محمد حسن حسن جبل' },
@@ -100,10 +100,10 @@ function EntryMeaning({ entry, multiple }: { entry: Entry; multiple: boolean }) 
       <ArabicText text={entry.ar} />
       {entry.footnotes.length > 0 && <details className="mt-3 text-xs"><summary className="cursor-pointer">پاورقی‌های صفحات منبع</summary>
         <p style={{ color: 'var(--ink-soft)' }}>این پاورقی‌ها متعلق به صفحه‌اند و ممکن است به مدخل‌های دیگر همان صفحه هم مربوط باشند.</p>
-        {entry.footnotes.map((note, i) => <div key={i} className="mt-2"><SourceReference label="صفحهٔ منبع" source={{ title: ROOT_BOOK_TITLES.ishtiqaqi.full, fields: [{ label: 'نویسنده', value: 'محمد حسن حسن جبل' }, { label: 'ارجاع', value: citation(note.source) }], notes: ['پاورقی این صفحه ممکن است به مدخل‌های دیگر همان صفحه مربوط باشد.'], links: [{ label: 'مشاهدهٔ صفحه', href: note.source.url }] }} /><ArabicText text={note.text} /></div>)}
+        {entry.footnotes.map((note, i) => <div key={i} className="mt-2"><SourceReference label="صفحهٔ منبع" source={{ resourceId:'book:ishtiqaqi',title: ROOT_BOOK_TITLES.ishtiqaqi.full, fields: [{ label: 'نویسنده', value: 'محمد حسن حسن جبل' }, { label: 'ارجاع', value: citation(note.source) }], notes: ['پاورقی این صفحه ممکن است به مدخل‌های دیگر همان صفحه مربوط باشد.'], links: [{ label: 'مشاهدهٔ صفحه', href: note.source.url }] }} /><ArabicText text={note.text} /></div>)}
       </details>}
       {entry.commonMeanings.length > 0 && <details className="mt-3 text-xs"><summary className="cursor-pointer">معنای مشترک فصل</summary>
-        {entry.commonMeanings.map(common => <div key={common.id} className="mt-2"><SourceReference source={{ title: ROOT_BOOK_TITLES.ishtiqaqi.full, fields: [{ label: 'بخش', value: common.heading }, ...common.references.map(ref => ({ label: 'ارجاع', value: citation(ref) }))], links: common.references.map(ref => ({ label: `صفحهٔ ${toFa(ref.printed_page)}`, href: ref.url })) }} /><ArabicText text={common.ar} /></div>)}
+        {entry.commonMeanings.map(common => <div key={common.id} className="mt-2"><SourceReference source={{ resourceId:'book:ishtiqaqi',title: ROOT_BOOK_TITLES.ishtiqaqi.full, fields: [{ label: 'بخش', value: common.heading }, ...common.references.map(ref => ({ label: 'ارجاع', value: citation(ref) }))], links: common.references.map(ref => ({ label: `صفحهٔ ${toFa(ref.printed_page)}`, href: ref.url })) }} /><ArabicText text={common.ar} /></div>)}
       </details>}
     </div>}
   </div>

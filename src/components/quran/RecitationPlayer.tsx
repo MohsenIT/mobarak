@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Pause, Play, SkipBack, SkipForward, SlidersHorizontal, X, Download, Check, LoaderCircle, Trash2 } from 'lucide-react'
+import ResourcePicker from './ResourcePicker'
 import { useRecitationMediaSession } from './useRecitationMediaSession'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import type { SurahMeta } from '@/lib/quran'
@@ -9,10 +10,11 @@ import { toFa } from '@/lib/quran'
 import { RECITER, RECITERS, nextRecitation, type PlaybackPosition } from '@/lib/recitation'
 import { audioDownloadStatus, cleanAudioCache, deleteRecitation, downloadRecitation, getVerseAudio } from '@/lib/recitation-storage'
 
-interface Props { controlsVisible?: boolean; open: boolean; surah: SurahMeta; startAyah: number; onClose: () => void; onFollow: (s: number, a: number) => void; selectedAyah?: number | null; onPlaying: (s: number,a: number) => void; onNextSurah: (s:number,a?:number) => void; previousSurahVerses?: number }
+export type RecitationTransportStatus='idle'|'loading'|'playing'|'paused'|'error'
+interface Props { playRequest?:number;onStatusChange?:(status:RecitationTransportStatus)=>void;controlsVisible?: boolean; open: boolean; surah: SurahMeta; startAyah: number; onClose: () => void; onFollow: (s: number, a: number) => void; selectedAyah?: number | null; onPlaying: (s: number,a: number) => void; onNextSurah: (s:number,a?:number) => void; previousSurahVerses?: number }
 const initial = (ayah: number): PlaybackPosition => ({ ayah, verseRound: 1, surahRound: 1 })
 const repeatOptions = [1,2,3,5,10,0]
-export default function RecitationPlayer({ controlsVisible=true, open, surah, startAyah, onClose, onFollow, selectedAyah, onPlaying, onNextSurah, previousSurahVerses }: Props) {
+export default function RecitationPlayer({ playRequest=0,onStatusChange,controlsVisible=true, open, surah, startAyah, onClose, onFollow, selectedAyah, onPlaying, onNextSurah, previousSurahVerses }: Props) {
   const audio = useRef<HTMLAudioElement>(null)
   const [reciterId,setReciterId]=useState<string>(RECITER.id)
   const reciter=RECITERS.find(item=>item.id===reciterId)??RECITER
@@ -32,6 +34,9 @@ export default function RecitationPlayer({ controlsVisible=true, open, surah, st
   const [ready, setReady] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const transportStatus:RecitationTransportStatus=!open?'idle':error?'error':!ready?'loading':playing?'playing':'paused'
+  useEffect(()=>{onStatusChange?.(transportStatus)},[transportStatus,onStatusChange])
+  const lastPlayRequest=useRef(playRequest)
   const [downloaded, setDownloaded] = useState(false)
   const [savedParts, setSavedParts] = useState(0)
   const [savedBytes, setSavedBytes] = useState(0)
@@ -150,6 +155,13 @@ export default function RecitationPlayer({ controlsVisible=true, open, surah, st
     document.addEventListener('visibilitychange',visibility);visibility()
     return()=>document.removeEventListener('visibilitychange',visibility)
   },[background])
+  useEffect(()=>{
+    if(lastPlayRequest.current===playRequest)return
+    lastPlayRequest.current=playRequest
+    if(!open)return
+    if(!ready||error){intent.current=true;setError('');setRetry(value=>value+1)}
+    else if(audio.current?.paused)toggle()
+  },[playRequest,open,ready,error])
   useRecitationMediaSession({audio,active:open,playing,title:`سورهٔ ${surah.fa} · آیهٔ ${toFa(position.ayah)}`,artist:reciter.name,
     onPlay:resume,onPause:pause,onNext:skipNext,onPrevious:skipPrevious,onStop:()=>{pause();onClose()}})
   const startDownload = async () => {
@@ -180,7 +192,7 @@ export default function RecitationPlayer({ controlsVisible=true, open, surah, st
     </div>}
     <Dialog open={open&&settings} onOpenChange={setSettings}><DialogContent className="recitation-settings" dir="rtl">
       <DialogHeader><DialogTitle>تلاوت {surah.fa}</DialogTitle><DialogDescription>{reciter.name} · ترتیل</DialogDescription></DialogHeader>
-      <label>قاری<select aria-label="قاری" value={reciter.id} onChange={e=>{setReciterId(e.target.value);saveSetting('reciter',e.target.value)}}>{RECITERS.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+      <div><span className="text-xs">قاری</span><ResourcePicker label="قاری" ids={RECITERS.map(item=>`reciter:${item.id}`)} value={`reciter:${reciter.id}`} onChange={id=>{const value=id.replace(/^reciter:/,'');setReciterId(value);saveSetting('reciter',value)}}/></div>
       <label>شروع از آیه<select aria-label="شروع از آیه" value={position.ayah} onChange={e=>move(Number(e.target.value))}>{Array.from({length:surah.vc},(_,i)=><option key={i+1} value={i+1}>{toFa(i+1)}</option>)}</select></label>
       <label>سرعت پخش<select aria-label="سرعت پخش" value={speed} onChange={e=>{const n=Number(e.target.value);setSpeed(n);saveSetting('speed',n)}}>{[0.75,1,1.25,1.5,2].map(n=><option key={n} value={n}>{toFa(n)}×</option>)}</select></label>
       <label>تکرار هر آیه<select aria-label="تکرار هر آیه" value={verseRepeats} onChange={e=>{const n=Number(e.target.value);setVerseRepeats(n);saveSetting('verseRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n?`${toFa(n)} بار`:'تا توقف'}</option>)}</select></label>

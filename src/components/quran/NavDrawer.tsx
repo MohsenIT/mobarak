@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import ResourcePicker from './ResourcePicker'
+import {RESOURCES} from '@/lib/resources'
 import ReadingScreenSettings from './ReadingScreen'
 import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
@@ -48,12 +50,6 @@ const TABS = [
   { id: 'settings', label: 'تنظیمات' },
 ] as const
 
-const TRANSLATORS: { id: Translator; name: string }[] = [
-  { id: 's', name: 'سید محمدرضا صفوی (مبتنی بر المیزان)' },
-  { id: 'f', name: 'محمدمهدی فولادوند' },
-  { id: 'a', name: 'حسین انصاریان' },
-  { id: 'm', name: 'ناصر مکارم شیرازی' },
-]
 
 export default function NavDrawer(props: Props) {
   const { meta, onClose, onGoPage, onGoSurah, onGoVerse, currentSurah } = props
@@ -281,21 +277,10 @@ export default function NavDrawer(props: Props) {
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
                   <IconTranslate /> مترجم
                 </h3>
-                <div className="flex flex-col gap-2">
-                  {TRANSLATORS.map(t => (
-                    <button key={t.id}
-                      className="rounded-xl border px-4 py-3 text-sm text-right font-medium transition-all"
-                      style={{
-                        borderColor: props.translator === t.id ? 'var(--sage)' : 'var(--line)',
-                        background: props.translator === t.id ? 'var(--word-root)' : 'transparent',
-                        color: 'var(--ink)',
-                      }}
-                      onClick={() => props.onTranslator(t.id)}>
-                      {t.name}
-                    </button>
-                  ))}
-                </div>
+                <ResourcePicker label="ترجمه" ids={['translation:s','translation:f','translation:a','translation:m']} value={`translation:${props.translator}`} onChange={id=>props.onTranslator(id.replace(/^translation:/,'') as Translator)}/>
               </section>
+
+              <section><h3 className="text-sm font-bold mb-3" style={{color:'var(--ink)'}}>منابع برنامه</h3><ResourcePicker browse label="منبع" ids={RESOURCES.map(r=>r.id)} value="" onChange={()=>{}}/></section>
 
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>

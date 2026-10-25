@@ -87,6 +87,7 @@ function TahqiqMeaning({ root }: { root: string }) {
 
 function tahqiqSource(entry: Entry) {
   return {
+    resourceId:'book:tahqiq',
     title: ROOT_BOOK_TITLES.tahqiq.full,
     description: 'واژه‌پژوهی قرآن با تمرکز بر معنای محوری ریشه‌ها و کاربردهای قرآنی آن‌ها.',
     fields: [

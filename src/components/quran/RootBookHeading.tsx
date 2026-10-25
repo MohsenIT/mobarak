@@ -21,7 +21,7 @@ export default function RootBookHeading({ book, expanded, summary, source, onTog
         <strong>{expanded ? title.full : title.short}{!expanded && summary && ': '}</strong>{!expanded && summary}
       </span>
     </button>
-    {expanded && source && <span className="shrink-0"><SourceReference source={source} /></span>}
+    {expanded && source && <span className="shrink-0"><SourceReference sourceId={`book:${book}`} source={source} /></span>}
     <button type="button" className="shrink-0 mt-1 cursor-pointer" aria-expanded={expanded} aria-label={`${expanded ? 'بستن' : 'بازکردن'} شرح ${title.short}`} onClick={onToggle}>
       <ChevronDown aria-hidden="true" size={16} className={`transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
     </button>

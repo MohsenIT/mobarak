@@ -2,9 +2,10 @@
 
 The reader has a play button and a compact playback row above the reading
 surface. One click starts the current ayah after loading and opens the controls;
-the toolbar button becomes an audio-controls icon. It collapses/expands the control
-row without stopping audio; transport play/pause stays only in that row. Its close
-button stops playback. A page load alone never starts audio. The analysis sheet remains independent. Clicking the current ayah label
+the toolbar button becomes an animated audio-activity icon while playing. When
+paused with the control row collapsed it becomes Play again; reopening the row
+resumes playback. Collapsing the row itself never changes transport state. The playback row remains the dedicated transport control,
+including play/pause, previous/next ayah and settings. Its close button stops playback. A page load alone never starts audio. The analysis sheet remains independent. Clicking the current ayah label
 returns to it; automatic following can be disabled. Choosing a different surah manually stops playback.
 After the configured repeats finish, playback continues from ayah 1 of the next
 surah; it stops at the end of surah 114. Starting playback with a word/root selected

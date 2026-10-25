@@ -14,7 +14,7 @@ import FlowPage, { FlowSurface } from '@/components/quran/FlowPage'
 import SurahPull from '@/components/quran/SurahPull'
 import RootPanel from '@/components/quran/RootPanel'
 import StartupSplash from '@/components/quran/StartupSplash'
-import RecitationPlayer from '@/components/quran/RecitationPlayer'
+import RecitationPlayer,{type RecitationTransportStatus} from '@/components/quran/RecitationPlayer'
 import { rootHue } from '@/lib/comparison-colors'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
@@ -22,7 +22,7 @@ import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, GitCompareArrows, Search, MoreHorizontal, ChevronDown, Play, AudioLines } from 'lucide-react'
+import { ArrowRight, GitCompareArrows, Search, MoreHorizontal, ChevronDown, Play, LoaderCircle, AudioLines } from 'lucide-react'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import {
@@ -112,6 +112,8 @@ export default function Home() {
   const onMushafContentReady = useCallback(() => setMushafContentRevision(n => n + 1), [])
   const [audioOpen, setAudioOpen] = useState(false)
   const [audioControlsVisible,setAudioControlsVisible]=useState(true)
+  const [audioStatus,setAudioStatus]=useState<RecitationTransportStatus>('idle')
+  const [audioPlayRequest,setAudioPlayRequest]=useState(0)
   const [audioVerse, setAudioVerse] = useState<{s:number;a:number}|null>(null)
   useEffect(()=>{if(!audioOpen)setAudioVerse(null)},[audioOpen])
   const [playbackTarget, setPlaybackTarget] = useState<{s:number;a:number}|null>(null)
@@ -502,7 +504,7 @@ export default function Home() {
 
         <button className="icon-btn" aria-label="جست‌وجو در قرآن" title="جست‌وجو در قرآن" onClick={() => { setSel(null); setQuickSearchOpen(true) }}><Search size={20} /></button>
 
-        <button className="icon-btn" aria-label={!audioOpen ? "پخش تلاوت از آیهٔ فعلی" : audioControlsVisible ? "جمع‌کردن کنترل‌های تلاوت" : "نمایش کنترل‌های تلاوت"} title={!audioOpen ? "پخش تلاوت از آیهٔ فعلی" : "کنترل‌های تلاوت"} aria-expanded={audioOpen && audioControlsVisible} style={audioOpen ? {color:"var(--sage)",background:"var(--word-root)"}:undefined} onClick={() => {if(audioOpen)setAudioControlsVisible(v=>!v);else{setAudioControlsVisible(true);setAudioOpen(true)}}}>{audioOpen ? <AudioLines size={20} /> : <Play size={20} fill="currentColor" />}</button>
+        <button className="icon-btn" aria-label={!audioOpen?'پخش تلاوت از آیهٔ فعلی':audioControlsVisible?'جمع‌کردن کنترل‌های تلاوت':audioStatus==='playing'?'نمایش کنترل‌های تلاوت':'بازکردن نوار و ادامهٔ تلاوت'} title={!audioOpen?'پخش تلاوت':audioControlsVisible?'جمع‌کردن نوار پخش':'بازکردن نوار پخش'} aria-expanded={audioOpen&&audioControlsVisible} aria-busy={audioStatus==='loading'} style={audioOpen?{color:'var(--sage)',background:'var(--word-root)'}:undefined} onClick={()=>{if(!audioOpen){setAudioControlsVisible(true);setAudioOpen(true)}else if(audioControlsVisible)setAudioControlsVisible(false);else{setAudioControlsVisible(true);if(audioStatus!=='loading')setAudioPlayRequest(value=>value+1)}}}>{audioStatus==='playing'&&audioOpen?<span className="recitation-activity" aria-hidden="true">{[0,1,2,3,4].map(i=><i key={i} style={{animationDelay:`${i*0.12}s`}}/>)}</span>:audioStatus==='loading'&&audioOpen?<LoaderCircle size={20} className="recitation-start-spinner animate-spin"/>:audioOpen&&audioControlsVisible?<AudioLines size={20}/>:<Play size={20} fill="currentColor"/>}</button>
 
         {/* surah keyword index — opens the sorted-keywords page */}
         <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label="فهرست کلیدواژه‌های سوره" title="فهرست کلیدواژه‌های سوره">
@@ -525,7 +527,7 @@ export default function Home() {
         </>}
       </header>
 
-      <RecitationPlayer controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
+      <RecitationPlayer playRequest={audioPlayRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
 
       {returnToSearch && !searchOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>

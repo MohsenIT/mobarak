@@ -1,11 +1,14 @@
 'use client'
 
 import { useId, useState } from 'react'
-import { BookOpen, ExternalLink, X } from 'lucide-react'
+import { BookOpen, ExternalLink, X, Info, UserRound } from 'lucide-react'
+import { getResource,RESOURCE_KINDS,RESOURCE_LANGUAGES,RECITATION_STYLES } from '@/lib/resources'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 export type SourceInfo = {
   title: string
+  resourceId?:string
+  image?:{src:string;alt:string}
   description?: string
   fields?: { label: string; value: string }[]
   notes?: string[]
@@ -33,15 +36,20 @@ function fromText(text: string): SourceInfo {
   return { title: lines[0] || 'مشخصات منبع', fields, notes, links }
 }
 
-export default function SourceReference({ text = '', source, label = 'منبع' }: { text?: string; source?: SourceInfo; label?: string }) {
+export default function SourceReference({ text = '', source, label = 'منبع',sourceId,iconOnly=false }: { text?: string; source?: SourceInfo; label?: string;sourceId?:string;iconOnly?:boolean }) {
   const [open, setOpen] = useState(false)
   const titleId = useId()
-  const info = source ?? fromText(text)
-  const links = info.links?.filter(link => /^https?:\/\//.test(link.href) || /^\/(?!\/)/.test(link.href))
+  const resource=getResource(sourceId??source?.resourceId??'')
+  const provided=source??fromText(text)
+  const base:SourceInfo|undefined=resource?{title:resource.title,description:resource.description,image:resource.image,
+    fields:[{label:'نوع منبع',value:RESOURCE_KINDS[resource.kind]},...(resource.creator?[{label:resource.kind==='recitation'?'قاری':resource.kind==='translation'?'مترجم':resource.kind==='lexicon'?'نویسنده':'پدیدآورنده',value:resource.creator}]:[]),...(resource.country?[{label:'کشور',value:resource.country}]:[]),{label:'زبان',value:RESOURCE_LANGUAGES[resource.language]??resource.language},...(resource.style?[{label:'شیوهٔ تلاوت',value:RECITATION_STYLES[resource.style]}]:[]),...(resource.date?[{label:resource.dateLabel??'زمان',value:resource.date}]:[])],notes:resource.features,links:resource.links}:undefined
+  const info:SourceInfo=base?{...provided,title:base.title,description:provided.description??base.description,image:provided.image??base.image,fields:[...(base.fields??[]).filter(field=>!provided.fields?.some(p=>p.label===field.label)),...(provided.fields??[])],notes:[...(base.notes??[]),...(provided.notes??[])],links:[...(base.links??[]),...(provided.links??[])]}:provided
+  const fields=(info.fields??[]).filter((field,i,all)=>!/(مجوز|license|copyright)/i.test(field.label)&&all.findIndex(other=>other.label===field.label&&other.value===field.value)===i)
+  const links = info.links?.filter((link,i,all) => (/^https?:\/\//.test(link.href) || /^\/(?!\/)/.test(link.href)) && all.findIndex(other=>other.href===link.href)===i)
   return <Popover open={open} onOpenChange={setOpen}>
     <PopoverTrigger asChild>
-      <button type="button" className={chipClass} aria-label={`${label}، ${info.title}`} style={chipStyle} data-source-chip>
-        <BookOpen size={13} aria-hidden="true" /><span>{label}</span>
+      <button type="button" className={iconOnly?'icon-btn sm resource-info-button':chipClass} aria-label={`${iconOnly?'مشخصات':label}، ${info.title}`} style={chipStyle} data-source-chip>
+        {iconOnly?<Info size={17} aria-hidden="true"/>:<><BookOpen size={13} aria-hidden="true"/><span>{label}</span></>}
       </button>
     </PopoverTrigger>
     <PopoverContent dir="rtl" side="top" aria-labelledby={titleId} className="w-[min(24rem,calc(100vw-2rem))] rounded-xl p-4 text-xs leading-7 break-words [overflow-wrap:anywhere]" style={{ background: 'var(--paper)', color: 'var(--ink)', borderColor: 'var(--line)', zIndex: 100, maxHeight: 'min(70dvh, var(--radix-popover-content-available-height, 70dvh))', overflowY: 'auto', overscrollBehavior: 'contain' }}>
@@ -49,9 +57,10 @@ export default function SourceReference({ text = '', source, label = 'منبع' 
         <h3 id={titleId} className="font-bold text-sm leading-7 flex-1">{info.title}</h3>
         <button type="button" aria-label="بستن مشخصات منبع" className="shrink-0 rounded-full p-1 cursor-pointer" onClick={() => setOpen(false)}><X size={16} aria-hidden="true" /></button>
       </header>
+      {resource&&<div className="resource-profile-picture">{info.image&&(/^(https:\/\/|\/(?!\/))/.test(info.image.src))?<img src={info.image.src} alt={info.image.alt} width="72" height="72" loading="lazy"/>:<UserRound size={32} aria-hidden="true"/>}</div>}
       {info.description && <p className="mb-3" style={{ color: 'var(--ink-soft)' }}>{info.description}</p>}
-      {!!info.fields?.length && <dl className="divide-y" style={{ borderColor: 'var(--line)' }}>
-        {info.fields.map((field, i) => <div key={i} className="grid grid-cols-[5rem_minmax(0,1fr)] gap-x-3 py-1.5" style={{ borderColor: 'var(--line)' }}>
+      {!!fields.length && <dl className="divide-y" style={{ borderColor: 'var(--line)' }}>
+        {fields.map((field, i) => <div key={i} className="grid grid-cols-[5rem_minmax(0,1fr)] gap-x-3 py-1.5" style={{ borderColor: 'var(--line)' }}>
           <dt style={{ color: 'var(--ink-soft)' }}>{field.label}</dt><dd className="min-w-0">{field.value}</dd>
         </div>)}
       </dl>}

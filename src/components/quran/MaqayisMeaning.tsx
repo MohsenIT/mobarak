@@ -42,6 +42,7 @@ export default function MaqayisMeaning({ root }: { root: string }) {
   }, [root])
   const entry = state.root === root ? state.entry : undefined
   const source = entry ? {
+    resourceId:'book:maqayis',
     title: ROOT_BOOK_TITLES.maqayis.full,
     description: 'فرهنگ ریشه‌های عربی؛ بررسی اصول معنایی هر ریشه با شواهد و کاربردهای زبانی.',
     fields: [
