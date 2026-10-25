@@ -55,7 +55,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
             {v.w.map((w, i) => {
               const hue = comparisonRange?.s === surah.n && w.r ? comparisonRoots?.[w.r] : undefined
               const isFlash = flash && flash.s === surah.n && flash.a === v.n && flash.pos === i + 1
-              const activeSelection = analysisSelection?.tab === 'word' ? analysisSelection : selection
+              const activeSelection = analysisSelection?.tab === 'verse' || analysisSelection?.tab === 'context' ? null : analysisSelection?.tab === 'word' ? analysisSelection : selection
               const isSelected = activeSelection?.s === surah.n && activeSelection.a === v.n && activeSelection.pos === i + 1
               const isSameRoot = highlightRoot && w.r === highlightRoot
               const isAnalysis = analysisSelection?.tab !== 'root' && matchesAnalysis(analysisSelection, surah.n, v.n, i + 1, w)

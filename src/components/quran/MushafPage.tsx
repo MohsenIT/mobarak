@@ -121,7 +121,8 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
         }
         line.removeAttribute('data-analysis-range')
         if (analysisSelection?.tab !== 'verse' && analysisSelection?.tab !== 'context') continue
-        const words = [...line.querySelectorAll<HTMLElement>('.analysis-selected')]
+        const words = [...line.querySelectorAll<HTMLElement>('.analysis-selected')].map(word => word.closest<HTMLElement>('[data-surah][data-ayah]') ?? word)
+        words.push(...line.querySelectorAll<HTMLElement>('[data-analysis-marker]'))
         if (!words.length) continue
         const bounds = line.getBoundingClientRect()
         const rects = words.map(word => word.getBoundingClientRect())
@@ -167,11 +168,12 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
               if (it.kind === 'marker') {
                 const preceding = items.slice(0, i).reverse().find(item => item.kind === 'word')
                 const inRange = preceding?.kind === 'word' && comparisonRange?.s === preceding.s && it.n >= comparisonRange.from && it.n <= comparisonRange.to
-                return <span key={i} data-comparison-range={inRange ? 'true' : undefined}><AyahMarker n={it.n} /></span>
+                const analysisMarker=preceding?.kind==='word' && analysisSelection?.s===preceding.s && (analysisSelection.tab==='verse' ? analysisSelection.a===preceding.a : analysisSelection.tab==='context' && analysisSelection.from!==undefined && analysisSelection.to!==undefined && preceding.a>=analysisSelection.from && preceding.a<=analysisSelection.to)
+                return <span key={i} data-analysis-marker={analysisMarker?'true':undefined} data-comparison-range={inRange ? 'true' : undefined}><AyahMarker n={it.n} /></span>
               }
               if (it.kind !== 'word') return null
               const isFlash = flash && flash.s === it.s && flash.a === it.a && flash.pos === it.pos
-              const activeSelection = analysisSelection?.tab === 'word' ? analysisSelection : selection
+              const activeSelection = analysisSelection?.tab === 'verse' || analysisSelection?.tab === 'context' ? null : analysisSelection?.tab === 'word' ? analysisSelection : selection
               const isSelected = activeSelection?.s === it.s && activeSelection.a === it.a && activeSelection.pos === it.pos
               const isSameRoot = highlightRoot && it.r === highlightRoot
               const hue = comparisonRange?.s === it.s && it.r ? comparisonRoots?.[it.r] : undefined

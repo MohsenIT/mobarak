@@ -44,3 +44,28 @@ media transport, CORS and audio correctness remain unverified here. Audio reques
 fail visibly and can be retried. The environment network draft could not be saved
 because its base version is stale; the proposed additional domain is
 `verses.quran.com`, preserving all existing domains.
+
+## System controls and background playback
+
+The web player registers Media Session metadata (surah, ayah, reciter and artwork),
+play/pause/stop, next/previous ayah, seeking and playback position/rate. Callbacks
+use current state, not the ayah that happened to be active when registered. Closing
+the player unregisters handlers and clears metadata. Track navigation crosses surah
+boundaries to the adjacent ayah. Repeats still apply to normal end-of-audio playback.
+
+Background playback is enabled by default. A persisted option can pause playback
+on document visibility loss, including pending loads, without resuming automatically
+when the page becomes visible again. Browser/OS support and lifecycle policies still
+apply; this cannot keep a browser alive after the OS kills it.
+
+Playing ayahs use the existing continuous verse-selection band in flow and mushaf
+views. Individual word/prefix backgrounds are suppressed inside this selection.
+The analysis sheet's verse target, translation and statistics track the current ayah.
+
+Media Session registration, metadata, actions, timeline and visibility policy were
+exercised in Chromium with real audio decoding of WAV fixtures. This does not verify
+physical lock-screen notifications, headphones, background behavior on an Android/iOS
+device, or native Android Auto integration. The Android SDK and native media service
+are absent here. Android Auto needs an Android MediaLibraryService/MediaSession
+with a native player and shared offline storage, not only browser Media Session;
+that native integration is not implemented by this web change.

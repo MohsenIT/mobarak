@@ -111,6 +111,8 @@ export default function Home() {
   const [mushafContentRevision, setMushafContentRevision] = useState(0)
   const onMushafContentReady = useCallback(() => setMushafContentRevision(n => n + 1), [])
   const [audioOpen, setAudioOpen] = useState(false)
+  const [audioVerse, setAudioVerse] = useState<{s:number;a:number}|null>(null)
+  useEffect(()=>{if(!audioOpen)setAudioVerse(null)},[audioOpen])
   const [playbackTarget, setPlaybackTarget] = useState<{s:number;a:number}|null>(null)
   const [panelMax, setPanelMax] = useState(false)
   const [sheetH, setSheetH] = useState(46)
@@ -522,7 +524,7 @@ export default function Home() {
         </>}
       </header>
 
-      <RecitationPlayer open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{if(sel)setPlaybackTarget({s,a})}} onNextSurah={s=>{if(sel)setPlaybackTarget({s,a:1});goVerse(s,1)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
+      <RecitationPlayer open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
 
       {returnToSearch && !searchOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
@@ -552,7 +554,7 @@ export default function Home() {
               onPageChange={setPage} onContentReady={onMushafContentReady} showTrans={showTrans} translator={translator} scale={scale}
               selection={sel ? analysisSelection ?? sel : null}
               highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
-              analysisSelection={sel ? analysisSelection : null} comparisonRange={comparisonRange}
+              analysisSelection={sel ? analysisSelection : audioVerse ? {...audioVerse,tab:'verse',pos:1,root:null,text:''} : null} comparisonRange={comparisonRange}
               comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots} flash={flash} onOpenSurahs={() => { setDrawerView('navigation'); setDrawerOpen(true) }} onWordTap={tapWord} />
           ) : (
             <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs} fontSize={flowFont} showTrans={showTrans} translator={translator}
@@ -579,7 +581,7 @@ export default function Home() {
                     fontSize={flowFont}
                     selection={sel ? analysisSelection ?? sel : null}
                     highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
-                    analysisSelection={sel ? analysisSelection : null}
+                    analysisSelection={sel ? analysisSelection : audioVerse ? {...audioVerse,tab:'verse',pos:1,root:null,text:''} : null}
                     comparisonRange={comparisonRange}
                     comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots}
                     flash={flash}
