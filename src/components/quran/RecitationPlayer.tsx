@@ -8,12 +8,14 @@ import { toFa } from '@/lib/quran'
 import { RECITER, nextRecitation, type PlaybackPosition } from '@/lib/recitation'
 import { audioDownloadStatus, cleanAudioCache, deleteRecitation, downloadRecitation, getVerseAudio } from '@/lib/recitation-storage'
 
-interface Props { open: boolean; surah: SurahMeta; startAyah: number; onClose: () => void; onFollow: (s: number, a: number) => void }
+interface Props { open: boolean; surah: SurahMeta; startAyah: number; onClose: () => void; onFollow: (s: number, a: number) => void; selectedAyah?: number | null; onPlaying: (s: number,a: number) => void; onNextSurah: (s:number) => void }
 const initial = (ayah: number): PlaybackPosition => ({ ayah, verseRound: 1, surahRound: 1 })
 const repeatOptions = [1,2,3,5,10,0]
-export default function RecitationPlayer({ open, surah, startAyah, onClose, onFollow }: Props) {
+export default function RecitationPlayer({ open, surah, startAyah, onClose, onFollow, selectedAyah, onPlaying, onNextSurah }: Props) {
   const audio = useRef<HTMLAudioElement>(null)
-  const [position, setPosition] = useState(() => initial(1))
+  const [position, setPosition] = useState(() => initial(startAyah))
+  const [positionSurah, setPositionSurah] = useState(surah.n)
+  const pendingSurah = useRef<number | null>(null)
   const [settings, setSettings] = useState(false)
   const [verseRepeats, setVerseRepeats] = useState(1)
   const [surahRepeats, setSurahRepeats] = useState(1)
@@ -30,8 +32,8 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
   const download = useRef<AbortController | null>(null)
   const intent = useRef(false)
   const source = useRef('')
-  const current = useRef({ position, verseRepeats, surahRepeats, total: surah.vc, follow, onFollow, surah: surah.n })
-  current.current = { position, verseRepeats, surahRepeats, total: surah.vc, follow, onFollow, surah: surah.n }
+  const current = useRef({ position, verseRepeats, surahRepeats, total: surah.vc, follow, onFollow, onPlaying, onNextSurah, surah: surah.n })
+  current.current = { position, verseRepeats, surahRepeats, total: surah.vc, follow, onFollow, onPlaying, onNextSurah, surah: surah.n }
   const start = useRef(startAyah); start.current = startAyah
   const [retry, setRetry] = useState(0)
 
@@ -51,8 +53,10 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
   }
   useEffect(() => { if (audio.current) audio.current.playbackRate = speed }, [speed])
   useEffect(() => {
-    intent.current = false; audio.current?.pause(); setPlaying(false); setSettings(false); setError(''); setNotice('')
-    setPosition(initial(Math.max(1, Math.min(surah.vc, start.current))))
+    const continuing=open && pendingSurah.current===surah.n
+    intent.current=continuing;pendingSurah.current=null; audio.current?.pause(); setPlaying(false); setSettings(false); setError(''); setNotice('')
+    setPosition(initial(continuing?1:Math.max(1, Math.min(surah.vc, start.current))))
+    setPositionSurah(surah.n)
     download.current?.abort(); download.current = null; setProgress(null); setDownloaded(false); setSavedParts(0); setSavedBytes(0)
     if (open) {
       let live = true
@@ -63,7 +67,7 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
 
   useEffect(() => {
     const element = audio.current
-    if (!element || !open) return
+    if (!element || !open || positionSurah!==surah.n) return
     const controller = new AbortController()
     setReady(false); setError(''); element.pause(); setPlaying(false)
     let objectUrl = ''
@@ -77,13 +81,17 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
       if (!controller.signal.aborted) { intent.current = false; setError('صوت دریافت نشد؛ اتصال اینترنت را بررسی و دوباره امتحان کنید.') }
     })
     return () => { controller.abort(); element.pause(); element.removeAttribute('src'); element.load(); if (objectUrl) URL.revokeObjectURL(objectUrl); source.current = '' }
-  }, [open, surah.n, position.ayah, retry])
+  }, [open, surah.n, positionSurah, position.ayah, retry])
   const currentSpeed = useRef(speed); currentSpeed.current = speed
   // Same verse repeats do not reload or download its audio.
   const ended = () => {
     const c = current.current
     const next = nextRecitation(c.position,c.total,c.verseRepeats,c.surahRepeats)
-    if (!next) { intent.current = false; setPlaying(false); return }
+    if (!next) {
+      if(c.surah<114){pendingSurah.current=c.surah+1;intent.current=true;setReady(false);c.onNextSurah(c.surah+1)}
+      else {intent.current=false;setPlaying(false)}
+      return
+    }
     setPosition(next)
     if (next.ayah === c.position.ayah && audio.current) {
       audio.current.currentTime = 0
@@ -95,6 +103,9 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
     if (!element || !ready) return
     if (!element.paused) { intent.current = false; element.pause(); return }
     intent.current = true; setError('')
+    const target=selectedAyah && selectedAyah>=1 && selectedAyah<=surah.vc?selectedAyah:position.ayah
+    onPlaying(surah.n,target)
+    if(target!==position.ayah){setPosition(initial(target));return}
     if (element.ended) { element.currentTime = 0; setPosition(initial(position.ayah)) }
     void element.play().catch(() => { intent.current = false; setError('پخش ممکن نشد؛ دوباره امتحان کنید.') })
   }
@@ -115,7 +126,7 @@ export default function RecitationPlayer({ open, surah, startAyah, onClose, onFo
   return <>
     <audio ref={audio} preload="none" onEnded={ended} onPlay={() => {
       setPlaying(true)
-      const c=current.current; if(c.follow) c.onFollow(c.surah,c.position.ayah)
+      const c=current.current;c.onPlaying(c.surah,c.position.ayah); if(c.follow) c.onFollow(c.surah,c.position.ayah)
     }} onPause={() => setPlaying(false)} onError={() => { if(source.current) { intent.current=false;setPlaying(false);setError('فایل صوتی قابل پخش نیست؛ دوباره امتحان کنید.') } }} />
     {open && playing && <style>{`main [data-surah="${surah.n}"][data-ayah="${position.ayah}"] { background-color: color-mix(in srgb, var(--sage) 20%, transparent); border-radius: 3px; }`}</style>}
     {open && <div className="recitation-bar" role="region" aria-label="پخش تلاوت">

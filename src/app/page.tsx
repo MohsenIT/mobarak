@@ -111,6 +111,7 @@ export default function Home() {
   const [mushafContentRevision, setMushafContentRevision] = useState(0)
   const onMushafContentReady = useCallback(() => setMushafContentRevision(n => n + 1), [])
   const [audioOpen, setAudioOpen] = useState(false)
+  const [playbackTarget, setPlaybackTarget] = useState<{s:number;a:number}|null>(null)
   const [panelMax, setPanelMax] = useState(false)
   const [sheetH, setSheetH] = useState(46)
   const [showIndex, setShowIndex] = useState(false)
@@ -271,6 +272,7 @@ export default function Home() {
   }, [mode, meta, requestMushafPage])
 
   const tapWord = useCallback((word: Selection) => {
+    setPlaybackTarget(null)
     if (!showComparison && !showIndex && comparisonRange?.s === word.s && word.root && comparisonRoots[word.root] !== undefined) {
       const root = word.root
       setHiddenComparisonRoots(current => {
@@ -520,7 +522,7 @@ export default function Home() {
         </>}
       </header>
 
-      <RecitationPlayer open={audioOpen} surah={meta.surahs[curSurahN-1]} startAyah={sel?.s===curSurahN?sel.a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
+      <RecitationPlayer open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{if(sel)setPlaybackTarget({s,a})}} onNextSurah={s=>{if(sel)setPlaybackTarget({s,a:1});goVerse(s,1)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
 
       {returnToSearch && !searchOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
@@ -555,7 +557,7 @@ export default function Home() {
           ) : (
             <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs} fontSize={flowFont} showTrans={showTrans} translator={translator}
               ready={!loadingPage && flowSurah?.n === surah}
-              enabled={!sel && !drawerOpen && !searchOpen && !showComparison && !showIndex}
+              enabled={!(sel && panelMax) && !drawerOpen && !searchOpen && !showComparison && !showIndex}
               arriveAtEnd={pullArrival.current?.s === surah && pullArrival.current.end}
               onNavigate={async (n, end) => {
                 // Keep the completed preview visible until all destination data is ready.
@@ -592,6 +594,7 @@ export default function Home() {
         {sel && (showIndex || showComparison
           ? createPortal(
               <RootPanel
+            playbackTarget={playbackTarget}
             onOpenOccurrences={(selection, scope) => { setSearchStart({ query: selection.root || selection.text, mode: selection.tab === 'root' ? 'root' : 'text', surahs: scope === 'surah' ? [selection.s] : [], revision: Date.now() }); setOccurrenceSearch(selection); setSearchOpen(true) }}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
@@ -612,6 +615,7 @@ export default function Home() {
           />, document.body)
           : (
               <RootPanel
+            playbackTarget={playbackTarget}
             onOpenOccurrences={(selection, scope) => { setSearchStart({ query: selection.root || selection.text, mode: selection.tab === 'root' ? 'root' : 'text', surahs: scope === 'surah' ? [selection.s] : [], revision: Date.now() }); setOccurrenceSearch(selection); setSearchOpen(true) }}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}

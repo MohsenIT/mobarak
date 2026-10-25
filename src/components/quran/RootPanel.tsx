@@ -19,6 +19,7 @@ import { readAnalysisView, saveAnalysisView } from '@/lib/analysis-view'
 import { IconClose, IconMaximize, IconRestore } from './Ornaments'
 
 interface Props {
+  playbackTarget?: {s:number;a:number}|null
   onOpenOccurrences: (selection: AnalysisSelection, scope: 'surah' | 'quran') => void
   comparisonRange?: { s: number; from: number; to: number } | null
   onCompareContext: (s: number, from: number, to: number) => void
@@ -52,10 +53,21 @@ export default function RootPanel(props: Props) {
 
 function RootPanelContent({
   sel: anchor, onSelectionChange, onCompareContext, onOpenOccurrences, meta, translator, maximized, onToggleMax, onClose, onJump, onJumpSurah,
-  stackedOverIndex = false, comparisonRange, sheetH, onSheetHeightChange: setSheetH,
+  playbackTarget, stackedOverIndex = false, comparisonRange, sheetH, onSheetHeightChange: setSheetH,
 }: Props) {
   const [tab, setTab] = useState<AnalysisTab>(() => { const saved = readAnalysisView().tab ?? 'root'; return (!anchor.root || anchor.part === 'prefix') && (saved === 'root' || saved === 'form') ? 'word' : saved })
   const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
+  useEffect(()=>{
+    if(!playbackTarget)return
+    let live=true
+    loadSurah(playbackTarget.s).then(data=>{
+      const word=data.v[playbackTarget.a-1]?.w[0]
+      if(!live || !word)return
+      const target={s:playbackTarget.s,a:playbackTarget.a,pos:1,...wordTarget(word)}
+      setTargets(current=>({...current,verse:target}));setPickerOpen(false);setTab('verse')
+    }).catch(()=>{})
+    return()=>{live=false}
+  },[playbackTarget])
   const rootAvailable = !!targets.root.root
   const sel = targets[tab]
   const [surah, setSurah] = useState<SurahData | null>(null)
