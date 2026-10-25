@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Search, X, LoaderCircle, ArrowRight, SlidersHorizontal, Languages, BookOpen, MoreHorizontal, Link, Check } from 'lucide-react'
+import { Search, X, LoaderCircle, ArrowRight, Funnel, Languages, BookOpen, MoreHorizontal, Link, Check } from 'lucide-react'
 import type { Meta, Translator, Translations } from '@/lib/quran'
 import { loadTrans, toFa, morphologyLabel } from '@/lib/quran'
 import { type AnalysisSelection } from '@/lib/analysis'
@@ -170,7 +170,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   }
   const setScope = (s: number, checked: boolean) => setSurahs(current => checked ? [...current, s].sort((a, b) => a - b) : current.filter(n => n !== s))
   const destinations = mode === 'text' && !occurrenceFilter ? searchDestinations(meta,query,restored?.contextSurah??currentSurah) : []
-  const scopeLabel = surahs.length === 0 ? 'همهٔ قرآن' : surahs.length === 1 ? `سورهٔ ${meta.surahs[surahs[0] - 1]?.fa}` : `${toFa(surahs.length)} سوره`
+  const scopeLabel = surahs.length === 0 ? 'همه سوره‌ها' : surahs.length === 1 ? `سورهٔ ${meta.surahs[surahs[0] - 1]?.fa}` : `${toFa(surahs.length)} سوره`
   if (!open) return null
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir="rtl" aria-label="جست‌وجو در قرآن" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
     <div className="search-page-shell">
@@ -202,8 +202,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         <div className="search-controls-row">
           <div className="search-mode-tabs" role="group" aria-label="روش جست‌وجو">{([['text', 'متن'], ['root', 'ریشه'], ['lemma', 'بُن‌واژه']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={mode === key && !occurrenceFilter} onClick={() => { onClearOccurrenceFilter?.(); setSuggestions([]); setMode(key); input.current?.focus({ preventScroll: true }) }}>{label}</button>)}</div>
           {(mode === 'text' || !!occurrenceFilter) && <button type="button" className="search-roots-toggle" aria-pressed={includeRoots && canExpandRoots} disabled={!canExpandRoots} title={!canExpandRoots ? 'هم‌ریشه‌ها برای یک واژه فعال است' : 'صورت‌های دیگر همین ریشه را هم نشان بده'} onClick={() => setIncludeRoots(value => !value)}>هم‌ریشه‌ها</button>}
-          <details className="search-scope"><summary aria-label="انتخاب سوره‌ها"><SlidersHorizontal size={14} /><span>{scopeLabel}</span></summary>
-            <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>همهٔ قرآن</button><button type="button" onClick={() => setSurahs([currentSurah])}>همین سوره</button></div><input type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder="نام یا شمارهٔ سوره" aria-label="یافتن سوره" /><p>بدون انتخاب سوره، در کل قرآن جست‌وجو می‌شود.</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
+          <details className="search-scope"><summary aria-label="انتخاب سوره‌ها"><Funnel size={14} /><span>{scopeLabel}</span></summary>
+            <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>همه سوره‌ها</button><button type="button" onClick={() => setSurahs([currentSurah])}>همین سوره</button></div><input type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder="نام یا شمارهٔ سوره" aria-label="یافتن سوره" /><p>بدون انتخاب سوره، در کل قرآن جست‌وجو می‌شود.</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
           </details>
           <details className="search-extra-options"><summary aria-label="گزینه‌های بیشتر جست‌وجو"><MoreHorizontal size={19} /></summary><div>
             <label><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />شامل بخشی از کلمه</label>
