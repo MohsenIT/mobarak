@@ -1576,3 +1576,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .resource-portrait { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:36px; height:36px; overflow:hidden; border-radius:50%; border:1px solid var(--line); background:var(--word-root); color:var(--sage); }
 .resource-portrait img { display:block; width:100%; height:100%; object-fit:cover; object-position:center 25%; }
 .resource-picker-copy { flex:1; min-width:0; }
+
+.resource-meta { display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:6px; }
+.resource-meta-chip { display:inline-flex; align-items:center; gap:4px; max-width:100%; border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--ink-soft); background:var(--word-root); font-size:10px; line-height:1.8; white-space:nowrap; }
+.resource-meta-chip > span { font-family:system-ui,sans-serif; font-size:12px; line-height:1; }

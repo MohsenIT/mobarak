@@ -4,7 +4,7 @@ import {EXTRA_TRANSLATIONS} from './translations'
 export type ResourceKind='quran'|'translation'|'recitation'|'lexicon'|'tafsir'|'corpus'
 export interface Resource {
   id:string;name:string;title:string;kind:ResourceKind;language:string
-  creator?:string;country?:string;nationality?:string;date?:string;dateLabel?:string
+  creator?:string;country?:string;countryCode?:string;nationality?:string;date?:string;dateLabel?:string
   style?:'murattal'|'mujawwad';description:string;features:string[];keywords?:string[]
   image?:{src:string;alt:string};links?:{label:string;href:string}[]
 }
@@ -23,3 +23,12 @@ export function filterResources(resources:Resource[],filters:ResourceFilters){co
  const haystack=normalizeResourceText([r.name,r.title,r.creator,r.country,r.nationality,r.date,r.description,t(RESOURCE_KINDS[r.kind]),RESOURCE_LANGUAGES[r.language],languageName(r.language),languageName(r.language,currentLanguage()),r.style&&t(RECITATION_STYLES[r.style]),...r.features,...(r.keywords??[])].filter(Boolean).join(' '))
  return words.every(word=>haystack.includes(word))
 })}
+
+export function resourceCountryFlag(resource:Pick<Resource,'countryCode'>){
+ const code=resource.countryCode
+ return code&&/^[A-Z]{2}$/.test(code)?String.fromCodePoint(...[...code].map(letter=>127397+letter.charCodeAt(0))):''
+}
+export function resourceCountryName(resource:Pick<Resource,'country'|'countryCode'>,language=currentLanguage()){
+ if(!resource.countryCode)return resource.country??''
+ try{return new Intl.DisplayNames([language],{type:'region'}).of(resource.countryCode)??resource.country??''}catch{return resource.country??''}
+}

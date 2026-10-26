@@ -24,7 +24,8 @@
     "image": {
       "src": "/images/reciters/minshawi.jpg",
       "alt": "محمد صدیق منشاوی"
-    }
+    },
+    "countryCode": "EG"
   },
   {
     "id": "reciter:parhizgar",
@@ -51,7 +52,8 @@
     "image": {
       "src": "/images/reciters/shahriar-parhizgar.webp",
       "alt": "شهریار پرهیزگار"
-    }
+    },
+    "countryCode": "IR"
   },
   {
     "id": "translation:s",
@@ -70,7 +72,8 @@
     "keywords": [
       "المیزان",
       "صفوی"
-    ]
+    ],
+    "countryCode": "IR"
   },
   {
     "id": "translation:f",
@@ -84,7 +87,8 @@
     "description": "ترجمهٔ فارسی قرآن از محمدمهدی فولادوند.",
     "features": [
       "ترجمهٔ فارسی"
-    ]
+    ],
+    "countryCode": "IR"
   },
   {
     "id": "translation:a",
@@ -98,7 +102,8 @@
     "description": "ترجمهٔ فارسی قرآن از حسین انصاریان.",
     "features": [
       "ترجمهٔ فارسی"
-    ]
+    ],
+    "countryCode": "IR"
   },
   {
     "id": "translation:m",
@@ -112,7 +117,8 @@
     "description": "ترجمهٔ فارسی قرآن از ناصر مکارم شیرازی.",
     "features": [
       "ترجمهٔ فارسی"
-    ]
+    ],
+    "countryCode": "IR"
   },
   {
     "id": "book:tahqiq",
@@ -132,7 +138,8 @@
     "keywords": [
       "مصطفوی",
       "التحقیق"
-    ]
+    ],
+    "countryCode": "IR"
   },
   {
     "id": "book:maqayis",
@@ -174,7 +181,8 @@
       "جبل",
       "اشتقاقی",
       "اشتقاقي"
-    ]
+    ],
+    "countryCode": "EG"
   },
   {
     "id": "quran:tanzil",
@@ -246,7 +254,8 @@
     "image": {
       "src": "/images/reciters/abdul-basit-abdul-samad.webp",
       "alt": "عبدالباسط عبدالصمد"
-    }
+    },
+    "countryCode": "EG"
   },
   {
     "id": "reciter:tanzil-basfar",
@@ -273,7 +282,8 @@
     "image": {
       "src": "/images/reciters/abdullah-basfar.webp",
       "alt": "عبدالله بصفر"
-    }
+    },
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-basfar2",
@@ -300,7 +310,8 @@
     "image": {
       "src": "/images/reciters/abdullah-basfar.webp",
       "alt": "عبدالله بصفر — ضبط دوم"
-    }
+    },
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-ajamy",
@@ -323,7 +334,8 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "countryCode": "KW"
   },
   {
     "id": "reciter:tanzil-ghamadi",
@@ -346,7 +358,8 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-hudhaify",
@@ -369,7 +382,8 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-husary",
@@ -392,7 +406,8 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "countryCode": "EG"
   },
   {
     "id": "reciter:tanzil-shateri",
@@ -419,7 +434,8 @@
     "image": {
       "src": "/images/reciters/abu-bakr-al-shatri.webp",
       "alt": "ابوبکر الشاطری"
-    }
+    },
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-shuraim",
@@ -446,7 +462,8 @@
     "image": {
       "src": "/images/reciters/saud-al-shuraim.webp",
       "alt": "سعود الشریم"
-    }
+    },
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-sudais",
@@ -473,7 +490,8 @@
     "image": {
       "src": "/images/reciters/abdul-rahman-al-sudais.webp",
       "alt": "عبدالرحمن السدیس"
-    }
+    },
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-tablawi",
@@ -496,7 +514,8 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "countryCode": "EG"
   },
   {
     "id": "reciter:tanzil-hani",
@@ -523,7 +542,8 @@
     "image": {
       "src": "/images/reciters/hani-al-rifai.webp",
       "alt": "هانی الرفاعی"
-    }
+    },
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-akhdar",
@@ -550,7 +570,8 @@
     "image": {
       "src": "/images/reciters/ibrahim-al-akhdar.webp",
       "alt": "ابراهیم الاخضر"
-    }
+    },
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-muaiqly",
@@ -577,7 +598,8 @@
     "image": {
       "src": "/images/reciters/maher-almaikulai.webp",
       "alt": "ماهر المعیقلی"
-    }
+    },
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-ayyub",
@@ -604,7 +626,8 @@
     "image": {
       "src": "/images/reciters/mohamed-ayoub.webp",
       "alt": "محمد ایوب"
-    }
+    },
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-jibreel",
@@ -631,7 +654,8 @@
     "image": {
       "src": "/images/reciters/muhammad-jibril.webp",
       "alt": "محمد جبریل"
-    }
+    },
+    "countryCode": "EG"
   },
   {
     "id": "reciter:tanzil-bukhatir",
@@ -654,7 +678,8 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "countryCode": "AE"
   },
   {
     "id": "reciter:tanzil-qasim",
@@ -677,7 +702,8 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-juhany",
@@ -700,7 +726,8 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "countryCode": "SA"
   },
   {
     "id": "reciter:tanzil-matrood",
@@ -723,6 +750,7 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "countryCode": "SA"
   }
 ]

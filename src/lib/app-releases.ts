@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.3',date:'2026-10-26',title:'مشخصات خواناتر منابع',changeKinds:['improvement','fix'],changes:[
+    'کشور، زبان و نوع تلاوت زیر نام قاری با برچسب‌های کوچک و پرچم کشور نمایش داده می‌شوند.',
+    'نام زبان در فهرست منابع فقط به زبان رابط نمایش داده می‌شود و دیگر دوزبانه و تکراری نیست.',
+  ],
+},{
   version:'0.4.2',date:'2026-10-26',title:'قاریان بیشتر و عکس‌های شناسنامه',changeKinds:['feature','improvement','fix','improvement'],changes:[
     '۲۰ مجموعهٔ ترتیل آیه‌به‌آیه از تنزیل به انتخاب قاری اضافه شد؛ هر قاری دانلود و ذخیرهٔ جداگانه دارد.',
     'عکس منشاوی، پرهیزگار و چند قاری دیگر در فهرست و شناسنامه نمایش داده می‌شود و همراه برنامه قابل نگهداری است.',
