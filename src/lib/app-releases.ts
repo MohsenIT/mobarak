@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.6',date:'2026-10-26',title:'هماهنگی رنگ نوار با تم برنامه',changeKinds:['improvement'],changes:[
+    'رنگ نوار به‌روزرسانی با سبز و کرم خود برنامه هماهنگ شد و همچنان از زمینه مشخص است.',
+  ],
+},{
   version:'0.4.5',date:'2026-10-26',title:'نوار به‌روزرسانی جمع‌وجورتر',changeKinds:['improvement'],changes:[
     'نوار به‌روزرسانی با فاصله‌های متوازن، دکمهٔ کوچک‌تر و رنگ متمایز از صفحه نمایش داده می‌شود.',
   ],
