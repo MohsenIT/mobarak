@@ -169,6 +169,9 @@ export default function Home() {
   useEffect(() => { setHiddenComparisonRoots(new Set()); setSoloComparisonRoot(null) }, [comparisonRange?.s, comparisonRange?.from, comparisonRange?.to])
   const mutedComparisonRoots = useMemo(() => new Set(Object.keys(comparisonRoots).filter(root => soloComparisonRoot ? root !== soloComparisonRoot : hiddenComparisonRoots.has(root))), [comparisonRoots, hiddenComparisonRoots, soloComparisonRoot])
   const pinchRef = useRef<{ d: number; s: number } | null>(null)
+  const zoomFrame = useRef<number | null>(null)
+  const pendingZoom = useRef(1)
+  useEffect(() => () => { if (zoomFrame.current !== null) cancelAnimationFrame(zoomFrame.current) }, [])
 
   useEffect(() => { loadMeta().then(setMeta) }, [])
   useEffect(() => {
@@ -189,7 +192,10 @@ export default function Home() {
   useEffect(() => { LS.set('mushaf.surah', surah) }, [surah])
   useEffect(() => { LS.set('mushaf.showTrans', showTrans) }, [showTrans])
   useEffect(() => { LS.set('mushaf.tr', translator); LS.set('mushaf.safavi-default.v1', true) }, [translator])
-  useEffect(() => { LS.set('mushaf.scale', scale) }, [scale])
+  useEffect(() => {
+    const timer = window.setTimeout(() => LS.set('mushaf.scale', scale), 200)
+    return () => window.clearTimeout(timer)
+  }, [scale])
   useEffect(() => { LS.set('mushaf.marks', bookmarks) }, [bookmarks])
 
   const segs = useMemo(() => (meta ? meta.pages[page - 1] || [] : []), [meta, page])
@@ -460,7 +466,12 @@ export default function Home() {
     if (pinchRef.current && e.touches.length === 2) {
       const d = touchDist(e.touches)
       const ratio = d / pinchRef.current.d
-      setScale(round05(clamp(pinchRef.current.s * ratio, 0.55, 1.9)))
+      if (pinchRef.current.d <= 0) return
+      pendingZoom.current = Math.round(clamp(pinchRef.current.s * ratio, 0.55, 1.9) * 1000) / 1000
+      if (zoomFrame.current === null) zoomFrame.current = requestAnimationFrame(() => {
+        zoomFrame.current = null
+        setScale(pendingZoom.current)
+      })
     }
   }
   const onTouchEnd = () => { pinchRef.current = null }

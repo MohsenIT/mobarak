@@ -298,7 +298,7 @@ export default function NavDrawer(props: Props) {
                     <span className="text-lg font-bold">−</span>
                   </button>
                 </div>
-                <input type="range" min={0.55} max={1.9} step={0.05} value={props.scale}
+                <input type="range" min={0.55} max={1.9} step={0.01} value={props.scale}
                   className="page-slider" dir="rtl"
                   style={{ ['--fill' as string]: `${((props.scale - 0.55) / 1.35) * 100}%` }}
                   onChange={e => props.onScale(+e.target.value)} />
