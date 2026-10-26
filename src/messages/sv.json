@@ -607,5 +607,11 @@
   "release.fix": "Buggrättelse",
   "release.security": "Säkerhet",
   "release.removed": "Borttagen",
-  "release.more": "Äldre versioner"
+  "release.more": "Äldre versioner",
+  "voice.start": "Röstinmatning",
+  "voice.stop": "Stoppa röstinmatning",
+  "voice.listening": "Lyssnar…",
+  "voice.unavailable": "Röstinmatning är inte tillgänglig i den här webbläsaren.",
+  "voice.denied": "Mikrofonåtkomst nekades.",
+  "voice.failed": "Talet kunde inte kännas igen; försök igen."
 }

@@ -607,5 +607,11 @@
   "release.fix": "Oprava chyb",
   "release.security": "Zabezpečení",
   "release.removed": "Odstraněno",
-  "release.more": "Starší verze"
+  "release.more": "Starší verze",
+  "voice.start": "Hlasové psaní",
+  "voice.stop": "Zastavit hlasové psaní",
+  "voice.listening": "Poslouchám…",
+  "voice.unavailable": "Hlasové psaní není v tomto prohlížeči dostupné.",
+  "voice.denied": "Přístup k mikrofonu byl zamítnut.",
+  "voice.failed": "Řeč nebyla rozpoznána; zkuste to znovu."
 }

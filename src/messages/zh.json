@@ -607,5 +607,11 @@
   "release.fix": "错误修复",
   "release.security": "安全",
   "release.removed": "已移除",
-  "release.more": "旧版本"
+  "release.more": "旧版本",
+  "voice.start": "语音输入",
+  "voice.stop": "停止语音输入",
+  "voice.listening": "正在聆听…",
+  "voice.unavailable": "此浏览器不支持语音输入。",
+  "voice.denied": "麦克风权限被拒绝。",
+  "voice.failed": "无法识别语音；请重试。"
 }

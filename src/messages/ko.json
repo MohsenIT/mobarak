@@ -607,5 +607,11 @@
   "release.fix": "버그 수정",
   "release.security": "보안",
   "release.removed": "제거됨",
-  "release.more": "이전 버전"
+  "release.more": "이전 버전",
+  "voice.start": "음성 입력",
+  "voice.stop": "음성 입력 중지",
+  "voice.listening": "듣는 중…",
+  "voice.unavailable": "이 브라우저에서는 음성 입력을 사용할 수 없습니다.",
+  "voice.denied": "마이크 권한이 거부되었습니다.",
+  "voice.failed": "음성을 인식하지 못했습니다. 다시 시도해 주세요."
 }

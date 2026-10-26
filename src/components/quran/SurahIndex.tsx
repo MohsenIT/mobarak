@@ -1,4 +1,5 @@
 'use client'
+import {DictationInput} from './DictationInput'
 import {t} from '@/lib/i18n'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -121,7 +122,7 @@ export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRo
           <label className="flex items-center gap-2 flex-1 rounded-xl border px-3 py-2"
             style={{ borderColor: 'var(--line-strong)', background: 'color-mix(in srgb, var(--paper) 60%, transparent)' }}>
             <IconSearch />
-            <input
+            <DictationInput
               value={q}
               onChange={e => setQ(e.target.value)}
               placeholder={t("ui.cadb0da2e6")}

@@ -1,4 +1,5 @@
 'use client'
+import {DictationInput} from './DictationInput'
 import {translationDirection,translationLanguage} from '@/lib/translations'
 import {t,uiDirection} from '@/lib/i18n'
 
@@ -183,7 +184,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           <button type="button" className="icon-btn" aria-label={t("ui.685e0d6bc0")} onClick={() => onOpenChange(false)}><ArrowRight size={20} /></button>
           <div className="search-page-input">
             <Search size={17} aria-hidden="true" />
-            <input ref={input} type="search" value={query} maxLength={160} role="combobox" aria-autocomplete="list" aria-expanded={completionOpen && !busy && suggestions.length > 0} aria-controls="search-completions" aria-activedescendant={completionOpen && completionIndex >= 0 ? `search-completion-${completionIndex}` : undefined}
+            <DictationInput ref={input} type="search" value={query} maxLength={160} role="combobox" aria-autocomplete="list" aria-expanded={completionOpen && !busy && suggestions.length > 0} aria-controls="search-completions" aria-activedescendant={completionOpen && completionIndex >= 0 ? `search-completion-${completionIndex}` : undefined}
               onFocus={() => setCompletionOpen(true)} onBlur={event => { if (!event.currentTarget.parentElement?.contains(event.relatedTarget)) setCompletionOpen(false) }}
               onChange={event => { if (occurrenceFilter) onClearOccurrenceFilter?.(); setQuery(event.target.value); setCompletionOpen(true); setCompletionIndex(-1) }}
               onKeyDown={event => {
@@ -206,7 +207,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           <div className="search-mode-tabs" role="group" aria-label={t("ui.50ca6c9156")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={mode === key && !occurrenceFilter} onClick={() => { onClearOccurrenceFilter?.(); setSuggestions([]); setMode(key); input.current?.focus({ preventScroll: true }) }}>{label}</button>)}</div>
           {(mode === 'text' || !!occurrenceFilter) && <button type="button" className="search-roots-toggle" aria-pressed={includeRoots && canExpandRoots} disabled={!canExpandRoots} title={!canExpandRoots ? t("ui.a85026f74c") : t("ui.099da0d424")} onClick={() => setIncludeRoots(value => !value)}>{t("ui.702b74fe3e")}</button>}
           <details className="search-scope"><summary aria-label={t("ui.d67a8d9786")}><Funnel size={14} /><span>{scopeLabel}</span></summary>
-            <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>{t("ui.5ad7b9b0af")}</button><button type="button" onClick={() => setSurahs([currentSurah])}>{t("ui.35fa085c5c")}</button></div><input type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder={t("ui.51b594c97e")} aria-label={t("ui.c8c0719ae1")} /><p>{t("ui.831ac25576")}</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label className="choice-row" key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
+            <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>{t("ui.5ad7b9b0af")}</button><button type="button" onClick={() => setSurahs([currentSurah])}>{t("ui.35fa085c5c")}</button></div><DictationInput type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder={t("ui.51b594c97e")} aria-label={t("ui.c8c0719ae1")} /><p>{t("ui.831ac25576")}</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label className="choice-row" key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
           </details>
           <details className="search-extra-options"><summary aria-label={t("ui.ba7db1f34f")}><MoreHorizontal size={19} /></summary><div>
             <label className="choice-row"><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />{t("ui.5105840a21")}</label>

@@ -607,5 +607,11 @@
   "release.fix": "Çareserkirina xeletiyan",
   "release.security": "Ewlehî",
   "release.removed": "Hat rakirin",
-  "release.more": "Guhertoyên kevntir"
+  "release.more": "Guhertoyên kevntir",
+  "voice.start": "Nivîsandina bi deng",
+  "voice.stop": "Rawestandina nivîsandina bi deng",
+  "voice.listening": "Guhdarî tê kirin…",
+  "voice.unavailable": "Nivîsandina bi deng di vê gerokê de neçalak e.",
+  "voice.denied": "Destûra mîkrofonê nehat dayîn.",
+  "voice.failed": "Axaftin nehat naskirin; ji kerema xwe dîsa biceribîne."
 }

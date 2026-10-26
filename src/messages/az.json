@@ -607,5 +607,11 @@
   "release.fix": "Səhv düzəlişi",
   "release.security": "Təhlükəsizlik",
   "release.removed": "Silinib",
-  "release.more": "Köhnə versiyalar"
+  "release.more": "Köhnə versiyalar",
+  "voice.start": "Səslə yazma",
+  "voice.stop": "Səslə yazmanı dayandır",
+  "voice.listening": "Dinlənilir…",
+  "voice.unavailable": "Səslə yazma bu brauzerdə mövcud deyil.",
+  "voice.denied": "Mikrofona giriş icazəsi rədd edildi.",
+  "voice.failed": "Nitq tanınmadı; zəhmət olmasa yenidən cəhd edin."
 }

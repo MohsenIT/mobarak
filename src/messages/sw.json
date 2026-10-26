@@ -607,5 +607,11 @@
   "release.fix": "Marekebisho ya hitilafu",
   "release.security": "Usalama",
   "release.removed": "Imeondolewa",
-  "release.more": "Matoleo ya zamani"
+  "release.more": "Matoleo ya zamani",
+  "voice.start": "Kuandika kwa sauti",
+  "voice.stop": "Sitisha kuandika kwa sauti",
+  "voice.listening": "Inasikiliza…",
+  "voice.unavailable": "Kuandika kwa sauti hakupatikani kwenye kivinjari hiki.",
+  "voice.denied": "Ruhusa ya maikrofoni imekataliwa.",
+  "voice.failed": "Sauti haikutambulika; tafadhali jaribu tena."
 }

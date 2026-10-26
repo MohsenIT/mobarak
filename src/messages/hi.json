@@ -607,5 +607,11 @@
   "release.fix": "बग फिक्स",
   "release.security": "सुरक्षा",
   "release.removed": "हटाया गया",
-  "release.more": "पुराने वर्ज़न"
+  "release.more": "पुराने वर्ज़न",
+  "voice.start": "वॉयस टाइपिंग",
+  "voice.stop": "वॉयस टाइपिंग बंद करें",
+  "voice.listening": "सुन रहे हैं…",
+  "voice.unavailable": "इस ब्राउज़र में वॉयस टाइपिंग उपलब्ध नहीं है।",
+  "voice.denied": "माइक्रोफ़ोन की अनुमति अस्वीकार कर दी गई।",
+  "voice.failed": "आवाज़ समझ नहीं आई; कृपया पुनः प्रयास करें।"
 }

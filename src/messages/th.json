@@ -607,5 +607,11 @@
   "release.fix": "แก้ไขข้อผิดพลาด",
   "release.security": "ความปลอดภัย",
   "release.removed": "ถูกลบออก",
-  "release.more": "เวอร์ชันเก่า"
+  "release.more": "เวอร์ชันเก่า",
+  "voice.start": "พิมพ์ด้วยเสียง",
+  "voice.stop": "หยุดพิมพ์ด้วยเสียง",
+  "voice.listening": "กำลังฟัง…",
+  "voice.unavailable": "เบราว์เซอร์นี้ไม่รองรับการพิมพ์ด้วยเสียง",
+  "voice.denied": "ไม่อนุญาตให้ใช้ไมโครโฟน",
+  "voice.failed": "ไม่พบเสียงพูด โปรดลองใหม่อีกครั้ง"
 }

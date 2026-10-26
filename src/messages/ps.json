@@ -607,5 +607,11 @@
   "release.fix": "د بګ اصلاح",
   "release.security": "امنیت",
   "release.removed": "لرې شوی",
-  "release.more": "پخوانۍ نسخې"
+  "release.more": "پخوانۍ نسخې",
+  "voice.start": "په غږ ټایپ کول",
+  "voice.stop": "د غږ ټایپ کول بند کړئ",
+  "voice.listening": "اورېدل کېږي…",
+  "voice.unavailable": "په دې براوزر کې د غږ ټایپ کول شتون نلري.",
+  "voice.denied": "د مایکروفون اجازه رد شوه.",
+  "voice.failed": "غږ ونه پېژندل شو؛ مهرباني وکړئ بیا هڅه وکړئ."
 }

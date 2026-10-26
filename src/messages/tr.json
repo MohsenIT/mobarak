@@ -607,5 +607,11 @@
   "release.fix": "Hata düzeltme",
   "release.security": "Güvenlik",
   "release.removed": "Kaldırılan",
-  "release.more": "Eski sürümler"
+  "release.more": "Eski sürümler",
+  "voice.start": "Sesle yazma",
+  "voice.stop": "Sesle yazmayı durdur",
+  "voice.listening": "Dinleniyor…",
+  "voice.unavailable": "Sesle yazma bu tarayıcıda kullanılamıyor.",
+  "voice.denied": "Mikrofon izni reddedildi.",
+  "voice.failed": "Konuşma algılanamadı; lütfen tekrar deneyin."
 }

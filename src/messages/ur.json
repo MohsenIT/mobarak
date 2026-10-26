@@ -607,5 +607,11 @@
   "release.fix": "بگ فکس",
   "release.security": "سیکیورٹی",
   "release.removed": "ہٹا دیا گیا",
-  "release.more": "پرانے ورژنز"
+  "release.more": "پرانے ورژنز",
+  "voice.start": "آواز سے ٹائپ کریں",
+  "voice.stop": "وائس ٹائپنگ بند کریں",
+  "voice.listening": "سن رہے ہیں…",
+  "voice.unavailable": "اس براؤزر میں وائس ٹائپنگ دستیاب نہیں ہے۔",
+  "voice.denied": "مائیکروفون کی اجازت نہیں دی گئی۔",
+  "voice.failed": "آواز کی شناخت نہیں ہوئی؛ دوبارہ کوشش کریں۔"
 }

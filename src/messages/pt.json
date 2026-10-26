@@ -607,5 +607,11 @@
   "release.fix": "Correção de bugs",
   "release.security": "Segurança",
   "release.removed": "Removido",
-  "release.more": "Versões anteriores"
+  "release.more": "Versões anteriores",
+  "voice.start": "Digitação por voz",
+  "voice.stop": "Parar digitação por voz",
+  "voice.listening": "Ouvindo…",
+  "voice.unavailable": "A digitação por voz não está disponível neste navegador.",
+  "voice.denied": "Permissão do microfone negada.",
+  "voice.failed": "Fala não reconhecida; tente novamente."
 }

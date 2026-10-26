@@ -607,5 +607,11 @@
   "release.fix": "Bug fix",
   "release.security": "Security",
   "release.removed": "Removed",
-  "release.more": "Older releases"
+  "release.more": "Older releases",
+  "voice.start": "Voice typing",
+  "voice.stop": "Stop voice typing",
+  "voice.listening": "Listening…",
+  "voice.unavailable": "Voice typing is not available in this browser.",
+  "voice.denied": "Microphone permission denied.",
+  "voice.failed": "Speech not recognized; please try again."
 }

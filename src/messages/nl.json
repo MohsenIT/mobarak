@@ -607,5 +607,11 @@
   "release.fix": "Bugfix",
   "release.security": "Beveiliging",
   "release.removed": "Verwijderd",
-  "release.more": "Oudere versies"
+  "release.more": "Oudere versies",
+  "voice.start": "Spraakgestuurd typen",
+  "voice.stop": "Spraakgestuurd typen stoppen",
+  "voice.listening": "Luisteren…",
+  "voice.unavailable": "Spraakgestuurd typen is niet beschikbaar in deze browser.",
+  "voice.denied": "Microfoontoegang geweigerd.",
+  "voice.failed": "Spraak niet herkend; probeer het opnieuw."
 }

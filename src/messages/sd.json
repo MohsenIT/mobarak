@@ -607,5 +607,11 @@
   "release.fix": "بگ فڪس",
   "release.security": "سيڪيورٽي",
   "release.removed": "هٽايو ويو",
-  "release.more": "پراڻا ورجن"
+  "release.more": "پراڻا ورجن",
+  "voice.start": "آواز سان ٽائپنگ",
+  "voice.stop": "آواز سان ٽائپنگ بند ڪريو",
+  "voice.listening": "ٻڌي رهيا آهيون…",
+  "voice.unavailable": "هن برائوزر ۾ آواز سان ٽائپنگ موجود ناهي.",
+  "voice.denied": "مائڪروفون جي اجازت رد ڪئي وئي.",
+  "voice.failed": "آواز جي سڃاڻپ نه ٿي؛ مهرباني ڪري ٻيهر ڪوشش ڪريو."
 }

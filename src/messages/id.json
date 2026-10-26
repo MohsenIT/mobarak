@@ -607,5 +607,11 @@
   "release.fix": "Perbaikan bug",
   "release.security": "Keamanan",
   "release.removed": "Dihapus",
-  "release.more": "Rilis lama"
+  "release.more": "Rilis lama",
+  "voice.start": "Ketik dengan suara",
+  "voice.stop": "Berhenti mengetik suara",
+  "voice.listening": "Mendengarkan…",
+  "voice.unavailable": "Pengetikan suara tidak tersedia di browser ini.",
+  "voice.denied": "Izin mikrofon ditolak.",
+  "voice.failed": "Ucapan tidak dikenali; silakan coba lagi."
 }

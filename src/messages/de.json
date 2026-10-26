@@ -607,5 +607,11 @@
   "release.fix": "Fehlerbehebung",
   "release.security": "Sicherheit",
   "release.removed": "Entfernt",
-  "release.more": "Ältere Versionen"
+  "release.more": "Ältere Versionen",
+  "voice.start": "Spracheingabe",
+  "voice.stop": "Spracheingabe stoppen",
+  "voice.listening": "Zuhören…",
+  "voice.unavailable": "Spracheingabe ist in diesem Browser nicht verfügbar.",
+  "voice.denied": "Mikrofonzugriff verweigert.",
+  "voice.failed": "Sprache nicht erkannt; bitte versuchen Sie es erneut."
 }

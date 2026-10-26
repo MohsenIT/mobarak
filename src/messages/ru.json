@@ -607,5 +607,11 @@
   "release.fix": "Исправление ошибок",
   "release.security": "Безопасность",
   "release.removed": "Удалено",
-  "release.more": "Старые версии"
+  "release.more": "Старые версии",
+  "voice.start": "Голосовой ввод",
+  "voice.stop": "Остановить голосовой ввод",
+  "voice.listening": "Слушаю…",
+  "voice.unavailable": "Голосовой ввод недоступен в этом браузере.",
+  "voice.denied": "Доступ к микрофону запрещен.",
+  "voice.failed": "Речь не распознана; попробуйте еще раз."
 }

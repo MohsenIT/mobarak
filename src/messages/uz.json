@@ -607,5 +607,11 @@
   "release.fix": "Xatolarni tuzatish",
   "release.security": "Xavfsizlik",
   "release.removed": "O'chirildi",
-  "release.more": "Eski versiyalar"
+  "release.more": "Eski versiyalar",
+  "voice.start": "Ovoz bilan yozish",
+  "voice.stop": "Ovozli yozishni to'xtatish",
+  "voice.listening": "Eshitilmoqda…",
+  "voice.unavailable": "Ushbu brauzerda ovozli yozish mavjud emas.",
+  "voice.denied": "Mikrofondan foydalanishga ruxsat berilmadi.",
+  "voice.failed": "Nutq aniqlanmadi; iltimos, qaytadan urinib ko'ring."
 }

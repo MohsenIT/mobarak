@@ -607,5 +607,11 @@
   "release.fix": "Corrección de errores",
   "release.security": "Seguridad",
   "release.removed": "Eliminado",
-  "release.more": "Versiones anteriores"
+  "release.more": "Versiones anteriores",
+  "voice.start": "Dictado por voz",
+  "voice.stop": "Detener dictado",
+  "voice.listening": "Escuchando…",
+  "voice.unavailable": "El dictado por voz no está disponible en este navegador.",
+  "voice.denied": "Permiso de micrófono denegado.",
+  "voice.failed": "No se reconoció la voz; inténtalo de nuevo."
 }

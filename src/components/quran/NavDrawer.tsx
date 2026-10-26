@@ -1,4 +1,5 @@
 'use client'
+import {DictationInput} from './DictationInput'
 import {t,t as tText} from '@/lib/i18n'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -120,7 +121,7 @@ export default function NavDrawer(props: Props) {
         </>}
         {props.view !== 'tools' && <>
         <form onSubmit={submitPage} className="flex items-center gap-2 px-4 pb-3">
-          <input
+          <DictationInput
             value={pageInput}
             onChange={e => { setPageInput(e.target.value); setPageError(false) }}
             aria-label={t("ui.54778fcf78")}

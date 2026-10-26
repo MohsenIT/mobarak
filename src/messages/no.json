@@ -607,5 +607,11 @@
   "release.fix": "Feilretting",
   "release.security": "Sikkerhet",
   "release.removed": "Fjernet",
-  "release.more": "Eldre versjoner"
+  "release.more": "Eldre versjoner",
+  "voice.start": "Stemmeskriving",
+  "voice.stop": "Stopp stemmeskriving",
+  "voice.listening": "Lytter…",
+  "voice.unavailable": "Stemmeskriving er ikke tilgjengelig i denne nettleseren.",
+  "voice.denied": "Tilgang til mikrofon ble nektet.",
+  "voice.failed": "Tale ikke gjenkjent; prøv igjen."
 }

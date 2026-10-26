@@ -607,5 +607,11 @@
   "release.fix": "バグ修正",
   "release.security": "セキュリティ",
   "release.removed": "削除済み",
-  "release.more": "以前のバージョン"
+  "release.more": "以前のバージョン",
+  "voice.start": "音声入力",
+  "voice.stop": "音声入力を停止",
+  "voice.listening": "聞いています…",
+  "voice.unavailable": "このブラウザでは音声入力が利用できません。",
+  "voice.denied": "マイクの使用が許可されていません。",
+  "voice.failed": "音声を認識できませんでした。もう一度お試しください。"
 }

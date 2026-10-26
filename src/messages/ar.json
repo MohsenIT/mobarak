@@ -607,5 +607,11 @@
   "release.fix": "إصلاح خطأ",
   "release.security": "أمان",
   "release.removed": "تمت الإزالة",
-  "release.more": "إصدارات أقدم"
+  "release.more": "إصدارات أقدم",
+  "voice.start": "الكتابة بالصوت",
+  "voice.stop": "إيقاف الكتابة بالصوت",
+  "voice.listening": "جاري الاستماع…",
+  "voice.unavailable": "الكتابة بالصوت غير متاحة في هذا المتصفح.",
+  "voice.denied": "تم رفض إذن الوصول إلى الميكروفون.",
+  "voice.failed": "لم يتم التعرف على الكلام؛ حاول مجدداً."
 }

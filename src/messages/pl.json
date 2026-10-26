@@ -607,5 +607,11 @@
   "release.fix": "Poprawka błędów",
   "release.security": "Bezpieczeństwo",
   "release.removed": "Usunięto",
-  "release.more": "Starsze wersje"
+  "release.more": "Starsze wersje",
+  "voice.start": "Pisanie głosowe",
+  "voice.stop": "Zatrzymaj pisanie głosowe",
+  "voice.listening": "Słucham…",
+  "voice.unavailable": "Pisanie głosowe nie jest dostępne w tej przeglądarce.",
+  "voice.denied": "Odmowa dostępu do mikrofonu.",
+  "voice.failed": "Nie rozpoznano mowy; spróbuj ponownie."
 }

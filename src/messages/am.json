@@ -607,5 +607,11 @@
   "release.fix": "የስህተት እርማት",
   "release.security": "ደህንነት",
   "release.removed": "ተወግዷል",
-  "release.more": "የድሮ ስሪቶች"
+  "release.more": "የድሮ ስሪቶች",
+  "voice.start": "በድምጽ መተየብ",
+  "voice.stop": "የድምጽ መተየብ አቁም",
+  "voice.listening": "በማዳመጥ ላይ…",
+  "voice.unavailable": "በዚህ አሳሽ የድምጽ መተየብ አይቻልም።",
+  "voice.denied": "የማይክሮፎን ፈቃድ ተከልክሏል።",
+  "voice.failed": "ንግግር አልታወቀም፤ እባክዎ እንደገና ይሞክሩ።"
 }

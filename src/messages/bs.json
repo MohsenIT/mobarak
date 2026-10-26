@@ -607,5 +607,11 @@
   "release.fix": "Ispravka grešaka",
   "release.security": "Sigurnost",
   "release.removed": "Uklonjeno",
-  "release.more": "Starije verzije"
+  "release.more": "Starije verzije",
+  "voice.start": "Glasovno kucanje",
+  "voice.stop": "Zaustavi glasovno kucanje",
+  "voice.listening": "Slušam…",
+  "voice.unavailable": "Glasovno kucanje nije dostupno u ovom pretraživaču.",
+  "voice.denied": "Dozvola za mikrofon je odbijena.",
+  "voice.failed": "Govor nije prepoznat; pokušajte ponovo."
 }

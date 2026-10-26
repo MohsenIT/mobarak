@@ -607,5 +607,11 @@
   "release.fix": "Хаталарны төзәтү",
   "release.security": "Иминлек",
   "release.removed": "Бетерелгән",
-  "release.more": "Иске версияләр"
+  "release.more": "Иске версияләр",
+  "voice.start": "Тавыш белән язу",
+  "voice.stop": "Тавыш белән язуны туктату",
+  "voice.listening": "Тыңлыйм…",
+  "voice.unavailable": "Бу браузерда тавыш белән язу мөмкин түгел.",
+  "voice.denied": "Микрофонга рөхсәт бирелмәде.",
+  "voice.failed": "Сүз танылмады; зинһар, яңадан тырышып карагыз."
 }

@@ -607,5 +607,11 @@
   "release.fix": "Correction de bug",
   "release.security": "Sécurité",
   "release.removed": "Supprimé",
-  "release.more": "Anciennes versions"
+  "release.more": "Anciennes versions",
+  "voice.start": "Saisie vocale",
+  "voice.stop": "Arrêter la saisie vocale",
+  "voice.listening": "Écoute…",
+  "voice.unavailable": "La saisie vocale n'est pas disponible dans ce navigateur.",
+  "voice.denied": "Autorisation du microphone refusée.",
+  "voice.failed": "Parole non reconnue ; veuillez réessayer."
 }

@@ -607,5 +607,11 @@
   "release.fix": "Pembaikan pepijat",
   "release.security": "Keselamatan",
   "release.removed": "Dibuang",
-  "release.more": "Keluaran lama"
+  "release.more": "Keluaran lama",
+  "voice.start": "Taip dengan suara",
+  "voice.stop": "Berhenti taip suara",
+  "voice.listening": "Mendengar…",
+  "voice.unavailable": "Pengetikan suara tidak tersedia dalam pelayar ini.",
+  "voice.denied": "Kebenaran mikrofon ditolak.",
+  "voice.failed": "Pertuturan tidak dikenali; sila cuba lagi."
 }

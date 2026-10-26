@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.3.7',date:'2026-10-26',title:'تایپ با صدا و چیدمان انتخاب زبان',changeKinds:['feature','fix','fix'],changes:[
+    'میکروفون کنار کادرهای متنی، در مرورگرهایی که تایپ صوتی را در اختیار برنامه می‌گذارند؛ متن پیش از ارسال قابل ویرایش است.',
+    'فاصلهٔ بیشتر میان اسکرول و گزینه‌های انتخاب زبان.',
+    'ضربدر پنجرهٔ انتخاب زبان از عنوان جدا و در سمت مناسب قرار گرفت.',
+  ],
+},{
   version:'0.3.6',date:'2026-10-26',title:'خوانایی آیکون و دکمه‌های به‌روزرسانی',changeKinds:['improvement','improvement'],changes:[
     'آیکون ترجمه با حروف «ب» و «B» واضح‌تر شد.',
     'دکمه‌های «بعداً» و «به‌روزرسانی» در پنجرهٔ تغییرات، هم‌اندازه و خواناتر شدند.',

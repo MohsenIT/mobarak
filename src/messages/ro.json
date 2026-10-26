@@ -607,5 +607,11 @@
   "release.fix": "Corecție erori",
   "release.security": "Securitate",
   "release.removed": "Eliminat",
-  "release.more": "Versiuni anterioare"
+  "release.more": "Versiuni anterioare",
+  "voice.start": "Tastare vocală",
+  "voice.stop": "Oprește tastarea vocală",
+  "voice.listening": "Ascult…",
+  "voice.unavailable": "Tastarea vocală nu este disponibilă în acest browser.",
+  "voice.denied": "Permisiunea pentru microfon a fost refuzată.",
+  "voice.failed": "Discurs nerecunoscut; vă rugăm să încercați din nou."
 }
