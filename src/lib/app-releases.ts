@@ -1,6 +1,10 @@
 export interface AppRelease { version:string; date:string; title:string; changes:string[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.3.3',date:'2026-10-26',title:'خوانایی پیشنهاد زبان',changes:[
+    'اصلاح پس‌زمینه، رنگ متن‌ها و دکمه‌های پیشنهاد زبان در حالت شب و روشن.',
+  ],
+},{
   version:'0.3.2',date:'2026-10-25',title:'زبان رابط و ترجمه‌های بیشتر',changes:[
     'انتخاب مستقل زبان رابط و ترجمهٔ قرآن در تنظیمات؛ متن‌های رابط در فایل‌های i18n جدا شده‌اند.',
     'پیشنهاد زبان در اولین ورود با تأیید کاربر و حفظ انتخاب برای دفعات بعد.',
