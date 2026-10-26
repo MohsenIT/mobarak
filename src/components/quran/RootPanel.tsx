@@ -1,4 +1,6 @@
 'use client'
+import {StudyNoteLink} from './StudyLinks'
+import {useStudyWorkspace} from '@/lib/study-store'
 import {t} from '@/lib/i18n'
 import { displayWordText, lexicalKey, wordTarget, type WordPart } from '@/lib/word-parts'
 
@@ -56,6 +58,7 @@ function RootPanelContent({
   sel: anchor, onSelectionChange, onCompareContext, onOpenOccurrences, meta, translator, maximized, onToggleMax, onClose, onJump, onJumpSurah,
   playbackTarget, stackedOverIndex = false, comparisonRange, sheetH, onSheetHeightChange: setSheetH,
 }: Props) {
+  const {work:studyWorkspace}=useStudyWorkspace()
   const [tab, setTab] = useState<AnalysisTab>(() => { const saved = readAnalysisView().tab ?? 'root'; return (!anchor.root || anchor.part === 'prefix') && (saved === 'root' || saved === 'form') ? 'word' : saved })
   const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
   useEffect(()=>{
@@ -192,7 +195,7 @@ function RootPanelContent({
 
   const selectTarget = (a: number, pos: number, part?: WordPart) => selectTargetFor(tab, a, pos, part)
 
-  const nav = useMemo(() => surah?.n === sel.s ? analysisNavigation(surah, { ...sel, tab, form: selectedForm }) : null, [surah, sel, tab, selectedForm])
+  const nav = useMemo(() => surah?.n === sel.s ? analysisNavigation(surah, { ...sel, tab, form: selectedForm }) : null, [surah, sel, tab, selectedForm,studyWorkspace])
   const noun = tab === 'context' ? t("ui.16836d5471") : tab === 'verse' ? t("ui.b1b168c791") : tab === 'word' ? t("ui.9f06b558df") : tab === 'form' ? t("ui.12706fd406") : t("ui.eecfc08eb8")
   const items = nav?.repetitions ?? []
   const index = nav?.repetitionIndex ?? -1
@@ -300,6 +303,7 @@ function RootPanelContent({
             </span>
           </div>
           <div className="panel-actions">
+            {surah?.n===20&&<StudyNoteLink surah={surah} a={sel.a} pos={sel.pos} tab={tab} contextId={selectedContext?.stableId??(selectedContext?`s20:${selectedContext.id}`:undefined)}/>}
             {surah?.n === sel.s && surah.v.find(v => v.n === sel.a) && <VerseActions key={`${sel.s}:${sel.a}`} surah={surah} verse={surah.v.find(v => v.n === sel.a)!} translator={translator} />}
             <AnalysisSettings tab={tab} />
             <button className="icon-btn sm" onClick={minimize} aria-label={minimized ? t("ui.b9228a4d01") : t("ui.c516d98418")} title={minimized ? t("ui.f3429230a3") : t("ui.71cf3491e7")}>

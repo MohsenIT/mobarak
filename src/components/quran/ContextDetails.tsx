@@ -1,4 +1,6 @@
 'use client'
+import {studyT as st} from '@/lib/study-messages'
+import {saveStudy,studyUrl,useStudyWorkspace} from '@/lib/study-store'
 import {t} from '@/lib/i18n'
 
 import type { Selection } from './MushafPage'
@@ -15,6 +17,7 @@ interface Props {
   onPick: (a: number, pos: number) => void
 }
 export default function ContextDetails({ selection, surah, onPick, onCompare }: Props) {
+  const {work}=useStudyWorkspace()
   const { enabled } = useAnalysisPreferences()
   const showMeaning = (id: string) => enabled('context', 'meaning', id)
   const showStat = (id: string) => enabled('context', 'stats', id)
@@ -26,13 +29,15 @@ export default function ContextDetails({ selection, surah, onPick, onCompare }: 
   const page = context?.sourcePage ?? source?.sourcePage ?? 1
   return (
     <div className="analysis-section-stack">
+      {surah.n===20&&work&&<section className="study-version"><div className="study-actions"><button aria-pressed={!work.active} onClick={()=>void saveStudy({...work,active:false})}>{st('source')}</button><button aria-pressed={work.active} onClick={()=>void saveStudy({...work,active:true})}>{st('personal')}</button></div><a href={studyUrl()}>{st('entry')}</a></section>}
+      {context?.title&&<h3 className="font-bold">{context.title}</h3>}
       {context && showMeaning('note') && !!(context.note || source) && <AnalysisSection tab="context" kind="meaning">
       {showMeaning('note') && <div className="mb-3">
         <SourceReference label={t("ui.92649bd7f9")} source={{
           title: contextSource.title,
           description: t("ui.2bfd4864cf"),
           fields: [{ label: t("ui.4fc7a5a7c2"), value: contextSource.publisher }, { label: t("ui.e1280ac99b"), value: t("ui.cea73c0237") }, context?.origin === 'user-clarification' ? { label: t("ui.191f2cdcd2"), value: t("ui.b43be2bd00") } : { label: t("ui.2cc6a9014c"), value: t("ui.f9119fddb7",{p0:(toFa(page))}) }],
-          notes: [context?.origin === 'user-clarification' ? t("ui.bba0200510") : t("ui.79d0d683fb")],
+          notes: [context?.origin === 'personal'?st('sourceInfo'):context?.origin === 'user-clarification' ? t("ui.bba0200510") : t("ui.79d0d683fb")],
           links: [{ label: context?.origin === 'user-clarification' ? t("ui.1024a32c6c") : t("ui.662e05e5a4",{p0:(toFa(page))}), href: context?.origin === 'user-clarification' ? contextSource.url : `${contextSource.url}#page=${page}` }],
         }} />
         {context.note && <p className="text-xs leading-6 mt-3">{context.note}</p>}

@@ -3,6 +3,7 @@
 const CACHE = 'quran-startup-v1'
 const PACKS = 'quran-offline-packs-v1'
 const SHELL = '/__last-successful-document'
+const shellFor=url=>url.pathname.startsWith('/study/taha')?'/__study-taha-document':SHELL
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim()))
 
@@ -30,11 +31,11 @@ self.addEventListener('fetch', event => {
       const response = await fetch(request, navigation ? { cache: 'no-store' } : undefined)
       if (navigation && response.status >= 500) throw new Error('Navigation unavailable')
       if (response.ok && cache) {
-        try { await cache.put(navigation ? SHELL : request, response.clone()) } catch { /* Quota must not interrupt reading. */ }
+        try { await cache.put(navigation ? shellFor(url) : request, response.clone()) } catch { /* Quota must not interrupt reading. */ }
       }
       return response
     } catch (error) {
-      const saved = cache && await cache.match(navigation ? SHELL : request)
+      const saved = cache && await cache.match(navigation ? shellFor(url) : request)
       if (saved) return saved
       if (navigation) return unavailable()
       throw error
@@ -89,7 +90,7 @@ self.addEventListener('message',event=>{
     if(documentUrl.origin!==self.location.origin)return
     const cache=await caches.open(CACHE)
     const response=await fetch(documentUrl.href,{cache:'no-store'})
-    if(response.ok&&response.headers.get('content-type')?.includes('text/html'))await cache.put(SHELL,response)
+    if(response.ok&&response.headers.get('content-type')?.includes('text/html'))await cache.put(shellFor(documentUrl),response)
     const assets=[...new Set(Array.isArray(event.data.assets)?event.data.assets:[])].slice(0,150)
     await Promise.allSettled(assets.map(async value=>{
       const url=new URL(value,self.location.origin)

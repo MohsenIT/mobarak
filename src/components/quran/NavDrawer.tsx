@@ -1,4 +1,5 @@
 'use client'
+import {StudyEntry} from './StudyLinks'
 import {DictationInput} from './DictationInput'
 import {t,t as tText} from '@/lib/i18n'
 
@@ -117,6 +118,7 @@ export default function NavDrawer(props: Props) {
         </div>
 
         {props.view === 'tools' && <>
+        <StudyEntry/>
         <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>{t("ui.c51349274d")}</span><span>{t("ui.b390c6bcd0")}</span></button>
         </>}
         {props.view !== 'tools' && <>

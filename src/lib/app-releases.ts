@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.0',date:'2026-10-26',title:'دفتر مطالعهٔ آزمایشی سورهٔ طه',changeKinds:['feature','feature','feature'],changes:[
+    'نسخهٔ شخصی سیاق‌بندی طه، با عنوان، توضیح و ویرایش مرزها؛ سیاق‌بندی منبع محفوظ می‌ماند.',
+    'یادداشت‌های مستقل برای آیه، سیاق، ریشه، بن‌واژه و باب؛ ذخیره روی همین دستگاه بدون ورود.',
+    'ویرایشگر سیر سوره، گزارش متنی و فایل پشتیبان برای دریافت و برگرداندن نوشته‌ها.',
+  ],
+},{
   version:'0.3.7',date:'2026-10-26',title:'تایپ با صدا و چیدمان انتخاب زبان',changeKinds:['feature','fix','fix'],changes:[
     'میکروفون کنار کادرهای متنی، در مرورگرهایی که تایپ صوتی را در اختیار برنامه می‌گذارند؛ متن پیش از ارسال قابل ویرایش است.',
     'فاصلهٔ بیشتر میان اسکرول و گزینه‌های انتخاب زبان.',

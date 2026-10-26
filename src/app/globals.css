@@ -1524,3 +1524,31 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .dictation-button:disabled { opacity:.4; cursor:default; }
 .dictation-multiline .dictation-button { top:6px; transform:none; }
 .dictation-error { display:block; padding:4px 2px; color:var(--ink-soft); font-size:11px; line-height:1.7; }
+.study-page { max-width:900px; margin:0 auto; padding:16px; color:var(--ink); background:var(--paper); min-height:100dvh; font-size:14px; line-height:1.9; }
+.study-header { display:flex; align-items:center; gap:10px; }
+.study-header>div { flex:1; }
+.study-header h1 { display:flex; align-items:center; gap:8px; font-weight:700; font-size:18px; }
+.study-header p,.study-save-status { color:var(--ink-soft); font-size:11px; }
+.study-tabs { display:flex; gap:6px; overflow-x:auto; padding-block:12px; border-bottom:1px solid var(--line); }
+.study-page button:not(.icon-btn):not(.dictation-button),.study-page select { min-height:44px; border:1px solid var(--line-strong); border-radius:9px; padding:7px 11px; color:var(--ink); background:var(--paper-2); cursor:pointer; }
+.study-tabs button { white-space:nowrap; }
+.study-page button[aria-pressed="true"],.study-page .study-primary { background:var(--ink)!important; color:var(--paper)!important; }
+.study-page label { display:block; margin-block:12px; }
+.study-page label.choice-row { display:flex; }
+.study-page label>select { display:block; width:100%; }
+.study-page textarea,.study-page .dictation-field input { display:block; width:100%; border:1px solid var(--line-strong); border-radius:8px; padding:9px 11px; margin-top:5px; background:var(--sheet); color:var(--ink); }
+.study-page textarea { min-height:110px; resize:vertical; }
+.study-version { padding-block:12px; border-bottom:1px solid var(--line); color:var(--ink-soft); font-size:12px; }
+.study-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-block:10px; }
+.study-actions button { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+.study-context { padding-block:18px; border-bottom:1px solid var(--line); }
+.study-context h2 { font-weight:700; font-size:15px; }
+.study-context h2 small { display:block; color:var(--ink-soft); font-size:11px; font-weight:400; }
+.study-context-body { white-space:pre-wrap; overflow-wrap:anywhere; }
+.study-quran { font-size:25px; line-height:2.3; text-align:justify; margin-block:12px; }
+.study-page .study-ayah { display:inline-grid; place-items:center; min-height:32px!important; min-width:32px; padding:0 4px!important; margin:0 3px; border-radius:50%!important; border-color:var(--gold-deep)!important; color:var(--gold-deep)!important; background:transparent!important; font-family:Vazirmatn,sans-serif; font-size:11px; vertical-align:middle; }
+.study-error { border:1px solid var(--line-strong); padding:8px; }
+.study-report pre { white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; }
+.study-version .study-actions > button { min-height:36px; border:1px solid var(--line-strong); border-radius:8px; padding:5px 10px; background:var(--paper); color:var(--ink); }
+.study-version .study-actions > button[aria-pressed="true"] { background:var(--ink); color:var(--paper); }
+.study-version > a { text-decoration:underline; text-underline-offset:3px; }

@@ -8,8 +8,10 @@ export interface ContextRange {
   sourceLabel?: string
   note?: string
   origin?: string
+  title?: string
+  stableId?: string
 }
-interface SurahContexts {
+export interface SurahContexts {
   status: string
   ranges: ContextRange[]
   sourcePage: number
@@ -18,7 +20,10 @@ interface SurahContexts {
 }
 const surahs = dataset.surahs as Record<string, SurahContexts>
 export const contextSource = dataset.source
-export function getSurahContexts(s: number): SurahContexts | undefined { return surahs[String(s)] }
+const overrides=new Map<number,SurahContexts>()
+export function getSourceSurahContexts(s:number):SurahContexts|undefined{return surahs[String(s)]}
+export function setPersonalContextOverride(s:number,value:SurahContexts|null){if(typeof window==='undefined')return;if(value)overrides.set(s,value);else overrides.delete(s)}
+export function getSurahContexts(s: number): SurahContexts | undefined { return (typeof window!=='undefined'?overrides.get(s):undefined)??getSourceSurahContexts(s) }
 export function getContext(s: number, a: number): ContextRange | undefined {
   return getSurahContexts(s)?.ranges.find(range => a >= range.from && a <= range.to)
 }

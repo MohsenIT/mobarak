@@ -1,4 +1,5 @@
 'use client'
+import {useStudyWorkspace} from '@/lib/study-store'
 import {t,useUiLanguage} from '@/lib/i18n'
 import {isTranslator} from '@/lib/translations'
 import {LanguageOnboarding} from '@/components/quran/LanguageSettings'
@@ -45,6 +46,7 @@ const round05 = (v: number) => Math.round(v * 20) / 20
 
 export default function Home() {
   useUiLanguage()
+  useStudyWorkspace()
   const [knownPersianReader]=useState(()=>LS.get('mushaf.safavi-default.v1',false)&&['s','f','a','m'].includes(LS.get('mushaf.tr','s')))
   const [meta, setMeta] = useState<Meta | null>(null)
   const [page, setPage] = useState(() => {
