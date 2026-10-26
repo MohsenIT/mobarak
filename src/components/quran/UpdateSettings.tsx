@@ -6,12 +6,27 @@ import { APP_RELEASES,CURRENT_RELEASE,checkAppUpdate,compareRelease,type AppUpda
 import { toFa } from '@/lib/quran'
 import ReleaseNotesDialog from './ReleaseNotesDialog'
 
-export async function refreshApplication() {
+export async function refreshApplication(onProgress?: (done:number,total:number)=>void) {
   const url = new URL(window.location.href)
   url.searchParams.set('_refresh', Date.now().toString())
   // Verify a fresh document is reachable before leaving a working offline reader.
   const response = await fetch(url.href, { cache: 'no-store', signal: AbortSignal.timeout(15000) })
   if (!response.ok || !response.headers.get('content-type')?.includes('text/html')) throw new Error('Update unavailable')
+  const html = await response.text()
+  const document = new DOMParser().parseFromString(html, 'text/html')
+  const assets = [...new Set([...document.querySelectorAll('script[src],link[rel=stylesheet][href],link[rel=modulepreload][href]')].map(node => new URL(node.getAttribute('src') || node.getAttribute('href')!, url)).filter(asset => asset.origin === url.origin && asset.pathname.startsWith('/_next/static/')).map(asset => asset.href))]
+  let done = 1, cursor = 0
+  const total = assets.length + 1
+  onProgress?.(done,total)
+  await Promise.all(Array.from({length:Math.min(4,assets.length)},async()=>{
+    while(cursor < assets.length){
+      const asset = assets[cursor++]
+      const result = await fetch(asset,{signal:AbortSignal.timeout(15000)})
+      if(!result.ok)throw new Error('Update asset unavailable')
+      await result.arrayBuffer()
+      onProgress?.(++done,total)
+    }
+  }))
   if ('serviceWorker' in navigator) {
     const registration = await navigator.serviceWorker.getRegistration().catch(() => undefined)
     await registration?.update().catch(() => undefined)

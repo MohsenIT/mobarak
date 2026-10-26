@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.1',date:'2026-10-26',title:'پیمایش نرم‌تر و نوار به‌روزرسانی خواناتر',changeKinds:['improvement','improvement','fix'],changes:[
+    'تغییر اندازهٔ متن با حرکت دو انگشت ریزتر شده و ذخیرهٔ تنظیمات پس از مکث انجام می‌شود.',
+    'نوار به‌روزرسانی با متن خواناتر، لینک تغییرات و نمایش پیشرفت دریافت فایل‌های لازم.',
+    'آیکون ترجمه با نشانه‌های آ و A نمایش داده می‌شود.',
+  ],
+},{
   version:'0.4.0',date:'2026-10-26',title:'دفتر مطالعهٔ آزمایشی سورهٔ طه',changeKinds:['feature','feature','feature'],changes:[
     'نسخهٔ شخصی سیاق‌بندی طه، با عنوان، توضیح و ویرایش مرزها؛ سیاق‌بندی منبع محفوظ می‌ماند.',
     'یادداشت‌های مستقل برای آیه، سیاق، ریشه، بن‌واژه و باب؛ ذخیره روی همین دستگاه بدون ورود.',

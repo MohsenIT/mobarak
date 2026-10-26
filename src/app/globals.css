@@ -1552,3 +1552,17 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .study-version .study-actions > button { min-height:36px; border:1px solid var(--line-strong); border-radius:8px; padding:5px 10px; background:var(--paper); color:var(--ink); }
 .study-version .study-actions > button[aria-pressed="true"] { background:var(--ink); color:var(--paper); }
 .study-version > a { text-decoration:underline; text-underline-offset:3px; }
+
+/* Keep the update invitation compact instead of separating its actions across the screen. */
+.app-update-notice { gap:8px; padding:5px 10px; padding-top:calc(5px + env(safe-area-inset-top,0px)); justify-content:center; }
+.app-update-title { flex:0 1 auto; font-size:14px; line-height:1.7; }
+.app-update-notice > .app-update-button { margin-inline-start:0; min-height:40px; padding:6px 10px; border-radius:8px; font-size:13px; }
+.app-update-later { min-height:40px; }
+.app-update-percent { font-variant-numeric:tabular-nums; }
+.app-update-progress { position:absolute; inset-inline:0; bottom:0; width:100%; height:3px; border:0; appearance:none; background:var(--line); color:var(--sage); accent-color:var(--sage); }
+.app-update-progress::-webkit-progress-bar { background:var(--line); }
+.app-update-progress::-webkit-progress-value { background:var(--sage); transition:width 140ms linear; }
+.app-update-progress::-moz-progress-bar { background:var(--sage); }
+.app-update-progress:indeterminate { background:linear-gradient(90deg,transparent,var(--sage),transparent); background-size:40% 100%; background-repeat:no-repeat; animation:update-progress-sweep 1.2s linear infinite; }
+@keyframes update-progress-sweep { from { background-position:140% 0; } to { background-position:-40% 0; } }
+@media(prefers-reduced-motion:reduce) { .app-update-progress:indeterminate { animation:none; background-position:center; } .app-update-progress::-webkit-progress-value { transition:none; } }

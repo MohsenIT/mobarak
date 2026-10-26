@@ -6,7 +6,8 @@ import { refreshApplication } from './UpdateSettings'
 import ReleaseNotesDialog from './ReleaseNotesDialog'
 import { checkAppUpdate,CURRENT_RELEASE,compareRelease,type AppUpdate } from '@/lib/app-releases'
 import { toFa } from '@/lib/quran'
-import { RefreshCw } from 'lucide-react'
+import { APP_NAME } from '@/lib/branding'
+import { Download } from 'lucide-react'
 
 export default function PwaRegistration() {
   const {language}=useUiLanguage()
@@ -22,6 +23,7 @@ export default function PwaRegistration() {
   },[language])
   const [available, setAvailable] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [progress,setProgress]=useState<number|null>(null)
   const [updateError, setUpdateError] = useState(false)
   const [update,setUpdate]=useState<AppUpdate|null>(null)
   const [notesOpen,setNotesOpen]=useState(false)
@@ -76,11 +78,12 @@ export default function PwaRegistration() {
   }, [])
 
   const dismiss=()=>{dismissed.current=available;setAvailable(null);setNotesOpen(false)}
-  const refresh=async()=>{setRefreshing(true);setUpdateError(false);try{await refreshApplication()}catch{setRefreshing(false);setUpdateError(true)}}
+  const refresh=async()=>{setRefreshing(true);setProgress(null);setUpdateError(false);try{await refreshApplication((done,total)=>setProgress(Math.round(done/total*100)))}catch{setRefreshing(false);setUpdateError(true)}}
   if (!available) return null
-  return <><div ref={banner} className="app-update-notice" role="status" aria-live="polite">
-    <div className="app-update-title flex-1 min-w-0"><button type="button" className="app-update-version" aria-haspopup="dialog" aria-expanded={notesOpen} aria-label={t("ui.7aee767160")} onClick={()=>setNotesOpen(true)}>{t("ui.953819a315")}{' '}{update?.latest?toFa(update.latest.version):t("ui.7b2b35c950")}</button>{' '}{t("ui.5e29284308")}{updateError&&<small className="block">{t("ui.0f59a42726")}</small>}</div>
-    <button type="button" className="app-update-button" disabled={refreshing} aria-busy={refreshing} aria-label={refreshing?t("ui.3c067a3db0"):t("ui.72eadf7b16")} onClick={()=>void refresh()}><RefreshCw size={14} aria-hidden="true" className={refreshing?'app-update-spinner':undefined}/>{refreshing?t("ui.14a687003e"):t("ui.72eadf7b16")}</button>
+  return <><div ref={banner} className="app-update-notice" dir="rtl" role="status" aria-live="polite">
+    <div className="app-update-title min-w-0"><button type="button" className="app-update-version" aria-haspopup="dialog" aria-expanded={notesOpen} aria-label={t("ui.7aee767160")} onClick={()=>setNotesOpen(true)}>{t("ui.953819a315")}{' '}{update?.latest?toFa(update.latest.version):t("ui.7b2b35c950")}</button>{' '}{APP_NAME}{' '}{t("ui.5e29284308")}{updateError&&<small className="block">{t("ui.0f59a42726")}</small>}</div>
+    <button type="button" className="app-update-button" disabled={refreshing} aria-busy={refreshing} aria-label={refreshing?t("ui.3c067a3db0"):t("ui.72eadf7b16")} onClick={()=>void refresh()}><Download size={14} aria-hidden="true" className={refreshing?'app-update-spinner':undefined}/>{refreshing?t("ui.14a687003e"):t("ui.72eadf7b16")}{refreshing&&progress!==null&&<span className="app-update-percent">{toFa(progress)}٪</span>}</button>
     <button type="button" className="app-update-later" disabled={refreshing} aria-label={t("ui.e862c63e41")} onClick={dismiss}>×</button>
+    {refreshing&&<progress className="app-update-progress" max={100} value={progress??undefined} aria-label={t("ui.3c067a3db0")}/> }
   </div><ReleaseNotesDialog open={notesOpen} onOpenChange={setNotesOpen} update={update} onUpdate={()=>void refresh()} onLater={dismiss} busy={refreshing} error={updateError}/></>
 }

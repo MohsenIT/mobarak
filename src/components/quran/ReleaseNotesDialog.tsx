@@ -3,11 +3,11 @@ import {useEffect,useRef,useState} from 'react'
 import {PlusCircle,Sparkles,Bug,ShieldCheck,MinusCircle} from 'lucide-react'
 import {t,uiDirection} from '@/lib/i18n'
 import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription} from '@/components/ui/dialog'
-import {CURRENT_RELEASE,missedReleases,type AppUpdate,type ReleaseChangeKind} from '@/lib/app-releases'
+import {CURRENT_RELEASE,compareRelease,missedReleases,type AppUpdate,type ReleaseChangeKind} from '@/lib/app-releases'
 import {toFa} from '@/lib/quran'
 const ICONS={feature:PlusCircle,improvement:Sparkles,fix:Bug,security:ShieldCheck,removed:MinusCircle}
 export default function ReleaseNotesDialog({open,onOpenChange,update,onUpdate,onLater,busy=false,error=false,history=false}:{open:boolean;onOpenChange:(open:boolean)=>void;update:AppUpdate|null;onUpdate?:()=>void;onLater?:()=>void;busy?:boolean;error?:boolean;history?:boolean}){
- const missed=missedReleases(update?.releases??[],CURRENT_RELEASE),entries=history?update?.releases??[]:missed
+ const missed=missedReleases(update?.releases??[],CURRENT_RELEASE),entries=history?update?.releases??[]:missed.length?missed:update?.latest&&compareRelease(update.latest.version,CURRENT_RELEASE)===0?[update.latest]:[]
  const [visible,setVisible]=useState(5),list=useRef<HTMLDivElement>(null),[sentinel,setSentinel]=useState<HTMLDivElement|null>(null)
  useEffect(()=>{if(open)setVisible(5)},[open,history,update?.build])
  useEffect(()=>{
