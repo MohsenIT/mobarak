@@ -10,6 +10,10 @@ export function quranDisplayText(text: string): string {
     // small waw/yeh and pronunciation marks are part of the Quran's writing;
     // deleting the whole Arabic-signs range silently removed them everywhere.
     .replace(/[\u06D6-\u06DC\u06DE\u06E9]/g, '')
+    // This Hafs build maps these three characters to its visible uni0600
+    // placeholder, rather than a positioned Quranic mark. Omit only those
+    // audited glyphs; retain superscript alef and supported small letters.
+    .replace(/[\u06DF\u06E3\u06EB]/g, '')
     // A hidden pause mark may leave a trailing space inside a selectable word.
     .trim()
 }

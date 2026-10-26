@@ -44,13 +44,13 @@ test('superscript alef and real yeh remain distinct in the reported Saffat verse
  expect(quranDisplayText('وَأَهْلَهُۥ')).toBe('وَأَهْلَهُۥ')
 })
 
-test('no Quran letter or pronunciation mark is lost across the entire source corpus',async()=>{
+test('Quran letters and supported pronunciation marks are preserved across the corpus',async()=>{
  let alefs=0,smallLetters=0
  for(let s=1;s<=114;s++){
   const data=await Bun.file(`${import.meta.dir}/../../public/data/surah/${s}.json`).json()
   for(const verse of data.v)for(const word of verse.w){
    const original=word.t as string,result=quranDisplayText(original)
-   for(const mark of ['\u0670','\u06DF','\u06E0','\u06E2','\u06E3','\u06E5','\u06E6','\u06E7','\u06E8','\u06EA','\u06EB','\u06EC','\u06ED','ي','ى']){
+   for(const mark of ['\u0670','\u06E0','\u06E2','\u06E5','\u06E6','\u06E7','\u06E8','\u06EA','\u06EC','\u06ED','ي','ى']){
     expect(result.split(mark).length).toBe(original.split(mark).length)
    }
    alefs+=(original.match(/\u0670/g)||[]).length
@@ -59,4 +59,27 @@ test('no Quran letter or pronunciation mark is lost across the entire source cor
  }
  expect(alefs).toBe(9725)
  expect(smallLetters).toBe(2253)
+})
+
+test('the font placeholder characters are omitted without stripping real letters',()=>{
+ expect(quranDisplayText('وَقَالُوا۟')).toBe('وَقَالُوا')
+ expect(quranDisplayText('ٱحْشُرُوا۟')).toBe('ٱحْشُرُوا')
+ expect(quranDisplayText('ظَلَمُوا۟')).toBe('ظَلَمُوا')
+ expect(quranDisplayText('كَانُوا۟')).toBe('كَانُوا')
+ expect(quranDisplayText('ۣ۫')).toBe('')
+ expect(quranDisplayText('نَادَىٰنَا وَنَجَّيْنَـٰهُ وَأَهْلَهُۥ')).toBe('نَادَىٰنَا وَنَجَّيْنَـٰهُ وَأَهْلَهُۥ')
+})
+
+test('all occurrences of the three audited placeholder glyphs are covered',async()=>{
+ let removed=0
+ for(let s=1;s<=114;s++){
+  const data=await Bun.file(`${import.meta.dir}/../../public/data/surah/${s}.json`).json()
+  for(const verse of data.v)for(const word of verse.w){
+   const original=word.t as string
+   removed+=(original.match(/[\u06DF\u06E3\u06EB]/g)||[]).length
+   expect(quranDisplayText(original)).not.toMatch(/[\u06DF\u06E3\u06EB]/)
+   expect(word.t).toBe(original)
+  }
+ }
+ expect(removed).toBe(3990)
 })
