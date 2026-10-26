@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.3.6',date:'2026-10-26',title:'خوانایی آیکون و دکمه‌های به‌روزرسانی',changeKinds:['improvement','improvement'],changes:[
+    'آیکون ترجمه با حروف «ب» و «B» واضح‌تر شد.',
+    'دکمه‌های «بعداً» و «به‌روزرسانی» در پنجرهٔ تغییرات، هم‌اندازه و خواناتر شدند.',
+  ],
+},{
   version:'0.3.5',date:'2026-10-26',title:'انتخاب زبان و مرور تغییرات',changeKinds:['fix','fix','improvement','improvement'],changes:[
     'انتخاب زبان با فهرست جست‌وجوپذیر؛ نوشته‌ها و دایرهٔ انتخاب در فارسی و انگلیسی در جای مناسب قرار می‌گیرند.',
     'نمایش شماره‌ها و شمارنده‌ها با رقم‌های زبان انتخابی، از جمله رقم‌های عربی.',

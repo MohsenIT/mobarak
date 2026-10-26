@@ -1444,7 +1444,7 @@ html[data-app-update] .quran-search-page { top:var(--app-update-height); height:
 .release-notes-list h3 { font-weight:700; font-size:14px; }
 .release-notes-list h3 small { font-weight:400; font-size:10px; color:var(--ink-soft); margin-inline-start:6px; }
 .release-notes-list section>p { font-size:12px; margin-block:5px; color:var(--ink-soft); }
-.release-notes-list ul { list-style:disc; padding-inline-start:18px; font-size:12px; line-height:1.9; }
+.release-notes-list ul { list-style:none; padding-inline-start:0; font-size:12px; line-height:1.9; }
 .release-notes-list li+li { margin-top:5px; }
 .release-notes-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-shrink:0; padding-top:8px; border-top:1px solid var(--line); }
 .release-notes-actions .chip { min-height:36px; padding:6px 12px; }
@@ -1505,3 +1505,11 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .release-change[data-change-kind="fix"] .release-change-icon { color:var(--gold-deep); }
 .release-notes-more { padding-block:14px; text-align:center; }
 .language-actions button { justify-content:center; text-align:center; }
+
+.release-notes-actions { display:grid; grid-template-columns:minmax(0,1fr); gap:10px; }
+.release-notes-actions[data-double="true"] { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.release-action { display:inline-flex; align-items:center; justify-content:center; min-height:44px; min-width:0; padding:10px 12px; border:1px solid var(--ink-soft); border-radius:10px; font-size:13px; font-weight:600; line-height:1.7; text-align:center; cursor:pointer; }
+.release-action-primary { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+.release-action-secondary { background:var(--paper-2); color:var(--ink); }
+.release-action:disabled { opacity:.6; cursor:wait; }
+.release-action:focus-visible { outline:2px solid var(--sage); outline-offset:3px; }

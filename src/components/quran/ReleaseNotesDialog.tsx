@@ -1,11 +1,11 @@
 'use client'
 import {useEffect,useRef,useState} from 'react'
-import {PlusCircle,Sparkles,Wrench,ShieldCheck,MinusCircle} from 'lucide-react'
+import {PlusCircle,Sparkles,Bug,ShieldCheck,MinusCircle} from 'lucide-react'
 import {t,uiDirection} from '@/lib/i18n'
 import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription} from '@/components/ui/dialog'
 import {CURRENT_RELEASE,missedReleases,type AppUpdate,type ReleaseChangeKind} from '@/lib/app-releases'
 import {toFa} from '@/lib/quran'
-const ICONS={feature:PlusCircle,improvement:Sparkles,fix:Wrench,security:ShieldCheck,removed:MinusCircle}
+const ICONS={feature:PlusCircle,improvement:Sparkles,fix:Bug,security:ShieldCheck,removed:MinusCircle}
 export default function ReleaseNotesDialog({open,onOpenChange,update,onUpdate,onLater,busy=false,error=false,history=false}:{open:boolean;onOpenChange:(open:boolean)=>void;update:AppUpdate|null;onUpdate?:()=>void;onLater?:()=>void;busy?:boolean;error?:boolean;history?:boolean}){
  const missed=missedReleases(update?.releases??[],CURRENT_RELEASE),entries=history?update?.releases??[]:missed
  const [visible,setVisible]=useState(5),list=useRef<HTMLDivElement>(null),[sentinel,setSentinel]=useState<HTMLDivElement|null>(null)
@@ -23,6 +23,6 @@ export default function ReleaseNotesDialog({open,onOpenChange,update,onUpdate,on
    {visible<entries.length&&<div ref={setSentinel} className="release-notes-more"><button className="chip" type="button" onClick={()=>setVisible(value=>Math.min(value+5,entries.length))}>{t('release.more')}</button></div>}
   </div>
   {error&&<p role="alert" className="text-xs">{t('ui.bfa8430237')}</p>}
-  <div className="release-notes-actions"><button type="button" className="chip" disabled={busy} onClick={()=>{onOpenChange(false);onLater?.()}}>{onUpdate?t('ui.bae3fdab58'):t('ui.313cbecb4d')}</button>{onUpdate&&<button type="button" className="app-update-button" disabled={busy} onClick={onUpdate}>{busy?t('ui.80516c4adb'):t('ui.2a9c64792a')}</button>}</div>
+  <div className="release-notes-actions" data-double={!!onUpdate}><button type="button" className="release-action release-action-secondary" disabled={busy} onClick={()=>{onOpenChange(false);onLater?.()}}>{onUpdate?t('ui.bae3fdab58'):t('ui.313cbecb4d')}</button>{onUpdate&&<button type="button" className="release-action release-action-primary" disabled={busy} onClick={onUpdate}>{busy?t('ui.80516c4adb'):t('ui.2a9c64792a')}</button>}</div>
  </DialogContent></Dialog>
 }
