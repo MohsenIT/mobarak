@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.8',date:'2026-10-26',title:'بازگشت تغییر پله‌ای اندازهٔ متن',changeKinds:['fix'],changes:[
+    'با دو انگشت، اندازهٔ واقعی فونت حین حرکت و در پله‌های پنج‌درصدی تغییر می‌کند؛ پیش‌نمایش بزرگ‌نمایی جداگانه برداشته شد.',
+  ],
+},{
   version:'0.4.7',date:'2026-10-26',title:'دقت متن قرآن و بزرگ‌نمایی نرم‌تر',changeKinds:['improvement','fix','fix'],changes:[
     'آیکون ترجمه از طرح ارسالی ساخته شد؛ تناسب حروف حفظ شده و رنگ آن با تم برنامه هماهنگ است.',
     'بزرگ‌نمایی با دو انگشت هنگام حرکت، متن سوره را پی‌درپی محاسبه نمی‌کند؛ اندازه پس از پایان حرکت ذخیره می‌شود.',

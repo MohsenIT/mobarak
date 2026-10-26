@@ -30,7 +30,7 @@ interface Props {
 
 /** One reading surface for both the reader and adjacent-surah previews. */
 export function FlowSurface({ children }: { children: ReactNode }) {
-  return <div data-pinch-content className="max-w-[720px] mx-auto px-4 py-4 pb-8">{children}</div>
+  return <div className="max-w-[720px] mx-auto px-4 py-4 pb-8">{children}</div>
 }
 
 /** Continuous, flowing surah view (متن پیوسته) */
