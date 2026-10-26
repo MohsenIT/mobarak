@@ -1554,8 +1554,8 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .study-version > a { text-decoration:underline; text-underline-offset:3px; }
 
 /* Keep the update invitation compact instead of separating its actions across the screen. */
-.app-update-notice { gap:8px; padding:5px 10px; padding-top:calc(5px + env(safe-area-inset-top,0px)); justify-content:center; }
-.app-update-title { flex:0 1 auto; font-size:14px; line-height:1.7; }
+.app-update-notice { gap:8px; padding:5px 10px; padding-top:calc(5px + env(safe-area-inset-top,0px)); justify-content:flex-start; }
+.app-update-title { flex:1 1 auto; text-align:right; font-size:14px; line-height:1.7; }
 .app-update-notice > .app-update-button { margin-inline-start:0; min-height:40px; padding:6px 10px; border-radius:8px; font-size:13px; }
 .app-update-later { min-height:40px; }
 .app-update-percent { font-variant-numeric:tabular-nums; }
@@ -1572,3 +1572,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .release-change-icon svg { flex-shrink:0; }
 .release-change-label { font-size:10px; font-weight:500; line-height:1.8; }
 @media(max-width:360px) { .release-change { grid-template-columns:62px minmax(0,1fr); gap:6px; } .release-change-label { font-size:9px; } }
+
+.resource-portrait { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:36px; height:36px; overflow:hidden; border-radius:50%; border:1px solid var(--line); background:var(--word-root); color:var(--sage); }
+.resource-portrait img { display:block; width:100%; height:100%; object-fit:cover; object-position:center 25%; }
+.resource-picker-copy { flex:1; min-width:0; }

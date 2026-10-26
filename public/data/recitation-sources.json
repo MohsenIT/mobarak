@@ -9,6 +9,147 @@
     "id": "parhizgar",
     "name": "شهریار پرهیزگار",
     "source": "تنزیل",
-    "sourcePage": "https://tanzil.net/"
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "parhizgar"
+  },
+  {
+    "id": "tanzil-abdulbasit",
+    "name": "عبدالباسط عبدالصمد",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "abdulbasit"
+  },
+  {
+    "id": "tanzil-basfar",
+    "name": "عبدالله بصفر",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "basfar"
+  },
+  {
+    "id": "tanzil-basfar2",
+    "name": "عبدالله بصفر — ضبط دوم",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "basfar2"
+  },
+  {
+    "id": "tanzil-ajamy",
+    "name": "احمد العجمی",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "ajamy"
+  },
+  {
+    "id": "tanzil-ghamadi",
+    "name": "سعد الغامدی",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "ghamadi"
+  },
+  {
+    "id": "tanzil-hudhaify",
+    "name": "علی عبدالرحمن الحذیفی",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "hudhaify"
+  },
+  {
+    "id": "tanzil-husary",
+    "name": "محمود خلیل الحصری",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "husary"
+  },
+  {
+    "id": "tanzil-shateri",
+    "name": "ابوبکر الشاطری",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "shateri"
+  },
+  {
+    "id": "tanzil-shuraim",
+    "name": "سعود الشریم",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "shuraim"
+  },
+  {
+    "id": "tanzil-sudais",
+    "name": "عبدالرحمن السدیس",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "sudais"
+  },
+  {
+    "id": "tanzil-tablawi",
+    "name": "محمد محمود الطبلاوی",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "tablawi"
+  },
+  {
+    "id": "tanzil-hani",
+    "name": "هانی الرفاعی",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "hani"
+  },
+  {
+    "id": "tanzil-akhdar",
+    "name": "ابراهیم الاخضر",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "akhdar"
+  },
+  {
+    "id": "tanzil-muaiqly",
+    "name": "ماهر المعیقلی",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "muaiqly"
+  },
+  {
+    "id": "tanzil-ayyub",
+    "name": "محمد ایوب",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "ayyub"
+  },
+  {
+    "id": "tanzil-jibreel",
+    "name": "محمد جبریل",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "jibreel"
+  },
+  {
+    "id": "tanzil-bukhatir",
+    "name": "صلاح بوخاطر",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "bukhatir"
+  },
+  {
+    "id": "tanzil-qasim",
+    "name": "عبدالمحسن القاسم",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "qasim"
+  },
+  {
+    "id": "tanzil-juhany",
+    "name": "عبدالله عواد الجهنی",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "juhany"
+  },
+  {
+    "id": "tanzil-matrood",
+    "name": "عبدالله المطرود",
+    "source": "تنزیل",
+    "sourcePage": "https://tanzil.net/",
+    "tanzilDirectory": "matrood"
   }
 ]

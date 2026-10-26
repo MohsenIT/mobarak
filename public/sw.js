@@ -14,7 +14,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url)
   if (request.method !== 'GET' || url.origin !== self.location.origin) return
   const navigation = request.mode === 'navigate'
-  const asset = url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/data/') || url.pathname.startsWith('/fonts/') || url.pathname.startsWith('/icons/')
+  const asset = url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/data/') || url.pathname.startsWith('/fonts/') || url.pathname.startsWith('/icons/') || url.pathname.startsWith('/images/')
   if (!navigation && !asset) return
   event.respondWith((async () => {
     let cache

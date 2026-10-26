@@ -2,7 +2,8 @@
 import {t,languageLabel,uiDirection} from '@/lib/i18n'
 
 import { useId, useState } from 'react'
-import { BookOpen, ExternalLink, X, Info, UserRound } from 'lucide-react'
+import { BookOpen, ExternalLink, X, Info } from 'lucide-react'
+import ResourcePortrait from './ResourcePortrait'
 import { getResource,RESOURCE_KINDS,RESOURCE_LANGUAGES,RECITATION_STYLES } from '@/lib/resources'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -58,7 +59,7 @@ export default function SourceReference({ text = '', source, label = t("ui.8a52f
         <h3 id={titleId} className="font-bold text-sm leading-7 flex-1">{info.title}</h3>
         <button type="button" aria-label={t("ui.7f0f10c904")} className="shrink-0 rounded-full p-1 cursor-pointer" onClick={() => setOpen(false)}><X size={16} aria-hidden="true" /></button>
       </header>
-      {resource&&<div className="resource-profile-picture">{info.image&&(/^(https:\/\/|\/(?!\/))/.test(info.image.src))?<img src={info.image.src} alt={info.image.alt} width="72" height="72" loading="lazy"/>:<UserRound size={32} aria-hidden="true"/>}</div>}
+      {resource&&<ResourcePortrait image={info.image} large/>}
       {info.description && <p className="mb-3" style={{ color: 'var(--ink-soft)' }}>{info.description}</p>}
       {!!fields.length && <dl className="divide-y" style={{ borderColor: 'var(--line)' }}>
         {fields.map((field, i) => <div key={i} className="grid grid-cols-[5rem_minmax(0,1fr)] gap-x-3 py-1.5" style={{ borderColor: 'var(--line)' }}>

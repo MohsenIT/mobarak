@@ -9,7 +9,7 @@ async function walk(dir) {
   for (const item of await readdir(dir, { withFileTypes: true })) {
     const file = path.join(dir, item.name)
     if (item.isDirectory()) { await walk(file); continue }
-    if (!/\.(json|woff2?|ttf|otf)$/.test(file) || file.endsWith('offline-manifest.json')) continue
+    if (!/\.(json|woff2?|ttf|otf|webp|jpe?g|png|svg)$/.test(file) || file.endsWith('offline-manifest.json')) continue
     const relative = file.slice(base.length)
     const translation=translations.find(item=>relative===`/data/translations/${item.id}.json`)
     const group = translation?`translation:${translation.id}`:['tahqiq', 'maqayis', 'ishtiqaqi'].find(book => relative.startsWith(`/data/${book}/`)) || 'core'

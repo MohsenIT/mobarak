@@ -19,3 +19,10 @@ describe('Tanzil audio endpoint',()=>{
   expect((await GET(request('r=parhizgar&s=1&a=1'))).status).toBe(502)
  })
 })
+
+test('new reciters still use fixed catalogue directories and reject traversal',async()=>{
+ let url='';globalThis.fetch=(async(input)=>{url=String(input);return new Response(new Uint8Array([73,68,51]),{headers:{'Content-Type':'audio/mpeg'}})}) as unknown as typeof fetch
+ expect((await GET(request('r=tanzil-husary&s=20&a=72&url=https://other.test'))).status).toBe(200)
+ expect(url).toBe('https://tanzil.net/res/audio/husary/020072.mp3')
+ expect((await GET(request('r=tanzil-..%2Fother&s=1&a=1'))).status).toBe(400)
+})

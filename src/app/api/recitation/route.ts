@@ -3,13 +3,14 @@ import { RECITERS, recitationSourceUrl } from '@/lib/recitation'
 
 const cors = { 'Access-Control-Allow-Origin':'*', 'X-Content-Type-Options':'nosniff' }
 const fail=(status:number)=>Response.json({error:'audio-unavailable'},{status,headers:cors})
-/** Fixed Tanzil/Parhizgar source only: never accept a caller-supplied URL. */
+/** Fixed catalogue sources only: never accept a caller-supplied URL or directory. */
 export async function GET(request:Request) {
   const params=new URL(request.url).searchParams
   const s=Number(params.get('s')), a=Number(params.get('a'))
-  if(params.get('r')!=='parhizgar'||!Number.isInteger(s)||s<1||s>114||!Number.isInteger(a)||a<1||a>meta.surahs[s-1].vc)return fail(400)
+  const reciter=RECITERS.find(item=>item.id===params.get('r')&&item.tanzilDirectory)
+  if(!reciter||!Number.isInteger(s)||s<1||s>114||!Number.isInteger(a)||a<1||a>meta.surahs[s-1].vc)return fail(400)
   try {
-    const upstream=await fetch(recitationSourceUrl(s,a,RECITERS[1]),{signal:AbortSignal.timeout(20000),redirect:'error',cache:'force-cache'})
+    const upstream=await fetch(recitationSourceUrl(s,a,reciter),{signal:AbortSignal.timeout(20000),redirect:'error',cache:'force-cache'})
     if(!upstream.ok||!upstream.headers.get('content-type')?.includes('audio/'))return fail(502)
     const reader=upstream.body?.getReader();if(!reader)return fail(502)
     const chunks:Uint8Array<ArrayBuffer>[]=[];let length=0

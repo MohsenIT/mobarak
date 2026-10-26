@@ -18,3 +18,10 @@ describe('recitation playback',()=>{
   test('infinite surah repeat wraps to first verse',()=>expect(nextRecitation({ayah:135,verseRound:1,surahRound:99},135,1,0)).toEqual({ayah:1,verseRound:1,surahRound:100}))
   test('ordinary playback stops at end',()=>expect(nextRecitation({ayah:7,verseRound:1,surahRound:1},7,1,1)).toBeNull())
 })
+
+test('each additional Tanzil reciter has a separate proxy and cache identity',()=>{
+ const supported=RECITERS.filter(r=>r.tanzilDirectory)
+ expect(supported.length).toBeGreaterThan(2)
+ expect(new Set(supported.map(r=>recitationUrl(20,72,r))).size).toBe(supported.length)
+ expect(RECITERS.some(r=>/afasy|alafasy/i.test(r.id))).toBe(false)
+})

@@ -20,7 +20,11 @@
         "label": "مأخذ صوت: Quran.com",
         "href": "https://quran.com/"
       }
-    ]
+    ],
+    "image": {
+      "src": "/images/reciters/minshawi.jpg",
+      "alt": "محمد صدیق منشاوی"
+    }
   },
   {
     "id": "reciter:parhizgar",
@@ -43,7 +47,11 @@
         "label": "مأخذ صوت: تنزیل",
         "href": "https://tanzil.net/"
       }
-    ]
+    ],
+    "image": {
+      "src": "/images/reciters/shahriar-parhizgar.webp",
+      "alt": "شهریار پرهیزگار"
+    }
   },
   {
     "id": "translation:s",
@@ -210,6 +218,510 @@
       {
         "label": "پیکرهٔ عربی قرآن",
         "href": "https://corpus.quran.com/"
+      }
+    ]
+  },
+  {
+    "id": "reciter:tanzil-abdulbasit",
+    "name": "عبدالباسط عبدالصمد",
+    "title": "ترتیل عبدالباسط عبدالصمد",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "عبدالباسط عبدالصمد",
+    "country": "مصر",
+    "nationality": "مصری",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای عبدالباسط عبدالصمد از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/abdul-basit-abdul-samad.webp",
+      "alt": "عبدالباسط عبدالصمد"
+    }
+  },
+  {
+    "id": "reciter:tanzil-basfar",
+    "name": "عبدالله بصفر",
+    "title": "ترتیل عبدالله بصفر",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "عبدالله بصفر",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای عبدالله بصفر از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/abdullah-basfar.webp",
+      "alt": "عبدالله بصفر"
+    }
+  },
+  {
+    "id": "reciter:tanzil-basfar2",
+    "name": "عبدالله بصفر — ضبط دوم",
+    "title": "ترتیل عبدالله بصفر — ضبط دوم",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "عبدالله بصفر — ضبط دوم",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای عبدالله بصفر — ضبط دوم از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/abdullah-basfar.webp",
+      "alt": "عبدالله بصفر — ضبط دوم"
+    }
+  },
+  {
+    "id": "reciter:tanzil-ajamy",
+    "name": "احمد العجمی",
+    "title": "ترتیل احمد العجمی",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "احمد العجمی",
+    "country": "کویت",
+    "nationality": "کویتی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای احمد العجمی از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ]
+  },
+  {
+    "id": "reciter:tanzil-ghamadi",
+    "name": "سعد الغامدی",
+    "title": "ترتیل سعد الغامدی",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "سعد الغامدی",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای سعد الغامدی از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ]
+  },
+  {
+    "id": "reciter:tanzil-hudhaify",
+    "name": "علی عبدالرحمن الحذیفی",
+    "title": "ترتیل علی عبدالرحمن الحذیفی",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "علی عبدالرحمن الحذیفی",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای علی عبدالرحمن الحذیفی از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ]
+  },
+  {
+    "id": "reciter:tanzil-husary",
+    "name": "محمود خلیل الحصری",
+    "title": "ترتیل محمود خلیل الحصری",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "محمود خلیل الحصری",
+    "country": "مصر",
+    "nationality": "مصری",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای محمود خلیل الحصری از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ]
+  },
+  {
+    "id": "reciter:tanzil-shateri",
+    "name": "ابوبکر الشاطری",
+    "title": "ترتیل ابوبکر الشاطری",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "ابوبکر الشاطری",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای ابوبکر الشاطری از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/abu-bakr-al-shatri.webp",
+      "alt": "ابوبکر الشاطری"
+    }
+  },
+  {
+    "id": "reciter:tanzil-shuraim",
+    "name": "سعود الشریم",
+    "title": "ترتیل سعود الشریم",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "سعود الشریم",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای سعود الشریم از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/saud-al-shuraim.webp",
+      "alt": "سعود الشریم"
+    }
+  },
+  {
+    "id": "reciter:tanzil-sudais",
+    "name": "عبدالرحمن السدیس",
+    "title": "ترتیل عبدالرحمن السدیس",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "عبدالرحمن السدیس",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای عبدالرحمن السدیس از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/abdul-rahman-al-sudais.webp",
+      "alt": "عبدالرحمن السدیس"
+    }
+  },
+  {
+    "id": "reciter:tanzil-tablawi",
+    "name": "محمد محمود الطبلاوی",
+    "title": "ترتیل محمد محمود الطبلاوی",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "محمد محمود الطبلاوی",
+    "country": "مصر",
+    "nationality": "مصری",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای محمد محمود الطبلاوی از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ]
+  },
+  {
+    "id": "reciter:tanzil-hani",
+    "name": "هانی الرفاعی",
+    "title": "ترتیل هانی الرفاعی",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "هانی الرفاعی",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای هانی الرفاعی از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/hani-al-rifai.webp",
+      "alt": "هانی الرفاعی"
+    }
+  },
+  {
+    "id": "reciter:tanzil-akhdar",
+    "name": "ابراهیم الاخضر",
+    "title": "ترتیل ابراهیم الاخضر",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "ابراهیم الاخضر",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای ابراهیم الاخضر از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/ibrahim-al-akhdar.webp",
+      "alt": "ابراهیم الاخضر"
+    }
+  },
+  {
+    "id": "reciter:tanzil-muaiqly",
+    "name": "ماهر المعیقلی",
+    "title": "ترتیل ماهر المعیقلی",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "ماهر المعیقلی",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای ماهر المعیقلی از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/maher-almaikulai.webp",
+      "alt": "ماهر المعیقلی"
+    }
+  },
+  {
+    "id": "reciter:tanzil-ayyub",
+    "name": "محمد ایوب",
+    "title": "ترتیل محمد ایوب",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "محمد ایوب",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای محمد ایوب از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/mohamed-ayoub.webp",
+      "alt": "محمد ایوب"
+    }
+  },
+  {
+    "id": "reciter:tanzil-jibreel",
+    "name": "محمد جبریل",
+    "title": "ترتیل محمد جبریل",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "محمد جبریل",
+    "country": "مصر",
+    "nationality": "مصری",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای محمد جبریل از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/muhammad-jibril.webp",
+      "alt": "محمد جبریل"
+    }
+  },
+  {
+    "id": "reciter:tanzil-bukhatir",
+    "name": "صلاح بوخاطر",
+    "title": "ترتیل صلاح بوخاطر",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "صلاح بوخاطر",
+    "country": "امارات",
+    "nationality": "اماراتی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای صلاح بوخاطر از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ]
+  },
+  {
+    "id": "reciter:tanzil-qasim",
+    "name": "عبدالمحسن القاسم",
+    "title": "ترتیل عبدالمحسن القاسم",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "عبدالمحسن القاسم",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای عبدالمحسن القاسم از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ]
+  },
+  {
+    "id": "reciter:tanzil-juhany",
+    "name": "عبدالله عواد الجهنی",
+    "title": "ترتیل عبدالله عواد الجهنی",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "عبدالله عواد الجهنی",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای عبدالله عواد الجهنی از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
+      }
+    ]
+  },
+  {
+    "id": "reciter:tanzil-matrood",
+    "name": "عبدالله المطرود",
+    "title": "ترتیل عبدالله المطرود",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "عبدالله المطرود",
+    "country": "عربستان",
+    "nationality": "سعودی",
+    "style": "murattal",
+    "description": "تلاوت ترتیل آیه‌به‌آیه با صدای عبدالله المطرود از مجموعهٔ صوتی تنزیل.",
+    "features": [
+      "پخش آیه‌به‌آیه",
+      "تکرار و تنظیم سرعت",
+      "دانلود اختیاری سوره"
+    ],
+    "links": [
+      {
+        "label": "مأخذ صوت: تنزیل",
+        "href": "https://tanzil.net/"
       }
     ]
   }

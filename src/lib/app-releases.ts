@@ -3,6 +3,13 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.2',date:'2026-10-26',title:'قاریان بیشتر و عکس‌های شناسنامه',changeKinds:['feature','improvement','fix','improvement'],changes:[
+    '۲۰ مجموعهٔ ترتیل آیه‌به‌آیه از تنزیل به انتخاب قاری اضافه شد؛ هر قاری دانلود و ذخیرهٔ جداگانه دارد.',
+    'عکس منشاوی، پرهیزگار و چند قاری دیگر در فهرست و شناسنامه نمایش داده می‌شود و همراه برنامه قابل نگهداری است.',
+    'زبان تایپ صوتی در جست‌وجوی قرآن روی عربی تنظیم شده؛ وضعیت شنیدن و پایان بدون دریافت گفتار هم نمایش داده می‌شود.',
+    'آیکون ترجمه ساده‌تر شد؛ متنِ اعلان نسخه در راست و دکمهٔ به‌روزرسانی و بستن در چپ قرار گرفتند.',
+  ],
+},{
   version:'0.4.1',date:'2026-10-26',title:'پیمایش نرم‌تر و نوار به‌روزرسانی خواناتر',changeKinds:['improvement','improvement','fix'],changes:[
     'تغییر اندازهٔ متن با حرکت دو انگشت ریزتر شده و ذخیرهٔ تنظیمات پس از مکث انجام می‌شود.',
     'نوار به‌روزرسانی با متن خواناتر، لینک تغییرات و نمایش پیشرفت دریافت فایل‌های لازم.',
