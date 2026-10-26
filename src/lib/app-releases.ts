@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.4',date:'2026-10-26',title:'اصلاح نوار به‌روزرسانی در موبایل',changeKinds:['fix'],changes:[
+    'متن نسخه در راست و دکمه‌ها در چپ ثابت ماندند؛ پایان جملهٔ «رسید.» در نمایشگر باریک بریده نمی‌شود.',
+  ],
+},{
   version:'0.4.3',date:'2026-10-26',title:'مشخصات خواناتر منابع',changeKinds:['improvement','fix'],changes:[
     'کشور، زبان و نوع تلاوت زیر نام قاری با برچسب‌های کوچک و پرچم کشور نمایش داده می‌شوند.',
     'نام زبان در فهرست منابع فقط به زبان رابط نمایش داده می‌شود و دیگر دوزبانه و تکراری نیست.',

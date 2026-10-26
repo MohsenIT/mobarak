@@ -1580,3 +1580,10 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .resource-meta { display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:6px; }
 .resource-meta-chip { display:inline-flex; align-items:center; gap:4px; max-width:100%; border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--ink-soft); background:var(--word-root); font-size:10px; line-height:1.8; white-space:nowrap; }
 .resource-meta-chip > span { font-family:system-ui,sans-serif; font-size:12px; line-height:1; }
+
+.app-update-notice { display:grid; grid-template-columns:minmax(0,1fr) auto auto; }
+.app-update-copy { display:flex; align-items:baseline; gap:4px; min-width:0; }
+.app-update-copy .app-update-version { flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.app-update-brand { flex:0 8 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.app-update-arrival { flex:none; unicode-bidi:isolate; }
+@media(max-width:360px) { .app-update-brand { display:none; } }
