@@ -1,3 +1,4 @@
+import readerArabic from '../../../public/data/reader-arabic.json'
 import {t} from '@/lib/i18n'
 import { toFa, type SurahMeta } from '@/lib/quran'
 
@@ -28,7 +29,7 @@ export function SurahBand({ sm, onNavigate }: { sm: SurahMeta; onNavigate?: () =
       </span>
       <span className="band-name">
         {revelation && <span className="band-revelation" title={t("ui.0eb0a3f03f",{p0:(revelation)})} aria-label={revelation}><RevelationIcon makki={sm.rev === 'makkah'} /></span>}
-        <span className="band-title">{t("ui.4ac1f68065")}{' '}{sm.ar}</span>
+        <span className="band-title" lang="ar" dir="rtl">{readerArabic.surahLabel}{' '}{sm.ar}</span>
       </span>
       <span className="band-side">
         <span className="band-meta band-info">{toFa(sm.vc)}{' '}{t("ui.b1b168c791")}</span>
@@ -40,7 +41,7 @@ export function SurahBand({ sm, onNavigate }: { sm: SurahMeta; onNavigate?: () =
 
 export function Bismillah({ size = '1em' }: { size?: string }) {
   return (
-    <div className="bismillah-line" style={{ fontSize: size }}>{t("ui.2ff6d6265e")}</div>
+    <div className="bismillah-line" lang="ar" dir="rtl" style={{ fontSize: size }}>{readerArabic.bismillah}</div>
   )
 }
 

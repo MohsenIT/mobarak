@@ -45,6 +45,7 @@ const round05 = (v: number) => Math.round(v * 20) / 20
 
 export default function Home() {
   useUiLanguage()
+  const [knownPersianReader]=useState(()=>LS.get('mushaf.safavi-default.v1',false)&&['s','f','a','m'].includes(LS.get('mushaf.tr','s')))
   const [meta, setMeta] = useState<Meta | null>(null)
   const [page, setPage] = useState(() => {
     if (typeof window === 'undefined') return LS.get('mushaf.page', 1)
@@ -495,7 +496,7 @@ export default function Home() {
           Removed the prev/next-surah chevrons (< >) — user said the
           constant-surah-jumping UX was weird. Surah switching now happens
           via the drawer (tap the title) or the slider in the drawer. */}
-      <header className="reader-toolbar relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
+      <header dir="rtl" className="reader-toolbar relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
         style={{
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
           backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
@@ -536,7 +537,7 @@ export default function Home() {
         </>}
       </header>
 
-      <LanguageOnboarding onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
+      <LanguageOnboarding knownPersianReader={knownPersianReader} onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
       <RecitationPlayer playRequest={audioPlayRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
 
       {returnToSearch && !searchOpen && (

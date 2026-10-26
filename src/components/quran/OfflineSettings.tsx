@@ -37,7 +37,7 @@ export default function OfflineSettings() {
   return <section aria-label={t("ui.995bf8fa6b")}>
     <h3 className="text-sm font-bold mb-3">{t("ui.995bf8fa6b")}</h3>
     <p className="text-xs leading-6 mb-2">{t("ui.12968b2a6b")}</p>
-    {([['maqayis', t("ui.4c3a424943")], ['ishtiqaqi', t("ui.1da653b2f3")]] as const).map(([id, label]) => <label key={id} className="flex gap-2 items-center min-h-11 text-sm"><input type="checkbox" checked={selected.includes(id)} disabled={busy} onChange={event => setSelected(event.target.checked ? [...selected, id] : selected.filter(item => item !== id))} />{label}</label>)}
+    {([['maqayis', t("ui.4c3a424943")], ['ishtiqaqi', t("ui.1da653b2f3")]] as const).map(([id, label]) => <label key={id} className="flex gap-2 items-center min-h-11 text-sm choice-row"><input type="checkbox" checked={selected.includes(id)} disabled={busy} onChange={event => setSelected(event.target.checked ? [...selected, id] : selected.filter(item => item !== id))} />{label}</label>)}
     <button className="chip min-h-11 px-3" disabled={busy} onClick={download}>{busy ? t("ui.80516c4adb") : t("ui.bdc6549d51")}</button>
     <p role="status" className="text-xs leading-6 mt-2">{message}</p>
   </section>

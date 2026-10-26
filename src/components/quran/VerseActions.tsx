@@ -68,9 +68,9 @@ export default function VerseActions({ surah, verse, translator }: { surah: Sura
         </div>
         <p id="share-help" className="text-sm" style={{ color: 'var(--ink-soft)' }}>{t("ui.cb4ff054ad")}</p>
         <div className="flex items-center gap-3 text-sm">
-          <label className="flex items-center gap-2 min-h-11"><input type="checkbox" checked={withTranslation} onChange={e => setWithTranslation(e.target.checked)} />{t("ui.d30162bcea")}</label>
+          <label className="flex items-center gap-2 min-h-11 choice-row"><input type="checkbox" checked={withTranslation} onChange={e => setWithTranslation(e.target.checked)} />{t("ui.d30162bcea")}</label>
           <details className="relative"><summary className="cursor-pointer p-2">{t("ui.d239a47f24")}</summary><div className="verse-share-options">
-            <label className="flex items-center gap-2 min-h-11"><input type="checkbox" checked={bismillah} onChange={e => setBismillah(e.target.checked)} />{t("ui.18068d691e")}</label>
+            <label className="flex items-center gap-2 min-h-11 choice-row"><input type="checkbox" checked={bismillah} onChange={e => setBismillah(e.target.checked)} />{t("ui.18068d691e")}</label>
             <button className="chip min-h-11 w-full" disabled={!chosen.length} onClick={() => copy(links())}><Link size={16} className="inline mx-1" />{t("ui.3b907474a3")}{' '}{chosen.length > 1 ? t("ui.d83f4af983") : t("ui.b1b168c791")}</button>
           </div></details>
         </div>

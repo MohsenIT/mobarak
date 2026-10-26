@@ -13,6 +13,8 @@ for (const file of ['src', 'public', 'package.json', 'tsconfig.json', 'postcss.c
 for (const book of ['maqayis', 'ishtiqaqi']) await rm(path.join(stage, 'public/data', book), { recursive: true, force: true })
 const extraTranslations=JSON.parse(await (await import('node:fs/promises')).readFile(path.join(root,'public/data/translations/catalogue.json'),'utf8'))
 for(const item of extraTranslations)await rm(path.join(stage,'public/data/translations',`${item.id}.json`),{force:true})
+const extraTranslations=JSON.parse(await (await import('node:fs/promises')).readFile(path.join(root,'public/data/translations/catalogue.json'),'utf8'))
+for(const item of extraTranslations)await rm(path.join(stage,'public/data/translations',`${item.id}.json`),{force:true})
 await rm(path.join(stage, 'src/app/api'), { recursive: true, force: true })
 const { readFile } = await import('node:fs/promises')
 const manifest = path.join(stage, 'src/app/manifest.ts')

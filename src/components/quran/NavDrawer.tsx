@@ -248,7 +248,7 @@ export default function NavDrawer(props: Props) {
 
           {tab === 'settings' && (
             <div className="p-4 flex flex-col gap-6">
-              <LanguageSettings translator={props.translator}/>
+              <LanguageSettings translator={props.translator} onTranslation={props.onTranslator}/>
               <ReadingScreenSettings />
               <UpdateSettings />
               <OfflineSettings />

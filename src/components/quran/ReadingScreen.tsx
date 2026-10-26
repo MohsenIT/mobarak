@@ -69,7 +69,7 @@ export function ReadingScreenProvider({ children }: { children: ReactNode }) {
 export default function ReadingScreenSettings() {
   const { enabled, status, toggle, retry } = useContext(ReadingScreen)
   return <section aria-label={t("ui.bc757e524c")}>
-    <label className="flex items-center justify-between gap-3 min-h-11 cursor-pointer text-sm font-bold">{t("ui.ddebea947c")}<input type="checkbox" role="switch" aria-label={t("ui.ddebea947c")} checked={enabled} disabled={status === 'unavailable'} onChange={event => toggle(event.target.checked)} className="h-5 w-5 shrink-0 accent-[var(--sage)]" />
+    <label className="flex items-center justify-between gap-3 min-h-11 cursor-pointer text-sm font-bold choice-row">{t("ui.ddebea947c")}<input type="checkbox" role="switch" aria-label={t("ui.ddebea947c")} checked={enabled} disabled={status === 'unavailable'} onChange={event => toggle(event.target.checked)} className="h-5 w-5 shrink-0 accent-[var(--sage)]" />
     </label>
     <p role="status" className="text-xs leading-6 mt-1" style={{ color: 'var(--ink-soft)' }}>{status === 'unavailable' ? t("ui.8cd5f86a69") : enabled && status === 'active' ? t("ui.763063cda7") : enabled && status === 'failed' ? t("ui.cd46e86ad5") : enabled ? t("ui.b5cbc3b789") : t("ui.8b1995cbd5")}</p>
     {enabled && status === 'failed' && <button type="button" className="chip min-h-11 px-3 mt-2" onClick={retry}>{t("ui.be9b8b4f2b")}</button>}

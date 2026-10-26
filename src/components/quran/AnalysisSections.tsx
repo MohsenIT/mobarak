@@ -61,7 +61,7 @@ export function AnalysisSettings({ tab, kind }: { tab: AnalysisTab; kind?: Kind 
         <legend className="font-bold text-xs mb-2">{value === 'meaning' ? t("ui.6b6bf2e9ed") : t("ui.72918c0be4")}</legend>
         {(value === 'meaning' ? MEANING_OPTIONS[tab] : STAT_OPTIONS[tab]).map(option => {
           const key = `${tab}.${value}.${option.id}`
-          return <label key={key} className="flex items-center gap-2 py-2 text-xs cursor-pointer"><input type="checkbox" checked={!prefs.hidden.includes(key)} onChange={() => update(current => ({ ...current, hidden: toggle(current.hidden, key) }))} />{t(option.label)}</label>
+          return <label key={key} className="flex items-center gap-2 py-2 text-xs cursor-pointer choice-row"><input type="checkbox" checked={!prefs.hidden.includes(key)} onChange={() => update(current => ({ ...current, hidden: toggle(current.hidden, key) }))} />{t(option.label)}</label>
         })}
       </fieldset>)}
       <label className="flex items-center gap-2 text-xs">{t("ui.56d96423b6")}<select aria-label={t("ui.6879ba512c")} value={prefs.statsFirst ? 'stats' : 'meaning'} onChange={event => update(current => ({ ...current, statsFirst: event.target.value === 'stats' }))} className="analysis-order-select"><option value="meaning">{t("ui.6b6bf2e9ed")}</option><option value="stats">{t("ui.72918c0be4")}</option></select></label>

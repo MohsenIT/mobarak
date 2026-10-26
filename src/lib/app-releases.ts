@@ -1,6 +1,12 @@
 export interface AppRelease { version:string; date:string; title:string; changes:string[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.3.4',date:'2026-10-26',title:'اصلاح نمایش زبان‌ها و متن عربی',changes:[
+    'بسم‌الله و عنوان سوره همیشه عربی می‌مانند و جای دکمه‌های نوار مطالعه با تغییر زبان عوض نمی‌شود.',
+    'تغییر زبان رابط، ترجمهٔ همان زبان را انتخاب می‌کند؛ نام زبان‌ها انگلیسی و بومی و با ترتیب تازه نمایش داده می‌شوند.',
+    'اصلاح جای متن و کنترل گزینه‌های انتخابی در رابط راست‌به‌چپ و چپ‌به‌راست.',
+  ],
+},{
   version:'0.3.3',date:'2026-10-26',title:'خوانایی پیشنهاد زبان',changes:[
     'اصلاح پس‌زمینه، رنگ متن‌ها و دکمه‌های پیشنهاد زبان در حالت شب و روشن.',
   ],

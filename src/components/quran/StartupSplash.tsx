@@ -1,5 +1,5 @@
 import {t} from '@/lib/i18n'
-import { APP_NAME, STARTUP_VERSE, STARTUP_VERSE_REFERENCE, STARTUP_VERSE_TRANSLATION, STARTUP_TRANSLATION_EMPHASIS } from '@/lib/branding'
+import { BISMILLAH, APP_NAME, STARTUP_VERSE, STARTUP_VERSE_REFERENCE, STARTUP_VERSE_TRANSLATION, STARTUP_TRANSLATION_EMPHASIS } from '@/lib/branding'
 
 export default function StartupSplash({ leaving = false, onHoldChange }: { leaving?: boolean; onHoldChange: (held: boolean) => void }) {
   return <div className={`startup-splash${leaving ? ' startup-leaving' : ''}`} onPointerDown={event => {
@@ -10,7 +10,7 @@ export default function StartupSplash({ leaving = false, onHoldChange }: { leavi
     onPointerUp={() => onHoldChange(false)} onPointerCancel={() => onHoldChange(false)}
     onLostPointerCapture={event => { if (event.target === event.currentTarget) onHoldChange(false) }} onContextMenu={event => event.preventDefault()}
     role="status" aria-label={t("ui.fb98ee85b5",{p0:(APP_NAME)})}>
-    <p className="startup-bism font-quran" lang="ar">{t("ui.a83ca7b2c2")}</p>
+    <p className="startup-bism font-quran" lang="ar">{BISMILLAH}</p>
     <img draggable={false} className="startup-logo" src="/icons/app-logo-v3-maskable-512.png" width="512" height="512" alt="" />
     <h1>{APP_NAME}</h1>
     <div className="startup-caption">

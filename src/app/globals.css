@@ -1487,3 +1487,12 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .language-dialog .language-accept { background:var(--ink); color:var(--paper); border-color:var(--ink); }
 .language-dialog .language-decline { background:var(--paper-2); color:var(--ink); border-color:var(--line-strong); }
 .language-dialog button:focus-visible { outline:2px solid var(--sage); outline-offset:3px; }
+
+/* Choice text follows interface direction; its control stays at the row's end. */
+.choice-row { display:flex; align-items:center; gap:.5rem; text-align:start; }
+.choice-row > input[type="checkbox"],.choice-row > input[type="radio"] { order:2; margin-inline-start:auto; flex-shrink:0; }
+.resource-select,.resource-picker-choice { text-align:start; }
+.language-dialog-compact { max-width:min(360px,calc(100vw - 32px)); padding:24px 20px 18px; gap:16px; }
+.language-dialog-compact .language-question { margin:12px 0 0; color:var(--ink); font-size:14px; line-height:1.9; text-align:start; }
+.language-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.language-actions button { flex:1; white-space:normal; }

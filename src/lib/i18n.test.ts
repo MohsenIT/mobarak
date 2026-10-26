@@ -1,7 +1,7 @@
 import {describe,test,expect} from 'bun:test'
 import {readFileSync,readdirSync} from 'node:fs'
 import ts from 'typescript'
-import {t,resolveLanguage,uiDirection,setUiLanguage,UI_LANGUAGES} from './i18n'
+import {t,resolveLanguage,uiDirection,setUiLanguage,UI_LANGUAGES,languageLabel,languageName} from './i18n'
 import fa from '@/messages/fa.json'
 import {EXTRA_TRANSLATIONS,isTranslator,defaultTranslation} from './translations'
 describe('language and translation contracts',()=>{
@@ -17,6 +17,12 @@ describe('language and translation contracts',()=>{
     ts.forEachChild(node,visit)
    };visit(source)
   }
+ })
+ test('language names have a native and English label even when ICU lacks the locale',()=>{
+  expect(UI_LANGUAGES.slice(0,3)).toEqual(['fa','ar','en'])
+  expect(languageLabel('tt')).toBe('Tatar · татар')
+  expect(languageLabel('fa')).toBe('Persian · فارسی')
+  for(const code of UI_LANGUAGES){expect(languageName(code)).not.toBe(code);expect(languageName(code,'en')).not.toBe(code)}
  })
  test('only registered translations can be restored from a link',()=>{expect(isTranslator('en.sahih')).toBe(true);expect(isTranslator('../../secret')).toBe(false);expect(defaultTranslation('en')).toBe('en.sahih');expect(defaultTranslation('fa')).toBe('s');expect(new Set(EXTRA_TRANSLATIONS.map(item=>item.language)).size).toBe(43)})
  test('translations preserve complete ordered source arrays and recorded empty verses',()=>{for(const item of EXTRA_TRANSLATIONS){const rows=JSON.parse(readFileSync(`public/data/translations/${item.id}.json`,'utf8'));expect(rows.length).toBe(6236);expect(rows.every((row:unknown)=>typeof row==='string')).toBe(true);expect(rows.filter((row:string)=>row.trim()).length).toBe(item.translatedVerses)}})

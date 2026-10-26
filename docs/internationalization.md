@@ -52,10 +52,29 @@ Off Vercel the endpoint returns null, and device detection still works. On nativ
 static exports a missing endpoint likewise falls back to the device. A 1.5-second
 bound prevents region lookup from holding the suggestion indefinitely.
 
-A non-Persian suggestion is shown in Persian and the target language. Neither UI
+A non-Persian suggestion uses a compact question and two actions in the target
+language, without a duplicated Persian paragraph or region explanation. Neither UI
 nor Quran translation changes before acceptance. Acceptance saves the locale,
 selects the target-language Quran source and enables translation display. Decline
 or dismissal keeps the current choices and suppresses future suggestions. An
-explicit Settings selection also suppresses suggestions. Interface language and
-Quran source can subsequently be changed independently. Stored choices survive
+explicit Settings selection also suppresses suggestions. Selecting an interface language in Settings also selects its default Quran
+source. Users can still override the Quran source independently afterwards. Stored choices survive
 reloads and work offline after their language/source assets have been obtained.
+
+Reader ornaments (Arabic basmala and surah prefix) are immutable data in
+`public/data/reader-arabic.json`, never UI translations. The top reader toolbar
+keeps RTL button positions regardless of interface direction. Choice rows keep
+text at the start and radio/checkbox controls at the end for each UI direction.
+
+`language-names.json` supplies guaranteed English and native names, including
+Tatar, Tamazight and Divehi when browser ICU omits them. Language lists start
+Persian, Arabic, English; subsequent order is a curated approximate Muslim-user
+reach priority, not measured speaker totals (second-language overlap and language
+boundaries make a precise count unavailable here). No demographic counts are
+presented as verified statistics.
+
+Do not prompt readers with a saved locale, prior dismissal, or a pre-existing
+Persian reading preference captured before first-render defaults are saved. A
+Persian browser language anywhere in the preferred list suppresses the suggestion.
+For an Iranian country hint and a generic English/unknown browser preference,
+keep Persian. These are conservative heuristics; no language is changed silently.

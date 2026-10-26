@@ -1,5 +1,5 @@
 'use client'
-import {t,uiDirection} from '@/lib/i18n'
+import {t,languageLabel,uiDirection} from '@/lib/i18n'
 
 import { useId, useState } from 'react'
 import { BookOpen, ExternalLink, X, Info, UserRound } from 'lucide-react'
@@ -43,7 +43,7 @@ export default function SourceReference({ text = '', source, label = t("ui.8a52f
   const resource=getResource(sourceId??source?.resourceId??'')
   const provided=source??fromText(text)
   const base:SourceInfo|undefined=resource?{title:resource.title,description:resource.description,image:resource.image,
-    fields:[{label:t("ui.23625d3dd4"),value:t(RESOURCE_KINDS[resource.kind])},...(resource.creator?[{label:resource.kind==='recitation'?t("ui.48288575ed"):resource.kind==='translation'?t("ui.52baa2cbee"):resource.kind==='lexicon'?t("ui.f72a3d8543"):t("ui.5544db5ccf"),value:resource.creator}]:[]),...(resource.country?[{label:t("ui.0ca5a0d367"),value:resource.country}]:[]),{label:t("ui.edd0aba98b"),value:RESOURCE_LANGUAGES[resource.language]??resource.language},...(resource.style?[{label:t("ui.861afdb3c3"),value:t(RECITATION_STYLES[resource.style])}]:[]),...(resource.date?[{label:resource.dateLabel??t("ui.9699c34220"),value:resource.date}]:[])],notes:resource.features,links:resource.links}:undefined
+    fields:[{label:t("ui.23625d3dd4"),value:t(RESOURCE_KINDS[resource.kind])},...(resource.creator?[{label:resource.kind==='recitation'?t("ui.48288575ed"):resource.kind==='translation'?t("ui.52baa2cbee"):resource.kind==='lexicon'?t("ui.f72a3d8543"):t("ui.5544db5ccf"),value:resource.creator}]:[]),...(resource.country?[{label:t("ui.0ca5a0d367"),value:resource.country}]:[]),{label:t("ui.edd0aba98b"),value:languageLabel(resource.language)},...(resource.style?[{label:t("ui.861afdb3c3"),value:t(RECITATION_STYLES[resource.style])}]:[]),...(resource.date?[{label:resource.dateLabel??t("ui.9699c34220"),value:resource.date}]:[])],notes:resource.features,links:resource.links}:undefined
   const info:SourceInfo=base?{...provided,title:base.title,description:provided.description??base.description,image:provided.image??base.image,fields:[...(base.fields??[]).filter(field=>!provided.fields?.some(p=>p.label===field.label)),...(provided.fields??[])],notes:[...(base.notes??[]),...(provided.notes??[])],links:[...(base.links??[]),...(provided.links??[])]}:provided
   const fields=(info.fields??[]).filter((field,i,all)=>!/(مجوز|license|copyright)/i.test(field.label)&&all.findIndex(other=>other.label===field.label&&other.value===field.value)===i)
   const links = info.links?.filter((link,i,all) => (/^https?:\/\//.test(link.href) || /^\/(?!\/)/.test(link.href)) && all.findIndex(other=>other.href===link.href)===i)
