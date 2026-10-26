@@ -4,13 +4,13 @@ import { quranDisplayText } from './quran-display'
 test('the sakin-sin hamza seat retains its tooth in the Hafs display', () => {
   expect(quranDisplayText('نَسْـَٔلُكَ')).toBe('نَسْئَلُكَ')
   expect(quranDisplayText('يَسْـَٔلُونَكَ')).toBe('يَسْئَلُونَكَ')
-  expect(quranDisplayText('مَسْـُٔولًۭا')).toBe('مَسْئُولًا')
+  expect(quranDisplayText('مَسْـُٔولًۭا')).toBe('مَسْئُولًۭا')
 })
 
 test('unrelated hamza carriers and letters are not rewritten', () => {
   expect(quranDisplayText('ٱلْـَٔاخِرَةِ')).toBe('ٱلْـَٔاخِرَةِ')
-  expect(quranDisplayText('بِـَٔايَـٰتِنَا')).toBe('بِـَٔايَـتِنَا')
-  expect(quranDisplayText('نَسْلُكُهُۥ')).toBe('نَسْلُكُهُ')
+  expect(quranDisplayText('بِـَٔايَـٰتِنَا')).toBe('بِـَٔايَـٰتِنَا')
+  expect(quranDisplayText('نَسْلُكُهُۥ')).toBe('نَسْلُكُهُۥ')
 })
 
 test('the compatibility fix covers the same pattern across all 114 surahs', async () => {
@@ -34,6 +34,29 @@ test('the compatibility fix covers the same pattern across all 114 surahs', asyn
 
 test('hidden pause signs do not leave whitespace inside selectable words', () => {
   expect(quranDisplayText('مِسَاسَ ۖ')).toBe('مِسَاسَ')
-  expect(quranDisplayText('أَسِفًۭا ۚ')).toBe('أَسِفًا')
+  expect(quranDisplayText('أَسِفًۭا ۚ')).toBe('أَسِفًۭا')
   expect(quranDisplayText('لَا مِسَاسَ ۖ')).toBe('لَا مِسَاسَ')
+})
+
+test('superscript alef and real yeh remain distinct in the reported Saffat verses',()=>{
+ expect(quranDisplayText('نَادَىٰنَا')).toBe('نَادَىٰنَا')
+ expect(quranDisplayText('وَنَجَّيْنَـٰهُ')).toBe('وَنَجَّيْنَـٰهُ')
+ expect(quranDisplayText('وَأَهْلَهُۥ')).toBe('وَأَهْلَهُۥ')
+})
+
+test('no Quran letter or pronunciation mark is lost across the entire source corpus',async()=>{
+ let alefs=0,smallLetters=0
+ for(let s=1;s<=114;s++){
+  const data=await Bun.file(`${import.meta.dir}/../../public/data/surah/${s}.json`).json()
+  for(const verse of data.v)for(const word of verse.w){
+   const original=word.t as string,result=quranDisplayText(original)
+   for(const mark of ['\u0670','\u06DF','\u06E0','\u06E2','\u06E3','\u06E5','\u06E6','\u06E7','\u06E8','\u06EA','\u06EB','\u06EC','\u06ED','ي','ى']){
+    expect(result.split(mark).length).toBe(original.split(mark).length)
+   }
+   alefs+=(original.match(/\u0670/g)||[]).length
+   smallLetters+=(original.match(/[\u06E5-\u06E8]/g)||[]).length
+  }
+ }
+ expect(alefs).toBe(9725)
+ expect(smallLetters).toBe(2253)
 })

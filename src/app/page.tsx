@@ -1,4 +1,5 @@
 'use client'
+import {useReaderPinch} from '@/components/quran/useReaderPinch'
 import {useStudyWorkspace} from '@/lib/study-store'
 import {t,useUiLanguage} from '@/lib/i18n'
 import {isTranslator} from '@/lib/translations'
@@ -168,10 +169,7 @@ export default function Home() {
   useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
   useEffect(() => { setHiddenComparisonRoots(new Set()); setSoloComparisonRoot(null) }, [comparisonRange?.s, comparisonRange?.from, comparisonRange?.to])
   const mutedComparisonRoots = useMemo(() => new Set(Object.keys(comparisonRoots).filter(root => soloComparisonRoot ? root !== soloComparisonRoot : hiddenComparisonRoots.has(root))), [comparisonRoots, hiddenComparisonRoots, soloComparisonRoot])
-  const pinchRef = useRef<{ d: number; s: number } | null>(null)
-  const zoomFrame = useRef<number | null>(null)
-  const pendingZoom = useRef(1)
-  useEffect(() => () => { if (zoomFrame.current !== null) cancelAnimationFrame(zoomFrame.current) }, [])
+  useReaderPinch(mainRef,scale,setScale,!!meta)
 
   useEffect(() => { loadMeta().then(setMeta) }, [])
   useEffect(() => {
@@ -453,29 +451,6 @@ export default function Home() {
     return () => window.removeEventListener('keydown', h)
   }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel, searchOpen])
 
-  // Pinch zoom; page reading is vertical in both display modes.
-  const touchDist = (t: React.TouchList) =>
-    Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY)
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 2) {
-      pinchRef.current = { d: touchDist(e.touches), s: scale }
-    }
-  }
-  const onTouchMove = (e: React.TouchEvent) => {
-    if (pinchRef.current && e.touches.length === 2) {
-      const d = touchDist(e.touches)
-      const ratio = d / pinchRef.current.d
-      if (pinchRef.current.d <= 0) return
-      pendingZoom.current = Math.round(clamp(pinchRef.current.s * ratio, 0.55, 1.9) * 1000) / 1000
-      if (zoomFrame.current === null) zoomFrame.current = requestAnimationFrame(() => {
-        zoomFrame.current = null
-        setScale(pendingZoom.current)
-      })
-    }
-  }
-  const onTouchEnd = () => { pinchRef.current = null }
-
   const pageInfo = useMemo(() => {
     if (!meta) return { names: '', juz: null as number | null }
     // Use Arabic names (s.ar) per user request — Persian names were confusing
@@ -573,8 +548,7 @@ export default function Home() {
       )}
       {/* ===== Main + side root panel ===== */}
       <div className="relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row lg:items-stretch">
-        <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main"
-          onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd}>
+        <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main">
           {mode === 'mushaf' ? (
             <ContinuousMushaf meta={meta} page={page} navigationRevision={mushafNavigationRevision}
               onPageChange={setPage} onContentReady={onMushafContentReady} showTrans={showTrans} translator={translator} scale={scale}

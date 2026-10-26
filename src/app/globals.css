@@ -1582,3 +1582,6 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .app-update-later { grid-column:3; grid-row:1; display:flex; align-items:center; justify-content:flex-start; direction:ltr; width:24px; min-height:32px; padding:0; color:var(--update-ink); }
 .app-update-later svg { width:14px; height:14px; display:block; }
 @media(max-width:360px) { .app-update-brand { display:none; } }
+
+.quran-main[data-reader-pinching] { user-select:none; -webkit-user-select:none; }
+.quran-main[data-reader-pinching] [data-reading-scroll] { overflow-anchor:none; }

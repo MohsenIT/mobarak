@@ -128,6 +128,7 @@ export default function ContinuousMushaf({ meta, page, navigationRevision, onPag
 
   return <div ref={scroll} data-reading-scroll data-continuous-mushaf className="relative flex-1 min-h-0 overflow-y-auto overflow-x-hidden nice-scroll"
     onScroll={schedule} style={{ overscrollBehaviorY: 'contain' }}>
+    <div data-pinch-content>
     {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => {
       const visible = p >= range.from && p <= range.to
       return <section key={p} ref={el => { if (el) sections.current.set(p, el); else sections.current.delete(p) }}
@@ -137,5 +138,6 @@ export default function ContinuousMushaf({ meta, page, navigationRevision, onPag
           fontSize={fontSize} flowFont={22 * scale} pageHeight={pageHeight} onReady={onContentReady} onMeasure={measure} {...reading} />}
       </section>
     })}
+    </div>
   </div>
 }

@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.7',date:'2026-10-26',title:'دقت متن قرآن و بزرگ‌نمایی نرم‌تر',changeKinds:['improvement','fix','fix'],changes:[
+    'آیکون ترجمه از طرح ارسالی ساخته شد؛ تناسب حروف حفظ شده و رنگ آن با تم برنامه هماهنگ است.',
+    'بزرگ‌نمایی با دو انگشت هنگام حرکت، متن سوره را پی‌درپی محاسبه نمی‌کند؛ اندازه پس از پایان حرکت ذخیره می‌شود.',
+    'الف‌های کوچک، واو و یای کوچک و نشانه‌های تلفظ قرآن دیگر هنگام نمایش حذف نمی‌شوند.',
+  ],
+},{
   version:'0.4.6',date:'2026-10-26',title:'هماهنگی رنگ نوار با تم برنامه',changeKinds:['improvement'],changes:[
     'رنگ نوار به‌روزرسانی با سبز و کرم خود برنامه هماهنگ شد و همچنان از زمینه مشخص است.',
   ],

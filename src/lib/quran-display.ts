@@ -6,7 +6,10 @@ export function quranDisplayText(text: string): string {
     // hamza glyph for display so its tooth remains visible (e.g. نَسْـَٔلُكَ).
     // Do not apply this to all tatweel/hamza pairs: الآخرة has a different seat.
     .replace(/سْـٔ/g, 'سْئ')
-    .replace(/[\u06D6-\u06ED\u0670]/g, '')
+    // Hide only standalone pause/section annotations. Superscript alef,
+    // small waw/yeh and pronunciation marks are part of the Quran's writing;
+    // deleting the whole Arabic-signs range silently removed them everywhere.
+    .replace(/[\u06D6-\u06DC\u06DE\u06E9]/g, '')
     // A hidden pause mark may leave a trailing space inside a selectable word.
     .trim()
 }
