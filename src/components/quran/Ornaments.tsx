@@ -82,7 +82,7 @@ export const IconChevronL = () => <I><path d="M14 6l-6 6 6 6" /></I>
 export const IconChevronR = () => <I><path d="M10 6l6 6-6 6" /></I>
 export const IconBook = () => <I><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5Z" /><path d="M4 20.5V5.5M20 18v3H6.5" /></I>
 export const IconType = () => <I><path d="M5 7V5h14v2M12 5v14M9.5 19h5" /></I>
-export const IconTranslate = () => <I><path d="M4 6h9M8.5 4v2c0 3.5-2.6 6.8-5.5 8M5.5 9.5c1 2.6 3.4 5 6 6" /><path d="M13 20l4.2-9 4.2 9M14.4 16.5h5.6" /></I>
+export const IconTranslate = ({size=22}:{size?:number}) => <I size={size}><text x="2" y="14" fontFamily="Vazirmatn, sans-serif" fontSize="16" fontWeight="600" direction="ltr" textAnchor="start" stroke="none" fill="currentColor">&#1593;</text><path d="M13 20l4.2-9 4.2 9M14.4 16.5h5.6" /></I>
 export const IconRoot = () => <I><circle cx="12" cy="5" r="2.2" /><path d="M12 7.5V12M12 12l-5 4.5M12 12l5 4.5M7 16.5c-1.5 2-2 4.5-2 4.5M17 16.5c1.5 2 2 4.5 2 4.5" /></I>
 
 /** Maximize (square with corner arrows) — for the half-page panel expand button */

@@ -1,4 +1,5 @@
 'use client'
+import {normalizeDigits} from '@/lib/locale-numbers'
 import {t} from '@/lib/i18n'
 import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
@@ -48,7 +49,7 @@ export default function QuickSurahSearch({ surah, meta, onNavigate, onClose, onP
   useEffect(() => {
     const id = ++request.current
     setError(false); setResults([]); setIndex(0)
-    const value = query.trim().replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
+    const value = normalizeDigits(query).trim().replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
     if (mode === 'text' && isNavigationInput(query)) { setBusy(false); return }
     if (/^\d+$/.test(value)) {
       const a = Number(value)

@@ -601,5 +601,11 @@
   "resource.tafsir": "Тәфсир",
   "resource.corpus": "Тел корпусы",
   "resource.murattal": "Мураттал",
-  "resource.mujawwad": "Мөҗәввәд"
+  "resource.mujawwad": "Мөҗәввәд",
+  "release.feature": "Яңа функция",
+  "release.improvement": "Яхшырту",
+  "release.fix": "Хаталарны төзәтү",
+  "release.security": "Иминлек",
+  "release.removed": "Бетерелгән",
+  "release.more": "Иске версияләр"
 }

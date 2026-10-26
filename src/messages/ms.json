@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Korpus bahasa",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mujawwad"
+  "resource.mujawwad": "Mujawwad",
+  "release.feature": "Ciri baharu",
+  "release.improvement": "Penambahbaikan",
+  "release.fix": "Pembaikan pepijat",
+  "release.security": "Keselamatan",
+  "release.removed": "Dibuang",
+  "release.more": "Keluaran lama"
 }

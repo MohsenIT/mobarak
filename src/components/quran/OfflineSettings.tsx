@@ -28,7 +28,7 @@ export default function OfflineSettings() {
   async function download() {
     setBusy(true); setMessage(t("ui.069a6fab08"))
     try {
-      await downloadOffline(['core', 'tahqiq', ...selected], (done, total) => setMessage(t("ui.b33ecce1c3",{p0:(done.toLocaleString('fa')),p1:(total.toLocaleString('fa'))})))
+      await downloadOffline(['core', 'tahqiq', ...selected], (done, total) => setMessage(t("ui.b33ecce1c3",{p0:(done),p1:(total)})))
       localStorage.setItem('offline-optional-books', JSON.stringify(selected))
       setMessage(t("ui.026091c23f"))
     } catch { setMessage(t("ui.d5455de594")) }

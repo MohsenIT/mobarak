@@ -601,5 +601,11 @@
   "resource.tafsir": "தப்ஸீர்",
   "resource.corpus": "மொழி தரவு",
   "resource.murattal": "முரத்தல்",
-  "resource.mujawwad": "முஜவ்வத்"
+  "resource.mujawwad": "முஜவ்வத்",
+  "release.feature": "புதிய அம்சம்",
+  "release.improvement": "மேம்பாடு",
+  "release.fix": "பிழை திருத்தம்",
+  "release.security": "பாதுகாப்பு",
+  "release.removed": "நீக்கப்பட்டது",
+  "release.more": "பழைய பதிப்புகள்"
 }

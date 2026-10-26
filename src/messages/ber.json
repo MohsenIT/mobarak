@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Aḍris n tutlayt",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mujawwad"
+  "resource.mujawwad": "Mujawwad",
+  "release.feature": "Tawuri tamaynut",
+  "release.improvement": "Asideg",
+  "release.fix": "Asiged n wugur",
+  "release.security": "Tafrat",
+  "release.removed": "Yettwakkes",
+  "release.more": "Isufta iqdimen"
 }

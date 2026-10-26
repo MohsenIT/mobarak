@@ -1,4 +1,5 @@
 'use client'
+import {normalizeDigits} from '@/lib/locale-numbers'
 import {t,uiDirection} from '@/lib/i18n'
 
 import { useEffect, useMemo, useState } from 'react'
@@ -19,7 +20,7 @@ interface Props {
 }
 
 function parseVerse(value: string) {
-  const normalized = value.trim().replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
+  const normalized = normalizeDigits(value).trim().replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
     .replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
   return /^\d+$/.test(normalized) ? Number(normalized) : NaN
 }
@@ -82,7 +83,7 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
           ].map(field => (
             <label key={field.label} className="flex-1 min-w-0 text-xs">
               {field.label}
-              <input inputMode="numeric" value={field.value} onChange={e => field.change(e.target.value)}
+              <input inputMode="numeric" value={toFa(field.value)} onChange={e => field.change(e.target.value)}
                 className="block w-full rounded-lg border p-2 mt-1 bg-transparent text-base"
                 style={{ borderColor: 'var(--line-strong)' }} aria-invalid={!valid} />
             </label>

@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Corpus lingvistic",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mujawwad"
+  "resource.mujawwad": "Mujawwad",
+  "release.feature": "Funcționalitate nouă",
+  "release.improvement": "Îmbunătățire",
+  "release.fix": "Corecție erori",
+  "release.security": "Securitate",
+  "release.removed": "Eliminat",
+  "release.more": "Versiuni anterioare"
 }

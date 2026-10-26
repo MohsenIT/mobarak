@@ -601,5 +601,11 @@
   "resource.tafsir": "تفسیر",
   "resource.corpus": "دادهٔ زبانی",
   "resource.murattal": "ترتیل",
-  "resource.mujawwad": "تحقیق / مجوّد"
+  "resource.mujawwad": "تحقیق / مجوّد",
+  "release.feature": "امکان تازه",
+  "release.improvement": "بهبود",
+  "release.fix": "رفع مشکل",
+  "release.security": "امنیت",
+  "release.removed": "حذف‌شده",
+  "release.more": "نسخه‌های قدیمی‌تر"
 }

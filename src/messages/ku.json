@@ -601,5 +601,11 @@
   "resource.tafsir": "Tefsîr",
   "resource.corpus": "Korpusê zimanî",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mucewwed"
+  "resource.mujawwad": "Mucewwed",
+  "release.feature": "Taybetmendiya nû",
+  "release.improvement": "Baştirbûn",
+  "release.fix": "Çareserkirina xeletiyan",
+  "release.security": "Ewlehî",
+  "release.removed": "Hat rakirin",
+  "release.more": "Guhertoyên kevntir"
 }

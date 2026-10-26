@@ -601,5 +601,11 @@
   "resource.tafsir": "Тафсир",
   "resource.corpus": "Корпуси забонӣ",
   "resource.murattal": "Мураттал",
-  "resource.mujawwad": "Муҷаввад"
+  "resource.mujawwad": "Муҷаввад",
+  "release.feature": "Хусусияти нав",
+  "release.improvement": "Беҳтарсозӣ",
+  "release.fix": "Ислоҳи хатогиҳо",
+  "release.security": "Амният",
+  "release.removed": "Хориҷ карда шуд",
+  "release.more": "Версияҳои кӯҳна"
 }

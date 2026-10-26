@@ -601,5 +601,11 @@
   "resource.tafsir": "Tefsir",
   "resource.corpus": "Jezički korpus",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mudževved"
+  "resource.mujawwad": "Mudževved",
+  "release.feature": "Nova funkcija",
+  "release.improvement": "Poboljšanje",
+  "release.fix": "Ispravka grešaka",
+  "release.security": "Sigurnost",
+  "release.removed": "Uklonjeno",
+  "release.more": "Starije verzije"
 }

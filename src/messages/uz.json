@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Til korpusi",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mujavvad"
+  "resource.mujawwad": "Mujavvad",
+  "release.feature": "Yangi funksiya",
+  "release.improvement": "Yaxshilash",
+  "release.fix": "Xatolarni tuzatish",
+  "release.security": "Xavfsizlik",
+  "release.removed": "O'chirildi",
+  "release.more": "Eski versiyalar"
 }

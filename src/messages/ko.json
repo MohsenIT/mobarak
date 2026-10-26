@@ -601,5 +601,11 @@
   "resource.tafsir": "타프시르",
   "resource.corpus": "언어 코퍼스",
   "resource.murattal": "무랏탈",
-  "resource.mujawwad": "무자우와드"
+  "resource.mujawwad": "무자우와드",
+  "release.feature": "새로운 기능",
+  "release.improvement": "개선 사항",
+  "release.fix": "버그 수정",
+  "release.security": "보안",
+  "release.removed": "제거됨",
+  "release.more": "이전 버전"
 }

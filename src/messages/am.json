@@ -601,5 +601,11 @@
   "resource.tafsir": "ተፍሲር",
   "resource.corpus": "ቋንቋዊ መረጃ",
   "resource.murattal": "ሙረታል",
-  "resource.mujawwad": "ሙጃውዋድ"
+  "resource.mujawwad": "ሙጃውዋድ",
+  "release.feature": "አዲስ ባህሪ",
+  "release.improvement": "ማሻሻያ",
+  "release.fix": "የስህተት እርማት",
+  "release.security": "ደህንነት",
+  "release.removed": "ተወግዷል",
+  "release.more": "የድሮ ስሪቶች"
 }

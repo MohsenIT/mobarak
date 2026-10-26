@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Data ya lugha",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mujawwad"
+  "resource.mujawwad": "Mujawwad",
+  "release.feature": "Kipengele kipya",
+  "release.improvement": "Uboreshaji",
+  "release.fix": "Marekebisho ya hitilafu",
+  "release.security": "Usalama",
+  "release.removed": "Imeondolewa",
+  "release.more": "Matoleo ya zamani"
 }

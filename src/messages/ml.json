@@ -601,5 +601,11 @@
   "resource.tafsir": "തഫ്സീർ",
   "resource.corpus": "ഭാഷാപരമായ വിവരങ്ങൾ",
   "resource.murattal": "മുറത്തൽ",
-  "resource.mujawwad": "മുജവ്വദ്"
+  "resource.mujawwad": "മുജവ്വദ്",
+  "release.feature": "പുതിയ ഫീച്ചർ",
+  "release.improvement": "മെച്ചപ്പെടുത്തൽ",
+  "release.fix": "ബഗ് പരിഹാരം",
+  "release.security": "സുരക്ഷ",
+  "release.removed": "നീക്കം ചെയ്തത്",
+  "release.more": "പഴയ പതിപ്പുകൾ"
 }

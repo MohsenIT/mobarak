@@ -1,4 +1,5 @@
 'use client'
+import {formatDigits} from './locale-numbers'
 import {useEffect,useSyncExternalStore} from 'react'
 import fa from '@/messages/fa.json'
 import languages from '@/messages/languages.json'
@@ -22,7 +23,7 @@ export function resolveLanguage(tags:readonly string[]){for(const tag of tags){c
 export function t(key:string,values:Record<string,string|number|undefined>={}){
  const id=Object.hasOwn(fa,key)?key:reverse.get(key)??key
  const text=catalogue[id]??(fa as Record<string,string>)[id]??key
- return text.replace(/\{(\w+)\}/g,(match,name)=>Object.hasOwn(values,name)?String(values[name]??''):match)
+ return formatDigits(text.replace(/\{(\w+)\}/g,(match,name)=>Object.hasOwn(values,name)?String(values[name]??''):match),locale)
 }
 export async function setUiLanguage(next:string,persist=true){
  if(!UI_LANGUAGES.includes(next))return false

@@ -601,5 +601,11 @@
   "resource.tafsir": "タフスィール",
   "resource.corpus": "言語コーパス",
   "resource.murattal": "ムラッタル",
-  "resource.mujawwad": "ムジャッワド"
+  "resource.mujawwad": "ムジャッワド",
+  "release.feature": "新機能",
+  "release.improvement": "改善",
+  "release.fix": "バグ修正",
+  "release.security": "セキュリティ",
+  "release.removed": "削除済み",
+  "release.more": "以前のバージョン"
 }

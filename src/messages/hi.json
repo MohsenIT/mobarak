@@ -601,5 +601,11 @@
   "resource.tafsir": "तफ़सीर",
   "resource.corpus": "भाषाई डेटा",
   "resource.murattal": "मुरत्तल",
-  "resource.mujawwad": "मुजव्वाद"
+  "resource.mujawwad": "मुजव्वाद",
+  "release.feature": "नया फीचर",
+  "release.improvement": "सुधार",
+  "release.fix": "बग फिक्स",
+  "release.security": "सुरक्षा",
+  "release.removed": "हटाया गया",
+  "release.more": "पुराने वर्ज़न"
 }

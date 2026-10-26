@@ -601,5 +601,11 @@
   "resource.tafsir": "Tefsir",
   "resource.corpus": "Dil külliyatı",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mücevved"
+  "resource.mujawwad": "Mücevved",
+  "release.feature": "Yeni özellik",
+  "release.improvement": "İyileştirme",
+  "release.fix": "Hata düzeltme",
+  "release.security": "Güvenlik",
+  "release.removed": "Kaldırılan",
+  "release.more": "Eski sürümler"
 }

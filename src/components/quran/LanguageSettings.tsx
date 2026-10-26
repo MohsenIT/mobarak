@@ -1,6 +1,7 @@
 'use client'
 import {useEffect,useState} from 'react'
-import {Languages,Download} from 'lucide-react'
+import {Download,ChevronDown} from 'lucide-react'
+import {IconTranslate} from './Ornaments'
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog'
 import {UI_LANGUAGES,languageName,languageLabel,resolveLanguage,uiDirection,setUiLanguage,useUiLanguage,t} from '@/lib/i18n'
 import {defaultTranslation,EXTRA_TRANSLATIONS,type Translator} from '@/lib/translations'
@@ -44,8 +45,11 @@ export function LanguageOnboarding({onTranslation,knownPersianReader=false}:{onT
  </Dialog>
 }
 export default function LanguageSettings({translator,onTranslation}:{translator:Translator;onTranslation:(id:Translator)=>void}){
- const {language,dir}=useUiLanguage(),[message,setMessage]=useState(''),[busy,setBusy]=useState(false)
- async function change(next:string){setBusy(true);if(await setUiLanguage(next)){onTranslation(defaultTranslation(next));setMessage(t('language.saved'))}else setMessage(t('language.failed'));setBusy(false)}
+ const {language,dir}=useUiLanguage(),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[choosing,setChoosing]=useState(false),[query,setQuery]=useState('')
+ async function change(next:string){setBusy(true);if(await setUiLanguage(next)){onTranslation(defaultTranslation(next));setMessage(t('language.saved'));setChoosing(false)}else setMessage(t('language.failed'));setBusy(false)}
  async function download(){setBusy(true);setMessage(t('language.downloading'));try{const groups=EXTRA_TRANSLATIONS.some(item=>item.id===translator)?[`translation:${translator}`]:['core'];await downloadOffline(groups);try{const saved=JSON.parse(localStorage.getItem('offline-optional-translations')??'[]');localStorage.setItem('offline-optional-translations',JSON.stringify([...new Set([...(Array.isArray(saved)?saved:[]),...groups.filter(group=>group.startsWith('translation:'))])]))}catch{};setMessage(t('language.downloaded'))}catch{setMessage(t('language.downloadFailed'))}finally{setBusy(false)}}
- return <section dir={dir} className="language-settings"><h3 className="text-sm font-bold mb-3 flex items-center gap-2"><Languages size={18}/>{t('language.settings')}</h3><label className="flex flex-col gap-2 text-sm">{t('language.interface')}<select aria-label={t('language.interface')} className="resource-select" value={language} disabled={busy} onChange={event=>void change(event.target.value)}>{UI_LANGUAGES.map(code=><option key={code} value={code} lang={code}>{languageLabel(code)}</option>)}</select></label><p className="text-xs leading-6 my-2">{t('language.separate')}</p><button type="button" className="chip min-h-11 px-3 inline-flex items-center gap-2" disabled={busy} onClick={download}><Download size={15}/>{t('language.download')}</button><p className="text-xs leading-6 mt-2" role="status">{message}</p></section>
+ return <section dir={dir} className="language-settings"><h3 className="text-sm font-bold mb-3 flex items-center gap-2"><IconTranslate size={18}/>{t('language.settings')}</h3>
+ <div className="flex flex-col gap-2 text-sm"><span>{t('language.interface')}</span><button type="button" aria-label={t('language.interface')} aria-haspopup="dialog" className="resource-select" onClick={()=>{setQuery('');setChoosing(true)}}><span>{languageLabel(language)}</span><ChevronDown size={15}/></button></div>
+ <Dialog open={choosing} onOpenChange={open=>{if(!busy)setChoosing(open)}}><DialogContent className="resource-picker-dialog language-select-dialog" dir={dir}><DialogTitle>{t('language.choose')}</DialogTitle><DialogDescription className="sr-only">{t('language.separate')}</DialogDescription><input type="search" className="resource-select" value={query} aria-label={t('language.choose')} placeholder={t('ui.edd0aba98b')} onChange={event=>setQuery(event.target.value)}/><div className="language-choice-list" role="radiogroup" aria-label={t('language.interface')}>{UI_LANGUAGES.filter(code=>`${languageLabel(code)} ${languageName(code,language)} ${code}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())).map(code=><label key={code} className="language-choice-row choice-row"><span>{languageLabel(code)}</span><input type="radio" name="ui-language-choice" value={code} checked={language===code} disabled={busy} onChange={()=>void change(code)}/></label>)}</div></DialogContent></Dialog>
+ <p className="text-xs leading-6 my-2">{t('language.separate')}</p><button type="button" className="chip min-h-11 px-3 inline-flex items-center gap-2" disabled={busy} onClick={download}><Download size={15}/>{t('language.download')}</button><p className="text-xs leading-6 mt-2" role="status">{message}</p></section>
 }

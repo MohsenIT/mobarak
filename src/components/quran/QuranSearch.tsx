@@ -4,7 +4,8 @@ import {t,uiDirection} from '@/lib/i18n'
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Search, X, LoaderCircle, ArrowRight, Funnel, Languages, BookOpen, MoreHorizontal, Link, Check } from 'lucide-react'
+import {IconTranslate} from './Ornaments'
+import { Search, X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreHorizontal, Link, Check } from 'lucide-react'
 import type { Meta, Translator, Translations } from '@/lib/quran'
 import { loadTrans, toFa, morphologyLabel } from '@/lib/quran'
 import { type AnalysisSelection } from '@/lib/analysis'
@@ -199,7 +200,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
             try { await navigator.clipboard.writeText(searchLink(process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app' : window.location.href, linkState).href); setCopyStatus(t("ui.dc5c67b8a3")) }
             catch { setCopyStatus(t("ui.7087c79136")) }
           }}>{copyStatus === t("ui.dc5c67b8a3") ? <Check size={18} /> : <Link size={18} />}</button>
-          <button type="button" className="icon-btn search-translation-toggle" aria-label={t("ui.37e2fdb79c")} title={t("ui.a35032af94")} aria-pressed={showTranslation} onClick={() => setShowTranslation(value => !value)}><Languages size={20} /></button>
+          <button type="button" className="icon-btn search-translation-toggle" aria-label={t("ui.37e2fdb79c")} title={t("ui.a35032af94")} aria-pressed={showTranslation} onClick={() => setShowTranslation(value => !value)}><IconTranslate size={20} /></button>
         </div>
         <div className="search-controls-row">
           <div className="search-mode-tabs" role="group" aria-label={t("ui.50ca6c9156")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={mode === key && !occurrenceFilter} onClick={() => { onClearOccurrenceFilter?.(); setSuggestions([]); setMode(key); input.current?.focus({ preventScroll: true }) }}>{label}</button>)}</div>

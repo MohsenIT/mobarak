@@ -601,5 +601,11 @@
   "resource.tafsir": "تفسير",
   "resource.corpus": "متن لغوي",
   "resource.murattal": "مرتل",
-  "resource.mujawwad": "مجوّد"
+  "resource.mujawwad": "مجوّد",
+  "release.feature": "ميزة جديدة",
+  "release.improvement": "تحسين",
+  "release.fix": "إصلاح خطأ",
+  "release.security": "أمان",
+  "release.removed": "تمت الإزالة",
+  "release.more": "إصدارات أقدم"
 }

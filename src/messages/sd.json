@@ -601,5 +601,11 @@
   "resource.tafsir": "تفسير",
   "resource.corpus": "لسانياتي مواد",
   "resource.murattal": "مرتل",
-  "resource.mujawwad": "مجوّد"
+  "resource.mujawwad": "مجوّد",
+  "release.feature": "نئين خصوصيت",
+  "release.improvement": "بهتري",
+  "release.fix": "بگ فڪس",
+  "release.security": "سيڪيورٽي",
+  "release.removed": "هٽايو ويو",
+  "release.more": "پراڻا ورجن"
 }

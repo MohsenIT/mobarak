@@ -47,3 +47,12 @@ App Store ratings or pixel-identical designs:
 For this app, history belongs next to the current version in the existing Update
 settings section; the top strip is only a shortcut. At widths below 300px the optional
 version text hides, while Update and Close remain. Otherwise the text may ellipsize.
+
+Release rows keep the backward-compatible `changes: string[]` payload and may
+supply parallel `changeKinds` values (feature, improvement, fix, security, removed).
+Unknown/legacy kinds default to improvement. The dialog shows a distinct icon and
+localized accessible label instead of a bullet. Public notes describe user
+behavior, not internal implementation. It renders five versions initially and
+loads five more when the list's end enters its scroll viewport, with a manual
+older-versions button as fallback. This paginates rendering; the small version API
+catalogue still arrives together for compatibility and offline history.

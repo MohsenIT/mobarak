@@ -601,5 +601,11 @@
   "resource.tafsir": "Təfsir",
   "resource.corpus": "Dil korpusu",
   "resource.murattal": "Mürəttəl",
-  "resource.mujawwad": "Mücəvvəd"
+  "resource.mujawwad": "Mücəvvəd",
+  "release.feature": "Yeni funksiya",
+  "release.improvement": "Təkmilləşdirmə",
+  "release.fix": "Səhv düzəlişi",
+  "release.security": "Təhlükəsizlik",
+  "release.removed": "Silinib",
+  "release.more": "Köhnə versiyalar"
 }

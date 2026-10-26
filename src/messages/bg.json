@@ -601,5 +601,11 @@
   "resource.tafsir": "Тафсир",
   "resource.corpus": "Лингвистичен корпус",
   "resource.murattal": "Мураттал",
-  "resource.mujawwad": "Муджаввад"
+  "resource.mujawwad": "Муджаввад",
+  "release.feature": "Нова функция",
+  "release.improvement": "Подобрение",
+  "release.fix": "Корекция на грешки",
+  "release.security": "Сигурност",
+  "release.removed": "Премахнато",
+  "release.more": "Стари версии"
 }

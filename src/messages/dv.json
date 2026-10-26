@@ -601,5 +601,11 @@
   "resource.tafsir": "ތަފްސީރު",
   "resource.corpus": "ބަހީ ހޯދުންތައް",
   "resource.murattal": "މުރައްތަލް",
-  "resource.mujawwad": "މުޖައްވަދު"
+  "resource.mujawwad": "މުޖައްވަދު",
+  "release.feature": "އައު ފީޗާ",
+  "release.improvement": "އިތުރު ފުރިހަމަކަން",
+  "release.fix": "ބަގް ފިކްސް",
+  "release.security": "ސެކިއުރިޓީ",
+  "release.removed": "ފޮހެލެވިފައި",
+  "release.more": "ކުރީގެ ވާޝަންތައް"
 }

@@ -78,3 +78,12 @@ Persian reading preference captured before first-render defaults are saved. A
 Persian browser language anywhere in the preferred list suppresses the suggestion.
 For an Iranian country hint and a generic English/unknown browser preference,
 keep Persian. These are conservative heuristics; no language is changed silently.
+
+The interface-language chooser is an in-app searchable radio list rather than an
+Android native select sheet, so text/control placement follows the UI direction.
+Hausa's native display name is Harshen Hausa; its normal script is Latin, so it
+must not be given a fabricated alternate script. `numbering-systems.json` records
+explicit digit systems, including Arabic (arab) and Persian (arabext), independent
+of browser ICU regional defaults. UI formatting normalizes existing decimal
+scripts before rendering; navigation accepts those digits without changing stored
+ASCII addresses or source datasets.

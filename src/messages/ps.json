@@ -601,5 +601,11 @@
   "resource.tafsir": "تفسیر",
   "resource.corpus": "ژبنی کورپس",
   "resource.murattal": "مرتل",
-  "resource.mujawwad": "مجوّد"
+  "resource.mujawwad": "مجوّد",
+  "release.feature": "نوې ځانګړنه",
+  "release.improvement": "پرمختګ",
+  "release.fix": "د بګ اصلاح",
+  "release.security": "امنیت",
+  "release.removed": "لرې شوی",
+  "release.more": "پخوانۍ نسخې"
 }

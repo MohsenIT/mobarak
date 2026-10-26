@@ -601,5 +601,11 @@
   "resource.tafsir": "তাফসির",
   "resource.corpus": "ভাষাগত তথ্য",
   "resource.murattal": "মুরাত্তাল",
-  "resource.mujawwad": "মুজাওয়াদ"
+  "resource.mujawwad": "মুজাওয়াদ",
+  "release.feature": "নতুন ফিচার",
+  "release.improvement": "উন্নতি",
+  "release.fix": "বাগ ফিক্স",
+  "release.security": "নিরাপত্তা",
+  "release.removed": "অপসারণ",
+  "release.more": "পুরানো রিলিজ"
 }

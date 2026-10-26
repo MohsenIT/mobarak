@@ -601,5 +601,11 @@
   "resource.tafsir": "古兰经注",
   "resource.corpus": "语言语料库",
   "resource.murattal": "穆拉塔尔",
-  "resource.mujawwad": "穆贾瓦德"
+  "resource.mujawwad": "穆贾瓦德",
+  "release.feature": "新功能",
+  "release.improvement": "改进",
+  "release.fix": "错误修复",
+  "release.security": "安全",
+  "release.removed": "已移除",
+  "release.more": "旧版本"
 }

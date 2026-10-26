@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Taalkundig corpus",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mudjawwad"
+  "resource.mujawwad": "Mudjawwad",
+  "release.feature": "Nieuwe functie",
+  "release.improvement": "Verbetering",
+  "release.fix": "Bugfix",
+  "release.security": "Beveiliging",
+  "release.removed": "Verwijderd",
+  "release.more": "Oudere versies"
 }

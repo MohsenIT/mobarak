@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Bayanan harshe",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mujawwad"
+  "resource.mujawwad": "Mujawwad",
+  "release.feature": "Sabon fasali",
+  "release.improvement": "Ingantawa",
+  "release.fix": "Gyaran kuskure",
+  "release.security": "Tsaro",
+  "release.removed": "An cire",
+  "release.more": "Tsoffin fitowar"
 }

@@ -601,5 +601,11 @@
   "resource.tafsir": "Tefsir",
   "resource.corpus": "Korpus gjuhësor",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Muxhavved"
+  "resource.mujawwad": "Muxhavved",
+  "release.feature": "Veçori e re",
+  "release.improvement": "Përmirësim",
+  "release.fix": "Rregullim gabimesh",
+  "release.security": "Siguria",
+  "release.removed": "Hequr",
+  "release.more": "Versionet e vjetra"
 }

@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Korpus językowy",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mudżawwad"
+  "resource.mujawwad": "Mudżawwad",
+  "release.feature": "Nowa funkcja",
+  "release.improvement": "Ulepszenie",
+  "release.fix": "Poprawka błędów",
+  "release.security": "Bezpieczeństwo",
+  "release.removed": "Usunięto",
+  "release.more": "Starsze wersje"
 }

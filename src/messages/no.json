@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Språkkorpus",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mudjawwad"
+  "resource.mujawwad": "Mudjawwad",
+  "release.feature": "Ny funksjon",
+  "release.improvement": "Forbedring",
+  "release.fix": "Feilretting",
+  "release.security": "Sikkerhet",
+  "release.removed": "Fjernet",
+  "release.more": "Eldre versjoner"
 }

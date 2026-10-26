@@ -11,6 +11,11 @@ describe('release history',()=>{
   expect(parseAppUpdate({version:'new',releases:[{version:'bad'},...APP_RELEASES,...APP_RELEASES]}).releases).toHaveLength(APP_RELEASES.length)
   expect(()=>parseAppUpdate({version:3})).toThrow()
  })
+ test('typed icons preserve old text-only release payloads',()=>{
+  const parsed=parseAppUpdate({version:'new',releases:[{version:'0.1.0',title:'test',date:'2026-10-26',changes:['a','b'],changeKinds:['feature','unknown']}]})
+  expect(parsed.releases[0].changeKinds).toEqual(['feature','improvement'])
+  expect(parsed.releases[0].changes).toEqual(['a','b'])
+ })
  test('published versions are unique and newest first with nonempty change notes',()=>{
   expect(CURRENT_RELEASE).toBe(APP_RELEASES[0].version)
   expect(new Set(APP_RELEASES.map(r=>r.version)).size).toBe(APP_RELEASES.length)

@@ -1,3 +1,4 @@
+import {normalizeDigits} from './locale-numbers'
 import {t} from './i18n'
 import type { Meta, SurahMeta } from './quran'
 import { getSurahContexts } from './contexts'
@@ -31,7 +32,7 @@ function findSurah(meta: Meta, query: string) {
 }
 const longPrefixes: Record<string,JumpKind> = { سوره:'surah', صفحه:'page', جزء:'juz', جز:'juz', آیه:'verse', ایه:'verse', سیاق:'context' }
 const shortPrefixes: Record<string,JumpKind> = { س:'surah', ص:'page', ج:'juz', آ:'verse', ا:'verse', ق:'context' }
-const commandText = (value:string) => value.normalize('NFC').replace(/[\u200c\u200d]/g,' ').replace(/[۰-۹]/g,d=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[\u064B-\u065F\u0670]/g,'').replace(/ة/g,'ه').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[أإٱ]/g,'ا').trim()
+const commandText = (value:string) => normalizeDigits(value).normalize('NFC').replace(/[\u200c\u200d]/g,' ').replace(/[۰-۹]/g,d=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[\u064B-\u065F\u0670]/g,'').replace(/ة/g,'ه').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[أإٱ]/g,'ا').trim()
 /** Recognize commands before normalizing alef: «ق ا» and «ق آ» have different meanings. */
 export function jumpCommand(input:string): {kind:JumpKind;value:string}|null {
   const value=commandText(input)

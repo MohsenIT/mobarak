@@ -601,5 +601,11 @@
   "resource.tafsir": "ตัฟซีร",
   "resource.corpus": "คลังข้อมูลภาษา",
   "resource.murattal": "มุร็อตตัล",
-  "resource.mujawwad": "มุญัฟวัด"
+  "resource.mujawwad": "มุญัฟวัด",
+  "release.feature": "ฟีเจอร์ใหม่",
+  "release.improvement": "การปรับปรุง",
+  "release.fix": "แก้ไขข้อผิดพลาด",
+  "release.security": "ความปลอดภัย",
+  "release.removed": "ถูกลบออก",
+  "release.more": "เวอร์ชันเก่า"
 }

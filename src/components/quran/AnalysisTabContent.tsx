@@ -87,7 +87,7 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
                           (first in RTL reading), count on the LEFT (second).
                           Reading RTL: "۱۱۴ / count" — i.e. "out of 114 surahs,
                           this many host this root". */}
-                      <b>۱۱۴ / {toFa(stats.df)}</b>
+                      <b>{toFa(114)} / {toFa(stats.df)}</b>
                       <span>{t("ui.637842efc1")}</span>
                     </div>
                   </div>

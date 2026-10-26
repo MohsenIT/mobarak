@@ -601,5 +601,11 @@
   "resource.tafsir": "تەپسىر",
   "resource.corpus": "تىل ماتېرىيالى",
   "resource.murattal": "مۇرەتتەل",
-  "resource.mujawwad": "مۇجەۋۋەد"
+  "resource.mujawwad": "مۇجەۋۋەد",
+  "release.feature": "يېڭى ئىقتىدار",
+  "release.improvement": "ياخشىلاش",
+  "release.fix": "خاتالىقنى تۈزىتىش",
+  "release.security": "بىخەتەرلىك",
+  "release.removed": "ئۆچۈرۈلدى",
+  "release.more": "كونا نەشرلىرى"
 }

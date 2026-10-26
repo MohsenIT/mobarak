@@ -601,5 +601,11 @@
   "resource.tafsir": "Tafsir",
   "resource.corpus": "Jazykový korpus",
   "resource.murattal": "Murattal",
-  "resource.mujawwad": "Mudžawwad"
+  "resource.mujawwad": "Mudžawwad",
+  "release.feature": "Nová funkce",
+  "release.improvement": "Vylepšení",
+  "release.fix": "Oprava chyb",
+  "release.security": "Zabezpečení",
+  "release.removed": "Odstraněno",
+  "release.more": "Starší verze"
 }

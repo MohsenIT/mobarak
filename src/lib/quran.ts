@@ -1,3 +1,4 @@
+import {formatDigits} from './locale-numbers'
 import {t,currentLanguage} from './i18n'
 import {EXTRA_TRANSLATIONS,type Translator} from './translations'
 export type {Translator} from './translations'
@@ -91,11 +92,7 @@ export function loadGlobalRoots(): Promise<Record<string, Record<string, number>
   return rootsPromise
 }
 
-const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹'
-export function toFa(n: number | string): string {
-  const digits=new Intl.NumberFormat(currentLanguage(),{useGrouping:false})
-  return String(n).replace(/[0-9]/g, d => digits.format(+d))
-}
+export function toFa(n: number | string): string { return formatDigits(n,currentLanguage()) }
 
 const FORM_LABELS: Record<string, string> = {
   I: t('ui.3d29181eea'), II: t('ui.d46524e04b'), III: t('ui.649e0a9bb4'), IV: t('ui.e591828577'),

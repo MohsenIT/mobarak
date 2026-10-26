@@ -1496,3 +1496,12 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .language-dialog-compact .language-question { margin:12px 0 0; color:var(--ink); font-size:14px; line-height:1.9; text-align:start; }
 .language-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
 .language-actions button { flex:1; white-space:normal; }
+.language-choice-list { min-height:0; overflow-y:auto; }
+.language-choice-row { min-height:48px; padding:10px 4px; border-bottom:1px solid var(--line); font-size:13px; cursor:pointer; }
+.language-choice-row > input { width:18px; height:18px; accent-color:var(--sage); }
+.release-notes-list ul { list-style:none; padding-inline-start:0; }
+.release-change { display:grid; grid-template-columns:18px minmax(0,1fr); gap:8px; align-items:start; }
+.release-change-icon { display:inline-flex; padding-top:4px; color:var(--sage); }
+.release-change[data-change-kind="fix"] .release-change-icon { color:var(--gold-deep); }
+.release-notes-more { padding-block:14px; text-align:center; }
+.language-actions button { justify-content:center; text-align:center; }

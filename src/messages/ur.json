@@ -601,5 +601,11 @@
   "resource.tafsir": "تفسیر",
   "resource.corpus": "لسانیاتی مواد",
   "resource.murattal": "مرتل",
-  "resource.mujawwad": "مجوّد"
+  "resource.mujawwad": "مجوّد",
+  "release.feature": "نئی خصوصیت",
+  "release.improvement": "بہتری",
+  "release.fix": "بگ فکس",
+  "release.security": "سیکیورٹی",
+  "release.removed": "ہٹا دیا گیا",
+  "release.more": "پرانے ورژنز"
 }
