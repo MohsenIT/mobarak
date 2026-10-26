@@ -21,3 +21,10 @@ export function speechConstructor():SpeechConstructor|undefined{
  const browser=window as typeof window&{SpeechRecognition?:SpeechConstructor;webkitSpeechRecognition?:SpeechConstructor}
  return browser.SpeechRecognition??browser.webkitSpeechRecognition
 }
+
+/** Speech services on Android expect a language/region tag, rather than a bare UI code. */
+export function speechLanguage(language:string, preferred:readonly string[]=[]){
+ const match=preferred.find(value=>value.toLowerCase().startsWith(language.toLowerCase()+'-'))
+ if(match)return match
+ try { const locale=new Intl.Locale(language).maximize();return locale.region?`${locale.language}-${locale.region}`:language } catch { return language }
+}
