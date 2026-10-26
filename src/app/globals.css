@@ -1566,3 +1566,9 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .app-update-progress:indeterminate { background:linear-gradient(90deg,transparent,var(--sage),transparent); background-size:40% 100%; background-repeat:no-repeat; animation:update-progress-sweep 1.2s linear infinite; }
 @keyframes update-progress-sweep { from { background-position:140% 0; } to { background-position:-40% 0; } }
 @media(prefers-reduced-motion:reduce) { .app-update-progress:indeterminate { animation:none; background-position:center; } .app-update-progress::-webkit-progress-value { transition:none; } }
+
+.release-change { grid-template-columns:minmax(68px,auto) minmax(0,1fr); }
+.release-change-icon { align-items:center; gap:4px; padding-top:3px; white-space:nowrap; }
+.release-change-icon svg { flex-shrink:0; }
+.release-change-label { font-size:10px; font-weight:500; line-height:1.8; }
+@media(max-width:360px) { .release-change { grid-template-columns:62px minmax(0,1fr); gap:6px; } .release-change-label { font-size:9px; } }
