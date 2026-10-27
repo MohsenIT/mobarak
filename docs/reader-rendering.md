@@ -11,3 +11,5 @@ Pinch interaction uses `useReaderPinch` with live, discrete 5% font-size steps. 
 The compositor-preview experiment in 0.4.7 was reverted after user feedback: live step-by-step resizing is the intended behavior. Physical Android performance still needs device verification.
 
 The translation icon uses the exact two filled vector outlines supplied by the user in `New Project.svg`; it is not approximated with font glyphs, images or hand-drawn paths. It retains the original 512-unit view box and inherits currentColor.
+
+Optional high/low meem annotations U+06E2 and U+06ED are hidden at display time by explicit user preference (0.4.10). Ordinary meem U+0645, vowels, superscript alef and source data remain unchanged. Corpus regression checks cover both annotations in all 114 surahs.

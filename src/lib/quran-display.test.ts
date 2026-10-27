@@ -4,7 +4,7 @@ import { quranDisplayText } from './quran-display'
 test('the sakin-sin hamza seat retains its tooth in the Hafs display', () => {
   expect(quranDisplayText('نَسْـَٔلُكَ')).toBe('نَسْئَلُكَ')
   expect(quranDisplayText('يَسْـَٔلُونَكَ')).toBe('يَسْئَلُونَكَ')
-  expect(quranDisplayText('مَسْـُٔولًۭا')).toBe('مَسْئُولًۭا')
+  expect(quranDisplayText('مَسْـُٔولًۭا')).toBe('مَسْئُولًا')
 })
 
 test('unrelated hamza carriers and letters are not rewritten', () => {
@@ -34,7 +34,7 @@ test('the compatibility fix covers the same pattern across all 114 surahs', asyn
 
 test('hidden pause signs do not leave whitespace inside selectable words', () => {
   expect(quranDisplayText('مِسَاسَ ۖ')).toBe('مِسَاسَ')
-  expect(quranDisplayText('أَسِفًۭا ۚ')).toBe('أَسِفًۭا')
+  expect(quranDisplayText('أَسِفًۭا ۚ')).toBe('أَسِفًا')
   expect(quranDisplayText('لَا مِسَاسَ ۖ')).toBe('لَا مِسَاسَ')
 })
 
@@ -50,7 +50,7 @@ test('Quran letters and supported pronunciation marks are preserved across the c
   const data=await Bun.file(`${import.meta.dir}/../../public/data/surah/${s}.json`).json()
   for(const verse of data.v)for(const word of verse.w){
    const original=word.t as string,result=quranDisplayText(original)
-   for(const mark of ['\u0670','\u06E0','\u06E2','\u06E5','\u06E6','\u06E7','\u06E8','\u06EA','\u06EC','\u06ED','ي','ى']){
+   for(const mark of ['\u0670','\u06E0','\u06E5','\u06E6','\u06E7','\u06E8','\u06EA','\u06EC','ي','ى']){
     expect(result.split(mark).length).toBe(original.split(mark).length)
    }
    alefs+=(original.match(/\u0670/g)||[]).length
@@ -82,4 +82,21 @@ test('all occurrences of the three audited placeholder glyphs are covered',async
   }
  }
  expect(removed).toBe(3990)
+})
+
+
+test('optional meem annotations stay hidden throughout all surahs, preserving real meem', async () => {
+ let affected = 0
+ for (let s = 1; s <= 114; s++) {
+  const data = await Bun.file(`${import.meta.dir}/../../public/data/surah/${s}.json`).json()
+  for (const verse of data.v) for (const word of verse.w) {
+   const original = word.t as string, displayed = quranDisplayText(original)
+   affected += (original.match(/[\u06E2\u06ED]/g) || []).length
+   expect(displayed).not.toMatch(/[\u06E2\u06ED]/)
+   expect(displayed.split('م').length).toBe(original.split('م').length)
+   expect(word.t).toBe(original)
+  }
+ }
+ expect(affected).toBeGreaterThan(0)
+ for (const [source, expected] of [['غَوْلٌۭ','غَوْلٌ'],['عِينٌۭ','عِينٌ'],['مَّكْنُونٌۭ','مَّكْنُونٌ']]) expect(quranDisplayText(source)).toBe(expected)
 })

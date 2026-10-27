@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.10',date:'2026-10-27',title:'حذف دوبارهٔ علامت‌های میم کوچک',changeKinds:['fix'],changes:[
+    'علامت‌های میم کوچکِ اضافی از نمایش قرآن حذف شدند؛ حروف اصلی، حرکت‌ها و الف کوچک حفظ شدند.',
+  ],
+},{
   version:'0.4.9',date:'2026-10-26',title:'رفع دایره‌های اضافی در متن قرآن',changeKinds:['fix'],changes:[
     'دایره‌های اضافی ناشی از سه نویسهٔ ناسازگار با فونت برطرف شدند؛ الف کوچک و حروف لازم محفوظ ماندند.',
   ],

@@ -14,6 +14,9 @@ export function quranDisplayText(text: string): string {
     // placeholder, rather than a positioned Quranic mark. Omit only those
     // audited glyphs; retain superscript alef and supported small letters.
     .replace(/[\u06DF\u06E3\u06EB]/g, '')
+    // Hide the optional high/low meem recitation annotations as requested.
+    // These are U+06E2/U+06ED, not the actual letter meem U+0645.
+    .replace(/[\u06E2\u06ED]/g, '')
     // A hidden pause mark may leave a trailing space inside a selectable word.
     .trim()
 }
