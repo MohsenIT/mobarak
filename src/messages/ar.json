@@ -617,5 +617,11 @@
   "resource.nationality": "الجنسية",
   "resource.saudiShort": "السعودية",
   "resource.countryAE": "الإمارات",
-  "resource.countryUS": "أمريكا"
+  "resource.countryUS": "أمريكا",
+  "auto.home": "الرئيسية",
+  "auto.library": "المكتبة",
+  "auto.resume": "متابعة الاستماع",
+  "auto.chooseVerse": "البدء من آية",
+  "auto.chooseReciter": "تغيير القارئ",
+  "auto.downloads": "السور المنزّلة"
 }

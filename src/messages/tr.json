@@ -617,5 +617,11 @@
   "resource.nationality": "Ülke",
   "resource.saudiShort": "Saudi Arabia",
   "resource.countryAE": "UAE",
-  "resource.countryUS": "US"
+  "resource.countryUS": "US",
+  "auto.home": "Home",
+  "auto.library": "Library",
+  "auto.resume": "Continue listening",
+  "auto.chooseVerse": "Start from an ayah",
+  "auto.chooseReciter": "Change reciter",
+  "auto.downloads": "Downloaded surahs"
 }

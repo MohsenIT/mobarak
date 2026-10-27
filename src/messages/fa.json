@@ -617,5 +617,11 @@
   "resource.nationality": "ملیت",
   "resource.saudiShort": "عربستان",
   "resource.countryAE": "امارات",
-  "resource.countryUS": "آمریکا"
+  "resource.countryUS": "آمریکا",
+  "auto.home": "خانه",
+  "auto.library": "کتابخانه",
+  "auto.resume": "ادامهٔ پخش",
+  "auto.chooseVerse": "شروع از آیهٔ دلخواه",
+  "auto.chooseReciter": "تغییر قاری",
+  "auto.downloads": "سوره‌های دانلودشده"
 }

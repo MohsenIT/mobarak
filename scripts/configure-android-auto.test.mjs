@@ -27,6 +27,6 @@ test('generated Android build gets a complete browse library and idempotent mani
   const catalog=JSON.parse(await readFile(path.join(main,'assets/quran-auto.json'),'utf8'))
   assert.equal(catalog.surahs[36].vc,182)
   assert.equal(catalog.labels.fa.verse,'آیه')
-  for(const labels of Object.values(catalog.labels))for(const key of ['verse','resume','speed','repeatVerse','repeatSurah'])assert.ok(labels[key])
+  for(const labels of Object.values(catalog.labels))for(const key of ['verse','resume','speed','repeatVerse','repeatSurah','home','library','chooseVerse','chooseReciter','surahs','recent','downloads'])assert.ok(labels[key])
  }finally{await rm(temp,{recursive:true,force:true})}
 })

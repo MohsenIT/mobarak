@@ -73,6 +73,7 @@ public final class QuranAudioBridge implements AutoCloseable {
       post(s);
     }catch(JSONException ignored){}
   }
+  private void refreshDownloads(){if(controller!=null)controller.sendCustomCommand(new androidx.media3.session.SessionCommand("refreshDownloads",android.os.Bundle.EMPTY),android.os.Bundle.EMPTY);}
   private void command(JSONObject c)throws Exception{
     int id=c.optInt("id");String op=c.optString("op");
     if(op.equals("hello")){state();ok(id);return;}
@@ -82,7 +83,7 @@ public final class QuranAudioBridge implements AutoCloseable {
         boolean success=true;
         for(int a=1;a<=counts[s-1];a++){File file=audioFile(activity,r,s,a);if(file.exists()&&!file.delete())success=false;}
         File pin=new File(audioFile(activity,r,s,1).getParentFile(),String.format(Locale.ROOT,"%03d.pin",s));if(pin.exists()&&!pin.delete())success=false;
-        final boolean deleted=success;activity.runOnUiThread(()->{if(deleted)ok(id);else sendError(id,"delete-failed");});
+        final boolean deleted=success;activity.runOnUiThread(()->{if(deleted){refreshDownloads();ok(id);}else sendError(id,"delete-failed");});
       });return;
     }
     if(op.equals("cache")){
@@ -101,7 +102,7 @@ public final class QuranAudioBridge implements AutoCloseable {
           if(!temp.renameTo(file))throw new IOException("Cannot save audio");
           if(pinned)new File(file.getParentFile(),String.format(Locale.ROOT,"%03d.pin",s)).createNewFile();
           pruneAudio();
-          activity.runOnUiThread(()->ok(id));
+          activity.runOnUiThread(()->{if(pinned&&a==counts[s-1])refreshDownloads();ok(id);});
         }catch(Exception e){if(temp!=null)temp.delete();activity.runOnUiThread(()->sendError(id,"cache-failed"));}
       });return;
     }

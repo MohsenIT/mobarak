@@ -19,7 +19,7 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
   for(const f of await readdir(path.join(root,'src/messages'))){
     if(!/^[a-z]{2,3}\.json$/.test(f))continue
     const m=JSON.parse(await readFile(path.join(root,'src/messages',f),'utf8'))
-    labels[f.slice(0,-5)]={app:brand.APP_NAME,verse:m['ui.b1b168c791'],resume:m['ui.f432f383bf'],repeatVerse:m['ui.9645b5c54f'],repeatSurah:m['ui.2cfa25518d'],speed:m['ui.991d782fda']}
+    labels[f.slice(0,-5)]={app:brand.APP_NAME,verse:m['ui.b1b168c791'],resume:m['auto.resume'],home:m['auto.home'],library:m['auto.library'],chooseVerse:m['auto.chooseVerse'],chooseReciter:m['auto.chooseReciter'],downloads:m['auto.downloads'],surahs:m['ui.a1e320e16e'],recent:m['ui.d8c76d09ca'],repeatVerse:m['ui.9645b5c54f'],repeatSurah:m['ui.2cfa25518d'],speed:m['ui.991d782fda']}
   }
   await mkdir(path.join(main,'assets'),{recursive:true})
   await writeFile(path.join(main,'assets/quran-auto.json'),JSON.stringify({reciters,surahs,labels}))

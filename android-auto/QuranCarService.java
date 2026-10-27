@@ -65,7 +65,7 @@ public final class QuranCarService extends MediaLibraryService {
     player.addListener(new Player.Listener() {
       @Override public void onMediaItemTransition(MediaItem item, int reason) {
         if(reason==Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT)verseRound++;else verseRound=1;
-        applyRepeat();remember();
+        applyRepeat();remember();refreshLibrary();
       }
       @Override public void onPlaybackStateChanged(int state) {
         if(state!=Player.STATE_ENDED || !player.getPlayWhenReady())return;
@@ -117,6 +117,12 @@ public final class QuranCarService extends MediaLibraryService {
       new CommandButton.Builder().setDisplayName(label("speed")+" · "+java.text.NumberFormat.getNumberInstance(getResources().getConfiguration().getLocales().get(0)).format(player.getPlaybackParameters().speed)).setIconResId(android.R.drawable.ic_media_ff).setSessionCommand(new SessionCommand("speed",Bundle.EMPTY)).build()
     ));
   }
+  private void refreshLibrary() {
+    if(session==null)return;
+    for(String parent:Arrays.asList("home","surahs","reciters","recent","verse-surahs")) {
+      try{session.notifyChildrenChanged(parent,children(parent).size(),null);}catch(RuntimeException ignored){}
+    }
+  }
   private String label(String key) { return labels.optString(key); }
   private String number(int value) { return java.text.NumberFormat.getIntegerInstance(getResources().getConfiguration().getLocales().get(0)).format(value); }
   private JSONObject reciter(String id) {
@@ -137,7 +143,7 @@ public final class QuranCarService extends MediaLibraryService {
     String directory = r.optString("tanzilDirectory");
     String uri = directory.isEmpty() ? "https://verses.quran.com/Minshawi/Murattal/mp3/"+file : "https://tanzil.net/res/audio/"+directory+"/"+file;
     MediaItem result=item("v/"+reciterId+"/"+surah+"/"+ayah, s.optString("ar")+" · "+label("verse")+" "+number(ayah), r.optString("name"), false, true, uri);
-    return result.buildUpon().setMediaMetadata(result.mediaMetadata.buildUpon().setSubtitle(s.optJSONArray("texts").optString(ayah-1)).build()).build();
+    return result.buildUpon().setMediaMetadata(result.mediaMetadata.buildUpon().setSubtitle(s.optJSONArray("texts").optString(ayah-1)).setDescription(s.optJSONArray("texts").optString(ayah-1)).build()).build();
   }
   private List<MediaItem> queue(String r, int s) {
     ArrayList<MediaItem> items = new ArrayList<>();
@@ -150,11 +156,22 @@ public final class QuranCarService extends MediaLibraryService {
     if (saved == null || player == null) return;
     MediaItem item = player.getCurrentMediaItem();
     if (item == null) return;
-    saved.edit().putString("item",item.mediaId).putLong("position",player.getCurrentPosition())
+    String[] parts=item.mediaId.split("/");
+    if(parts.length==4)currentReciter=parts[1];
+    LinkedHashMap<String,String> recent=new LinkedHashMap<>();
+    try{
+      JSONArray old=new JSONArray(saved.getString("recent","[]"));
+      if(parts.length==4)recent.put(parts[1]+"/"+parts[2],item.mediaId);
+      for(int i=0;i<old.length();i++){String id=old.optString(i);String[] p=id.split("/");if(p.length==4)recent.putIfAbsent(p[1]+"/"+p[2],id);}
+    }catch(JSONException ignored){}
+    JSONArray history=new JSONArray();for(String id:recent.values()){if(history.length()==8)break;history.put(id);}
+    saved.edit().putString("recent",history.toString()).putString("item",item.mediaId).putLong("position",player.getCurrentPosition())
       .putInt("verseRepeats",verseRepeats).putInt("surahRepeats",surahRepeats).putString("reciter",currentReciter).putFloat("speed",player.getPlaybackParameters().speed).apply();
   }
   private String normalize(String text) {
-    return java.text.Normalizer.normalize(text,java.text.Normalizer.Form.NFD).replaceAll("\\p{M}","")
+    StringBuilder digits=new StringBuilder();
+    for(int i=0;i<text.length();i++){char c=text.charAt(i);int digit=Character.digit(c,10);digits.append(digit>=0?(char)('0'+digit):c);}
+    return java.text.Normalizer.normalize(digits.toString(),java.text.Normalizer.Form.NFD).replaceAll("\\p{M}","")
       .replace('ٱ','ا').replace('ى','ي').replace('ی','ي').replace('ک','ك').replace('ـ',' ').trim().replaceAll("\\s+"," ").toLowerCase(Locale.ROOT);
   }
   private List<MediaItem> search(String query) {
@@ -165,42 +182,104 @@ public final class QuranCarService extends MediaLibraryService {
       result.add(verse(currentReciter,1,1)); return result;
     }
     String q=" "+normalize(query)+" ";
+    java.util.regex.Matcher address=java.util.regex.Pattern.compile("(?:^|\\s)([0-9]{1,3})\\s*[:/]\\s*([0-9]{1,3})(?:\\s|$)").matcher(q);
+    if(address.find()){
+      try{result.add(verse(currentReciter,Integer.parseInt(address.group(1)),Integer.parseInt(address.group(2))));}catch(IllegalArgumentException ignored){}
+      return result;
+    }
+    java.util.regex.Matcher requestedAyah=java.util.regex.Pattern.compile("(?:اي[ةه]|ayah|verse)\\s*([0-9]{1,3})").matcher(q);
+    int ayah=requestedAyah.find()?Integer.parseInt(requestedAyah.group(1)):1;
     for(int i=0;i<surahs.length();i++) {
       JSONObject s=surahs.optJSONObject(i);
-      if(q.contains(" "+normalize(s.optString("ar"))+" ") || q.contains(" "+normalize(s.optString("fa"))+" ")) result.add(verse(currentReciter,s.optInt("n"),1));
+      if(q.contains(" "+normalize(s.optString("ar"))+" ") || q.contains(" "+normalize(s.optString("fa"))+" ")) {if(ayah>=1&&ayah<=s.optInt("vc"))result.add(verse(currentReciter,s.optInt("n"),ayah));}
     }
     return result;
   }
+  private String selectedVerse() {
+    MediaItem playing=player.getCurrentMediaItem();
+    return playing!=null?playing.mediaId:saved.getString("item","v/"+currentReciter+"/1/1");
+  }
+  private MediaItem continuation() {
+    String[] p=selectedVerse().split("/");
+    MediaItem track=verse(p[1],Integer.parseInt(p[2]),Integer.parseInt(p[3]));
+    return item("resume",label("resume"),track.mediaMetadata.title+" · "+reciter(p[1]).optString("name"),false,true,null);
+  }
+  private boolean downloaded(String r,int n,int count) {
+    java.io.File first=QuranAudioBridge.audioFile(this,r,n,1);
+    if(!new java.io.File(first.getParentFile(),String.format(Locale.ROOT,"%03d.pin",n)).isFile())return false;
+    for(int a=1;a<=count;a++){java.io.File f=QuranAudioBridge.audioFile(this,r,n,a);if(!f.isFile()||f.length()==0)return false;}
+    return true;
+  }
+  private MediaItem surahItem(String r,JSONObject surah,boolean browse) {
+    String id=(browse?"s/":"v/")+r+"/"+surah.optInt("n")+(browse?"":"/1");
+    MediaItem result=item(id,number(surah.optInt("n"))+" · "+surah.optString("ar"),reciter(r).optString("name"),browse,!browse,null);
+    return result.buildUpon().setMediaMetadata(result.mediaMetadata.buildUpon()
+      .setMediaType(browse?MediaMetadata.MEDIA_TYPE_FOLDER_MIXED:MediaMetadata.MEDIA_TYPE_ALBUM).build()).build();
+  }
   private List<MediaItem> children(String parent) {
-    ArrayList<MediaItem> items = new ArrayList<>();
-    if (parent.equals("root")) {
-      if (saved.contains("item")) items.add(item("resume",label("resume"),"",false,true,null));
-      for (int i=0;i<reciters.length();i++) {
-        JSONObject r=reciters.optJSONObject(i);
-        items.add(item("r/"+r.optString("id"),r.optString("name"),"",true,false,null));
+    ArrayList<MediaItem> items=new ArrayList<>();
+    if(parent.equals("root")) {
+      items.add(item("home",label("home"),"",true,false,null));
+      items.add(item("surahs",label("surahs"),"",true,false,null));
+      items.add(item("library",label("library"),"",true,false,null));
+    } else if(parent.equals("home")) {
+      items.add(continuation());
+      items.add(item("recent",label("recent"),"",true,false,null));
+      String[] p=selectedVerse().split("/");
+      items.add(item("s/"+p[1]+"/"+p[2],label("chooseVerse"),surahs.optJSONObject(Integer.parseInt(p[2])-1).optString("ar"),true,false,null));
+      items.add(item("reciters",label("chooseReciter"),reciter(currentReciter).optString("name"),true,false,null));
+    } else if(parent.equals("library")) {
+      items.add(item("reciters",label("chooseReciter"),reciter(currentReciter).optString("name"),true,false,null));
+      items.add(item("verse-surahs",label("chooseVerse"),"",true,false,null));
+      items.add(item("downloads",label("downloads"),"",true,false,null));
+    } else if(parent.equals("recent")) {
+      try{JSONArray history=new JSONArray(saved.getString("recent","[]"));
+        for(int i=0;i<history.length();i++){String[] p=history.getString(i).split("/");items.add(verse(p[1],Integer.parseInt(p[2]),Integer.parseInt(p[3])));}
+      }catch(JSONException e){throw new IllegalArgumentException(e);}
+    } else if(parent.equals("reciters")) {
+      for(int i=0;i<reciters.length();i++){JSONObject r=reciters.optJSONObject(i);
+        items.add(item("pick/"+r.optString("id"),(r.optString("id").equals(currentReciter)?"✓ ":"")+r.optString("name"),"",false,true,null));
       }
-    } else if (parent.startsWith("r/")) {
-      String id=parent.substring(2); JSONObject r=reciter(id);
-      for(int i=0;i<surahs.length();i++) { JSONObject s=surahs.optJSONObject(i);
-        items.add(item("s/"+id+"/"+s.optInt("n"),s.optString("ar"),r.optString("name"),true,false,null));
+    } else if(parent.equals("surahs")||parent.equals("verse-surahs")||parent.equals("downloads")) {
+      for(int i=0;i<surahs.length();i++){JSONObject surah=surahs.optJSONObject(i);
+        if(parent.equals("downloads")&&!downloaded(currentReciter,surah.optInt("n"),surah.optInt("vc")))continue;
+        items.add(surahItem(currentReciter,surah,parent.equals("verse-surahs")));
       }
-    } else if (parent.startsWith("s/")) {
-      String[] p=parent.split("/"); if(p.length!=3) throw new IllegalArgumentException();
+    } else if(parent.startsWith("r/")) {
+      // Preserve saved media IDs from older car hosts, but make surahs immediately playable.
+      String r=parent.substring(2);reciter(r);
+      for(int i=0;i<surahs.length();i++)items.add(surahItem(r,surahs.optJSONObject(i),false));
+    } else if(parent.startsWith("s/")) {
+      String[] p=parent.split("/");if(p.length!=3)throw new IllegalArgumentException();
       items.addAll(queue(p[1],Integer.parseInt(p[2])));
     } else throw new IllegalArgumentException("Unknown parent");
     return items;
+  }
+  private MediaItem resolveBrowseItem(String id) {
+    if(id.equals("root"))return item("root",label("app"),"",true,false,null);
+    if(id.equals("resume"))return continuation();
+    if(id.startsWith("v/")){String[] p=id.split("/");if(p.length!=4)throw new IllegalArgumentException();return verse(p[1],Integer.parseInt(p[2]),Integer.parseInt(p[3]));}
+    if(id.startsWith("pick/")){String r=id.substring(5);return item(id,reciter(r).optString("name"),"",false,true,null);}
+    if(id.startsWith("r/")){String r=id.substring(2);return item(id,reciter(r).optString("name"),"",true,false,null);}
+    if(id.startsWith("s/")){String[] p=id.split("/");if(p.length!=3)throw new IllegalArgumentException();int n=Integer.parseInt(p[2]);if(n<1||n>114)throw new IllegalArgumentException();return surahItem(p[1],surahs.optJSONObject(n-1),true);}
+    for(String parent:Arrays.asList("root","home","library"))for(MediaItem result:children(parent))if(result.mediaId.equals(id))return result;
+    throw new IllegalArgumentException("Unknown media ID");
   }
   private final class Library implements MediaLibrarySession.Callback {
     @Override public MediaSession.ConnectionResult onConnect(MediaSession s, ControllerInfo c) {
       SessionCommands commands = MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
         .add(new SessionCommand("repeatVerse",Bundle.EMPTY)).add(new SessionCommand("repeatSurah",Bundle.EMPTY)).add(new SessionCommand("speed",Bundle.EMPTY)).build();
-      if(c.getPackageName().equals(getPackageName()))commands=commands.buildUpon().add(new SessionCommand("configureRepeat",Bundle.EMPTY)).build();
+      if(c.getPackageName().equals(getPackageName()))commands=commands.buildUpon().add(new SessionCommand("configureRepeat",Bundle.EMPTY)).add(new SessionCommand("refreshDownloads",Bundle.EMPTY)).build();
       return new MediaSession.ConnectionResult.AcceptedResultBuilder(s).setAvailableSessionCommands(commands).build();
     }
     @Override public ListenableFuture<SessionResult> onCustomCommand(MediaSession s, ControllerInfo c, SessionCommand command, Bundle args) {
       switch(command.customAction) {
         case "repeatVerse": verseRepeats=verseRepeats==0?1:0;verseRound=1;applyRepeat();break;
         case "repeatSurah": surahRepeats=surahRepeats==0?1:0;surahRound=1;break;
+        case "refreshDownloads":
+          if(!c.getPackageName().equals(getPackageName()))return Futures.immediateFuture(new SessionResult(SessionError.ERROR_PERMISSION_DENIED));
+          session.notifyChildrenChanged("downloads",children("downloads").size(),null);
+          return Futures.immediateFuture(new SessionResult(SessionResult.RESULT_SUCCESS));
         case "configureRepeat":
           if(!c.getPackageName().equals(getPackageName()))return Futures.immediateFuture(new SessionResult(SessionError.ERROR_PERMISSION_DENIED));
           int v=args.getInt("verse",1),whole=args.getInt("surah",1);
@@ -234,11 +313,7 @@ public final class QuranCarService extends MediaLibraryService {
     }
     @Override public ListenableFuture<LibraryResult<MediaItem>> onGetItem(MediaLibrarySession s, ControllerInfo c, String id) {
       try {
-        MediaItem result;
-        if(id.equals("root")) result=item("root",label("app"),"",true,false,null);
-        else if(id.equals("resume") && saved.contains("item")) result=item("resume",label("resume"),"",false,true,null);
-        else if(id.startsWith("v/")) {String[] p=id.split("/");if(p.length!=4)throw new IllegalArgumentException();result=verse(p[1],Integer.parseInt(p[2]),Integer.parseInt(p[3]));}
-        else { int slash=id.lastIndexOf('/');String parent=id.startsWith("r/")?"root":"r/"+id.substring(2,slash);result=children(parent).stream().filter(x->x.mediaId.equals(id)).findFirst().orElseThrow(()->new IllegalArgumentException("Unknown media ID")); }
+        MediaItem result=resolveBrowseItem(id);
         return Futures.immediateFuture(LibraryResult.ofItem(result,null));
       } catch (RuntimeException e) { return Futures.immediateFuture(LibraryResult.ofError(SessionError.ERROR_BAD_VALUE)); }
     }
@@ -263,13 +338,17 @@ public final class QuranCarService extends MediaLibraryService {
           id=matches.get(0).mediaId;
         }
         boolean resume=id.equals("resume");
-        if(resume) id=saved.getString("item","");
+        if(resume) id=selectedVerse();
+        if(id.startsWith("pick/")){
+          String r=id.substring(5);reciter(r);String[] selected=selectedVerse().split("/");
+          id="v/"+r+"/"+selected[2]+"/"+selected[3];position=0;
+        }
         String[] p=id.split("/"); if(p.length!=4 || !p[0].equals("v")) throw new IllegalArgumentException();
         int surah=Integer.parseInt(p[2]), ayah=Integer.parseInt(p[3]); verse(p[1],surah,ayah);
         currentReciter=p[1];
         verseRound=1;surahRound=1;applyRepeat();
         player.setPlaybackSpeed(saved.getFloat("speed",1f));
-        return Futures.immediateFuture(new MediaSession.MediaItemsWithStartPosition(queue(p[1],surah),ayah-1,resume?saved.getLong("position",0):Math.max(0,position==C.TIME_UNSET?0:position)));
+        return Futures.immediateFuture(new MediaSession.MediaItemsWithStartPosition(queue(p[1],surah),ayah-1,resume?(player.getCurrentMediaItem()!=null?player.getCurrentPosition():saved.getLong("position",0)):Math.max(0,position==C.TIME_UNSET?0:position)));
       } catch(RuntimeException e) { return Futures.immediateFailedFuture(new IllegalArgumentException("Invalid Quran media selection",e)); }
     }
   }

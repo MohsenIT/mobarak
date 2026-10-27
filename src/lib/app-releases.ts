@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.15',date:'2026-10-27',title:'دسترسی ساده‌تر در اندروید اوتو',changeKinds:['improvement'],changes:[
+    'خانه، سوره‌ها و کتابخانه جای تب‌های قاری را گرفتند؛ انتخاب سوره مستقیم پخش می‌کند و تغییر قاری، ادامهٔ پخش، سوره‌های اخیر و دانلودها در دسترس جداگانه‌اند.',
+  ],
+},{
   version:'0.4.14',date:'2026-10-27',title:'انتخاب ساده‌تر قاری',changeKinds:['improvement'],changes:[
     'فهرست قاری‌ها با جست‌وجو و فیلترهای چیپی مرتب شد؛ ملیت‌ها با پرچم و تعداد، از بیشترین به کمترین نمایش داده می‌شوند.',
   ],
