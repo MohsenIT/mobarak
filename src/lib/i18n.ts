@@ -1,4 +1,5 @@
 'use client'
+import {syncNativeUiLanguage} from './native-ui-language'
 import {formatDigits} from './locale-numbers'
 import {useEffect,useSyncExternalStore} from 'react'
 import fa from '@/messages/fa.json'
@@ -32,10 +33,10 @@ export async function setUiLanguage(next:string,persist=true){
  catalogue=messages;locale=next
  if(typeof document!=='undefined'){document.documentElement.lang=next;document.documentElement.dir=uiDirection(next)}
  if(persist)try{localStorage.setItem(KEY,next)}catch{}
- listeners.forEach(listener=>listener());return true
+ listeners.forEach(listener=>listener());void syncNativeUiLanguage(next).catch(()=>{});return true
 }
 export function useUiLanguage(){
  const language=useSyncExternalStore(listener=>{listeners.add(listener);return()=>{listeners.delete(listener)}},()=>locale,()=> 'fa')
- useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem(KEY)}catch{};if(saved&&saved!==locale)void setUiLanguage(saved,false)},[])
+ useEffect(()=>{let saved:string|null=null;try{saved=localStorage.getItem(KEY)}catch{};if(saved&&saved!==locale)void setUiLanguage(saved,false);else void syncNativeUiLanguage(locale).catch(()=>{})},[])
  return {language,t,dir:uiDirection(language)}
 }

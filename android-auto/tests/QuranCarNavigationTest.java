@@ -91,6 +91,24 @@ public class QuranCarNavigationTest {
     }
     try{provider.openFile(children("surahs").get(0).mediaMetadata.artworkUri,"rw");fail("Allowed writes");}catch(java.io.FileNotFoundException expected){}
   }
+  @Test public void appLanguageControlsMenusDigitsAndPersistsWithoutResettingPlayback()throws Exception{
+    assertEquals("خانه",children("root").get(0).mediaMetadata.title.toString());
+    Method update=QuranCarService.class.getDeclaredMethod("updateLanguage",String.class);update.setAccessible(true);
+    assertEquals(true,update.invoke(service,"en"));assertEquals("Home",children("root").get(0).mediaMetadata.title.toString());
+    MediaSession.MediaItemsWithStartPosition selected=callback().onSetMediaItems(null,null,Arrays.asList(children("s/minshawi-murattal/20").get(71)),0,2345).get();
+    Field field=QuranCarService.class.getDeclaredField("player");field.setAccessible(true);Player player=(Player)field.get(service);
+    player.setMediaItems(selected.mediaItems,selected.startIndex,selected.startPositionMs);
+    int index=player.getCurrentMediaItemIndex();long position=player.getCurrentPosition();String id=player.getCurrentMediaItem().mediaId;
+    assertEquals(true,update.invoke(service,"fa"));
+    assertEquals("خانه",children("root").get(0).mediaMetadata.title.toString());
+    assertTrue(player.getCurrentMediaItem().mediaMetadata.title.toString().contains("۷۲"));
+    assertEquals(id,player.getCurrentMediaItem().mediaId);assertEquals(index,player.getCurrentMediaItemIndex());assertEquals(position,player.getCurrentPosition());
+    assertEquals(135,player.getMediaItemCount());assertEquals("fa",service.getSharedPreferences("quran-auto",Context.MODE_PRIVATE).getString("language",""));
+    assertEquals(false,update.invoke(service,"unsupported"));assertEquals("خانه",children("root").get(0).mediaMetadata.title.toString());
+    service.getSharedPreferences("quran-auto",Context.MODE_PRIVATE).edit().putString("language","ar").commit();
+    controller.destroy();controller=Robolectric.buildService(QuranCarService.class);service=controller.get();controller.create();
+    assertEquals("الرئيسية",children("root").get(0).mediaMetadata.title.toString());
+  }
   @Test public void downloadsRequireEveryVerseAndExplicitPin()throws Exception{
     String r=children("reciters").get(0).mediaId.substring(5);
     assertTrue(children("downloads").isEmpty());

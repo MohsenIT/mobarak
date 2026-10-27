@@ -25,7 +25,9 @@ public final class QuranCarService extends MediaLibraryService {
   private ExoPlayer player;
   private MediaLibrarySession session;
   private JSONArray reciters, surahs;
-  private JSONObject labels;
+  private JSONObject labels,translations,numberingSystems;
+  private Locale uiLocale;
+  private final Set<String> languageParents=new HashSet<>(Arrays.asList("root","home","library","surahs","reciters","recent","verse-surahs","downloads"));
   private SharedPreferences saved;
   private String currentReciter;
   private int verseRepeats=1,surahRepeats=1,verseRound=1,surahRound=1;
@@ -33,15 +35,14 @@ public final class QuranCarService extends MediaLibraryService {
 
   @Override public void onCreate() {
     super.onCreate();
+    saved = getSharedPreferences("quran-auto", MODE_PRIVATE);
     try {
       JSONObject catalog = new JSONObject(readCatalogue());
       reciters = catalog.getJSONArray("reciters"); surahs = catalog.getJSONArray("surahs");
-      JSONObject translations = catalog.getJSONObject("labels");
-      String language = getResources().getConfiguration().getLocales().get(0).getLanguage();
-      labels = translations.optJSONObject(language);
-      if (labels == null) labels = translations.getJSONObject("fa");
+      translations = catalog.getJSONObject("labels");
+      numberingSystems = catalog.optJSONObject("numberingSystems");
+      if(!selectLanguage(saved.getString("language","fa")))selectLanguage("fa");
     } catch (Exception e) { throw new IllegalStateException("Invalid bundled Quran media catalogue", e); }
-    saved = getSharedPreferences("quran-auto", MODE_PRIVATE);
     currentReciter = saved.getString("reciter", reciters.optJSONObject(0).optString("id"));
     verseRepeats=saved.getInt("verseRepeats",1);surahRepeats=saved.getInt("surahRepeats",1);
     ResolvingDataSource.Factory audioSource=new ResolvingDataSource.Factory(new DefaultDataSource.Factory(this),spec->{
@@ -114,8 +115,31 @@ public final class QuranCarService extends MediaLibraryService {
     session.setCustomLayout(Arrays.asList(
       new CommandButton.Builder().setDisplayName((verseRepeats==0?"✓ ":"")+label("repeatVerse")).setIconResId(android.R.drawable.ic_menu_revert).setSessionCommand(new SessionCommand("repeatVerse",Bundle.EMPTY)).build(),
       new CommandButton.Builder().setDisplayName((surahRepeats==0?"✓ ":"")+label("repeatSurah")).setIconResId(android.R.drawable.ic_menu_rotate).setSessionCommand(new SessionCommand("repeatSurah",Bundle.EMPTY)).build(),
-      new CommandButton.Builder().setDisplayName(label("speed")+" · "+java.text.NumberFormat.getNumberInstance(getResources().getConfiguration().getLocales().get(0)).format(player.getPlaybackParameters().speed)).setIconResId(android.R.drawable.ic_media_ff).setSessionCommand(new SessionCommand("speed",Bundle.EMPTY)).build()
+      new CommandButton.Builder().setDisplayName(label("speed")+" · "+java.text.NumberFormat.getNumberInstance(uiLocale).format(player.getPlaybackParameters().speed)).setIconResId(android.R.drawable.ic_media_ff).setSessionCommand(new SessionCommand("speed",Bundle.EMPTY)).build()
     ));
+  }
+  private boolean selectLanguage(String language) {
+    if(!translations.has(language))return false;
+    labels=translations.optJSONObject(language);
+    String numbering=numberingSystems==null?null:numberingSystems.optString(language,null);
+    uiLocale=Locale.forLanguageTag(language+(numbering==null?"":"-u-nu-"+numbering));
+    saved.edit().putString("language",language).apply();return true;
+  }
+  private boolean updateLanguage(String language) {
+    if(!translations.has(language))return false;
+    if(language.equals(saved.getString("language",""))&&uiLocale!=null&&uiLocale.getLanguage().equals(language))return true;
+    if(!selectLanguage(language))return false;
+    if(player!=null){
+      for(int i=0;i<player.getMediaItemCount();i++){
+        MediaItem original=player.getMediaItemAt(i);String[] p=original.mediaId.split("/");
+        if(p.length==4&&p[0].equals("v")){
+          MediaMetadata metadata=verse(p[1],Integer.parseInt(p[2]),Integer.parseInt(p[3])).mediaMetadata;
+          player.replaceMediaItem(i,original.buildUpon().setMediaMetadata(metadata).build());
+        }
+      }
+    }
+    if(session!=null){controls();for(String parent:new HashSet<>(languageParents))try{session.notifyChildrenChanged(parent,children(parent).size(),null);}catch(RuntimeException ignored){}}
+    return true;
   }
   private void refreshLibrary() {
     if(session==null)return;
@@ -124,7 +148,7 @@ public final class QuranCarService extends MediaLibraryService {
     }
   }
   private String label(String key) { return labels.optString(key); }
-  private String number(int value) { return java.text.NumberFormat.getIntegerInstance(getResources().getConfiguration().getLocales().get(0)).format(value); }
+  private String number(int value) { return java.text.NumberFormat.getIntegerInstance(uiLocale).format(value); }
   private JSONObject reciter(String id) {
     for (int i=0;i<reciters.length();i++) { JSONObject r=reciters.optJSONObject(i); if (r.optString("id").equals(id)) return r; }
     throw new IllegalArgumentException("Unknown reciter");
@@ -271,13 +295,16 @@ public final class QuranCarService extends MediaLibraryService {
     @Override public MediaSession.ConnectionResult onConnect(MediaSession s, ControllerInfo c) {
       SessionCommands commands = MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
         .add(new SessionCommand("repeatVerse",Bundle.EMPTY)).add(new SessionCommand("repeatSurah",Bundle.EMPTY)).add(new SessionCommand("speed",Bundle.EMPTY)).build();
-      if(c.getPackageName().equals(getPackageName()))commands=commands.buildUpon().add(new SessionCommand("configureRepeat",Bundle.EMPTY)).add(new SessionCommand("refreshDownloads",Bundle.EMPTY)).build();
+      if(c.getPackageName().equals(getPackageName()))commands=commands.buildUpon().add(new SessionCommand("configureRepeat",Bundle.EMPTY)).add(new SessionCommand("refreshDownloads",Bundle.EMPTY)).add(new SessionCommand("configureLanguage",Bundle.EMPTY)).build();
       return new MediaSession.ConnectionResult.AcceptedResultBuilder(s).setAvailableSessionCommands(commands).build();
     }
     @Override public ListenableFuture<SessionResult> onCustomCommand(MediaSession s, ControllerInfo c, SessionCommand command, Bundle args) {
       switch(command.customAction) {
         case "repeatVerse": verseRepeats=verseRepeats==0?1:0;verseRound=1;applyRepeat();break;
         case "repeatSurah": surahRepeats=surahRepeats==0?1:0;surahRound=1;break;
+        case "configureLanguage":
+          if(!c.getPackageName().equals(getPackageName()))return Futures.immediateFuture(new SessionResult(SessionError.ERROR_PERMISSION_DENIED));
+          return Futures.immediateFuture(new SessionResult(updateLanguage(args.getString("language",""))?SessionResult.RESULT_SUCCESS:SessionError.ERROR_BAD_VALUE));
         case "refreshDownloads":
           if(!c.getPackageName().equals(getPackageName()))return Futures.immediateFuture(new SessionResult(SessionError.ERROR_PERMISSION_DENIED));
           session.notifyChildrenChanged("downloads",children("downloads").size(),null);
@@ -298,7 +325,7 @@ public final class QuranCarService extends MediaLibraryService {
     }
     @Override public ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> onGetChildren(MediaLibrarySession s, ControllerInfo c, String id, int page, int size, LibraryParams p) {
       try {
-        List<MediaItem> list=children(id);
+        List<MediaItem> list=children(id);languageParents.add(id);
         if(page<0 || size<1) throw new IllegalArgumentException();
         long offset=(long)page*size; int start=(int)Math.min(offset,list.size()), end=(int)Math.min(offset+size,list.size());
         return Futures.immediateFuture(LibraryResult.ofItemList(list.subList(start,end),p));

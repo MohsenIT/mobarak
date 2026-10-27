@@ -26,6 +26,8 @@ public final class QuranAudioBridge implements AutoCloseable {
   private MediaController controller;
   private JavaScriptReplyProxy reply;
   private boolean closed;
+  private String pendingLanguage;
+  private final Set<String> languages=new HashSet<>();
   private final android.app.Application.ActivityLifecycleCallbacks lifecycle=new android.app.Application.ActivityLifecycleCallbacks(){
     public void onActivityCreated(Activity a,Bundle b){}
     public void onActivityStarted(Activity a){}
@@ -43,6 +45,7 @@ public final class QuranAudioBridge implements AutoCloseable {
     try(InputStream in=activity.getAssets().open("quran-auto.json");ByteArrayOutputStream out=new ByteArrayOutputStream()){
       byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)out.write(b,0,n);
       JSONObject data=new JSONObject(out.toString("UTF-8"));JSONArray rs=data.getJSONArray("reciters"),ss=data.getJSONArray("surahs");
+      Iterator<String> locales=data.getJSONObject("labels").keys();while(locales.hasNext())languages.add(locales.next());
       for(int i=0;i<rs.length();i++)reciters.add(rs.getJSONObject(i).getString("id"));
       for(int i=0;i<ss.length();i++)counts[i]=ss.getJSONObject(i).getInt("vc");
     }catch(Exception e){throw new IllegalStateException("Invalid native audio catalogue",e);}
@@ -55,7 +58,7 @@ public final class QuranAudioBridge implements AutoCloseable {
     });
     }else throw new IllegalStateException("WebView message listener unsupported");
     future=new MediaController.Builder(activity,new SessionToken(activity,new ComponentName(activity,QuranCarService.class))).buildAsync();
-    future.addListener(()->{try{controller=future.get();controller.addListener(new Player.Listener(){@Override public void onEvents(Player p,Player.Events e){state();}});state();}catch(Exception e){sendError(0,"connection-failed");}},activity::runOnUiThread);
+    future.addListener(()->{try{controller=future.get();if(pendingLanguage!=null)applyLanguage(pendingLanguage);controller.addListener(new Player.Listener(){@Override public void onEvents(Player p,Player.Events e){state();}});state();}catch(Exception e){sendError(0,"connection-failed");}},activity::runOnUiThread);
     activity.getApplication().registerActivityLifecycleCallbacks(lifecycle);
     handler.post(tick);
   }
@@ -74,8 +77,19 @@ public final class QuranAudioBridge implements AutoCloseable {
     }catch(JSONException ignored){}
   }
   private void refreshDownloads(){if(controller!=null)controller.sendCustomCommand(new androidx.media3.session.SessionCommand("refreshDownloads",android.os.Bundle.EMPTY),android.os.Bundle.EMPTY);}
+  private void applyLanguage(String language){
+    Bundle args=new Bundle();args.putString("language",language);
+    controller.sendCustomCommand(new SessionCommand("configureLanguage",Bundle.EMPTY),args);
+  }
   private void command(JSONObject c)throws Exception{
     int id=c.optInt("id");String op=c.optString("op");
+    if(op.equals("language")){
+      String language=c.getString("language");if(!languages.contains(language))throw new IllegalArgumentException("Unsupported language");
+      pendingLanguage=language;
+      if(controller!=null)applyLanguage(language);
+      else activity.getSharedPreferences("quran-auto",android.content.Context.MODE_PRIVATE).edit().putString("language",language).apply();
+      ok(id);return;
+    }
     if(op.equals("hello")){state();ok(id);return;}
     if(op.equals("deleteCache")){
       String r=c.getString("r");int s=c.getInt("s");validate(r,s,1);

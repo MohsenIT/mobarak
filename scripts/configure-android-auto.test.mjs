@@ -29,11 +29,16 @@ test('generated Android build gets a complete browse library and idempotent mani
    assert.equal(image.subarray(1,4).toString(),'PNG')
    assert.equal(image.readUInt32BE(16),512);assert.equal(image.readUInt32BE(20),512)
   }
+  assert.match(first,/android:icon="@mipmap\/ic_launcher"/)
+  for(const density of ['mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi'])assert.deepEqual(
+   await readFile(path.join(main,'res',`mipmap-${density}`,'ic_launcher.png')),
+   await readFile(path.join(process.cwd(),'src-tauri/icons/android',`mipmap-${density}`,'ic_launcher.png')))
+  assert.match(await readFile(path.join(main,'res/mipmap-anydpi-v26/ic_launcher.xml'),'utf8'),/quran_launcher_logo/)
   const gradle=await readFile(path.join(temp,'app/build.gradle.kts'),'utf8')
   assert.equal((gradle.match(/media3-session/g)||[]).length,1)
   const catalog=JSON.parse(await readFile(path.join(main,'assets/quran-auto.json'),'utf8'))
   assert.equal(catalog.surahs[36].vc,182)
-  assert.equal(catalog.labels.fa.verse,'آیه')
+  assert.equal(catalog.labels.fa.verse,'آیه');assert.equal(catalog.numberingSystems.fa,'arabext');assert.equal(catalog.numberingSystems.ar,'arab')
   for(const labels of Object.values(catalog.labels))for(const key of ['verse','resume','speed','repeatVerse','repeatSurah','home','library','chooseVerse','chooseReciter','surahs','recent','downloads'])assert.ok(labels[key])
  }finally{await rm(temp,{recursive:true,force:true})}
 })

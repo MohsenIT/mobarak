@@ -22,8 +22,20 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
     labels[f.slice(0,-5)]={app:brand.APP_NAME,verse:m['ui.b1b168c791'],resume:m['auto.resume'],home:m['auto.home'],library:m['auto.library'],chooseVerse:m['auto.chooseVerse'],chooseReciter:m['auto.chooseReciter'],downloads:m['auto.downloads'],surahs:m['ui.a1e320e16e'],recent:m['ui.d8c76d09ca'],repeatVerse:m['ui.9645b5c54f'],repeatSurah:m['ui.2cfa25518d'],speed:m['ui.991d782fda']}
   }
   await mkdir(path.join(main,'assets'),{recursive:true})
+  // Tauri init regenerates placeholder launchers; install the actual app branding afterwards.
+  for(const density of ['mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi']){
+    const target=path.join(main,'res',`mipmap-${density}`);await mkdir(target,{recursive:true});
+    for(const name of ['ic_launcher.png','ic_launcher_round.png'])await copyFile(path.join(root,'src-tauri/icons/android',`mipmap-${density}`,name),path.join(target,name));
+  }
+  const drawable=path.join(main,'res/drawable-nodpi');await mkdir(drawable,{recursive:true});
+  await copyFile(path.join(root,'src-tauri/icons/icon.png'),path.join(drawable,'quran_launcher_logo.png'));
+  const adaptive=path.join(main,'res/mipmap-anydpi-v26');await mkdir(adaptive,{recursive:true});
+  const iconXml='<?xml version="1.0" encoding="utf-8"?><adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"><background android:drawable="@color/quran_launcher_background"/><foreground><inset android:inset="18%" android:drawable="@drawable/quran_launcher_logo"/></foreground></adaptive-icon>\n';
+  for(const name of ['ic_launcher.xml','ic_launcher_round.xml'])await writeFile(path.join(adaptive,name),iconXml);
+  const values=path.join(main,'res/values');await mkdir(values,{recursive:true});
+  await writeFile(path.join(values,'quran_launcher_background.xml'),'<?xml version="1.0" encoding="utf-8"?><resources><color name="quran_launcher_background">#fbf7e7</color></resources>\n');
   for(const surah of surahs){const name=String(surah.n).padStart(3,'0')+'.png';await mkdir(path.join(main,'assets/surah-artwork'),{recursive:true});await copyFile(path.join(root,'public/images/surahs',name),path.join(main,'assets/surah-artwork',name))}
-  await writeFile(path.join(main,'assets/quran-auto.json'),JSON.stringify({reciters,surahs,labels}))
+  await writeFile(path.join(main,'assets/quran-auto.json'),JSON.stringify({reciters,surahs,labels,numberingSystems:JSON.parse(await readFile(path.join(root,'src/messages/numbering-systems.json'),'utf8')).languages}))
   const java=path.join(main,'java/app/quranmubarak/reader/auto');await mkdir(java,{recursive:true})
   for(const file of ['QuranCarService.java','QuranAudioBridge.java','QuranArtworkProvider.java'])await copyFile(path.join(root,'android-auto',file),path.join(java,file))
   const activity=path.join(main,'java/app/quranmubarak/reader/MainActivity.kt')
@@ -53,6 +65,10 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
   let m=await readFile(manifest,'utf8')
   const permission=['android.permission.INTERNET','android.permission.FOREGROUND_SERVICE','android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK','android.permission.WAKE_LOCK']
   for(const p of permission)if(!m.includes(`android:name="${p}"`))m=m.replace(/<application\b/,`<uses-permission android:name="${p}"/>\n    <application`)
+  m=m.replace(/(<application\b[^>]*\bandroid:icon=)["'][^"']+["']/, '$1"@mipmap/ic_launcher"');
+  if(!/<application\b[^>]*\bandroid:icon=/.test(m))m=m.replace(/<application\b/,'<application android:icon="@mipmap/ic_launcher"');
+  m=m.replace(/(<application\b[^>]*\bandroid:roundIcon=)["'][^"']+["']/, '$1"@mipmap/ic_launcher_round"');
+  if(!/<application\b[^>]*\bandroid:roundIcon=/.test(m))m=m.replace(/<application\b/,'<application android:roundIcon="@mipmap/ic_launcher_round"');
   m=m.replace(/\s*<!-- quran-auto:start -->[\s\S]*?<!-- quran-auto:end -->/g,'')
   if(!m.includes('</application>'))throw Error('Generated Android manifest has no application')
   m=m.replace(/\s*<\/application>/,`\n        <!-- quran-auto:start -->

@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.17',date:'2026-10-27',title:'زبان و نشان برنامه در اندروید اوتو',changeKinds:['fix','fix'],changes:[
+    'زبان منوها، کنترل‌های برنامه و شمارهٔ آیه در اندروید اوتو از زبان انتخاب‌شده داخل اپ پیروی می‌کند و برای استفادهٔ بعدی ذخیره می‌شود.',
+    'نشان اصلی قرآن مبارک جای آیکون پیش‌فرض بستهٔ اندروید را گرفت.',
+  ],
+},{
   version:'0.4.16',date:'2026-10-27',title:'تصویر سوره در پخش',changeKinds:['improvement'],changes:[
     'تصویر پخش با نام همان سوره جایگزین نشان عمومی شد؛ تصویرها در مرورگر و نسخهٔ اندروید بدون اینترنت هم در دسترس‌اند.',
   ],
