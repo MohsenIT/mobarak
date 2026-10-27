@@ -615,5 +615,7 @@
   "voice.denied": "Доступ к микрофону запрещен.",
   "voice.failed": "Речь не распознана; попробуйте еще раз.",
   "resource.nationality": "Страна",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

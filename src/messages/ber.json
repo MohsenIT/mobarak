@@ -615,5 +615,7 @@
   "voice.denied": "Ttwakkes-d turagt n umikrufun.",
   "voice.failed": "Ur yettwassen ara wawal; ɛreḍ tikelt nniḍen.",
   "resource.nationality": "Tamurt",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

@@ -615,5 +615,7 @@
   "voice.denied": "Přístup k mikrofonu byl zamítnut.",
   "voice.failed": "Řeč nebyla rozpoznána; zkuste to znovu.",
   "resource.nationality": "Země",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

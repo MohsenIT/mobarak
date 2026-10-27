@@ -615,5 +615,7 @@
   "voice.denied": "An hana izinin amfani da makirufo.",
   "voice.failed": "Ba a gane maganar ba; don Allah a sake gwadawa.",
   "resource.nationality": "Kasa",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

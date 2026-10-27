@@ -615,5 +615,7 @@
   "voice.denied": "麦克风权限被拒绝。",
   "voice.failed": "无法识别语音；请重试。",
   "resource.nationality": "国家",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

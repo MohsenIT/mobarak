@@ -615,5 +615,7 @@
   "voice.denied": "Ruhusa ya maikrofoni imekataliwa.",
   "voice.failed": "Sauti haikutambulika; tafadhali jaribu tena.",
   "resource.nationality": "Nchi",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

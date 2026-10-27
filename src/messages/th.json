@@ -615,5 +615,7 @@
   "voice.denied": "ไม่อนุญาตให้ใช้ไมโครโฟน",
   "voice.failed": "ไม่พบเสียงพูด โปรดลองใหม่อีกครั้ง",
   "resource.nationality": "ประเทศ",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

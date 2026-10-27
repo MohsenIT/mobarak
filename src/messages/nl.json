@@ -615,5 +615,7 @@
   "voice.denied": "Microfoontoegang geweigerd.",
   "voice.failed": "Spraak niet herkend; probeer het opnieuw.",
   "resource.nationality": "Land",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

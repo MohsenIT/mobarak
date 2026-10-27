@@ -615,5 +615,7 @@
   "voice.denied": "Микрофонга рөхсәт бирелмәде.",
   "voice.failed": "Сүз танылмады; зинһар, яңадан тырышып карагыз.",
   "resource.nationality": "Ил",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

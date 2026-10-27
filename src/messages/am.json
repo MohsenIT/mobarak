@@ -615,5 +615,7 @@
   "voice.denied": "የማይክሮፎን ፈቃድ ተከልክሏል።",
   "voice.failed": "ንግግር አልታወቀም፤ እባክዎ እንደገና ይሞክሩ።",
   "resource.nationality": "አገር",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

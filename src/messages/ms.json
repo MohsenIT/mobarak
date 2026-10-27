@@ -615,5 +615,7 @@
   "voice.denied": "Kebenaran mikrofon ditolak.",
   "voice.failed": "Pertuturan tidak dikenali; sila cuba lagi.",
   "resource.nationality": "Negara",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

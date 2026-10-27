@@ -615,5 +615,7 @@
   "voice.denied": "د مایکروفون اجازه رد شوه.",
   "voice.failed": "غږ ونه پېژندل شو؛ مهرباني وکړئ بیا هڅه وکړئ.",
   "resource.nationality": "هېواد",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

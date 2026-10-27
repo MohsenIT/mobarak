@@ -615,5 +615,7 @@
   "voice.denied": "Leja për mikrofonin u refuzua.",
   "voice.failed": "Të folurit nuk u njoh; ju lutemi provoni përsëri.",
   "resource.nationality": "Vendi",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

@@ -615,5 +615,7 @@
   "voice.denied": "Microphone permission denied.",
   "voice.failed": "Speech not recognized; please try again.",
   "resource.nationality": "Country",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

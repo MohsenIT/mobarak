@@ -615,5 +615,7 @@
   "voice.denied": "마이크 권한이 거부되었습니다.",
   "voice.failed": "음성을 인식하지 못했습니다. 다시 시도해 주세요.",
   "resource.nationality": "국가",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

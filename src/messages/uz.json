@@ -615,5 +615,7 @@
   "voice.denied": "Mikrofondan foydalanishga ruxsat berilmadi.",
   "voice.failed": "Nutq aniqlanmadi; iltimos, qaytadan urinib ko'ring.",
   "resource.nationality": "Mamlakat",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

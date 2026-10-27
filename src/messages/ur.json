@@ -615,5 +615,7 @@
   "voice.denied": "مائیکروفون کی اجازت نہیں دی گئی۔",
   "voice.failed": "آواز کی شناخت نہیں ہوئی؛ دوبارہ کوشش کریں۔",
   "resource.nationality": "ملک",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

@@ -615,5 +615,7 @@
   "voice.denied": "माइक्रोफ़ोन की अनुमति अस्वीकार कर दी गई।",
   "voice.failed": "आवाज़ समझ नहीं आई; कृपया पुनः प्रयास करें।",
   "resource.nationality": "देश",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

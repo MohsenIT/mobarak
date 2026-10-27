@@ -615,5 +615,7 @@
   "voice.denied": "اجازهٔ استفاده از میکروفون داده نشد.",
   "voice.failed": "گفتار دریافت نشد؛ دوباره تلاش کنید.",
   "resource.nationality": "ملیت",
-  "resource.saudiShort": "عربستان"
+  "resource.saudiShort": "عربستان",
+  "resource.countryAE": "امارات",
+  "resource.countryUS": "آمریکا"
 }

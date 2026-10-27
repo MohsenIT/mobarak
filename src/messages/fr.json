@@ -615,5 +615,7 @@
   "voice.denied": "Autorisation du microphone refusée.",
   "voice.failed": "Parole non reconnue ; veuillez réessayer.",
   "resource.nationality": "Pays",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

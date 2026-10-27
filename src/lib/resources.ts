@@ -29,7 +29,9 @@ export function resourceCountryFlag(resource:Pick<Resource,'countryCode'>){
  return code&&/^[A-Z]{2}$/.test(code)?String.fromCodePoint(...[...code].map(letter=>127397+letter.charCodeAt(0))):''
 }
 export function resourceCountryName(resource:Pick<Resource,'country'|'countryCode'>,language=currentLanguage()){
- if(resource.countryCode==='SA'&&language==='fa')return t('resource.saudiShort')
+ if(resource.countryCode==='SA'&&['fa','ar'].includes(language))return t('resource.saudiShort')
+ if(resource.countryCode==='AE'&&['fa','ar','en'].includes(language))return t('resource.countryAE')
+ if(resource.countryCode==='US'&&['fa','ar','en'].includes(language))return t('resource.countryUS')
  if(!resource.countryCode)return resource.country??''
- try{return new Intl.DisplayNames([language],{type:'region'}).of(resource.countryCode)??resource.country??''}catch{return resource.country??''}
+ try{return new Intl.DisplayNames([language],{type:'region',style:'short'}).of(resource.countryCode)??resource.country??''}catch{return resource.country??''}
 }

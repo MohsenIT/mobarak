@@ -615,5 +615,7 @@
   "voice.denied": "Destûra mîkrofonê nehat dayîn.",
   "voice.failed": "Axaftin nehat naskirin; ji kerema xwe dîsa biceribîne.",
   "resource.nationality": "وڵات",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

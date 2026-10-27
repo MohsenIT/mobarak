@@ -615,5 +615,7 @@
   "voice.denied": "Permissão do microfone negada.",
   "voice.failed": "Fala não reconhecida; tente novamente.",
   "resource.nationality": "Toque em cada raiz para abrir as palavras da mesma raiz no painel lateral. A lista permanece aberta para manter sua posição de estudo.",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

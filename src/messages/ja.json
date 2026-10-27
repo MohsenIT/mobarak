@@ -615,5 +615,7 @@
   "voice.denied": "マイクの使用が許可されていません。",
   "voice.failed": "音声を認識できませんでした。もう一度お試しください。",
   "resource.nationality": "国",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

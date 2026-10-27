@@ -615,5 +615,7 @@
   "voice.denied": "മൈക്രോഫോൺ അനുമതി നിഷേധിച്ചു.",
   "voice.failed": "സംസാരം തിരിച്ചറിഞ്ഞില്ല; ദയവായി വീണ്ടും ശ്രമിക്കുക.",
   "resource.nationality": "രാജ്യം",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

@@ -615,5 +615,7 @@
   "voice.denied": "مائڪروفون جي اجازت رد ڪئي وئي.",
   "voice.failed": "آواز جي سڃاڻپ نه ٿي؛ مهرباني ڪري ٻيهر ڪوشش ڪريو.",
   "resource.nationality": "ملڪ",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }

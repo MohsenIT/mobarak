@@ -615,5 +615,7 @@
   "voice.denied": "Mikrofona giriş icazəsi rədd edildi.",
   "voice.failed": "Nitq tanınmadı; zəhmət olmasa yenidən cəhd edin.",
   "resource.nationality": "Ölkə",
-  "resource.saudiShort": "Saudi Arabia"
+  "resource.saudiShort": "Saudi Arabia",
+  "resource.countryAE": "UAE",
+  "resource.countryUS": "US"
 }
