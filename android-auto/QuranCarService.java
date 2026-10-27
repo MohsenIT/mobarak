@@ -7,6 +7,9 @@ import android.os.Bundle;
 import androidx.media3.common.*;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
+import androidx.media3.datasource.DefaultDataSource;
+import androidx.media3.datasource.ResolvingDataSource;
 import androidx.media3.session.*;
 import androidx.media3.session.MediaLibraryService.MediaLibrarySession;
 import androidx.media3.session.MediaSession.ControllerInfo;
@@ -25,6 +28,7 @@ public final class QuranCarService extends MediaLibraryService {
   private JSONObject labels;
   private SharedPreferences saved;
   private String currentReciter;
+  private int verseRepeats=1,surahRepeats=1,verseRound=1,surahRound=1;
 
 
   @Override public void onCreate() {
@@ -39,12 +43,37 @@ public final class QuranCarService extends MediaLibraryService {
     } catch (Exception e) { throw new IllegalStateException("Invalid bundled Quran media catalogue", e); }
     saved = getSharedPreferences("quran-auto", MODE_PRIVATE);
     currentReciter = saved.getString("reciter", reciters.optJSONObject(0).optString("id"));
-    player = new ExoPlayer.Builder(this).build();
+    verseRepeats=saved.getInt("verseRepeats",1);surahRepeats=saved.getInt("surahRepeats",1);
+    ResolvingDataSource.Factory audioSource=new ResolvingDataSource.Factory(new DefaultDataSource.Factory(this),spec->{
+      String url=spec.uri.toString();
+      for(int i=0;i<reciters.length();i++){
+        JSONObject r=reciters.optJSONObject(i);String directory=r.optString("tanzilDirectory");
+        String base=directory.isEmpty()?"https://verses.quran.com/Minshawi/Murattal/mp3/":"https://tanzil.net/res/audio/"+directory+"/";
+        if(!url.startsWith(base))continue;
+        String file=url.substring(base.length());if(!file.matches("[0-9]{6}\\.mp3"))continue;
+        int surah=Integer.parseInt(file.substring(0,3)),ayah=Integer.parseInt(file.substring(3,6));
+        JSONObject s=surahs.optJSONObject(surah-1);if(s==null||ayah<1||ayah>s.optInt("vc"))continue;
+        java.io.File cached=QuranAudioBridge.audioFile(this,r.optString("id"),surah,ayah);
+        if(cached.isFile()&&cached.length()>0){cached.setLastModified(System.currentTimeMillis());return spec.withUri(android.net.Uri.fromFile(cached));}
+      }
+      return spec;
+    });
+    player = new ExoPlayer.Builder(this).setMediaSourceFactory(new DefaultMediaSourceFactory(audioSource)).build();
     player.setAudioAttributes(new AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_SPEECH).build(), true);
     player.setHandleAudioBecomingNoisy(true);
     player.setWakeMode(C.WAKE_MODE_LOCAL);
     player.addListener(new Player.Listener() {
-      @Override public void onMediaItemTransition(MediaItem item, int reason) { remember(); }
+      @Override public void onMediaItemTransition(MediaItem item, int reason) {
+        if(reason==Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT)verseRound++;else verseRound=1;
+        applyRepeat();remember();
+      }
+      @Override public void onPlaybackStateChanged(int state) {
+        if(state!=Player.STATE_ENDED || !player.getPlayWhenReady())return;
+        if(surahRepeats==0 || surahRound<surahRepeats){surahRound++;player.seekToDefaultPosition(0);player.play();return;}
+        MediaItem item=player.getCurrentMediaItem();if(item==null)return;
+        String[] p=item.mediaId.split("/");int next=Integer.parseInt(p[2])+1;
+        if(next<=114){surahRound=1;player.setMediaItems(queue(currentReciter,next));player.prepare();player.play();}
+      }
       @Override public void onIsPlayingChanged(boolean playing) { remember(); }
       @Override public void onPlaybackParametersChanged(PlaybackParameters parameters) { remember(); }
     });
@@ -80,10 +109,11 @@ public final class QuranCarService extends MediaLibraryService {
       return out.toString("UTF-8");
     }
   }
+  private void applyRepeat(){player.setRepeatMode(verseRepeats==0 || verseRound<verseRepeats?Player.REPEAT_MODE_ONE:Player.REPEAT_MODE_OFF);}
   private void controls() {
     session.setCustomLayout(Arrays.asList(
-      new CommandButton.Builder().setDisplayName((player.getRepeatMode()==Player.REPEAT_MODE_ONE?"✓ ":"")+label("repeatVerse")).setIconResId(android.R.drawable.ic_menu_revert).setSessionCommand(new SessionCommand("repeatVerse",Bundle.EMPTY)).build(),
-      new CommandButton.Builder().setDisplayName((player.getRepeatMode()==Player.REPEAT_MODE_ALL?"✓ ":"")+label("repeatSurah")).setIconResId(android.R.drawable.ic_menu_rotate).setSessionCommand(new SessionCommand("repeatSurah",Bundle.EMPTY)).build(),
+      new CommandButton.Builder().setDisplayName((verseRepeats==0?"✓ ":"")+label("repeatVerse")).setIconResId(android.R.drawable.ic_menu_revert).setSessionCommand(new SessionCommand("repeatVerse",Bundle.EMPTY)).build(),
+      new CommandButton.Builder().setDisplayName((surahRepeats==0?"✓ ":"")+label("repeatSurah")).setIconResId(android.R.drawable.ic_menu_rotate).setSessionCommand(new SessionCommand("repeatSurah",Bundle.EMPTY)).build(),
       new CommandButton.Builder().setDisplayName(label("speed")+" · "+java.text.NumberFormat.getNumberInstance(getResources().getConfiguration().getLocales().get(0)).format(player.getPlaybackParameters().speed)).setIconResId(android.R.drawable.ic_media_ff).setSessionCommand(new SessionCommand("speed",Bundle.EMPTY)).build()
     ));
   }
@@ -121,7 +151,7 @@ public final class QuranCarService extends MediaLibraryService {
     MediaItem item = player.getCurrentMediaItem();
     if (item == null) return;
     saved.edit().putString("item",item.mediaId).putLong("position",player.getCurrentPosition())
-      .putInt("repeat",player.getRepeatMode()).putString("reciter",currentReciter).putFloat("speed",player.getPlaybackParameters().speed).apply();
+      .putInt("verseRepeats",verseRepeats).putInt("surahRepeats",surahRepeats).putString("reciter",currentReciter).putFloat("speed",player.getPlaybackParameters().speed).apply();
   }
   private String normalize(String text) {
     return java.text.Normalizer.normalize(text,java.text.Normalizer.Form.NFD).replaceAll("\\p{M}","")
@@ -164,12 +194,18 @@ public final class QuranCarService extends MediaLibraryService {
     @Override public MediaSession.ConnectionResult onConnect(MediaSession s, ControllerInfo c) {
       SessionCommands commands = MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
         .add(new SessionCommand("repeatVerse",Bundle.EMPTY)).add(new SessionCommand("repeatSurah",Bundle.EMPTY)).add(new SessionCommand("speed",Bundle.EMPTY)).build();
+      if(c.getPackageName().equals(getPackageName()))commands=commands.buildUpon().add(new SessionCommand("configureRepeat",Bundle.EMPTY)).build();
       return new MediaSession.ConnectionResult.AcceptedResultBuilder(s).setAvailableSessionCommands(commands).build();
     }
     @Override public ListenableFuture<SessionResult> onCustomCommand(MediaSession s, ControllerInfo c, SessionCommand command, Bundle args) {
       switch(command.customAction) {
-        case "repeatVerse": player.setRepeatMode(player.getRepeatMode()==Player.REPEAT_MODE_ONE?Player.REPEAT_MODE_OFF:Player.REPEAT_MODE_ONE); break;
-        case "repeatSurah": player.setRepeatMode(player.getRepeatMode()==Player.REPEAT_MODE_ALL?Player.REPEAT_MODE_OFF:Player.REPEAT_MODE_ALL); break;
+        case "repeatVerse": verseRepeats=verseRepeats==0?1:0;verseRound=1;applyRepeat();break;
+        case "repeatSurah": surahRepeats=surahRepeats==0?1:0;surahRound=1;break;
+        case "configureRepeat":
+          if(!c.getPackageName().equals(getPackageName()))return Futures.immediateFuture(new SessionResult(SessionError.ERROR_PERMISSION_DENIED));
+          int v=args.getInt("verse",1),whole=args.getInt("surah",1);
+          if(!Arrays.asList(0,1,2,3,5,10).contains(v)||!Arrays.asList(0,1,2,3,5,10).contains(whole))return Futures.immediateFuture(new SessionResult(SessionError.ERROR_BAD_VALUE));
+          verseRepeats=v;surahRepeats=whole;verseRound=1;surahRound=1;applyRepeat();break;
         case "speed": float speed=player.getPlaybackParameters().speed; player.setPlaybackSpeed(speed<1?1f:speed<1.25f?1.25f:speed<1.5f?1.5f:0.75f); break;
         default: return Futures.immediateFuture(new SessionResult(SessionError.ERROR_NOT_SUPPORTED));
       }
@@ -231,7 +267,7 @@ public final class QuranCarService extends MediaLibraryService {
         String[] p=id.split("/"); if(p.length!=4 || !p[0].equals("v")) throw new IllegalArgumentException();
         int surah=Integer.parseInt(p[2]), ayah=Integer.parseInt(p[3]); verse(p[1],surah,ayah);
         currentReciter=p[1];
-        player.setRepeatMode(saved.getInt("repeat",Player.REPEAT_MODE_OFF));
+        verseRound=1;surahRound=1;applyRepeat();
         player.setPlaybackSpeed(saved.getFloat("speed",1f));
         return Futures.immediateFuture(new MediaSession.MediaItemsWithStartPosition(queue(p[1],surah),ayah-1,resume?saved.getLong("position",0):Math.max(0,position==C.TIME_UNSET?0:position)));
       } catch(RuntimeException e) { return Futures.immediateFailedFuture(new IllegalArgumentException("Invalid Quran media selection",e)); }

@@ -8,6 +8,9 @@ on:
       - 'src/app/page.tsx'
       - 'src/components/quran/useVisibleSelection.ts'
       - 'src/lib/reading-visibility*'
+      - 'src/lib/native-recitation*'
+      - 'src/components/quran/RecitationPlayer.tsx'
+      - 'src/components/quran/useRecitationMediaSession.ts'
       - '.github/workflows/releases.yml'
   schedule:
     - cron: '30 2 * * *'

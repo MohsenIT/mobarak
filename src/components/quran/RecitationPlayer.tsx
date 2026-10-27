@@ -1,9 +1,10 @@
 'use client'
 import {t,uiDirection} from '@/lib/i18n'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Pause, Play, SkipBack, SkipForward, SlidersHorizontal, X, Download, Check, LoaderCircle, Trash2 } from 'lucide-react'
 import ResourcePicker from './ResourcePicker'
+import {NativeRecitationAudio,nativeRecitationAvailable,cacheNativeVerse,nativeCommand} from '@/lib/native-recitation'
 import { useRecitationMediaSession } from './useRecitationMediaSession'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import type { SurahMeta } from '@/lib/quran'
@@ -12,11 +13,19 @@ import { RECITER, RECITERS, nextRecitation, type PlaybackPosition } from '@/lib/
 import { audioDownloadStatus, cleanAudioCache, deleteRecitation, downloadRecitation, getVerseAudio } from '@/lib/recitation-storage'
 
 export type RecitationTransportStatus='idle'|'loading'|'playing'|'paused'|'error'
-interface Props { playRequest?:number;onStatusChange?:(status:RecitationTransportStatus)=>void;controlsVisible?: boolean; open: boolean; surah: SurahMeta; startAyah: number; onClose: () => void; onFollow: (s: number, a: number) => void; selectedAyah?: number | null; onPlaying: (s: number,a: number) => void; onNextSurah: (s:number,a?:number) => void; previousSurahVerses?: number }
+interface Props { onNativeActive?:(s:number,a:number)=>void;playRequest?:number;onStatusChange?:(status:RecitationTransportStatus)=>void;controlsVisible?: boolean; open: boolean; surah: SurahMeta; startAyah: number; onClose: () => void; onFollow: (s: number, a: number) => void; selectedAyah?: number | null; onPlaying: (s: number,a: number) => void; onNextSurah: (s:number,a?:number) => void; previousSurahVerses?: number }
 const initial = (ayah: number): PlaybackPosition => ({ ayah, verseRound: 1, surahRound: 1 })
 const repeatOptions = [1,2,3,5,10,0]
-export default function RecitationPlayer({ playRequest=0,onStatusChange,controlsVisible=true, open, surah, startAyah, onClose, onFollow, selectedAyah, onPlaying, onNextSurah, previousSurahVerses }: Props) {
-  const audio = useRef<HTMLAudioElement>(null)
+export default function RecitationPlayer({ onNativeActive,playRequest=0,onStatusChange,controlsVisible=true, open, surah, startAyah, onClose, onFollow, selectedAyah, onPlaying, onNextSurah, previousSurahVerses }: Props) {
+  const audio = useRef<HTMLAudioElement|null>(null)
+  const nativeAudio=useRef<NativeRecitationAudio|null>(null)
+  const nativeAdopting=useRef<{r:string;s:number;a:number}|null>(null)
+  const nativePositionCallback=useRef<(p:{r:string;s:number;a:number},state:{playing:boolean;speed:number})=>void>(()=>{})
+  const attachAudio=useCallback((element:HTMLAudioElement|null)=>{
+    nativeAudio.current?.dispose();nativeAudio.current=null
+    if(element&&nativeRecitationAvailable())nativeAudio.current=new NativeRecitationAudio(element,(p,state)=>nativePositionCallback.current(p,state))
+    audio.current=nativeAudio.current?(nativeAudio.current as unknown as HTMLAudioElement):element
+  },[])
   const [reciterId,setReciterId]=useState<string>(RECITER.id)
   const reciter=RECITERS.find(item=>item.id===reciterId)??RECITER
   const activeAudio=useRef({s:surah.n,id:reciter.id});activeAudio.current={s:surah.n,id:reciter.id}
@@ -48,6 +57,13 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
   const source = useRef('')
   const current = useRef({ position, verseRepeats, surahRepeats, total: surah.vc, follow, onFollow, onPlaying, onNextSurah, surah: surah.n })
   current.current = { position, verseRepeats, surahRepeats, total: surah.vc, follow, onFollow, onPlaying, onNextSurah, surah: surah.n }
+  nativePositionCallback.current=(p,state)=>{
+    setReciterId(p.r);setSpeed(state.speed)
+    if(p.s===current.current.surah){setPosition(old=>old.ayah===p.a?old:initial(p.a));setPositionSurah(p.s)}
+    else current.current.onNextSurah(p.s,p.a)
+    if(state.playing){current.current.onPlaying(p.s,p.a);if(current.current.follow)current.current.onFollow(p.s,p.a)}
+    if(state.playing&&!open)onNativeActive?.(p.s,p.a)
+  }
   const start = useRef(startAyah); start.current = startAyah
   const [retry, setRetry] = useState(0)
 
@@ -72,7 +88,12 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
     const starting=open && !wasOpen.current
     wasOpen.current=open
     const continuing=open && pendingSurah.current===surah.n
-    intent.current=(starting || continuing && pendingAutoplay.current) && (background || !document.hidden);pendingSurah.current=null; audio.current?.pause(); setPlaying(false); setSettings(false); setError(''); setNotice('')
+    if(nativeAudio.current?.state.item&&open&&(!starting||nativeAudio.current.state.playing)){
+      const item=nativeAudio.current.state.item.split('/')
+      if(Number(item[2])===surah.n||starting&&nativeAudio.current.state.playing){if(starting&&nativeAudio.current.state.playing)nativeAdopting.current={r:item[1],s:Number(item[2]),a:Number(item[3])};intent.current=nativeAudio.current.state.playWhenReady;setPosition(initial(Number(item[3])));setPositionSurah(Number(item[2]));return}
+    }
+    if(open)nativeAudio.current?.expect({r:reciter.id,s:surah.n,a:continuing?pendingAyah.current:Math.max(1,Math.min(surah.vc,start.current))})
+    intent.current=(starting || continuing && pendingAutoplay.current) && (background || !document.hidden);pendingSurah.current=null;if(!nativeAudio.current||!open)audio.current?.pause();setPlaying(false); setSettings(false); setError(''); setNotice('')
     setPosition(initial(continuing?pendingAyah.current:Math.max(1, Math.min(surah.vc, start.current))))
     setPositionSurah(surah.n)
     download.current?.abort(); download.current = null; setProgress(null); setDownloaded(false); setSavedParts(0); setSavedBytes(0)
@@ -89,6 +110,18 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
     const element = audio.current
     if (!element || !open || positionSurah!==surah.n) return
     const controller = new AbortController()
+    const native=nativeAudio.current
+    if(native){
+      const target={r:reciter.id,s:surah.n,a:position.ayah}
+      if(nativeAdopting.current){const p=nativeAdopting.current;if(p.r!==target.r||p.s!==target.s||p.a!==target.a)return;nativeAdopting.current=null}
+      source.current='native'
+      if(native.matches(target)){setReady(native.state.ready);return}
+      native.expect(target);setReady(false);setError('')
+      getVerseAudio(surah.n,position.ayah,controller.signal,false,reciter).then(async result=>{
+        if(!controller.signal.aborted)await native.prepare(result.blob,target,()=>intent.current,verseRepeats,surahRepeats,controller.signal)
+      }).catch(()=>{if(!controller.signal.aborted){intent.current=false;setError(t("ui.823d089129"))}})
+      return()=>{controller.abort();native.cancel(target)}
+    }
     setReady(false); setError(''); element.pause(); setPlaying(false)
     let objectUrl = ''
     getVerseAudio(surah.n,position.ayah,controller.signal,false,reciter).then(result => {
@@ -104,7 +137,9 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
   }, [open, surah.n, positionSurah, position.ayah, retry,reciter.id])
   const currentSpeed = useRef(speed); currentSpeed.current = speed
   // Same verse repeats do not reload or download its audio.
+  useEffect(()=>{nativeAudio.current?.configure(verseRepeats,surahRepeats)},[verseRepeats,surahRepeats])
   const ended = () => {
+    if(nativeAudio.current)return
     if(!background && document.hidden){intent.current=false;setPlaying(false);return}
     const c = current.current
     const next = nextRecitation(c.position,c.total,c.verseRepeats,c.surahRepeats)
@@ -169,16 +204,24 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
     const controller = new AbortController(); download.current = controller; setProgress(0); setError('')
     try {
       await downloadRecitation(surah.n,surah.vc,controller.signal,setProgress,reciter)
+      if(nativeAudio.current&&!controller.signal.aborted){
+        for(let a=1;a<=surah.vc;a++){
+          if(controller.signal.aborted)break
+          const cached=await getVerseAudio(surah.n,a,controller.signal,false,reciter)
+          await cacheNativeVerse(cached.blob,{r:reciter.id,s:surah.n,a},true)
+        }
+      }
       if (!controller.signal.aborted) { setDownloaded(true); setNotice(t("ui.f77fdf433a")) }
     } catch { if (!controller.signal.aborted) setError(t("ui.3d82b884ee")) }
     finally { if (download.current === controller) { download.current = null; setProgress(null); void audioDownloadStatus(surah.n,surah.vc,reciter).then(value=>{if(activeAudio.current.s!==surah.n||activeAudio.current.id!==reciter.id)return;setDownloaded(value.complete);setSavedParts(value.count);setSavedBytes(value.bytes)}).catch(()=>{}) } }
   }
   return <>
-    <audio ref={audio} preload="none" onEnded={ended} onPlay={() => {
+    <audio ref={attachAudio} preload="none" onCanPlay={()=>setReady(true)} onLoadStart={()=>setReady(false)} onRateChange={()=>{if(nativeAudio.current)setSpeed(nativeAudio.current.playbackRate)}} onEnded={ended} onPlay={() => {
       if(!background && document.hidden){intent.current=false;audio.current?.pause();return}
       setPlaying(true)
-      const c=current.current;c.onPlaying(c.surah,c.position.ayah); if(c.follow) c.onFollow(c.surah,c.position.ayah)
-    }} onPause={() => setPlaying(false)} onError={() => { if(source.current) { intent.current=false;setPlaying(false);setError(t("ui.69833552b5")) } }} />
+      if(nativeAudio.current){intent.current=nativeAudio.current.state.playWhenReady;return}
+      const c=current.current;c.onPlaying(c.surah,c.position.ayah);if(c.follow)c.onFollow(c.surah,c.position.ayah)
+    }} onPause={() => {setPlaying(false);if(nativeAudio.current&&!nativeAudio.current.state.playWhenReady)intent.current=false}} onError={() => { if(source.current) { intent.current=false;setPlaying(false);setError(t("ui.69833552b5")) } }} />
 
     {open && controlsVisible && <div className="recitation-bar" role="region" aria-label={t("ui.1f7cc9473a")}>
       <button type="button" className="recitation-location" onClick={() => onFollow(surah.n,position.ayah)} title={t("ui.edcffc5849")}>{surah.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(position.ayah)}<small>{reciter.name}</small></button>
@@ -203,7 +246,7 @@ export default function RecitationPlayer({ playRequest=0,onStatusChange,controls
       <div className="recitation-download">
         {savedParts>0&&<small>{toFa(savedParts)}{' '}{t("ui.e1448c3b31")}{' '}{toFa(Math.round(savedBytes/1024/1024*10)/10)}{' '}{t("ui.9a29784b98")}</small>}
         {progress!==null?<><p role="status">{t("ui.0c77df7fdd")}{' '}{toFa(progress)}{' '}{t("ui.77e7a9224b")}{' '}{toFa(surah.vc)}</p><progress value={progress} max={surah.vc}/><button type="button" className="chip" onClick={()=>download.current?.abort()}>{t("ui.f8960d4ff6")}</button></>:downloaded?<><p><Check size={16}/>{t("ui.ac3db18411")}</p></>:<button type="button" className="chip" onClick={()=>void startDownload()}><Download size={16}/>{t("ui.4078092b65")}</button>}
-        {savedParts>0&&progress===null&&<button type="button" className="chip" onClick={()=>void deleteRecitation(surah.n,reciter).then(()=>{setDownloaded(false);setSavedParts(0);setSavedBytes(0)}).catch(()=>setError(t("ui.398f681786")))}><Trash2 size={15}/>{t("ui.e2188fd0aa")}</button>}
+        {savedParts>0&&progress===null&&<button type="button" className="chip" onClick={()=>void deleteRecitation(surah.n,reciter).then(async()=>{if(nativeAudio.current)await nativeCommand({op:"deleteCache",r:reciter.id,s:surah.n});setDownloaded(false);setSavedParts(0);setSavedBytes(0)}).catch(()=>setError(t("ui.398f681786")))}><Trash2 size={15}/>{t("ui.e2188fd0aa")}</button>}
         <small>{t("ui.27e353abc8")}</small>
         {notice&&<p role="status">{notice}</p>}
       </div>

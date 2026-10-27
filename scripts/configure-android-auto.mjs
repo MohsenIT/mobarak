@@ -24,7 +24,28 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
   await mkdir(path.join(main,'assets'),{recursive:true})
   await writeFile(path.join(main,'assets/quran-auto.json'),JSON.stringify({reciters,surahs,labels}))
   const java=path.join(main,'java/app/quranmubarak/reader/auto');await mkdir(java,{recursive:true})
-  await copyFile(path.join(root,'android-auto/QuranCarService.java'),path.join(java,'QuranCarService.java'))
+  for(const file of ['QuranCarService.java','QuranAudioBridge.java'])await copyFile(path.join(root,'android-auto',file),path.join(java,file))
+  const activity=path.join(main,'java/app/quranmubarak/reader/MainActivity.kt')
+  let kotlin=await readFile(activity,'utf8')
+  kotlin=kotlin.replace(/\s*\/\/ quran-audio:start[\s\S]*?\/\/ quran-audio:end/g,'')
+  if(/override fun (onWebViewCreate|onDestroy)/.test(kotlin))throw Error('MainActivity has custom lifecycle hooks; merge native audio explicitly')
+  const hooks=`
+    // quran-audio:start
+    @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
+    private var quranAudioBridge: app.quranmubarak.reader.auto.QuranAudioBridge? = null
+    @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
+    override fun onWebViewCreate(webView: android.webkit.WebView) {
+        super.onWebViewCreate(webView)
+        quranAudioBridge?.close()
+        if (androidx.webkit.WebViewFeature.isFeatureSupported(androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            quranAudioBridge = app.quranmubarak.reader.auto.QuranAudioBridge(this, webView)
+        }
+    }
+    // quran-audio:end`
+  const declaration=/class MainActivity\s*:\s*TauriActivity\(\)\s*(\{)?/
+  if(!declaration.test(kotlin))throw Error('Unrecognized generated MainActivity')
+  kotlin=kotlin.replace(declaration,(_all,brace)=>`class MainActivity : TauriActivity() {${hooks}${brace?'':'\n}'}`)
+  await writeFile(activity,kotlin)
   const xml=path.join(main,'res/xml');await mkdir(xml,{recursive:true})
   await writeFile(path.join(xml,'automotive_app_desc.xml'),'<?xml version="1.0" encoding="utf-8"?><automotiveApp><uses name="media"/></automotiveApp>\n')
   const manifest=path.join(main,'AndroidManifest.xml')
@@ -48,7 +69,7 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
   const gradle=path.join(app,'build.gradle.kts')
   let g=await readFile(gradle,'utf8')
   g=g.replace(/\n?\/\/ quran-auto:start[\s\S]*?\/\/ quran-auto:end\n?/g,'\n')
-  g+='\n// quran-auto:start\ndependencies {\n    implementation("androidx.media3:media3-exoplayer:1.5.1")\n    implementation("androidx.media3:media3-session:1.5.1")\n}\n// quran-auto:end\n'
+  g+='\n// quran-auto:start\ndependencies {\n    implementation("androidx.media3:media3-exoplayer:1.5.1")\n    implementation("androidx.media3:media3-session:1.5.1")\n    implementation("androidx.webkit:webkit:1.12.1")\n}\n// quran-auto:end\n'
   await writeFile(gradle,g)
   return {reciters:reciters.length,surahs:surahs.length,verses:6236}
 }

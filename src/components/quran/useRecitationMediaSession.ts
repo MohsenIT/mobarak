@@ -1,4 +1,5 @@
 'use client'
+import {nativeRecitationAvailable} from '@/lib/native-recitation'
 import {APP_NAME} from '@/lib/branding'
 import { useEffect, useRef, type RefObject } from 'react'
 
@@ -11,7 +12,7 @@ interface Options {
 export function useRecitationMediaSession(options: Options) {
   const current=useRef(options);current.current=options
   useEffect(()=>{
-    if(!options.active || !('mediaSession' in navigator))return
+    if(nativeRecitationAvailable()||!options.active || !('mediaSession' in navigator))return
     const session=navigator.mediaSession
     const seek=(offset:number)=>{const a=current.current.audio.current;if(a&&Number.isFinite(a.duration))a.currentTime=Math.max(0,Math.min(a.duration,a.currentTime+offset))}
     const handlers:Partial<Record<MediaSessionAction,MediaSessionActionHandler>>={
@@ -36,7 +37,7 @@ export function useRecitationMediaSession(options: Options) {
     }
   },[options.active,options.audio])
   useEffect(()=>{
-    if(!options.active||!('mediaSession' in navigator))return
+    if(nativeRecitationAvailable()||!options.active||!('mediaSession' in navigator))return
     if(typeof MediaMetadata!=='undefined')navigator.mediaSession.metadata=new MediaMetadata({
       title:options.title,artist:options.artist,album:APP_NAME,
       artwork:[192,512].map(size=>({src:new URL(`/icons/app-logo-v3-any-${size}.png`,location.href).href,sizes:`${size}x${size}`,type:'image/png'})),
