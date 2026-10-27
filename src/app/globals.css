@@ -1151,9 +1151,6 @@ input[type='range'].page-slider::-moz-range-thumb {
 .analysis-occurrence-match { color: var(--ink); background: var(--word-selected); border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; text-decoration: underline; text-decoration-color: var(--sage); text-underline-offset: 5px; }
 @media (max-width: 380px) { .analysis-unit-button svg { display: none; } .analysis-navigation { gap: 2px; padding-inline: 5px; } .analysis-repeat-button { font-size: 11px; } }
 
-.app-update-spinner { animation: app-update-spin 1s linear infinite; }
-@keyframes app-update-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .app-update-spinner { animation: none; } }
 
 .startup-verse strong { font-weight: 700; color: #284b34; }
 
