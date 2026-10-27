@@ -613,5 +613,7 @@
   "voice.listening": "Escuchando…",
   "voice.unavailable": "El dictado por voz no está disponible en este navegador.",
   "voice.denied": "Permiso de micrófono denegado.",
-  "voice.failed": "No se reconoció la voz; inténtalo de nuevo."
+  "voice.failed": "No se reconoció la voz; inténtalo de nuevo.",
+  "resource.nationality": "País",
+  "resource.saudiShort": "Saudi Arabia"
 }

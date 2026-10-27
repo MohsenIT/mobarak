@@ -613,5 +613,7 @@
   "voice.listening": "Ana saurare…",
   "voice.unavailable": "Rubuta da murya ba ya aiki a wannan burauzar.",
   "voice.denied": "An hana izinin amfani da makirufo.",
-  "voice.failed": "Ba a gane maganar ba; don Allah a sake gwadawa."
+  "voice.failed": "Ba a gane maganar ba; don Allah a sake gwadawa.",
+  "resource.nationality": "Kasa",
+  "resource.saudiShort": "Saudi Arabia"
 }

@@ -613,5 +613,7 @@
   "voice.listening": "Lytter…",
   "voice.unavailable": "Stemmeskriving er ikke tilgjengelig i denne nettleseren.",
   "voice.denied": "Tilgang til mikrofon ble nektet.",
-  "voice.failed": "Tale ikke gjenkjent; prøv igjen."
+  "voice.failed": "Tale ikke gjenkjent; prøv igjen.",
+  "resource.nationality": "Land",
+  "resource.saudiShort": "Saudi Arabia"
 }

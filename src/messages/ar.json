@@ -613,5 +613,7 @@
   "voice.listening": "جاري الاستماع…",
   "voice.unavailable": "الكتابة بالصوت غير متاحة في هذا المتصفح.",
   "voice.denied": "تم رفض إذن الوصول إلى الميكروفون.",
-  "voice.failed": "لم يتم التعرف على الكلام؛ حاول مجدداً."
+  "voice.failed": "لم يتم التعرف على الكلام؛ حاول مجدداً.",
+  "resource.nationality": "الجنسية",
+  "resource.saudiShort": "السعودية"
 }

@@ -613,5 +613,7 @@
   "voice.listening": "In ascolto…",
   "voice.unavailable": "La digitazione vocale non è disponibile in questo browser.",
   "voice.denied": "Autorizzazione microfono negata.",
-  "voice.failed": "Voce non riconosciuta; riprova."
+  "voice.failed": "Voce non riconosciuta; riprova.",
+  "resource.nationality": "Paese",
+  "resource.saudiShort": "Saudi Arabia"
 }

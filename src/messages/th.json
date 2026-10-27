@@ -613,5 +613,7 @@
   "voice.listening": "กำลังฟัง…",
   "voice.unavailable": "เบราว์เซอร์นี้ไม่รองรับการพิมพ์ด้วยเสียง",
   "voice.denied": "ไม่อนุญาตให้ใช้ไมโครโฟน",
-  "voice.failed": "ไม่พบเสียงพูด โปรดลองใหม่อีกครั้ง"
+  "voice.failed": "ไม่พบเสียงพูด โปรดลองใหม่อีกครั้ง",
+  "resource.nationality": "ประเทศ",
+  "resource.saudiShort": "Saudi Arabia"
 }

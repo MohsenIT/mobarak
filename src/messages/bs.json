@@ -613,5 +613,7 @@
   "voice.listening": "Slušam…",
   "voice.unavailable": "Glasovno kucanje nije dostupno u ovom pretraživaču.",
   "voice.denied": "Dozvola za mikrofon je odbijena.",
-  "voice.failed": "Govor nije prepoznat; pokušajte ponovo."
+  "voice.failed": "Govor nije prepoznat; pokušajte ponovo.",
+  "resource.nationality": "Zemlja",
+  "resource.saudiShort": "Saudi Arabia"
 }

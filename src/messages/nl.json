@@ -613,5 +613,7 @@
   "voice.listening": "Luisteren…",
   "voice.unavailable": "Spraakgestuurd typen is niet beschikbaar in deze browser.",
   "voice.denied": "Microfoontoegang geweigerd.",
-  "voice.failed": "Spraak niet herkend; probeer het opnieuw."
+  "voice.failed": "Spraak niet herkend; probeer het opnieuw.",
+  "resource.nationality": "Land",
+  "resource.saudiShort": "Saudi Arabia"
 }

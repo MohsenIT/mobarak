@@ -613,5 +613,7 @@
   "voice.listening": "Duke dëgjuar…",
   "voice.unavailable": "Shkrimi me zë nuk është i disponueshëm në këtë shfletues.",
   "voice.denied": "Leja për mikrofonin u refuzua.",
-  "voice.failed": "Të folurit nuk u njoh; ju lutemi provoni përsëri."
+  "voice.failed": "Të folurit nuk u njoh; ju lutemi provoni përsëri.",
+  "resource.nationality": "Vendi",
+  "resource.saudiShort": "Saudi Arabia"
 }

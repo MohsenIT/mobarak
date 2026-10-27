@@ -613,5 +613,7 @@
   "voice.listening": "Inasikiliza…",
   "voice.unavailable": "Kuandika kwa sauti hakupatikani kwenye kivinjari hiki.",
   "voice.denied": "Ruhusa ya maikrofoni imekataliwa.",
-  "voice.failed": "Sauti haikutambulika; tafadhali jaribu tena."
+  "voice.failed": "Sauti haikutambulika; tafadhali jaribu tena.",
+  "resource.nationality": "Nchi",
+  "resource.saudiShort": "Saudi Arabia"
 }

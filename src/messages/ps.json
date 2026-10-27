@@ -613,5 +613,7 @@
   "voice.listening": "اورېدل کېږي…",
   "voice.unavailable": "په دې براوزر کې د غږ ټایپ کول شتون نلري.",
   "voice.denied": "د مایکروفون اجازه رد شوه.",
-  "voice.failed": "غږ ونه پېژندل شو؛ مهرباني وکړئ بیا هڅه وکړئ."
+  "voice.failed": "غږ ونه پېژندل شو؛ مهرباني وکړئ بیا هڅه وکړئ.",
+  "resource.nationality": "هېواد",
+  "resource.saudiShort": "Saudi Arabia"
 }

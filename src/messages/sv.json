@@ -613,5 +613,7 @@
   "voice.listening": "Lyssnar…",
   "voice.unavailable": "Röstinmatning är inte tillgänglig i den här webbläsaren.",
   "voice.denied": "Mikrofonåtkomst nekades.",
-  "voice.failed": "Talet kunde inte kännas igen; försök igen."
+  "voice.failed": "Talet kunde inte kännas igen; försök igen.",
+  "resource.nationality": "Land",
+  "resource.saudiShort": "Saudi Arabia"
 }

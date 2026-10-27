@@ -613,5 +613,7 @@
   "voice.listening": "ئاڭلاۋاتىدۇ…",
   "voice.unavailable": "بۇ توركۆرگۈدە ئاۋازلىق يېزىش ئىقتىدارى يوق.",
   "voice.denied": "مىكروفون ئىجازىتى رەت قىلىندى.",
-  "voice.failed": "سۆز تونۇلمىدى؛ قايتا سىناپ بېقىڭ."
+  "voice.failed": "سۆز تونۇلمىدى؛ قايتا سىناپ بېقىڭ.",
+  "resource.nationality": "دۆلەت",
+  "resource.saudiShort": "Saudi Arabia"
 }

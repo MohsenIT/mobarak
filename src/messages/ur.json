@@ -613,5 +613,7 @@
   "voice.listening": "سن رہے ہیں…",
   "voice.unavailable": "اس براؤزر میں وائس ٹائپنگ دستیاب نہیں ہے۔",
   "voice.denied": "مائیکروفون کی اجازت نہیں دی گئی۔",
-  "voice.failed": "آواز کی شناخت نہیں ہوئی؛ دوبارہ کوشش کریں۔"
+  "voice.failed": "آواز کی شناخت نہیں ہوئی؛ دوبارہ کوشش کریں۔",
+  "resource.nationality": "ملک",
+  "resource.saudiShort": "Saudi Arabia"
 }

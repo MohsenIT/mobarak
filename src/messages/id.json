@@ -613,5 +613,7 @@
   "voice.listening": "Mendengarkan…",
   "voice.unavailable": "Pengetikan suara tidak tersedia di browser ini.",
   "voice.denied": "Izin mikrofon ditolak.",
-  "voice.failed": "Ucapan tidak dikenali; silakan coba lagi."
+  "voice.failed": "Ucapan tidak dikenali; silakan coba lagi.",
+  "resource.nationality": "Negara",
+  "resource.saudiShort": "Saudi Arabia"
 }

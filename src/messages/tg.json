@@ -613,5 +613,7 @@
   "voice.listening": "Гӯш додан…",
   "voice.unavailable": "Воридкунии овозӣ дар ин браузер дастрас нест.",
   "voice.denied": "Иҷозат барои истифодаи микрофон рад карда шуд.",
-  "voice.failed": "Сухан шинохта нашуд; лутфан дубора кӯшиш кунед."
+  "voice.failed": "Сухан шинохта нашуд; лутфан дубора кӯшиш кунед.",
+  "resource.nationality": "Кишвар",
+  "resource.saudiShort": "Saudi Arabia"
 }

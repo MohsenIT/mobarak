@@ -613,5 +613,7 @@
   "voice.listening": "கேட்கிறது…",
   "voice.unavailable": "இந்த உலாவியில் குரல் தட்டச்சு இல்லை.",
   "voice.denied": "மைக்ரோஃபோன் அனுமதி மறுக்கப்பட்டது.",
-  "voice.failed": "பேச்சு அடையாளம் காணப்படவில்லை; மீண்டும் முயற்சிக்கவும்."
+  "voice.failed": "பேச்சு அடையாளம் காணப்படவில்லை; மீண்டும் முயற்சிக்கவும்.",
+  "resource.nationality": "நாடு",
+  "resource.saudiShort": "Saudi Arabia"
 }

@@ -613,5 +613,7 @@
   "voice.listening": "در حال شنیدن…",
   "voice.unavailable": "تایپ صوتی در این مرورگر در دسترس نیست.",
   "voice.denied": "اجازهٔ استفاده از میکروفون داده نشد.",
-  "voice.failed": "گفتار دریافت نشد؛ دوباره تلاش کنید."
+  "voice.failed": "گفتار دریافت نشد؛ دوباره تلاش کنید.",
+  "resource.nationality": "ملیت",
+  "resource.saudiShort": "عربستان"
 }

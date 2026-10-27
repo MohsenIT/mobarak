@@ -613,5 +613,7 @@
   "voice.listening": "Слушаю…",
   "voice.unavailable": "Голосовой ввод недоступен в этом браузере.",
   "voice.denied": "Доступ к микрофону запрещен.",
-  "voice.failed": "Речь не распознана; попробуйте еще раз."
+  "voice.failed": "Речь не распознана; попробуйте еще раз.",
+  "resource.nationality": "Страна",
+  "resource.saudiShort": "Saudi Arabia"
 }

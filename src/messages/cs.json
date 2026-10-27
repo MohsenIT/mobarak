@@ -613,5 +613,7 @@
   "voice.listening": "Poslouchám…",
   "voice.unavailable": "Hlasové psaní není v tomto prohlížeči dostupné.",
   "voice.denied": "Přístup k mikrofonu byl zamítnut.",
-  "voice.failed": "Řeč nebyla rozpoznána; zkuste to znovu."
+  "voice.failed": "Řeč nebyla rozpoznána; zkuste to znovu.",
+  "resource.nationality": "Země",
+  "resource.saudiShort": "Saudi Arabia"
 }

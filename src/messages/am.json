@@ -613,5 +613,7 @@
   "voice.listening": "በማዳመጥ ላይ…",
   "voice.unavailable": "በዚህ አሳሽ የድምጽ መተየብ አይቻልም።",
   "voice.denied": "የማይክሮፎን ፈቃድ ተከልክሏል።",
-  "voice.failed": "ንግግር አልታወቀም፤ እባክዎ እንደገና ይሞክሩ።"
+  "voice.failed": "ንግግር አልታወቀም፤ እባክዎ እንደገና ይሞክሩ።",
+  "resource.nationality": "አገር",
+  "resource.saudiShort": "Saudi Arabia"
 }

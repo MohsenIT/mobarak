@@ -613,5 +613,7 @@
   "voice.listening": "Ascult…",
   "voice.unavailable": "Tastarea vocală nu este disponibilă în acest browser.",
   "voice.denied": "Permisiunea pentru microfon a fost refuzată.",
-  "voice.failed": "Discurs nerecunoscut; vă rugăm să încercați din nou."
+  "voice.failed": "Discurs nerecunoscut; vă rugăm să încercați din nou.",
+  "resource.nationality": "Țară",
+  "resource.saudiShort": "Saudi Arabia"
 }

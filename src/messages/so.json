@@ -613,5 +613,7 @@
   "voice.listening": "Waan dhageysanayaa…",
   "voice.unavailable": "Qorista codka lagama heli karo biraawsarkan.",
   "voice.denied": "Ogolaanshaha makarafoonka waa la diiday.",
-  "voice.failed": "Codka lama aqoonsan; fadlan mar kale isku day."
+  "voice.failed": "Codka lama aqoonsan; fadlan mar kale isku day.",
+  "resource.nationality": "Dalka",
+  "resource.saudiShort": "Saudi Arabia"
 }

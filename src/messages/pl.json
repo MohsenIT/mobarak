@@ -613,5 +613,7 @@
   "voice.listening": "Słucham…",
   "voice.unavailable": "Pisanie głosowe nie jest dostępne w tej przeglądarce.",
   "voice.denied": "Odmowa dostępu do mikrofonu.",
-  "voice.failed": "Nie rozpoznano mowy; spróbuj ponownie."
+  "voice.failed": "Nie rozpoznano mowy; spróbuj ponownie.",
+  "resource.nationality": "Kraj",
+  "resource.saudiShort": "Saudi Arabia"
 }

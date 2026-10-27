@@ -613,5 +613,7 @@
   "voice.listening": "Listening…",
   "voice.unavailable": "Voice typing is not available in this browser.",
   "voice.denied": "Microphone permission denied.",
-  "voice.failed": "Speech not recognized; please try again."
+  "voice.failed": "Speech not recognized; please try again.",
+  "resource.nationality": "Country",
+  "resource.saudiShort": "Saudi Arabia"
 }

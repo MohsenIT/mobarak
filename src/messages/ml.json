@@ -613,5 +613,7 @@
   "voice.listening": "കേൾക്കുന്നു…",
   "voice.unavailable": "ഈ ബ്രൗസറിൽ വോയ്‌സ് ടൈപ്പിംഗ് ലഭ്യമല്ല.",
   "voice.denied": "മൈക്രോഫോൺ അനുമതി നിഷേധിച്ചു.",
-  "voice.failed": "സംസാരം തിരിച്ചറിഞ്ഞില്ല; ദയവായി വീണ്ടും ശ്രമിക്കുക."
+  "voice.failed": "സംസാരം തിരിച്ചറിഞ്ഞില്ല; ദയവായി വീണ്ടും ശ്രമിക്കുക.",
+  "resource.nationality": "രാജ്യം",
+  "resource.saudiShort": "Saudi Arabia"
 }

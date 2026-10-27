@@ -613,5 +613,7 @@
   "voice.listening": "Тыңлыйм…",
   "voice.unavailable": "Бу браузерда тавыш белән язу мөмкин түгел.",
   "voice.denied": "Микрофонга рөхсәт бирелмәде.",
-  "voice.failed": "Сүз танылмады; зинһар, яңадан тырышып карагыз."
+  "voice.failed": "Сүз танылмады; зинһар, яңадан тырышып карагыз.",
+  "resource.nationality": "Ил",
+  "resource.saudiShort": "Saudi Arabia"
 }

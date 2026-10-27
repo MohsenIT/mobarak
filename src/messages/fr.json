@@ -613,5 +613,7 @@
   "voice.listening": "Écoute…",
   "voice.unavailable": "La saisie vocale n'est pas disponible dans ce navigateur.",
   "voice.denied": "Autorisation du microphone refusée.",
-  "voice.failed": "Parole non reconnue ; veuillez réessayer."
+  "voice.failed": "Parole non reconnue ; veuillez réessayer.",
+  "resource.nationality": "Pays",
+  "resource.saudiShort": "Saudi Arabia"
 }

@@ -613,5 +613,7 @@
   "voice.listening": "सुन रहे हैं…",
   "voice.unavailable": "इस ब्राउज़र में वॉयस टाइपिंग उपलब्ध नहीं है।",
   "voice.denied": "माइक्रोफ़ोन की अनुमति अस्वीकार कर दी गई।",
-  "voice.failed": "आवाज़ समझ नहीं आई; कृपया पुनः प्रयास करें।"
+  "voice.failed": "आवाज़ समझ नहीं आई; कृपया पुनः प्रयास करें।",
+  "resource.nationality": "देश",
+  "resource.saudiShort": "Saudi Arabia"
 }

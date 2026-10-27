@@ -613,5 +613,7 @@
   "voice.listening": "Слушам…",
   "voice.unavailable": "Гласовото въвеждане не е достъпно в този браузър.",
   "voice.denied": "Достъпът до микрофона е отказан.",
-  "voice.failed": "Речта не е разпозната; моля, опитайте отново."
+  "voice.failed": "Речта не е разпозната; моля, опитайте отново.",
+  "resource.nationality": "Държава",
+  "resource.saudiShort": "Saudi Arabia"
 }

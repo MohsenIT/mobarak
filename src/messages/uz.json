@@ -613,5 +613,7 @@
   "voice.listening": "Eshitilmoqda…",
   "voice.unavailable": "Ushbu brauzerda ovozli yozish mavjud emas.",
   "voice.denied": "Mikrofondan foydalanishga ruxsat berilmadi.",
-  "voice.failed": "Nutq aniqlanmadi; iltimos, qaytadan urinib ko'ring."
+  "voice.failed": "Nutq aniqlanmadi; iltimos, qaytadan urinib ko'ring.",
+  "resource.nationality": "Mamlakat",
+  "resource.saudiShort": "Saudi Arabia"
 }

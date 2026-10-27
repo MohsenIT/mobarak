@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.14',date:'2026-10-27',title:'انتخاب ساده‌تر قاری',changeKinds:['improvement'],changes:[
+    'فهرست قاری‌ها با جست‌وجو و فیلترهای چیپی مرتب شد؛ ملیت‌ها با پرچم و تعداد، از بیشترین به کمترین نمایش داده می‌شوند.',
+  ],
+},{
   version:'0.4.13',date:'2026-10-27',title:'اتصال پخش اپ به کنترل‌های اندروید',changeKinds:['fix'],changes:[
     'پخش داخل نسخهٔ اندروید به پخش‌کنندهٔ بومی وصل شد تا اعلان پخش و کنترل‌های سیستم و خودرو همان تلاوت را کنترل کنند؛ جابه‌جایی آیه از سیستم نیز به اپ برمی‌گردد.',
   ],

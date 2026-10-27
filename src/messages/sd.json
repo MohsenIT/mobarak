@@ -613,5 +613,7 @@
   "voice.listening": "ٻڌي رهيا آهيون…",
   "voice.unavailable": "هن برائوزر ۾ آواز سان ٽائپنگ موجود ناهي.",
   "voice.denied": "مائڪروفون جي اجازت رد ڪئي وئي.",
-  "voice.failed": "آواز جي سڃاڻپ نه ٿي؛ مهرباني ڪري ٻيهر ڪوشش ڪريو."
+  "voice.failed": "آواز جي سڃاڻپ نه ٿي؛ مهرباني ڪري ٻيهر ڪوشش ڪريو.",
+  "resource.nationality": "ملڪ",
+  "resource.saudiShort": "Saudi Arabia"
 }

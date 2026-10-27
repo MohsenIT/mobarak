@@ -613,5 +613,7 @@
   "voice.listening": "Dinleniyor…",
   "voice.unavailable": "Sesle yazma bu tarayıcıda kullanılamıyor.",
   "voice.denied": "Mikrofon izni reddedildi.",
-  "voice.failed": "Konuşma algılanamadı; lütfen tekrar deneyin."
+  "voice.failed": "Konuşma algılanamadı; lütfen tekrar deneyin.",
+  "resource.nationality": "Ülke",
+  "resource.saudiShort": "Saudi Arabia"
 }

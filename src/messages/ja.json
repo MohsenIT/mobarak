@@ -613,5 +613,7 @@
   "voice.listening": "聞いています…",
   "voice.unavailable": "このブラウザでは音声入力が利用できません。",
   "voice.denied": "マイクの使用が許可されていません。",
-  "voice.failed": "音声を認識できませんでした。もう一度お試しください。"
+  "voice.failed": "音声を認識できませんでした。もう一度お試しください。",
+  "resource.nationality": "国",
+  "resource.saudiShort": "Saudi Arabia"
 }

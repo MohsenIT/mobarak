@@ -613,5 +613,7 @@
   "voice.listening": "Zuhören…",
   "voice.unavailable": "Spracheingabe ist in diesem Browser nicht verfügbar.",
   "voice.denied": "Mikrofonzugriff verweigert.",
-  "voice.failed": "Sprache nicht erkannt; bitte versuchen Sie es erneut."
+  "voice.failed": "Sprache nicht erkannt; bitte versuchen Sie es erneut.",
+  "resource.nationality": "Land",
+  "resource.saudiShort": "Saudi Arabia"
 }
