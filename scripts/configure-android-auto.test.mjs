@@ -22,6 +22,13 @@ test('generated Android build gets a complete browse library and idempotent mani
   assert.match(first,/foregroundServiceType="mediaPlayback"/)
   assert.match(first,/android.media.browse.MediaBrowserService/)
   assert.equal(await readFile(path.join(main,'java/app/quranmubarak/reader/MainActivity.kt'),'utf8'),activity)
+  assert.equal((first.match(/<provider /g)||[]).length,1)
+  assert.match(first,/QuranArtworkProvider/)
+  for(let n=1;n<=114;n++){
+   const image=await readFile(path.join(main,'assets/surah-artwork',String(n).padStart(3,'0')+'.png'))
+   assert.equal(image.subarray(1,4).toString(),'PNG')
+   assert.equal(image.readUInt32BE(16),512);assert.equal(image.readUInt32BE(20),512)
+  }
   const gradle=await readFile(path.join(temp,'app/build.gradle.kts'),'utf8')
   assert.equal((gradle.match(/media3-session/g)||[]).length,1)
   const catalog=JSON.parse(await readFile(path.join(main,'assets/quran-auto.json'),'utf8'))

@@ -199,7 +199,7 @@ export default function RecitationPlayer({ onNativeActive,playRequest=0,onStatus
     else if(audio.current?.paused)toggle()
   },[playRequest,open,ready,error])
   useRecitationMediaSession({audio,active:open,playing,title:t("ui.cb282cb444",{p0:(surah.fa),p1:(toFa(position.ayah))}),artist:reciter.name,
-    onPlay:resume,onPause:pause,onNext:skipNext,onPrevious:skipPrevious,onStop:()=>{pause();onClose()}})
+    surah:surah.n,onPlay:resume,onPause:pause,onNext:skipNext,onPrevious:skipPrevious,onStop:()=>{pause();onClose()}})
   const startDownload = async () => {
     const controller = new AbortController(); download.current = controller; setProgress(0); setError('')
     try {

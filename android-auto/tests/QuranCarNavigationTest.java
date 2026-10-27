@@ -78,6 +78,19 @@ public class QuranCarNavigationTest {
     }
     assertTrue(((List<MediaItem>)search.invoke(service,"20:999")).isEmpty());
   }
+  @Test public void coversUseBundledSurahArtAndProviderRejectsOtherFiles()throws Exception{
+    android.content.pm.ProviderInfo info=new android.content.pm.ProviderInfo();info.authority=service.getPackageName()+".artwork";info.exported=true;
+    QuranArtworkProvider provider=new QuranArtworkProvider();provider.attachInfo(service,info);
+    for(int n=1;n<=114;n++){
+      MediaItem item=children("surahs").get(n-1);android.net.Uri uri=item.mediaMetadata.artworkUri;
+      assertNotNull(uri);assertEquals("content",uri.getScheme());assertEquals(info.authority,uri.getAuthority());assertEquals("image/png",provider.getType(uri));
+      try(java.io.InputStream in=new android.os.ParcelFileDescriptor.AutoCloseInputStream(provider.openFile(uri,"r"))){assertEquals(137,in.read());assertEquals(80,in.read());}
+    }
+    for(String path:Arrays.asList("/surah/000.png","/surah/115.png","/surah/../secret","/surah/001.png?file=private","/anything")){
+      try{provider.openFile(android.net.Uri.parse("content://"+info.authority+path),"r");fail(path);}catch(java.io.FileNotFoundException expected){}
+    }
+    try{provider.openFile(children("surahs").get(0).mediaMetadata.artworkUri,"rw");fail("Allowed writes");}catch(java.io.FileNotFoundException expected){}
+  }
   @Test public void downloadsRequireEveryVerseAndExplicitPin()throws Exception{
     String r=children("reciters").get(0).mediaId.substring(5);
     assertTrue(children("downloads").isEmpty());

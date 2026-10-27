@@ -58,7 +58,7 @@ public final class QuranCarService extends MediaLibraryService {
       }
       return spec;
     });
-    player = new ExoPlayer.Builder(this).setMediaSourceFactory(new DefaultMediaSourceFactory(audioSource)).build();
+    player = new ExoPlayer.Builder(this).setMediaSourceFactory(new DefaultMediaSourceFactory(audioSource,new androidx.media3.extractor.DefaultExtractorsFactory().setMp3ExtractorFlags(androidx.media3.extractor.mp3.Mp3Extractor.FLAG_DISABLE_ID3_METADATA))).build();
     player.setAudioAttributes(new AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_SPEECH).build(), true);
     player.setHandleAudioBecomingNoisy(true);
     player.setWakeMode(C.WAKE_MODE_LOCAL);
@@ -136,6 +136,7 @@ public final class QuranCarService extends MediaLibraryService {
     if (uri != null) b.setUri(uri);
     return b.build();
   }
+  private android.net.Uri artwork(int surah){return android.net.Uri.parse("content://"+getPackageName()+".artwork/surah/"+String.format(Locale.ROOT,"%03d.png",surah));}
   private MediaItem verse(String reciterId, int surah, int ayah) {
     JSONObject r = reciter(reciterId), s = surahs.optJSONObject(surah-1);
     if (s == null || ayah < 1 || ayah > s.optInt("vc")) throw new IllegalArgumentException("Invalid verse");
@@ -143,7 +144,7 @@ public final class QuranCarService extends MediaLibraryService {
     String directory = r.optString("tanzilDirectory");
     String uri = directory.isEmpty() ? "https://verses.quran.com/Minshawi/Murattal/mp3/"+file : "https://tanzil.net/res/audio/"+directory+"/"+file;
     MediaItem result=item("v/"+reciterId+"/"+surah+"/"+ayah, s.optString("ar")+" · "+label("verse")+" "+number(ayah), r.optString("name"), false, true, uri);
-    return result.buildUpon().setMediaMetadata(result.mediaMetadata.buildUpon().setSubtitle(s.optJSONArray("texts").optString(ayah-1)).setDescription(s.optJSONArray("texts").optString(ayah-1)).build()).build();
+    return result.buildUpon().setMediaMetadata(result.mediaMetadata.buildUpon().setArtworkUri(artwork(surah)).setSubtitle(s.optJSONArray("texts").optString(ayah-1)).setDescription(s.optJSONArray("texts").optString(ayah-1)).build()).build();
   }
   private List<MediaItem> queue(String r, int s) {
     ArrayList<MediaItem> items = new ArrayList<>();
@@ -202,7 +203,8 @@ public final class QuranCarService extends MediaLibraryService {
   private MediaItem continuation() {
     String[] p=selectedVerse().split("/");
     MediaItem track=verse(p[1],Integer.parseInt(p[2]),Integer.parseInt(p[3]));
-    return item("resume",label("resume"),track.mediaMetadata.title+" · "+reciter(p[1]).optString("name"),false,true,null);
+    MediaItem result=item("resume",label("resume"),track.mediaMetadata.title+" · "+reciter(p[1]).optString("name"),false,true,null);
+    return result.buildUpon().setMediaMetadata(result.mediaMetadata.buildUpon().setArtworkUri(artwork(Integer.parseInt(p[2]))).build()).build();
   }
   private boolean downloaded(String r,int n,int count) {
     java.io.File first=QuranAudioBridge.audioFile(this,r,n,1);
@@ -214,7 +216,7 @@ public final class QuranCarService extends MediaLibraryService {
     String id=(browse?"s/":"v/")+r+"/"+surah.optInt("n")+(browse?"":"/1");
     MediaItem result=item(id,number(surah.optInt("n"))+" · "+surah.optString("ar"),reciter(r).optString("name"),browse,!browse,null);
     return result.buildUpon().setMediaMetadata(result.mediaMetadata.buildUpon()
-      .setMediaType(browse?MediaMetadata.MEDIA_TYPE_FOLDER_MIXED:MediaMetadata.MEDIA_TYPE_ALBUM).build()).build();
+      .setArtworkUri(artwork(surah.optInt("n"))).setMediaType(browse?MediaMetadata.MEDIA_TYPE_FOLDER_MIXED:MediaMetadata.MEDIA_TYPE_ALBUM).build()).build();
   }
   private List<MediaItem> children(String parent) {
     ArrayList<MediaItem> items=new ArrayList<>();

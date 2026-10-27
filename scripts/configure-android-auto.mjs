@@ -22,9 +22,10 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
     labels[f.slice(0,-5)]={app:brand.APP_NAME,verse:m['ui.b1b168c791'],resume:m['auto.resume'],home:m['auto.home'],library:m['auto.library'],chooseVerse:m['auto.chooseVerse'],chooseReciter:m['auto.chooseReciter'],downloads:m['auto.downloads'],surahs:m['ui.a1e320e16e'],recent:m['ui.d8c76d09ca'],repeatVerse:m['ui.9645b5c54f'],repeatSurah:m['ui.2cfa25518d'],speed:m['ui.991d782fda']}
   }
   await mkdir(path.join(main,'assets'),{recursive:true})
+  for(const surah of surahs){const name=String(surah.n).padStart(3,'0')+'.png';await mkdir(path.join(main,'assets/surah-artwork'),{recursive:true});await copyFile(path.join(root,'public/images/surahs',name),path.join(main,'assets/surah-artwork',name))}
   await writeFile(path.join(main,'assets/quran-auto.json'),JSON.stringify({reciters,surahs,labels}))
   const java=path.join(main,'java/app/quranmubarak/reader/auto');await mkdir(java,{recursive:true})
-  for(const file of ['QuranCarService.java','QuranAudioBridge.java'])await copyFile(path.join(root,'android-auto',file),path.join(java,file))
+  for(const file of ['QuranCarService.java','QuranAudioBridge.java','QuranArtworkProvider.java'])await copyFile(path.join(root,'android-auto',file),path.join(java,file))
   const activity=path.join(main,'java/app/quranmubarak/reader/MainActivity.kt')
   let kotlin=await readFile(activity,'utf8')
   kotlin=kotlin.replace(/\s*\/\/ quran-audio:start[\s\S]*?\/\/ quran-audio:end/g,'')
@@ -56,6 +57,7 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
   if(!m.includes('</application>'))throw Error('Generated Android manifest has no application')
   m=m.replace(/\s*<\/application>/,`\n        <!-- quran-auto:start -->
         <meta-data android:name="com.google.android.gms.car.application" android:resource="@xml/automotive_app_desc"/>
+        <provider android:name="app.quranmubarak.reader.auto.QuranArtworkProvider" android:authorities="\${applicationId}.artwork" android:exported="true"/>
         <service android:name="app.quranmubarak.reader.auto.QuranCarService" android:exported="true" android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaLibraryService"/>

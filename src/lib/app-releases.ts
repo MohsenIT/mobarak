@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.16',date:'2026-10-27',title:'تصویر سوره در پخش',changeKinds:['improvement'],changes:[
+    'تصویر پخش با نام همان سوره جایگزین نشان عمومی شد؛ تصویرها در مرورگر و نسخهٔ اندروید بدون اینترنت هم در دسترس‌اند.',
+  ],
+},{
   version:'0.4.15',date:'2026-10-27',title:'دسترسی ساده‌تر در اندروید اوتو',changeKinds:['improvement'],changes:[
     'خانه، سوره‌ها و کتابخانه جای تب‌های قاری را گرفتند؛ انتخاب سوره مستقیم پخش می‌کند و تغییر قاری، ادامهٔ پخش، سوره‌های اخیر و دانلودها در دسترس جداگانه‌اند.',
   ],

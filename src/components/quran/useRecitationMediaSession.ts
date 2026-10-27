@@ -5,7 +5,7 @@ import { useEffect, useRef, type RefObject } from 'react'
 
 interface Options {
   audio: RefObject<HTMLAudioElement | null>; active: boolean; playing: boolean
-  title: string; artist: string
+  title: string; artist: string; surah:number
   onPlay: () => void; onPause: () => void; onNext: () => void; onPrevious: () => void; onStop: () => void
 }
 /** Browser/OS media controls. Native Android Auto requires a separate MediaLibraryService. */
@@ -40,8 +40,8 @@ export function useRecitationMediaSession(options: Options) {
     if(nativeRecitationAvailable()||!options.active||!('mediaSession' in navigator))return
     if(typeof MediaMetadata!=='undefined')navigator.mediaSession.metadata=new MediaMetadata({
       title:options.title,artist:options.artist,album:APP_NAME,
-      artwork:[192,512].map(size=>({src:new URL(`/icons/app-logo-v3-any-${size}.png`,location.href).href,sizes:`${size}x${size}`,type:'image/png'})),
+      artwork:[{src:new URL(`/images/surahs/${String(options.surah).padStart(3,'0')}.png`,location.href).href,sizes:'512x512',type:'image/png'}],
     })
     navigator.mediaSession.playbackState=options.playing?'playing':'paused'
-  },[options.active,options.playing,options.title,options.artist])
+  },[options.active,options.playing,options.title,options.artist,options.surah])
 }
