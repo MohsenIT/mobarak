@@ -21,6 +21,7 @@ import StartupSplash from '@/components/quran/StartupSplash'
 import RecitationPlayer,{type RecitationTransportStatus} from '@/components/quran/RecitationPlayer'
 import { rootHue } from '@/lib/comparison-colors'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
+import {revealReadingTarget} from '@/lib/reading-visibility'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
@@ -319,19 +320,24 @@ export default function Home() {
     else setSurah(nn)
   }, [meta, mode, goPage])
 
+  const requestMushafVerse = useCallback((p:number,s:number,a:number,pos:number)=>{
+    const mounted=mainRef.current?.querySelector(`[data-reading-scroll] [data-surah="${s}"][data-ayah="${a}"][data-pos="${pos}"]`)
+    if(!mounted)requestMushafPage(p)
+  },[requestMushafPage])
+
   const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start') => {
     pullArrival.current = null
     loadSurah(s).then(d => {
       const v = d.v[a - 1]
       if (v) {
-        if (mode === 'mushaf') requestMushafPage(v.p)
+        if (mode === 'mushaf') requestMushafVerse(v.p,s,a,pos)
         else setSurah(s)
         writeVerseAddress({ s, a, pos })
         setFlash({ s, a, pos })
         setSearchTarget({ s, a, pos, align })
       }
     })
-  }, [mode, requestMushafPage])
+  }, [mode, requestMushafVerse])
 
   const navigateDestination = (destination: Destination) => {
     setQuickSearchOpen(false);setSel(null)
@@ -388,8 +394,7 @@ export default function Home() {
     if (!main || !word) return
     const scroll = main.querySelector<HTMLElement>('[data-reading-scroll]') ?? main
     const frame = requestAnimationFrame(() => {
-      const top = scroll.scrollTop + word.getBoundingClientRect().top - scroll.getBoundingClientRect().top - (searchTarget.align === 'start' ? 12 : scroll.clientHeight * 0.35)
-      scroll.scrollTo({ top: Math.max(0, top), behavior: searchTarget.align === 'start' || quickSearchOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
+      revealReadingTarget(scroll,word,searchTarget.align === 'start' || quickSearchOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth')
       setSearchTarget(null)
     })
     return () => cancelAnimationFrame(frame)
@@ -398,10 +403,10 @@ export default function Home() {
   // panel jump: keep panel open, highlight target
   const panelJump = useCallback((s: number, a: number, pos: number, p: number) => {
     writeVerseAddress({ s, a, pos })
-    if (mode === 'mushaf') requestMushafPage(p)
+    if (mode === 'mushaf') requestMushafVerse(p,s,a,pos)
     else setSurah(s)
     setFlash({ s, a, pos })
-  }, [mode, requestMushafPage])
+  }, [mode, requestMushafVerse])
 
   // jump to root occurrence in another surah; retarget panel selection
   const jumpSurahRoot = useCallback((surahN: number, root: string) => {
@@ -412,11 +417,11 @@ export default function Home() {
       const w = d.v[a - 1]?.w[pos - 1]
       if (!w) return
       setSel({ s: surahN, a, pos, ...wordTarget(w), root })
-      if (mode === 'mushaf') requestMushafPage(d.v[a - 1].p)
+      if (mode === 'mushaf') requestMushafVerse(d.v[a - 1].p,surahN,a,pos)
       else setSurah(surahN)
       setFlash({ s: surahN, a, pos })
     })
-  }, [mode, requestMushafPage])
+  }, [mode, requestMushafVerse])
 
   // SurahIndex: pick a root from the index page → open RootPanel for first occurrence
   // NOTE: the index STAYS OPEN — user wants to return to the same scroll position

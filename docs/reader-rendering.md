@@ -11,3 +11,5 @@ The original React touch handlers from before `eb75896` are restored: the initia
 The translation icon uses the exact two filled vector outlines supplied by the user in `New Project.svg`; it is not approximated with font glyphs, images or hand-drawn paths. It retains the original 512-unit view box and inherits currentColor.
 
 Optional high/low meem annotations U+06E2 and U+06ED are hidden at display time by explicit user preference (0.4.10). Ordinary meem U+0645, vowels, superscript alef and source data remain unchanged. Corpus regression checks cover both annotations in all 114 surahs.
+
+Navigation to a word/root occurrence or ayah now leaves a fully exposed target unchanged. Hidden or partially obscured targets align 12px below the top of the actual reading window, accounting for the visual viewport, overlay sheet, update notice and player where they overlap the target. Tail space permits the same alignment for final ayahs. A mounted Mushaf target no longer resets the page before checking visibility. This replaces both the selection-centering and search-position formulas.

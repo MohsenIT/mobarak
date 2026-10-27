@@ -5,6 +5,9 @@ on:
     paths:
       - 'android-auto/**'
       - 'scripts/configure-android-auto*'
+      - 'src/app/page.tsx'
+      - 'src/components/quran/useVisibleSelection.ts'
+      - 'src/lib/reading-visibility*'
       - '.github/workflows/releases.yml'
   schedule:
     - cron: '30 2 * * *'
