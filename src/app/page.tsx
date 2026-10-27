@@ -21,7 +21,7 @@ import StartupSplash from '@/components/quran/StartupSplash'
 import RecitationPlayer,{type RecitationTransportStatus} from '@/components/quran/RecitationPlayer'
 import { rootHue } from '@/lib/comparison-colors'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
-import {revealReadingTarget} from '@/lib/reading-visibility'
+import {revealReadingTarget,revealReadingVerse} from '@/lib/reading-visibility'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
@@ -97,7 +97,7 @@ export default function Home() {
     }
   }
   const [returnToSearch, setReturnToSearch] = useState(false)
-  const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number; align?: 'start' } | null>(null)
+  const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number; align?: 'start'; wholeVerse?: boolean } | null>(null)
   const [sel, setSel] = useState<Selection | null>(null)
   const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
   const [flash, setFlash] = useState<{ s: number; a: number; pos: number } | null>(null)
@@ -164,7 +164,8 @@ export default function Home() {
   }, [contextComparison, showComparison, comparisonRange])
 
   const mainRef = useRef<HTMLElement>(null)
-  useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, !!sel && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}:${mushafContentRevision}`)
+  const followingVerse=!!(audioOpen&&audioVerse&&flash?.s===audioVerse.s&&flash?.a===audioVerse.a)
+  useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, (!!sel||followingVerse) && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}:${mushafContentRevision}`, followingVerse||analysisSelection?.tab==='verse'||analysisSelection?.tab==='context')
   const focusComparisonRoot = useCallback((root: string) => { setSoloComparisonRoot(root); setSel(null) }, [])
   useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
   useEffect(() => { setHiddenComparisonRoots(new Set()); setSoloComparisonRoot(null) }, [comparisonRange?.s, comparisonRange?.from, comparisonRange?.to])
@@ -286,7 +287,7 @@ export default function Home() {
       writeVerseAddress(target)
       setSurah(first.s)
       setFlash(target)
-      setSearchTarget({ ...target, align: 'start' })
+      setSearchTarget({ ...target, align: 'start', wholeVerse:true })
     } else requestMushafPage(destination)
     setSel(null)
     setComparisonRoot(null)
@@ -325,7 +326,7 @@ export default function Home() {
     if(!mounted)requestMushafPage(p)
   },[requestMushafPage])
 
-  const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start') => {
+  const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start', wholeVerse = true) => {
     pullArrival.current = null
     loadSurah(s).then(d => {
       const v = d.v[a - 1]
@@ -334,7 +335,7 @@ export default function Home() {
         else setSurah(s)
         writeVerseAddress({ s, a, pos })
         setFlash({ s, a, pos })
-        setSearchTarget({ s, a, pos, align })
+        setSearchTarget({ s, a, pos, align, wholeVerse })
       }
     })
   }, [mode, requestMushafVerse])
@@ -372,7 +373,7 @@ export default function Home() {
           if (!verse) return
           const pos = Math.min(target.pos, verse.w.length)
           setFlash({ ...target, pos })
-          setSearchTarget({ ...target, pos })
+          setSearchTarget({ ...target, pos, wholeVerse:pos===1 })
         })
       } else {
         const s = readSurahNumber(window.location.search, window.location.pathname) ?? 0, p = readPageNumber(window.location.search, window.location.pathname) ?? 0
@@ -394,7 +395,8 @@ export default function Home() {
     if (!main || !word) return
     const scroll = main.querySelector<HTMLElement>('[data-reading-scroll]') ?? main
     const frame = requestAnimationFrame(() => {
-      revealReadingTarget(scroll,word,searchTarget.align === 'start' || quickSearchOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth')
+      const reveal=searchTarget.wholeVerse?revealReadingVerse:revealReadingTarget
+      reveal(scroll,word,searchTarget.align === 'start' || quickSearchOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth')
       setSearchTarget(null)
     })
     return () => cancelAnimationFrame(frame)
@@ -499,7 +501,7 @@ export default function Home() {
       <PatternBG />
 
       <QuranSearch onNavigate={navigateDestination} key={searchStart?.revision ?? 0} onStateChange={writeSearchState} initialSearch={searchStart} occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
-        setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); setComparisonRoot(null); goVerse(s, a, pos)
+        setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); setComparisonRoot(null); goVerse(s, a, pos,undefined,false)
       }} />
 
       {/* ===== Top bar =====
@@ -512,7 +514,7 @@ export default function Home() {
           backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
         }}>
         {quickSearchOpen ? <QuickSurahSearch meta={meta} onNavigate={navigateDestination} surah={meta.surahs[curSurahN - 1]} onClose={() => setQuickSearchOpen(false)}
-          onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos) }}
+          onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false) }}
           onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><MoreHorizontal size={22} /></button>
 

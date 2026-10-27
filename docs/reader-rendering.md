@@ -13,3 +13,8 @@ The translation icon uses the exact two filled vector outlines supplied by the u
 Optional high/low meem annotations U+06E2 and U+06ED are hidden at display time by explicit user preference (0.4.10). Ordinary meem U+0645, vowels, superscript alef and source data remain unchanged. Corpus regression checks cover both annotations in all 114 surahs.
 
 Navigation to a word/root occurrence or ayah now leaves a fully exposed target unchanged. Hidden or partially obscured targets align 12px below the top of the actual reading window, accounting for the visual viewport, overlay sheet, update notice and player where they overlap the target. Tail space permits the same alignment for final ayahs. A mounted Mushaf target no longer resets the page before checking visibility. This replaces both the selection-centering and search-position formulas.
+
+
+## Whole-ayah navigation (0.4.19)
+
+Ayah navigation and recitation following measure the complete ayah, rather than only word one. Flow bounds include its marker and displayed translation fragments. Mushaf bounds combine all rendered word boxes and the closing ayah marker. A fully exposed ayah stays still. A partially hidden ayah that fits moves only enough to reveal the obscured edge, with margins reduced when necessary to fit. A completely offscreen ayah starts at the exposed top. An ayah taller than the available area starts at the top without changing font size; simultaneous full visibility is impossible in that case. Root/word-occurrence navigation retains its word-based visibility rule. Overlay geometry, reader-only scrolling and end-of-document spacer handling are shared.

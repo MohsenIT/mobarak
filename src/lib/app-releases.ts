@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.19',date:'2026-10-27',title:'دنبال‌کردن تمام آیه هنگام پخش',changeKinds:['fix'],changes:[
+    'قابل‌دیدن‌بودنِ تمام آیه و ترجمهٔ نمایش‌داده‌شده بررسی می‌شود؛ آیهٔ نیمه‌پنهان با کمترین حرکت نمایان می‌شود و آیهٔ کاملاً بیرون صفحه از بالا نشان داده می‌شود.',
+  ],
+},{
   version:'0.4.18',date:'2026-10-27',title:'نمایش روشن‌تر پیشرفت دانلود',changeKinds:['fix'],changes:[
     'فلش دانلود هنگام دریافت نسخه ثابت می‌ماند؛ وضعیت دریافت با نوار پیشرفت و درصد نمایش داده می‌شود.',
   ],

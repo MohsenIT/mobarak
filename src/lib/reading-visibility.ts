@@ -6,8 +6,8 @@ export function readingTargetDelta(rect:{top:number;bottom:number},visible:Readi
   if(rect.top>=visible.top && rect.bottom<=visible.bottom)return 0
   return rect.top-visible.top-gap
 }
-export function readingWindow(scroll:HTMLElement,target:HTMLElement):ReadingWindow {
- const bounds=scroll.getBoundingClientRect(),word=target.getBoundingClientRect(),viewport=window.visualViewport
+export function readingWindow(scroll:HTMLElement,target:HTMLElement,word=target.getBoundingClientRect()):ReadingWindow {
+ const bounds=scroll.getBoundingClientRect(),viewport=window.visualViewport
  const visible={top:Math.max(bounds.top,viewport?.offsetTop??0),bottom:Math.min(bounds.bottom,(viewport?.offsetTop??0)+(viewport?.height??window.innerHeight))}
  for(const overlay of document.querySelectorAll<HTMLElement>('.root-panel,.app-update-notice,.recitation-bar')){
   const style=getComputedStyle(overlay)
@@ -23,9 +23,12 @@ export function readingWindow(scroll:HTMLElement,target:HTMLElement):ReadingWind
  return visible
 }
 export function revealReadingTarget(scroll:HTMLElement,target:HTMLElement,behavior:ScrollBehavior='smooth'):boolean {
- const visible=readingWindow(scroll,target),bounds=scroll.getBoundingClientRect()
+ const visible=readingWindow(scroll,target)
+ return scrollReadingDelta(scroll,visible,readingTargetDelta(target.getBoundingClientRect(),visible),behavior)
+}
+function scrollReadingDelta(scroll:HTMLElement,visible:ReadingWindow,delta:number,behavior:ScrollBehavior):boolean {
+ const bounds=scroll.getBoundingClientRect()
  if(visible.bottom<=visible.top+40)return false
- const delta=readingTargetDelta(target.getBoundingClientRect(),visible)
  if(Math.abs(delta)<=1)return false
  let spacer=scroll.querySelector<HTMLElement>(':scope > [data-reader-reveal-spacer]')
  const covered=Math.max(0,bounds.bottom-visible.bottom)
@@ -38,4 +41,35 @@ export function revealReadingTarget(scroll:HTMLElement,target:HTMLElement,behavi
  const next=Math.max(0,Math.min(scroll.scrollHeight-scroll.clientHeight,scroll.scrollTop+delta))
  if(Math.abs(delta)<=1 || Math.abs(next-scroll.scrollTop)<=1)return false
  scroll.scrollTo({top:next,behavior});return true
+}
+
+/** Reveal the entire ayah with the smallest movement when it is only partly hidden. */
+export function readingVerseDelta(rect:{top:number;bottom:number},visible:ReadingWindow,gap=12):number {
+ const available=visible.bottom-visible.top,height=rect.bottom-rect.top
+ if(available<=0||rect.top>=visible.top&&rect.bottom<=visible.bottom)return 0
+ if(height>available)return rect.top-visible.top-gap
+ const margin=Math.min(gap,Math.max(0,(available-height)/2))
+ if(rect.bottom<=visible.top||rect.top>=visible.bottom)return rect.top-visible.top-margin
+ if(rect.top<visible.top)return rect.top-visible.top-margin
+ return rect.bottom-visible.bottom+margin
+}
+export function readingVerseBounds(scroll:HTMLElement,target:HTMLElement):DOMRect {
+ const word=target.closest<HTMLElement>('[data-surah][data-ayah][data-pos]')??target
+ const s=word.dataset.surah,a=word.dataset.ayah
+ if(!s||!a)return target.getBoundingClientRect()
+ const flow=word.closest<HTMLElement>('[data-verse]')
+ const elements:HTMLElement[]=flow?[flow]:[...scroll.querySelectorAll<HTMLElement>(`[data-surah="${s}"][data-ayah="${a}"][data-pos]`)]
+ if(flow)elements.push(...flow.parentElement!.querySelectorAll<HTMLElement>(`[data-translation-verse="${a}"]`))
+ else {
+  const last=elements.at(-1),marker=last?.nextElementSibling?.querySelector<HTMLElement>('.ayah-marker')
+  if(marker)elements.push(marker)
+ }
+ const rects=elements.map(element=>element.getBoundingClientRect()).filter(rect=>rect.width>0&&rect.height>0)
+ if(!rects.length)return word.getBoundingClientRect()
+ const left=Math.min(...rects.map(r=>r.left)),right=Math.max(...rects.map(r=>r.right)),top=Math.min(...rects.map(r=>r.top)),bottom=Math.max(...rects.map(r=>r.bottom))
+ return new DOMRect(left,top,right-left,bottom-top)
+}
+export function revealReadingVerse(scroll:HTMLElement,target:HTMLElement,behavior:ScrollBehavior='smooth'):boolean {
+ const rect=readingVerseBounds(scroll,target),visible=readingWindow(scroll,target,rect)
+ return scrollReadingDelta(scroll,visible,readingVerseDelta(rect,visible),behavior)
 }
