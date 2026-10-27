@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.11',date:'2026-10-27',title:'پخش خودرو و بازگشت بزرگ‌نمایی قبلی',changeKinds:['feature','fix'],changes:[
+    'پخش بومی اندروید اوتو به نسخهٔ اندروید اضافه شد: انتخاب قاری، سوره و آیه، کنترل پخش، تکرار و سرعت؛ نمایش امکانات به پشتیبانی نمایشگر خودرو بستگی دارد.',
+    'بزرگ‌وکوچک‌کردن دو انگشتی به رفتار اولیه بازگشت؛ ذخیرهٔ تنظیمات هنگام حرکت فشار کمتری ایجاد می‌کند.',
+  ],
+},{
   version:'0.4.10',date:'2026-10-27',title:'حذف دوبارهٔ علامت‌های میم کوچک',changeKinds:['fix'],changes:[
     'علامت‌های میم کوچکِ اضافی از نمایش قرآن حذف شدند؛ حروف اصلی، حرکت‌ها و الف کوچک حفظ شدند.',
   ],

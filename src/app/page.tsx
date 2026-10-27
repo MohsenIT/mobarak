@@ -1,5 +1,4 @@
 'use client'
-import {useReaderPinch} from '@/components/quran/useReaderPinch'
 import {useStudyWorkspace} from '@/lib/study-store'
 import {t,useUiLanguage} from '@/lib/i18n'
 import {isTranslator} from '@/lib/translations'
@@ -169,7 +168,7 @@ export default function Home() {
   useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
   useEffect(() => { setHiddenComparisonRoots(new Set()); setSoloComparisonRoot(null) }, [comparisonRange?.s, comparisonRange?.from, comparisonRange?.to])
   const mutedComparisonRoots = useMemo(() => new Set(Object.keys(comparisonRoots).filter(root => soloComparisonRoot ? root !== soloComparisonRoot : hiddenComparisonRoots.has(root))), [comparisonRoots, hiddenComparisonRoots, soloComparisonRoot])
-  useReaderPinch(mainRef,scale,setScale,!!meta)
+  const pinchRef = useRef<{ d: number; s: number } | null>(null)
 
   useEffect(() => { loadMeta().then(setMeta) }, [])
   useEffect(() => {
@@ -451,6 +450,24 @@ export default function Home() {
     return () => window.removeEventListener('keydown', h)
   }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel, searchOpen])
 
+  // Pinch zoom; page reading is vertical in both display modes.
+  const touchDist = (t: React.TouchList) =>
+    Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY)
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      pinchRef.current = { d: touchDist(e.touches), s: scale }
+    }
+  }
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (pinchRef.current && e.touches.length === 2) {
+      const d = touchDist(e.touches)
+      const ratio = d / pinchRef.current.d
+      setScale(round05(clamp(pinchRef.current.s * ratio, 0.55, 1.9)))
+    }
+  }
+  const onTouchEnd = () => { pinchRef.current = null }
+
   const pageInfo = useMemo(() => {
     if (!meta) return { names: '', juz: null as number | null }
     // Use Arabic names (s.ar) per user request — Persian names were confusing
@@ -548,7 +565,8 @@ export default function Home() {
       )}
       {/* ===== Main + side root panel ===== */}
       <div className="relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row lg:items-stretch">
-        <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main">
+        <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main"
+          onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd}>
           {mode === 'mushaf' ? (
             <ContinuousMushaf meta={meta} page={page} navigationRevision={mushafNavigationRevision}
               onPageChange={setPage} onContentReady={onMushafContentReady} showTrans={showTrans} translator={translator} scale={scale}

@@ -1,5 +1,11 @@
 name: Daily offline installers
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'android-auto/**'
+      - 'scripts/configure-android-auto*'
+      - '.github/workflows/releases.yml'
   schedule:
     - cron: '30 2 * * *'
   workflow_dispatch:
@@ -150,6 +156,8 @@ jobs:
         run: |
           export NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018"
           bun run tauri android init --ci
+          node --test scripts/configure-android-auto.test.mjs
+          node scripts/configure-android-auto.mjs
           node -e 'require("fs").writeFileSync("tauri-ci.json",JSON.stringify({version:process.env.RELEASE_VERSION,build:{beforeBuildCommand:""}}))'
           bun run tauri android build --apk --split-per-abi --config tauri-ci.json
       - name: Sign installable APKs when the release key is configured

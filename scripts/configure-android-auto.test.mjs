@@ -1,0 +1,27 @@
+import {test} from 'node:test'
+import assert from 'node:assert/strict'
+import {mkdtemp,mkdir,writeFile,readFile,rm} from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
+import {configureAndroidAuto} from './configure-android-auto.mjs'
+test('generated Android build gets a complete browse library and idempotent manifest/dependencies',async()=>{
+ const temp=await mkdtemp(path.join(os.tmpdir(),'quran-auto-fixture-'))
+ try{
+  const main=path.join(temp,'app/src/main');await mkdir(main,{recursive:true})
+  await writeFile(path.join(main,'AndroidManifest.xml'),'<manifest xmlns:android="http://schemas.android.com/apk/res/android"><application android:label="Reader"></application></manifest>')
+  await writeFile(path.join(temp,'app/build.gradle.kts'),'plugins { id("com.android.application") }\n')
+  assert.deepEqual(await configureAndroidAuto(process.cwd(),temp),{reciters:22,surahs:114,verses:6236})
+  const first=await readFile(path.join(main,'AndroidManifest.xml'),'utf8')
+  await configureAndroidAuto(process.cwd(),temp)
+  assert.equal(await readFile(path.join(main,'AndroidManifest.xml'),'utf8'),first)
+  assert.equal((first.match(/<service /g)||[]).length,1)
+  assert.match(first,/foregroundServiceType="mediaPlayback"/)
+  assert.match(first,/android.media.browse.MediaBrowserService/)
+  const gradle=await readFile(path.join(temp,'app/build.gradle.kts'),'utf8')
+  assert.equal((gradle.match(/media3-session/g)||[]).length,1)
+  const catalog=JSON.parse(await readFile(path.join(main,'assets/quran-auto.json'),'utf8'))
+  assert.equal(catalog.surahs[36].vc,182)
+  assert.equal(catalog.labels.fa.verse,'آیه')
+  for(const labels of Object.values(catalog.labels))for(const key of ['verse','resume','speed','repeatVerse','repeatSurah'])assert.ok(labels[key])
+ }finally{await rm(temp,{recursive:true,force:true})}
+})

@@ -6,9 +6,7 @@ A cmap and composite-glyph audit of the shipped KFGQPC Hafs font found three cod
 
 In Saffat 37:75, `نَادَىٰنَا` contains alef maqsura and superscript alef, not an ordinary dotted yeh. Restoring its superscript alef is correct; adding two dots would change the writing. The ordinary yeh in 37:76 `وَنَجَّيْنَـٰهُ` is preserved independently.
 
-Pinch interaction uses `useReaderPinch` with live, discrete 5% font-size steps. Each new step changes the actual reader font while both fingers are still down; no transform, zoomed screenshot or end-only reflow is used. Duplicate moves within the same step are ignored and updates are coalesced to animation frames. The final pending step is flushed on touchend, font limits remain 55–190%, and the existing deferred preference write remains. Single-finger reading and scroll/surah navigation are left available; a brief click guard prevents accidental word selection after a pinch.
-
-The compositor-preview experiment in 0.4.7 was reverted after user feedback: live step-by-step resizing is the intended behavior. Physical Android performance still needs device verification.
+The original React touch handlers from before `eb75896` are restored: the initial two-finger distance and font scale are captured on touchstart, every touchmove directly updates the actual font in 5% steps, and touchend clears the gesture. The later native capture listener, target restriction, animation-frame gate and click suppression are removed. The only retained performance change is deferring the preference write by 200ms, so storage is not written for every movement. No transform preview or new interaction is introduced. Physical Android feel still needs device verification.
 
 The translation icon uses the exact two filled vector outlines supplied by the user in `New Project.svg`; it is not approximated with font glyphs, images or hand-drawn paths. It retains the original 512-unit view box and inherits currentColor.
 
