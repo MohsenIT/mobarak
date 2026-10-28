@@ -1,10 +1,22 @@
 'use client'
 
 import { useLayoutEffect, type RefObject } from 'react'
-import {revealReadingTarget,revealReadingVerse} from '@/lib/reading-visibility'
+import {revealReadingTarget,revealReadingVerse,clearUncoveredReadingSpace} from '@/lib/reading-visibility'
 
 /** Keep word or whole-ayah selections inside the uncovered reading area. */
 export function useVisibleSelection(main: RefObject<HTMLElement | null>, target: { s: number; a: number; pos: number } | null, enabled: boolean, layoutKey: string, wholeVerse=false) {
+  useLayoutEffect(()=>{
+    const reader=main.current;if(!reader)return
+    let frame=0
+    const trim=()=>{const scroll=reader.querySelector<HTMLElement>('[data-reading-scroll]');if(scroll)clearUncoveredReadingSpace(scroll)}
+    const schedule=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(trim)}
+    const changes=new MutationObserver(schedule)
+    changes.observe(reader.parentElement??reader,{childList:true,subtree:true,attributes:true,attributeFilter:['style']})
+    const size=new ResizeObserver(schedule);size.observe(reader)
+    window.visualViewport?.addEventListener('resize',schedule)
+    schedule()
+    return()=>{cancelAnimationFrame(frame);changes.disconnect();size.disconnect();window.visualViewport?.removeEventListener('resize',schedule)}
+  },[main,layoutKey])
   useLayoutEffect(() => {
     const reader=main.current,scroll=reader?.querySelector<HTMLElement>('[data-reading-scroll]')
     if(!enabled||!target||!reader||!scroll)return

@@ -673,5 +673,18 @@
   "auto.translationHint": "Changing translation restarts the current ayah. The selected recorded translation may differ from the written translation.",
   "auto.translationOfflineHint": "For offline playback, download both recitation and recorded translation.",
   "auto.downloadTranslation": "Download this surah’s audio translation",
-  "auto.deleteTranslation": "Delete downloaded audio translation"
+  "auto.deleteTranslation": "Delete downloaded audio translation",
+  "calendar.settings": "Date and calendar",
+  "calendar.type": "Calendar",
+  "calendar.auto": "Automatic (language and region)",
+  "calendar.persian": "Persian (Solar Hijri)",
+  "calendar.islamic-umalqura": "Hijri (Umm al-Qura)",
+  "calendar.islamic-civil": "Hijri (civil, calculated)",
+  "calendar.gregory": "Gregorian",
+  "calendar.buddhist": "Buddhist",
+  "calendar.ethiopic": "Ethiopic",
+  "calendar.hebrew": "Hebrew",
+  "calendar.indian": "Indian national",
+  "calendar.japanese": "Japanese era",
+  "calendar.example": "Example: {date}"
 }

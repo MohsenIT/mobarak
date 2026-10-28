@@ -1,0 +1,1 @@
+PASS: final-ayah reveal spacer disappears after sheet closes; end gap <100px; calendar settings update history immediately and persist; night theme sends native appearance command.

@@ -673,5 +673,18 @@
   "auto.translationHint": "تغییر ترجمهٔ صوتی، آیهٔ فعلی را از ابتدا پخش می‌کند. ترجمهٔ صوتی می‌تواند با ترجمهٔ نوشتاری انتخابی متفاوت باشد.",
   "auto.translationOfflineHint": "برای پخش آفلاین، هم تلاوت و هم ترجمهٔ صوتی را دریافت کن.",
   "auto.downloadTranslation": "دریافت ترجمهٔ صوتی این سوره",
-  "auto.deleteTranslation": "حذف ترجمهٔ صوتی دریافت‌شده"
+  "auto.deleteTranslation": "حذف ترجمهٔ صوتی دریافت‌شده",
+  "calendar.settings": "تاریخ و تقویم",
+  "calendar.type": "نوع تقویم",
+  "calendar.auto": "خودکار (زبان و منطقه)",
+  "calendar.persian": "هجری شمسی",
+  "calendar.islamic-umalqura": "هجری قمری (ام‌القری)",
+  "calendar.islamic-civil": "هجری قمری (محاسباتی)",
+  "calendar.gregory": "میلادی",
+  "calendar.buddhist": "بودایی",
+  "calendar.ethiopic": "اتیوپیایی",
+  "calendar.hebrew": "عبری",
+  "calendar.indian": "ملی هند",
+  "calendar.japanese": "دوره‌های ژاپنی",
+  "calendar.example": "نمونه: {date}"
 }

@@ -33,7 +33,7 @@ public final class QuranAudioBridge implements AutoCloseable {
   private final android.app.Application.ActivityLifecycleCallbacks lifecycle=new android.app.Application.ActivityLifecycleCallbacks(){
     public void onActivityCreated(Activity a,Bundle b){}
     public void onActivityStarted(Activity a){}
-    public void onActivityResumed(Activity a){}
+    public void onActivityResumed(Activity a){if(a==activity)handler.post(()->QuranSystemBars.restore(activity));}
     public void onActivityPaused(Activity a){}
     public void onActivityStopped(Activity a){}
     public void onActivitySaveInstanceState(Activity a,Bundle b){}
@@ -93,6 +93,10 @@ public final class QuranAudioBridge implements AutoCloseable {
   }
   private void command(JSONObject c)throws Exception{
     int id=c.optInt("id");String op=c.optString("op");
+    if(op.equals("appearance")){
+      String theme=c.getString("theme");if(!theme.equals("paper")&&!theme.equals("night"))throw new IllegalArgumentException("Invalid theme");
+      QuranSystemBars.apply(activity,theme.equals("night"));ok(id);return;
+    }
     if(op.equals("carOption")){
       if(controller==null)throw new IllegalStateException("Controller not ready");
       Bundle args=new Bundle();args.putString("key",c.getString("key"));args.putString("value",c.getString("value"));

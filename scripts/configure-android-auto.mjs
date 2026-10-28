@@ -40,7 +40,7 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
   for(const surah of surahs){const name=String(surah.n).padStart(3,'0')+'.png';await mkdir(path.join(main,'assets/surah-artwork'),{recursive:true});await copyFile(path.join(root,'public/images/surahs',name),path.join(main,'assets/surah-artwork',name))}
   await writeFile(path.join(main,'assets/quran-auto.json'),JSON.stringify({reciters,translationAudio,surahs,labels,numberingSystems:JSON.parse(await readFile(path.join(root,'src/messages/numbering-systems.json'),'utf8')).languages}))
   const java=path.join(main,'java/app/quranmubarak/reader/auto');await mkdir(java,{recursive:true})
-  for(const file of ['QuranCarService.java','QuranAudioBridge.java','QuranArtworkProvider.java','QuranCarLibrary.java','QuranVerseMediaSourceFactory.java'])await copyFile(path.join(root,'android-auto',file),path.join(java,file))
+  for(const file of ['QuranCarService.java','QuranAudioBridge.java','QuranArtworkProvider.java','QuranCarLibrary.java','QuranVerseMediaSourceFactory.java','QuranSystemBars.java'])await copyFile(path.join(root,'android-auto',file),path.join(java,file))
   const activity=path.join(main,'java/app/quranmubarak/reader/MainActivity.kt')
   let kotlin=await readFile(activity,'utf8')
   kotlin=kotlin.replace(/\s*\/\/ quran-audio:start[\s\S]*?\/\/ quran-audio:end/g,'')
@@ -52,6 +52,7 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
     @androidx.annotation.OptIn(markerClass = [androidx.media3.common.util.UnstableApi::class])
     override fun onWebViewCreate(webView: android.webkit.WebView) {
         super.onWebViewCreate(webView)
+        app.quranmubarak.reader.auto.QuranSystemBars.restore(this)
         quranAudioBridge?.close()
         if (androidx.webkit.WebViewFeature.isFeatureSupported(androidx.webkit.WebViewFeature.WEB_MESSAGE_LISTENER)) {
             quranAudioBridge = app.quranmubarak.reader.auto.QuranAudioBridge(this, webView)

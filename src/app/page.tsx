@@ -23,6 +23,7 @@ import { rootHue } from '@/lib/comparison-colors'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import {revealReadingTarget,revealReadingVerse} from '@/lib/reading-visibility'
 import CarStudySync from '@/components/quran/CarStudySync'
+import {syncNativeAppearance} from '@/lib/native-appearance'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
@@ -166,7 +167,7 @@ export default function Home() {
 
   const mainRef = useRef<HTMLElement>(null)
   const followingVerse=!!(audioOpen&&audioVerse&&flash?.s===audioVerse.s&&flash?.a===audioVerse.a)
-  useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, (!!sel||followingVerse) && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}:${mushafContentRevision}`, followingVerse||analysisSelection?.tab==='verse'||analysisSelection?.tab==='context')
+  useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, (!!sel||followingVerse) && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}:${mushafContentRevision}:${!!sel}:${audioOpen}:${audioControlsVisible}`, followingVerse||analysisSelection?.tab==='verse'||analysisSelection?.tab==='context')
   const focusComparisonRoot = useCallback((root: string) => { setSoloComparisonRoot(root); setSel(null) }, [])
   useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
   useEffect(() => { setHiddenComparisonRoots(new Set()); setSoloComparisonRoot(null) }, [comparisonRange?.s, comparisonRange?.from, comparisonRange?.to])
@@ -176,6 +177,8 @@ export default function Home() {
   useEffect(() => { loadMeta().then(setMeta) }, [])
   useEffect(() => {
     document.documentElement.dataset.theme = theme
+    document.documentElement.style.colorScheme = theme==='night'?'dark':'light'
+    void syncNativeAppearance(theme)
     LS.set('mushaf.theme', theme)
   }, [theme])
   useEffect(() => {

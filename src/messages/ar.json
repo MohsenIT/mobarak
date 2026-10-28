@@ -673,5 +673,18 @@
   "auto.translationHint": "تغيير الترجمة الصوتية يعيد الآية الحالية من البداية. قد تختلف عن الترجمة المكتوبة المختارة.",
   "auto.translationOfflineHint": "للتشغيل دون إنترنت، نزّل التلاوة والترجمة الصوتية معًا.",
   "auto.downloadTranslation": "تنزيل الترجمة الصوتية للسورة",
-  "auto.deleteTranslation": "حذف الترجمة الصوتية المنزّلة"
+  "auto.deleteTranslation": "حذف الترجمة الصوتية المنزّلة",
+  "calendar.settings": "التاريخ والتقويم",
+  "calendar.type": "نوع التقويم",
+  "calendar.auto": "تلقائي (اللغة والمنطقة)",
+  "calendar.persian": "الهجري الشمسي",
+  "calendar.islamic-umalqura": "الهجري (أم القرى)",
+  "calendar.islamic-civil": "الهجري (حسابي)",
+  "calendar.gregory": "الميلادي",
+  "calendar.buddhist": "البوذي",
+  "calendar.ethiopic": "الإثيوبي",
+  "calendar.hebrew": "العبري",
+  "calendar.indian": "الهندي الوطني",
+  "calendar.japanese": "العصور اليابانية",
+  "calendar.example": "مثال: {date}"
 }

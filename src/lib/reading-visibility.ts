@@ -1,5 +1,10 @@
 /** Reader-only navigation geometry; never scroll ancestors or the page itself. */
 export type ReadingWindow={top:number;bottom:number}
+/** A temporary reveal spacer belongs to the covering sheet, not to the surah. */
+export function clearUncoveredReadingSpace(scroll:HTMLElement){
+ const spacer=scroll.querySelector<HTMLElement>(':scope > [data-reader-reveal-spacer]')
+ if(spacer&&scroll.getBoundingClientRect().bottom-readingWindow(scroll,scroll).bottom<=1)spacer.remove()
+}
 export function readingTargetDelta(rect:{top:number;bottom:number},visible:ReadingWindow,gap=12):number {
   if(visible.bottom<=visible.top)return 0
   // A passage already fully exposed stays exactly where the reader left it.

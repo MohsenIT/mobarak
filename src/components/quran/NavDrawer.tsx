@@ -5,6 +5,7 @@ import {t,t as tText} from '@/lib/i18n'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import LanguageSettings from './LanguageSettings'
+import CalendarSettings from './CalendarSettings'
 import {TRANSLATION_IDS} from '@/lib/translations'
 import ResourcePicker from './ResourcePicker'
 import {RESOURCES} from '@/lib/resources'
@@ -252,6 +253,7 @@ export default function NavDrawer(props: Props) {
           {tab === 'settings' && (
             <div className="p-4 flex flex-col gap-6">
               <LanguageSettings translator={props.translator} onTranslation={props.onTranslator}/>
+              <CalendarSettings/>
               <ReadingScreenSettings />
               <UpdateSettings />
               <OfflineSettings />
