@@ -674,6 +674,16 @@
   "auto.translationOfflineHint": "For offline playback, download both recitation and recorded translation.",
   "auto.downloadTranslation": "Download this surah’s audio translation",
   "auto.deleteTranslation": "Delete downloaded audio translation",
+  "mizan.open": "Al-Mizan commentary",
+  "mizan.failed": "The commentary could not be loaded.",
+  "mizan.loading": "Loading commentary…",
+  "mizan.verse": "Source text linked to verse {from}.",
+  "mizan.range": "Shared source text linked to verses {from}–{to}.",
+  "mizan.offline": "Al-Mizan Persian commentary (optional download, about 64 MB)",
+  "mizan.aiSummary": "AI-generated summary",
+  "mizan.summaryPending": "A source-checked summary is not available for this verse yet.",
+  "mizan.downloadFull": "Download full commentary for this surah ({mb} MB)",
+  "mizan.full": "Full source text",
   "calendar.settings": "Date and calendar",
   "calendar.type": "Calendar",
   "calendar.auto": "Automatic (language and region)",
@@ -686,5 +696,6 @@
   "calendar.hebrew": "Hebrew",
   "calendar.indian": "Indian national",
   "calendar.japanese": "Japanese era",
-  "calendar.example": "Example: {date}"
+  "calendar.example": "Example: {date}",
+  "mizan.excerpt": "د المیزان د متن یوه برخه"
 }

@@ -674,6 +674,16 @@
   "auto.translationOfflineHint": "للتشغيل دون إنترنت، نزّل التلاوة والترجمة الصوتية معًا.",
   "auto.downloadTranslation": "تنزيل الترجمة الصوتية للسورة",
   "auto.deleteTranslation": "حذف الترجمة الصوتية المنزّلة",
+  "mizan.open": "تفسير الميزان بالفارسية",
+  "mizan.failed": "تعذّر تحميل التفسير.",
+  "mizan.loading": "جارٍ تحميل التفسير…",
+  "mizan.verse": "نص المصدر المرتبط بالآية {from}.",
+  "mizan.range": "نص المصدر المشترك للآيات {from}–{to}.",
+  "mizan.offline": "تفسير الميزان بالفارسية (تنزيل اختياري، نحو 64 ميغابايت)",
+  "mizan.aiSummary": "ملخص بالذكاء الاصطناعي",
+  "mizan.summaryPending": "لم يتوفر ملخص مُراجع لهذه الآية بعد.",
+  "mizan.downloadFull": "تنزيل تفسير السورة كاملاً ({mb} ميغابايت)",
+  "mizan.full": "نص المصدر الكامل",
   "calendar.settings": "التاريخ والتقويم",
   "calendar.type": "نوع التقويم",
   "calendar.auto": "تلقائي (اللغة والمنطقة)",
@@ -686,5 +696,6 @@
   "calendar.hebrew": "العبري",
   "calendar.indian": "الهندي الوطني",
   "calendar.japanese": "العصور اليابانية",
-  "calendar.example": "مثال: {date}"
+  "calendar.example": "مثال: {date}",
+  "mizan.excerpt": "مقتطف من نص الميزان"
 }

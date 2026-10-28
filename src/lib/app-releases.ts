@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.22',date:'2026-10-28',title:'المیزان پس از ترجمهٔ هر آیه',changeKinds:['feature','feature','feature'],changes:[
+    'بخشی از ابتدای متن المیزان برای همهٔ آیه‌ها همراه برنامه و بدون دانلود جداگانه در دسترس است؛ مدخل‌های مشترک با بازهٔ آیات مشخص شده‌اند.',
+    'خلاصه‌های بازبینی‌شده به‌تدریج جای گزیدهٔ متن را می‌گیرند و با برچسب هوش مصنوعی نمایش داده می‌شوند؛ هنوز برای همهٔ آیات آماده نیستند.',
+    'متن کامل تفسیر هر سوره با دکمهٔ دانلود و کل تفسیر از تنظیمات آفلاین به‌صورت اختیاری دریافت می‌شود.',
+  ],
+},{
   version:'0.4.21',date:'2026-10-28',title:'تقویم دلخواه و خواندن بدون فضای اضافه',changeKinds:['feature','fix','fix'],changes:[
     'تقویم تاریخ‌ها از تنظیمات قابل انتخاب است؛ حالت خودکار، زبان و منطقه و تنظیم صریح تقویم دستگاه را رعایت می‌کند.',
     'رنگ ساعت و آیکن‌های نوار وضعیت اندروید با پوستهٔ روشن و شب برنامه هماهنگ شد.',

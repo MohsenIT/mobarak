@@ -674,6 +674,16 @@
   "auto.translationOfflineHint": "برای پخش آفلاین، هم تلاوت و هم ترجمهٔ صوتی را دریافت کن.",
   "auto.downloadTranslation": "دریافت ترجمهٔ صوتی این سوره",
   "auto.deleteTranslation": "حذف ترجمهٔ صوتی دریافت‌شده",
+  "mizan.open": "تفسیر المیزان",
+  "mizan.failed": "دریافت متن تفسیر ممکن نشد.",
+  "mizan.loading": "در حال دریافت تفسیر…",
+  "mizan.verse": "متن پیوندشده در منبع به آیهٔ {from}.",
+  "mizan.range": "متن مشترک منبع برای آیه‌های {from} تا {to}.",
+  "mizan.offline": "تفسیر فارسی المیزان (دانلود اختیاری، حدود ۶۴ مگابایت)",
+  "mizan.aiSummary": "خلاصهٔ هوش مصنوعی",
+  "mizan.summaryPending": "خلاصهٔ بررسی‌شدهٔ این آیه هنوز آماده نشده است.",
+  "mizan.downloadFull": "دانلود متن کامل تفسیر این سوره ({mb} مگابایت)",
+  "mizan.full": "متن کامل منبع",
   "calendar.settings": "تاریخ و تقویم",
   "calendar.type": "نوع تقویم",
   "calendar.auto": "خودکار (زبان و منطقه)",
@@ -686,5 +696,6 @@
   "calendar.hebrew": "عبری",
   "calendar.indian": "ملی هند",
   "calendar.japanese": "دوره‌های ژاپنی",
-  "calendar.example": "نمونه: {date}"
+  "calendar.example": "نمونه: {date}",
+  "mizan.excerpt": "بخشی از متن المیزان"
 }

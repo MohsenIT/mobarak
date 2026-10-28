@@ -19,7 +19,7 @@ describe('resource catalogue',()=>{
  })
  test('language kind title and era remain searchable',()=>{
   expect(filterResources(RESOURCES,{language:'fa',kind:'translation'})).toHaveLength(4)
-  expect(filterResources(RESOURCES,{query:'المیزان'}).map(r=>r.id)).toEqual(['translation:s'])
+  expect(filterResources(RESOURCES,{query:'المیزان'}).map(r=>r.id)).toEqual(['translation:s','book:mizan'])
   expect(filterResources(RESOURCES,{query:'قرن چهارم'}).map(r=>r.id)).toEqual(['book:maqayis'])
   expect(filterResources(RESOURCES,{query:'مقاييس'}).some(r=>r.id==='book:maqayis')).toBe(true)
  })

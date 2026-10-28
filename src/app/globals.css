@@ -1595,3 +1595,9 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .car-study-controls li > span { flex:1; min-width:0; }
 .car-playlist-editor { display:grid; gap:8px; }
 .car-playlist-editor input { width:100%; min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:8px; }
+
+.mizan-commentary { border: 1px solid var(--line); border-radius: .75rem; padding: .75rem; }
+.mizan-commentary > summary { cursor: pointer; font-weight: 700; min-height: 2.75rem; display: list-item; }
+.mizan-commentary article { overflow-wrap: anywhere; margin-top: .75rem; }
+.verse-source-block { font-family: 'Vazirmatn', system-ui, sans-serif; font-size: 14px; line-height: 2; margin: .75rem 0 1.5rem; }
+.verse-source-block > p { color: var(--ink-soft); margin-bottom: .75rem; }

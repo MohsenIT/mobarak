@@ -1,8 +1,9 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
 import path from 'node:path'
+import './build-mizan-excerpts.mjs'
 const base = 'public'
-const groups = { core: [], tahqiq: [], maqayis: [], ishtiqaqi: [] }
+const groups = { core: [], tahqiq: [], maqayis: [], ishtiqaqi: [], mizan: [] }
 const translations=JSON.parse(await readFile('public/data/translations/catalogue.json','utf8'))
 for(const item of translations)groups[`translation:${item.id}`]=[]
 async function walk(dir) {
@@ -12,7 +13,7 @@ async function walk(dir) {
     if (!/\.(json|woff2?|ttf|otf|webp|jpe?g|png|svg)$/.test(file) || file.endsWith('offline-manifest.json')) continue
     const relative = file.slice(base.length)
     const translation=translations.find(item=>relative===`/data/translations/${item.id}.json`)
-    const group = translation?`translation:${translation.id}`:['tahqiq', 'maqayis', 'ishtiqaqi'].find(book => relative.startsWith(`/data/${book}/`)) || 'core'
+    const group = translation?`translation:${translation.id}`:['tahqiq', 'maqayis', 'ishtiqaqi', 'mizan'].find(book => relative.startsWith(`/data/${book}/`)) || 'core'
     const data = await readFile(file)
     groups[group].push({ url: relative, sha256: createHash('sha256').update(data).digest('hex'), bytes: data.length })
   }

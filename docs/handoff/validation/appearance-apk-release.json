@@ -1,0 +1,16 @@
+{
+  "apkVersion": "0.2.19",
+  "versionCode": 2019,
+  "webRelease": "0.4.21",
+  "source": "58f8257b6daf8c786e2a7b33e0583e1555688f59",
+  "workflowRun": 40661621771,
+  "conclusion": "success",
+  "sha256": "7b501c9a039ad87efacdb1f05d75069b618c317ade89aaae07a215f55b2c1b5a",
+  "publishedChecksumMatches": true,
+  "signatureValid": true,
+  "sameSigningCertificateAs0217": true,
+  "nativeAppearanceCommandPresent": true,
+  "nativeAppearancePreferencesPresent": true,
+  "deviceInstallationTested": false,
+  "url": "https://github.com/MohsenIT/quran-vajeh/releases/download/offline-2026-10-28-19/app-arm64-release.apk"
+}

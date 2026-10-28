@@ -1,0 +1,811 @@
+{
+  "id": "mizan",
+  "title": "ترجمهٔ تفسیر المیزان",
+  "creator": "سید محمدحسین طباطبایی",
+  "language": "fa",
+  "source": "https://quran.inoor.ir/",
+  "archiveSha256": "f2902c817b661f8d7aafc1de659ce1dbb7925bef53feb486fb628008ed865931",
+  "verses": 6236,
+  "uniqueSourceTexts": 1375,
+  "bytes": 63855740,
+  "surahs": [
+    {
+      "surah": 1,
+      "verses": 7,
+      "passages": 5,
+      "bytes": 161797,
+      "sha256": "255a40605ac84c2ea38edfbddb0077613a4c49e84a8dc7fdb67f9f85cd24cc28"
+    },
+    {
+      "surah": 2,
+      "verses": 286,
+      "passages": 171,
+      "bytes": 4912960,
+      "sha256": "d257645f0ed70c28ab33f17a5bca12bde4c97378c488bb070765404921daa89d"
+    },
+    {
+      "surah": 3,
+      "verses": 200,
+      "passages": 55,
+      "bytes": 2893422,
+      "sha256": "0fe606c40dae24f7ca6767c8ac6f08abea4033616ea1babaaee0765834cc23bf"
+    },
+    {
+      "surah": 4,
+      "verses": 176,
+      "passages": 120,
+      "bytes": 4981662,
+      "sha256": "90cd9fa5d94ffea74c6da8ac0ddef089225ba031201b13f5776e257a1725bad4"
+    },
+    {
+      "surah": 5,
+      "verses": 120,
+      "passages": 61,
+      "bytes": 5471234,
+      "sha256": "df8b36b66330dd7edb48e62b3a0125b5b8c1464b614deadbcf912ccbdc762cb8"
+    },
+    {
+      "surah": 6,
+      "verses": 165,
+      "passages": 116,
+      "bytes": 4136878,
+      "sha256": "ff2c47df782b7d8f2dc6fc28320a85dfa24226721852ab00f293429b3becc0b9"
+    },
+    {
+      "surah": 7,
+      "verses": 206,
+      "passages": 145,
+      "bytes": 5917693,
+      "sha256": "03e1ef31a84d93ee9976a5b72dcb76202b52056a63b68e879d9f9ec68a4a5ed1"
+    },
+    {
+      "surah": 8,
+      "verses": 75,
+      "passages": 52,
+      "bytes": 1525284,
+      "sha256": "d7f7f6c715c48328b391806c657678e6e07e958c54d2a2dab35c480021a3a424"
+    },
+    {
+      "surah": 9,
+      "verses": 129,
+      "passages": 89,
+      "bytes": 2461873,
+      "sha256": "ec4212816fdf755b6ce45e85e165fceb65a77ccdefd357a94aab52ba5d6fc481"
+    },
+    {
+      "surah": 10,
+      "verses": 109,
+      "passages": 46,
+      "bytes": 1328939,
+      "sha256": "019da14f5820094ec34ef58c06cf41dc08c022e05e741e6d3f60652eae0ce1ba"
+    },
+    {
+      "surah": 11,
+      "verses": 123,
+      "passages": 54,
+      "bytes": 3424819,
+      "sha256": "7ce800ffd36cf9ce366fc57473f0179580685d2dd1bc2a9ff61bc99d5db91915"
+    },
+    {
+      "surah": 12,
+      "verses": 111,
+      "passages": 46,
+      "bytes": 2781387,
+      "sha256": "41e99dd8b0fd1ead4d9cd7446198c321b8f817a663d6917db9c7c70e051c1fa8"
+    },
+    {
+      "surah": 13,
+      "verses": 43,
+      "passages": 20,
+      "bytes": 1060851,
+      "sha256": "ae15ef7d2583636dbd16e2a5ea351042ddf8ff4d971afa299ec34b435feb69fc"
+    },
+    {
+      "surah": 14,
+      "verses": 52,
+      "passages": 15,
+      "bytes": 603176,
+      "sha256": "11cb1e6e8b6299799fdf86d56829c4164e6520e09204a7131616d6bf1c5ff190"
+    },
+    {
+      "surah": 15,
+      "verses": 99,
+      "passages": 13,
+      "bytes": 730862,
+      "sha256": "e7e7f4fc2b6ef6588868defa90b4fdbce56f236d88c5c0402529b7d70514ac75"
+    },
+    {
+      "surah": 16,
+      "verses": 128,
+      "passages": 27,
+      "bytes": 1542335,
+      "sha256": "cf1e7999d0617943733d8767178529240110b9974c249292e7bee4b9ee444ca5"
+    },
+    {
+      "surah": 17,
+      "verses": 111,
+      "passages": 19,
+      "bytes": 1245888,
+      "sha256": "5e525ba1a0f780c795caaa0b95aba701049ebfd6528d6c4ee3ab3e4b93279d41"
+    },
+    {
+      "surah": 18,
+      "verses": 110,
+      "passages": 15,
+      "bytes": 1021937,
+      "sha256": "8f281cde4ddb506cb7ddf0cd9e9a50fe06aed50fc107c57ecd29d35d72b0a60c"
+    },
+    {
+      "surah": 19,
+      "verses": 98,
+      "passages": 18,
+      "bytes": 1002026,
+      "sha256": "886458b88c870b8b639b91ff25dc57364e8fe0285e4755be44288c04758b69bd"
+    },
+    {
+      "surah": 20,
+      "verses": 135,
+      "passages": 20,
+      "bytes": 870688,
+      "sha256": "e093065e39fa11fdb3642542c98f0790a44ddadcf6499f2fab62ae6ccea51a44"
+    },
+    {
+      "surah": 21,
+      "verses": 112,
+      "passages": 10,
+      "bytes": 569145,
+      "sha256": "a4be705df2664ff1c2f2f68a42ad10553df0c61028d5c210b3cac81c44cba298"
+    },
+    {
+      "surah": 22,
+      "verses": 78,
+      "passages": 12,
+      "bytes": 531527,
+      "sha256": "1f9fdfa4c6aed299d443ff150260e1fa6f4ce33a3f822954a6ca651a721dc1c9"
+    },
+    {
+      "surah": 23,
+      "verses": 118,
+      "passages": 7,
+      "bytes": 373536,
+      "sha256": "da36de75949ac513e62b7f3e09ec3896985e97d5a9d82d011f60f65fc9158a75"
+    },
+    {
+      "surah": 24,
+      "verses": 64,
+      "passages": 6,
+      "bytes": 429173,
+      "sha256": "a99cb7786450c73a62f6c8760cb9cb32fc354aee6d01d860b96147816dd76911"
+    },
+    {
+      "surah": 25,
+      "verses": 77,
+      "passages": 6,
+      "bytes": 355306,
+      "sha256": "cef341b4507ebba2780139724734adb8b48b8d159a809776f30b482b3ac1834b"
+    },
+    {
+      "surah": 26,
+      "verses": 227,
+      "passages": 33,
+      "bytes": 539467,
+      "sha256": "4f851c3ba36688e5e66a177d32a74bec27cbab1e472bdda406d96959bb4ec543"
+    },
+    {
+      "surah": 27,
+      "verses": 93,
+      "passages": 7,
+      "bytes": 346060,
+      "sha256": "98c2c7a9584e4d61e5df2cb4b42e50e0547d4253b23522a789090ebb9493285c"
+    },
+    {
+      "surah": 28,
+      "verses": 88,
+      "passages": 25,
+      "bytes": 693495,
+      "sha256": "e0e2bcd2765568e2e3b438900dda78cf6661405142e00d51c6a1e1422ecc2deb"
+    },
+    {
+      "surah": 29,
+      "verses": 69,
+      "passages": 5,
+      "bytes": 289303,
+      "sha256": "d1829bf0948f5bca3e1e96f8c14f81bed3e5c01b68e5fa4773c2aaba007bfb7c"
+    },
+    {
+      "surah": 30,
+      "verses": 60,
+      "passages": 8,
+      "bytes": 284782,
+      "sha256": "2a9824a2702728fecafddf530282c09fbbb6b56283b04909f4df0c49708dc1e2"
+    },
+    {
+      "surah": 31,
+      "verses": 34,
+      "passages": 4,
+      "bytes": 180444,
+      "sha256": "e73be1926225cdd1efe02ac6d08f7055e2ce727925a012dc327402dbe30378a3"
+    },
+    {
+      "surah": 32,
+      "verses": 30,
+      "passages": 2,
+      "bytes": 147047,
+      "sha256": "1abb050e59717468dad7b035dc260b66920940acea8ad7f6a2ba175f1cfcbc96"
+    },
+    {
+      "surah": 33,
+      "verses": 73,
+      "passages": 19,
+      "bytes": 725239,
+      "sha256": "581a2a13a0c71259c7cb30aa73b0658a445ed73368313fa6944315397aedd968"
+    },
+    {
+      "surah": 34,
+      "verses": 54,
+      "passages": 5,
+      "bytes": 209335,
+      "sha256": "f14f2f5e6d5a8fff9e5a8ff3260a9258011b216dbecb793249f7872e7a9ee7c0"
+    },
+    {
+      "surah": 35,
+      "verses": 45,
+      "passages": 6,
+      "bytes": 271453,
+      "sha256": "237559b0049e9246887c463d968f77f81602a772096b124a23adad6f093ff57c"
+    },
+    {
+      "surah": 36,
+      "verses": 83,
+      "passages": 5,
+      "bytes": 290158,
+      "sha256": "db16344a9b985bbe9b5c0d30d2d3360aaff6ea668659366ba9fcc5bbf51bd629"
+    },
+    {
+      "surah": 37,
+      "verses": 182,
+      "passages": 6,
+      "bytes": 293389,
+      "sha256": "9d9327162a6d19bf328dbac99e9681ad6d873605e30fe63bef6e85c66cc1c41e"
+    },
+    {
+      "surah": 38,
+      "verses": 88,
+      "passages": 6,
+      "bytes": 243369,
+      "sha256": "7405f1e6f6dda5f8eb0bc291b51ef65142e4c62c7755c1f73bf0bce9e986fd3a"
+    },
+    {
+      "surah": 39,
+      "verses": 75,
+      "passages": 6,
+      "bytes": 345551,
+      "sha256": "5f21a5c2f0410cba2e5ca0b0a0084c45bec296be7548080c2b0ed278c14474d4"
+    },
+    {
+      "surah": 40,
+      "verses": 85,
+      "passages": 8,
+      "bytes": 276828,
+      "sha256": "f222c2f7c57b1096be2b8e7ea222f643c2977677070619054f974377141ab2bd"
+    },
+    {
+      "surah": 41,
+      "verses": 54,
+      "passages": 4,
+      "bytes": 247932,
+      "sha256": "e8ba263a79d4c7b5dadc857e136244a8bf618bce439a0a8bb474983a57a53600"
+    },
+    {
+      "surah": 42,
+      "verses": 53,
+      "passages": 31,
+      "bytes": 1024193,
+      "sha256": "9560ca94fdea0ed9f2bac83c0097fcff04967e59057cc2e3640df361432d2e47"
+    },
+    {
+      "surah": 43,
+      "verses": 89,
+      "passages": 45,
+      "bytes": 746487,
+      "sha256": "bb577d5f556bd21d365637682b46b5b61815f1407a875c457e149b0811a14101"
+    },
+    {
+      "surah": 44,
+      "verses": 59,
+      "passages": 22,
+      "bytes": 525023,
+      "sha256": "d84c2438c49eeffb8ca2c009b3ae8a092d18ffb34cf6ec6ab722584370de7ba1"
+    },
+    {
+      "surah": 45,
+      "verses": 37,
+      "passages": 20,
+      "bytes": 583913,
+      "sha256": "4af3d933cae80ed5b61ee77e3436814278a69402444b8c002d05316332e7645a"
+    },
+    {
+      "surah": 46,
+      "verses": 35,
+      "passages": 7,
+      "bytes": 276901,
+      "sha256": "09765d2a490f58fa0767d5c607b58a6c9fab0ccbeb3d486ad026b15d6573e4a5"
+    },
+    {
+      "surah": 47,
+      "verses": 38,
+      "passages": 4,
+      "bytes": 131518,
+      "sha256": "52bac7d47fa6e13176df9ed4725963c15c4304257e4751c6b718ef2a4ef03937"
+    },
+    {
+      "surah": 48,
+      "verses": 29,
+      "passages": 5,
+      "bytes": 243052,
+      "sha256": "64cbc18f3ee5221468bb3304145e899c610298246be82ec04333399d8ec36f6a"
+    },
+    {
+      "surah": 49,
+      "verses": 18,
+      "passages": 2,
+      "bytes": 162347,
+      "sha256": "658c106e03ea48c62e460c50690a6ceace2ed43d3615fecdbbc127194fc614fb"
+    },
+    {
+      "surah": 50,
+      "verses": 45,
+      "passages": 3,
+      "bytes": 132157,
+      "sha256": "879bacdd94d57462d28f14c5783d04c718f40489a13798c7f1b8ad30cb367c6f"
+    },
+    {
+      "surah": 51,
+      "verses": 60,
+      "passages": 3,
+      "bytes": 143477,
+      "sha256": "7533ee411ba893aeb54a4a647c6b07355e98edbc4ce0591f819b101b3579a1c0"
+    },
+    {
+      "surah": 52,
+      "verses": 49,
+      "passages": 4,
+      "bytes": 103584,
+      "sha256": "28dc471e66bbc554f17725e98a6b285931a24733c8ccc6ce788a32ff8a30fc32"
+    },
+    {
+      "surah": 53,
+      "verses": 62,
+      "passages": 3,
+      "bytes": 146430,
+      "sha256": "632c4e99d392e3148b2c6c967090e2f418b29660267fe7c3a94d56d67b37487a"
+    },
+    {
+      "surah": 54,
+      "verses": 55,
+      "passages": 3,
+      "bytes": 198959,
+      "sha256": "d8b1ceaba7efc00890dcd43cd3bf2d5954c80f736ee08cf1d3a865b031d4a000"
+    },
+    {
+      "surah": 55,
+      "verses": 78,
+      "passages": 2,
+      "bytes": 125649,
+      "sha256": "e7df9b88005d1645d85016071a1676aaf460a17120d19e41c5dfe718b1828c42"
+    },
+    {
+      "surah": 56,
+      "verses": 96,
+      "passages": 3,
+      "bytes": 160369,
+      "sha256": "7119abb33b3ca2a5fd26c8bebbb4a09ab1c99dbd9bd566b04e9511ccdac5193d"
+    },
+    {
+      "surah": 57,
+      "verses": 29,
+      "passages": 4,
+      "bytes": 197691,
+      "sha256": "e885c72ad1821fd93e6ae9e66a433feb004b68ee6c6fe9494879c5d0e712a997"
+    },
+    {
+      "surah": 58,
+      "verses": 22,
+      "passages": 3,
+      "bytes": 116532,
+      "sha256": "b1aa2666ef293fe6fda00e708bc38ab737b92dcd90547148821939e7e36a7113"
+    },
+    {
+      "surah": 59,
+      "verses": 24,
+      "passages": 3,
+      "bytes": 135711,
+      "sha256": "d349e587d244673145532beed4bba3882521c62d77f7b543b3150a3c28decf26"
+    },
+    {
+      "surah": 60,
+      "verses": 13,
+      "passages": 2,
+      "bytes": 113853,
+      "sha256": "e865bc9347f031783b19afffaed2258056bb8ff82be4d4f0cc951c86fc897677"
+    },
+    {
+      "surah": 61,
+      "verses": 14,
+      "passages": 2,
+      "bytes": 76825,
+      "sha256": "20b1516df0f7cc8168f4f0fbeae238ebe415f7a868a6c8139cc2bb33e9febd3c"
+    },
+    {
+      "surah": 62,
+      "verses": 11,
+      "passages": 2,
+      "bytes": 81942,
+      "sha256": "27cddfc375fc26297ebe9f668f8945e6ca8675f1a5286d5c56ec6856ab7c1d1d"
+    },
+    {
+      "surah": 63,
+      "verses": 11,
+      "passages": 2,
+      "bytes": 77247,
+      "sha256": "2f05961c9e0538d08aa2d6e8f063b563c4e5759317a86bc3f1cf3491a2db17c0"
+    },
+    {
+      "surah": 64,
+      "verses": 18,
+      "passages": 2,
+      "bytes": 96702,
+      "sha256": "fefbf0b3e9b71eecf6f625f14a4b135eb3372bd87d4c65aa0085aabe2cff144a"
+    },
+    {
+      "surah": 65,
+      "verses": 12,
+      "passages": 2,
+      "bytes": 94088,
+      "sha256": "3d0b958c7cc988c362835471e83d2c9accbd831909870a1ed318e50f31b140ee"
+    },
+    {
+      "surah": 66,
+      "verses": 12,
+      "passages": 2,
+      "bytes": 108941,
+      "sha256": "2da63c532a7215bc32b5411bee9acb5e7fe5cc91da533f1197614411f8bca1d7"
+    },
+    {
+      "surah": 67,
+      "verses": 30,
+      "passages": 3,
+      "bytes": 100080,
+      "sha256": "e5e787e2ac16b2972cc003bfcc0279a9920c187ce907899bea095bcea49b2a91"
+    },
+    {
+      "surah": 68,
+      "verses": 52,
+      "passages": 2,
+      "bytes": 127848,
+      "sha256": "e87ad122779c84ec7a8b1f0ebe57c0b11f6760805a9482c08b5ec0738b16644c"
+    },
+    {
+      "surah": 69,
+      "verses": 52,
+      "passages": 3,
+      "bytes": 73317,
+      "sha256": "33789e7bc1dea39ce46e18e5d34a178754e2a7d2af5ab9653d38c6d2b2e65c15"
+    },
+    {
+      "surah": 70,
+      "verses": 44,
+      "passages": 3,
+      "bytes": 100888,
+      "sha256": "2893e38f5258070f285a51be6483b66fe861079deaa137fe2f3ffe4926e87942"
+    },
+    {
+      "surah": 71,
+      "verses": 28,
+      "passages": 2,
+      "bytes": 63207,
+      "sha256": "f47e9d4584002fdc7480cda50f6ad7c44549c82881700d2ddff3290442be124f"
+    },
+    {
+      "surah": 72,
+      "verses": 28,
+      "passages": 2,
+      "bytes": 112007,
+      "sha256": "8dd2ef2ed785d80643ccfd799b4db81e0005960da8be6a168117e3b7ca90ffbc"
+    },
+    {
+      "surah": 73,
+      "verses": 20,
+      "passages": 2,
+      "bytes": 94473,
+      "sha256": "857f6143983c6d5146c58ee5e1c4e2f699e54bf17f24ff3bad76361710be48ff"
+    },
+    {
+      "surah": 74,
+      "verses": 56,
+      "passages": 4,
+      "bytes": 113871,
+      "sha256": "20aa587c1993701d9ba227a3e2049e2f45be8d42c04b17a831828f88d91ddba8"
+    },
+    {
+      "surah": 75,
+      "verses": 40,
+      "passages": 2,
+      "bytes": 80935,
+      "sha256": "5761e00367f713191360edb811179a3d587990f1d8af74c0b63fc0096d50f0d0"
+    },
+    {
+      "surah": 76,
+      "verses": 31,
+      "passages": 2,
+      "bytes": 129283,
+      "sha256": "c0fe529a4fdd6480824cacfe605361951e7aac7a16bcb0ca7fc86b8b258b4c48"
+    },
+    {
+      "surah": 77,
+      "verses": 50,
+      "passages": 2,
+      "bytes": 67559,
+      "sha256": "ffeb286f0f5bee3f99a411b4ade418e4299d1d219b1225e2f670ac526c04e2de"
+    },
+    {
+      "surah": 78,
+      "verses": 40,
+      "passages": 2,
+      "bytes": 92578,
+      "sha256": "9a6e8baf37da91d92a4a8de8d7d1a12475e3f3fe36f8659669ecd9fe15a950f4"
+    },
+    {
+      "surah": 79,
+      "verses": 46,
+      "passages": 2,
+      "bytes": 104076,
+      "sha256": "954089b80807e5bd8d341b99d5359d9ddf8c1e0fe173646d5668eac1084735ba"
+    },
+    {
+      "surah": 80,
+      "verses": 42,
+      "passages": 2,
+      "bytes": 70432,
+      "sha256": "3c8fe5ef9c5bc49afc3a45e3661e9b9c43f728f37f90eb5508734af0302ede7c"
+    },
+    {
+      "surah": 81,
+      "verses": 29,
+      "passages": 2,
+      "bytes": 47281,
+      "sha256": "3c1e159b61bbb6b3846a04ac3b590114e95fd007f949313753725cfdd5b6bd93"
+    },
+    {
+      "surah": 82,
+      "verses": 19,
+      "passages": 1,
+      "bytes": 36745,
+      "sha256": "9b375998a4101872407a6cefd261b4cb901254ecb9f29f5d8fecf927a9f18afa"
+    },
+    {
+      "surah": 83,
+      "verses": 36,
+      "passages": 2,
+      "bytes": 58368,
+      "sha256": "4522f71ae643e97fa828a66af373307ecac4ca8904b773fb930cef79136c3f13"
+    },
+    {
+      "surah": 84,
+      "verses": 25,
+      "passages": 1,
+      "bytes": 38356,
+      "sha256": "b05c186053397a778085568e07d35d9f46c21683858d24c3a2ae97c184755238"
+    },
+    {
+      "surah": 85,
+      "verses": 22,
+      "passages": 1,
+      "bytes": 48190,
+      "sha256": "010803b5deb9f36fb2ecab53f2b7e2e20393b24a94a814b0810d83930afe96c4"
+    },
+    {
+      "surah": 86,
+      "verses": 17,
+      "passages": 1,
+      "bytes": 27972,
+      "sha256": "2d2ea619f52012c9a4caba218eda4c7b3e14ba7ce3ff316147dbad2e1fc4a17c"
+    },
+    {
+      "surah": 87,
+      "verses": 19,
+      "passages": 1,
+      "bytes": 50721,
+      "sha256": "1190534a6ccc9212a0e6cc3f705ebb13412135bfe6c3d19f88a4f99b35d42925"
+    },
+    {
+      "surah": 88,
+      "verses": 26,
+      "passages": 1,
+      "bytes": 29384,
+      "sha256": "3066b91647f30cd42dc14bf6a6c21a6cf517b2d10c344ec0ef125cda16a35507"
+    },
+    {
+      "surah": 89,
+      "verses": 30,
+      "passages": 1,
+      "bytes": 55703,
+      "sha256": "478224c0bf39cc565bc76944d2ac28c6b8d8a00fe748037b9160b598dc25b4d9"
+    },
+    {
+      "surah": 90,
+      "verses": 20,
+      "passages": 1,
+      "bytes": 39981,
+      "sha256": "46796d7e07e0406dc407b193aeb8de90422ca7fbd2bdc2b29a18a0296d96d11a"
+    },
+    {
+      "surah": 91,
+      "verses": 15,
+      "passages": 1,
+      "bytes": 30964,
+      "sha256": "ff2fb80adeec74d64911a74320fa1bd6684b8c67c444657eafc7e7b6660151c3"
+    },
+    {
+      "surah": 92,
+      "verses": 21,
+      "passages": 1,
+      "bytes": 45323,
+      "sha256": "f63af6d9b5f911776b4c82ec2a55bb372bd1d8f95948766b4f327eb1cf4a695e"
+    },
+    {
+      "surah": 93,
+      "verses": 11,
+      "passages": 1,
+      "bytes": 19266,
+      "sha256": "a207d1bd9cbf81f540859c0d65971e1538e9cc5348d18b2aed6c423b80884ce9"
+    },
+    {
+      "surah": 94,
+      "verses": 8,
+      "passages": 1,
+      "bytes": 27308,
+      "sha256": "96eb03d5c0592e982bd9e4f8a9a5b94a9831a733d9ee6ccc0c1bb86d59e92055"
+    },
+    {
+      "surah": 95,
+      "verses": 8,
+      "passages": 1,
+      "bytes": 20176,
+      "sha256": "a0459abda836fb8170f8cc4a293d5780c895899dfca8fac81a280f4c09ffa65c"
+    },
+    {
+      "surah": 96,
+      "verses": 19,
+      "passages": 1,
+      "bytes": 43885,
+      "sha256": "9acef0f72c2829ffe9aca28746cbf6eba1a5eaf82ec04db8f336d8683c855f8e"
+    },
+    {
+      "surah": 97,
+      "verses": 5,
+      "passages": 1,
+      "bytes": 28376,
+      "sha256": "9a2a7cce101cbda1f50ba99f194208a7f4eecee3c228cbd10ae483f945ef933b"
+    },
+    {
+      "surah": 98,
+      "verses": 8,
+      "passages": 1,
+      "bytes": 34653,
+      "sha256": "37066dd01b211c7f5467d902eca9da153f9ef5a096e1f1e0beb06a19ce1f0dce"
+    },
+    {
+      "surah": 99,
+      "verses": 8,
+      "passages": 1,
+      "bytes": 18717,
+      "sha256": "ead437d56684d2806974880b9111dfd50075635caded281c93ff2e664480f5e7"
+    },
+    {
+      "surah": 100,
+      "verses": 11,
+      "passages": 2,
+      "bytes": 20561,
+      "sha256": "68685148f6d4136983b56915626275cfd0fdfadb828f38630ea18dfba7b0debd"
+    },
+    {
+      "surah": 101,
+      "verses": 11,
+      "passages": 2,
+      "bytes": 12647,
+      "sha256": "7ef08e21f8cd5be0a3aa783d591f55ac00b41545989c10441a8458ddfa6b9e02"
+    },
+    {
+      "surah": 102,
+      "verses": 8,
+      "passages": 2,
+      "bytes": 27874,
+      "sha256": "b1ceba11971de9963ea9f75e4f1fc64f961f4aca510f57b58846817f42704669"
+    },
+    {
+      "surah": 103,
+      "verses": 3,
+      "passages": 3,
+      "bytes": 18353,
+      "sha256": "e3a830b50b523b136813fb3cfcffca1471bd3704504d33edf0d3f0d06e9db309"
+    },
+    {
+      "surah": 104,
+      "verses": 9,
+      "passages": 1,
+      "bytes": 16664,
+      "sha256": "1d5e947c9537d273fd5dc505d1cc308e92ff9b7f4b2c0ebbc2b176284a6cae7f"
+    },
+    {
+      "surah": 105,
+      "verses": 5,
+      "passages": 1,
+      "bytes": 14072,
+      "sha256": "fa08683da9f16f8f37841f927620ecbaf09ffee51b8e68c4415b3f80ef940f60"
+    },
+    {
+      "surah": 106,
+      "verses": 4,
+      "passages": 1,
+      "bytes": 20313,
+      "sha256": "7e3d60853b436677e5f47f04b1a0eb3d1afe3046765ff5debf00d1c41c2e015f"
+    },
+    {
+      "surah": 107,
+      "verses": 7,
+      "passages": 1,
+      "bytes": 12064,
+      "sha256": "a8a06e8cfa506e9661fd6cebb7ecf73d6ff74bf753baede0e4382f0fc04a9f2a"
+    },
+    {
+      "surah": 108,
+      "verses": 3,
+      "passages": 1,
+      "bytes": 17907,
+      "sha256": "cafb0d4bd2fdc8adec32dd64409ed036b27bfd6a6149ea330e2312fbb2cc0676"
+    },
+    {
+      "surah": 109,
+      "verses": 6,
+      "passages": 1,
+      "bytes": 14675,
+      "sha256": "07a614e0d9b188eb06ab32bd49686bf53d836160c3488f8844c1e5b3ce79fdb2"
+    },
+    {
+      "surah": 110,
+      "verses": 3,
+      "passages": 1,
+      "bytes": 39160,
+      "sha256": "2ec6981d0ab2b22da180a59edc1efe3251f8908e7fe3d6fa2fa835164849d2eb"
+    },
+    {
+      "surah": 111,
+      "verses": 5,
+      "passages": 2,
+      "bytes": 22266,
+      "sha256": "fc57b8764a7fb6d00e4401f272353d7d13463bf9a9087b93bffb4fc447d9ef7c"
+    },
+    {
+      "surah": 112,
+      "verses": 4,
+      "passages": 1,
+      "bytes": 27297,
+      "sha256": "da751d238fce1068afebb60f880a1a0be5639b1fc182a82dc5440653639341d9"
+    },
+    {
+      "surah": 113,
+      "verses": 5,
+      "passages": 1,
+      "bytes": 18278,
+      "sha256": "1a11ee3bb7df8389b4179627054226b4e5287db81d00d5c72ffa1728c014b4a4"
+    },
+    {
+      "surah": 114,
+      "verses": 6,
+      "passages": 1,
+      "bytes": 19845,
+      "sha256": "8462b0a98eaa50908c437a722fe06e0e39444625119d6a4b53c10c0550cfeba3"
+    }
+  ]
+}

@@ -8,6 +8,7 @@ import { morphologyLabel, formName, toFa } from '@/lib/quran'
 import { analysisOccurrences, type AnalysisSelection, type AnalysisTab } from '@/lib/analysis'
 import { lexicalKey } from '@/lib/word-parts'
 import SourceReference from './SourceReference'
+import MizanCommentary from './MizanCommentary'
 import { AnalysisSection, STAT_OPTIONS, useAnalysisPreferences } from './AnalysisSections'
 
 type Index = { words: Record<string, Record<string, number>>; forms: Record<string, Record<string, number>>; rootForms: Record<string, Record<string, number>> }
@@ -70,6 +71,7 @@ export default function SelectionDetails({ tab, selection, surah, trans, transla
       {tab === 'word' && showMeaning('lemma') && <p className="text-xs leading-6 mb-3">{t("ui.05132ec8e6")}</p>}
       {tab === 'verse' && showMeaning('translation') && translation && <p dir={translationDirection(translator)} lang={translationLanguage(translator)} className="text-sm leading-8 text-justify">{translation}</p>}
       </AnalysisSection>}
+      {tab==='verse'&&<MizanCommentary s={surah.n} a={selection.a}/>}
       {STAT_OPTIONS[tab].some(option => showStat(option.id) && (option.id !== 'total' && option.id !== 'hosts' || !!distribution)) && <AnalysisSection tab={tab} kind="stats">
       {tab === 'verse' ? (
         <div className="flex gap-2 mb-4">

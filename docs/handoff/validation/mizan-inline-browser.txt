@@ -1,0 +1,1 @@
+PASS: ayah 1:2 shows translation first, then its AI-labelled Mizan summary, with no full-commentary request.

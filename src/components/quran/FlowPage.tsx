@@ -6,7 +6,9 @@ import { toFa } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
 import SelectableWord from './SelectableWord'
 import { rootColorStyle } from '@/lib/comparison-colors'
-import FlowTranslations from './FlowTranslations'
+import MizanCommentary from './MizanCommentary'
+import {translationDirection,translationLanguage} from '@/lib/translations'
+import {t} from '@/lib/i18n'
 import { matchesAnalysis, type AnalysisSelection } from '@/lib/analysis'
 import type { Selection } from './MushafPage'
 
@@ -49,8 +51,9 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
           const isComparisonRange = comparisonRange?.s === surah.n && v.n >= comparisonRange.from && v.n <= comparisonRange.to
           const continues = isComparisonRange ? v.n < comparisonRange.to
             : isRange && v.n < surah.vc && matchesAnalysis(analysisSelection, surah.n, v.n + 1, 1, v.w[0])
+          const VerseContainer=showTrans?'div':'span'
           return (
-          <span key={v.n} data-verse={v.n}>
+          <VerseContainer key={v.n} data-verse={v.n}>
           <span className={`${isRange ? 'analysis-range' : ''}${isComparisonRange ? ' comparison-range-band' : ''}`} data-comparison-range={isComparisonRange ? 'true' : undefined}>
             {v.w.map((w, i) => {
               const hue = comparisonRange?.s === surah.n && w.r ? comparisonRoots?.[w.r] : undefined
@@ -71,9 +74,9 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
             })}
             <AyahMarker n={v.n} />{continues ? ' ' : null}
           </span>{!continues ? ' ' : null}
-          </span>
+          {showTrans&&<div className="verse-source-block"><p data-translation-verse={v.n} dir={translationDirection(translator)} lang={translationLanguage(translator)}>{trans?.[String(v.n)]?.[translator]??t('translation.unavailable')}</p><MizanCommentary s={surah.n} a={v.n}/></div>}
+          </VerseContainer>
         )})}
-        {showTrans && <FlowTranslations container={textRef} surah={surah} trans={trans} translator={translator} fontSize={fontSize} />}
       </div>
 
 

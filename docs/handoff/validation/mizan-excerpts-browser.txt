@@ -1,0 +1,1 @@
+PASS: translation then verbatim excerpt; no AI mislabel; 620 core files installed; excerpt survives offline reload; unvisited surah opening available offline; full source fetched only after explicit click; no page errors.
