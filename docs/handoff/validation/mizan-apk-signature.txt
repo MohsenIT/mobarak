@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Quran Mubarak, O=Quran Mubarak
+Signer #1 certificate SHA-256 digest: e0dcc2576146caac93ba4459648090c750ba652b5ae3816833acfb2cfda9c842
+Signer #1 certificate SHA-1 digest: 2db04b5d3856e6beb3b88ae8acd3bb201fbaaa56
+Signer #1 certificate MD5 digest: 8c159b442005772572247da5c7f90866
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 4096
+Signer #1 public key SHA-256 digest: b863a18344455b29025e41bbaf4490f46c190c2ebefc9481a9f7be57b84bd5ce
+Signer #1 public key SHA-1 digest: 54feea1c016e93edc64b16e12549999165016890
+Signer #1 public key MD5 digest: 8544685e4dfa31bb08094902252ca58d

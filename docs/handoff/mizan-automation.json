@@ -1,0 +1,12 @@
+{
+  "id": "6ae200dd93e88191ac933c6179a7c34b",
+  "title": "ادامهٔ تخلیص المیزان",
+  "schedule": "BEGIN:VEVENT\nRRULE:FREQ=HOURLY\nEND:VEVENT",
+  "timezone": "Asia/Tehran",
+  "enabledConfirmed": true,
+  "completionConfirmed": false,
+  "stopWhenReviewedAyahs": 6236,
+  "latestReviewedAyahs": 80,
+  "remainingAyahs": 6156,
+  "notes": "Read current.md/status.md, inspect real files and active runs before writing. Each run composes and source-checks a meaningful pending batch; no paid API, no account/paid dictionary work. Do not report scheduling as completed execution. Disable this automation when complete."
+}

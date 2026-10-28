@@ -1,0 +1,19 @@
+{
+  "apkVersion": "0.2.20",
+  "versionCode": 2020,
+  "webRelease": "0.4.22",
+  "source": "430f340378b55c51463313b9d3bb603a99d04243",
+  "workflowRun": 40674962754,
+  "conclusion": "success",
+  "sha256": "7d1dda8953ec920aada8c6ebafe6677b157320765951d7599f9582d56ade8222",
+  "publishedChecksumMatches": true,
+  "signatureValid": true,
+  "sameSigningCertificateAs0219": true,
+  "embeddedExcerptSurahs": 114,
+  "embeddedSummaryIndexes": 114,
+  "fullSurahAssetsBundled": 0,
+  "excerptAyahCoverage": 6236,
+  "reviewedSummaryAyahs": 61,
+  "deviceInstallationTested": false,
+  "url": "https://github.com/MohsenIT/quran-vajeh/releases/download/offline-2026-10-28-20/app-arm64-release.apk"
+}
