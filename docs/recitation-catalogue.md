@@ -17,20 +17,22 @@ Portraits are local assets shared by picker and profile, with a neutral icon whe
 | عبدالباسط عبدالصمد | [تنزیل](https://tanzil.net/) | Yes |
 | عبدالله بصفر | [تنزیل](https://tanzil.net/) | Yes |
 | عبدالله بصفر — ضبط دوم | [تنزیل](https://tanzil.net/) | Yes |
-| احمد العجمی | [تنزیل](https://tanzil.net/) | Not available |
-| سعد الغامدی | [تنزیل](https://tanzil.net/) | Not available |
-| علی عبدالرحمن الحذیفی | [تنزیل](https://tanzil.net/) | Not available |
-| محمود خلیل الحصری | [تنزیل](https://tanzil.net/) | Not available |
+| احمد العجمی | [تنزیل](https://tanzil.net/) | Yes |
+| سعد الغامدی | [تنزیل](https://tanzil.net/) | Yes |
+| علی عبدالرحمن الحذیفی | [تنزیل](https://tanzil.net/) | Yes |
+| محمود خلیل الحصری | [تنزیل](https://tanzil.net/) | Yes |
 | ابوبکر الشاطری | [تنزیل](https://tanzil.net/) | Yes |
 | سعود الشریم | [تنزیل](https://tanzil.net/) | Yes |
 | عبدالرحمن السدیس | [تنزیل](https://tanzil.net/) | Yes |
-| محمد محمود الطبلاوی | [تنزیل](https://tanzil.net/) | Not available |
+| محمد محمود الطبلاوی | [تنزیل](https://tanzil.net/) | Yes |
 | هانی الرفاعی | [تنزیل](https://tanzil.net/) | Yes |
 | ابراهیم الاخضر | [تنزیل](https://tanzil.net/) | Yes |
 | ماهر المعیقلی | [تنزیل](https://tanzil.net/) | Yes |
 | محمد ایوب | [تنزیل](https://tanzil.net/) | Yes |
 | محمد جبریل | [تنزیل](https://tanzil.net/) | Yes |
-| صلاح بوخاطر | [تنزیل](https://tanzil.net/) | Not available |
-| عبدالمحسن القاسم | [تنزیل](https://tanzil.net/) | Not available |
-| عبدالله عواد الجهنی | [تنزیل](https://tanzil.net/) | Not available |
-| عبدالله المطرود | [تنزیل](https://tanzil.net/) | Not available |
+| صلاح بوخاطر | [تنزیل](https://tanzil.net/) | Yes |
+| عبدالمحسن القاسم | [تنزیل](https://tanzil.net/) | Yes |
+| عبدالله عواد الجهنی | [تنزیل](https://tanzil.net/) | Yes |
+| عبدالله المطرود | [تنزیل](https://tanzil.net/) | Yes |
+
+All 22 registered recording entries now have local portraits (21 people; Basfar has two recordings). Nine missing portraits were added from named Assabile profiles and Commons; attribution/source URLs remain in reciter-portraits-LICENSE.txt. No new playback source was added by this image change.

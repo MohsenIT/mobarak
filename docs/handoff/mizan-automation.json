@@ -3,7 +3,7 @@
   "title": "ادامهٔ تخلیص المیزان",
   "schedule": "BEGIN:VEVENT\nDTSTART;TZID=Asia/Tehran:20261028T174251\nRRULE:FREQ=HOURLY\nEND:VEVENT",
   "timezone": "Asia/Tehran",
-  "enabledConfirmed": true,
+  "enabledConfirmed": false,
   "completionConfirmed": false,
   "stopWhenReviewedAyahs": 6236,
   "latestReviewedAyahs": 565,
@@ -15,5 +15,7 @@
   "independentBackgroundRunConfirmed": false,
   "parallelAgentsAuthorized": true,
   "parallelPromptUpdatedConfirmed": true,
-  "latestBatchIndependentlyCompared": true
+  "latestBatchIndependentlyCompared": true,
+  "pausedByUserConsumptionConstraint": true,
+  "pauseReason": "User requested no new summaries, review existing drafts only, stop at60% of five-hour quota. Quota percentage unavailable, so agents and hourly automation paused conservatively."
 }

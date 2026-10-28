@@ -335,7 +335,11 @@
         "href": "https://tanzil.net/"
       }
     ],
-    "countryCode": "KW"
+    "countryCode": "KW",
+    "image": {
+      "src": "/images/reciters/ajamy.webp",
+      "alt": "احمد العجمی"
+    }
   },
   {
     "id": "reciter:tanzil-ghamadi",
@@ -359,7 +363,11 @@
         "href": "https://tanzil.net/"
       }
     ],
-    "countryCode": "SA"
+    "countryCode": "SA",
+    "image": {
+      "src": "/images/reciters/ghamadi.webp",
+      "alt": "سعد الغامدی"
+    }
   },
   {
     "id": "reciter:tanzil-hudhaify",
@@ -383,7 +391,11 @@
         "href": "https://tanzil.net/"
       }
     ],
-    "countryCode": "SA"
+    "countryCode": "SA",
+    "image": {
+      "src": "/images/reciters/hudhaify.webp",
+      "alt": "علی عبدالرحمن الحذیفی"
+    }
   },
   {
     "id": "reciter:tanzil-husary",
@@ -407,7 +419,11 @@
         "href": "https://tanzil.net/"
       }
     ],
-    "countryCode": "EG"
+    "countryCode": "EG",
+    "image": {
+      "src": "/images/reciters/husary.webp",
+      "alt": "محمود خلیل الحصری"
+    }
   },
   {
     "id": "reciter:tanzil-shateri",
@@ -515,7 +531,11 @@
         "href": "https://tanzil.net/"
       }
     ],
-    "countryCode": "EG"
+    "countryCode": "EG",
+    "image": {
+      "src": "/images/reciters/tablawi.webp",
+      "alt": "محمد محمود الطبلاوی"
+    }
   },
   {
     "id": "reciter:tanzil-hani",
@@ -679,7 +699,11 @@
         "href": "https://tanzil.net/"
       }
     ],
-    "countryCode": "AE"
+    "countryCode": "AE",
+    "image": {
+      "src": "/images/reciters/bukhatir.webp",
+      "alt": "صلاح بوخاطر"
+    }
   },
   {
     "id": "reciter:tanzil-qasim",
@@ -703,7 +727,11 @@
         "href": "https://tanzil.net/"
       }
     ],
-    "countryCode": "SA"
+    "countryCode": "SA",
+    "image": {
+      "src": "/images/reciters/qasim.webp",
+      "alt": "عبدالمحسن القاسم"
+    }
   },
   {
     "id": "reciter:tanzil-juhany",
@@ -727,7 +755,11 @@
         "href": "https://tanzil.net/"
       }
     ],
-    "countryCode": "SA"
+    "countryCode": "SA",
+    "image": {
+      "src": "/images/reciters/juhany.webp",
+      "alt": "عبدالله عواد الجهنی"
+    }
   },
   {
     "id": "reciter:tanzil-matrood",
@@ -751,7 +783,11 @@
         "href": "https://tanzil.net/"
       }
     ],
-    "countryCode": "SA"
+    "countryCode": "SA",
+    "image": {
+      "src": "/images/reciters/matrood.webp",
+      "alt": "عبدالله المطرود"
+    }
   },
   {
     "id": "book:mizan",

@@ -26,3 +26,33 @@ SOFTWARE.
 Minshawi photograph and identification:
 https://github.com/abunaafi/minshawiTributePage/blob/master/Elminshwey.jpg
 https://github.com/abunaafi/minshawiTributePage/blob/master/index.html
+
+
+Additional portraits added 2026-10-28:
+ajamy.webp: https://www.assabile.com/ahmed-al-ajmi
+Image: https://www.assabile.com/media/portraits/13-200.webp
+Retrieved from the named reciter profile; no open license asserted. Resized to 200px.
+ghamadi.webp: https://www.assabile.com/saad-al-ghamdi
+Image: https://www.assabile.com/media/portraits/4-200.webp
+Retrieved from the named reciter profile; no open license asserted. Resized to 200px.
+hudhaify.webp: https://www.assabile.com/ali-al-hudhaify
+Image: https://www.assabile.com/media/portraits/19-200.webp
+Retrieved from the named reciter profile; no open license asserted. Resized to 200px.
+husary.webp: https://www.assabile.com/mahmoud-khalil-al-hussary
+Image: https://www.assabile.com/media/portraits/27-200.webp
+Retrieved from the named reciter profile; no open license asserted. Resized to 200px.
+tablawi.webp: https://www.assabile.com/mohamed-tablawi
+Image: https://www.assabile.com/media/portraits/31-200.webp
+Retrieved from the named reciter profile; no open license asserted. Resized to 200px.
+bukhatir.webp: https://www.assabile.com/salah-bukhatir
+Image: https://www.assabile.com/media/portraits/23-200.webp
+Retrieved from the named reciter profile; no open license asserted. Resized to 200px.
+qasim.webp: https://commons.wikimedia.org/wiki/File:Abdul_Mohsin_Al-Qasim.jpg
+Author: শেখ শরীফ. CC BY 4.0 https://creativecommons.org/licenses/by/4.0/
+Changes: cropped and resized to 200px, converted to WebP.
+juhany.webp: https://www.assabile.com/abdullah-awad-al-juhani
+Image: https://www.assabile.com/media/portraits/93-200.webp
+Retrieved from the named reciter profile; no open license asserted. Resized to 200px.
+matrood.webp: https://www.assabile.com/abdullah-matrood
+Image: https://www.assabile.com/media/portraits/5-200.webp
+Retrieved from the named reciter profile; no open license asserted. Resized to 200px.
