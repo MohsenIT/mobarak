@@ -1,0 +1,15 @@
+Persian Al-Mizan summaries — reviewable generation scope
+
+Current implementation: one source-checked example (1:2), automatic small-summary loading, explicit full-surah download, AI icon/label, source hashes and evidence. No external model API has been called.
+
+Remaining scope: 6235 ayahs; each gets an independent 2–3-sentence Persian explanation grounded in its linked source passage and the Quran verse, preserving authorial qualifications and alternatives. Shared passages must not be copied indiscriminately across different verses. Some source entries are only cross-references; resolve them rather than fabricate interpretation. Source passages reach 360433 characters; no silent truncation is permitted.
+
+Provider/model and cost cap are pending user input. Dictionary translation jobs remain stopped. Do not use old translation ledgers or spend their budget. No API credentials are configured in the present environment.
+
+A bulk generation workflow should:
+1. Group exact source hashes to avoid paying for duplicate source input.
+2. Retain separate targets and Quran text for every ayah in that source group.
+3. Produce draft summaries and exact supporting source excerpts; record model/prompt and source hash.
+4. Conduct a separate source-to-summary review of negation, qualifications, alternatives and unsupported claims; revise failures.
+5. Mark only reviewed results source-checked. Validate all addresses, evidence and source hashes with scripts/validate-mizan-summaries.mjs --require-complete before publication.
+6. Keep original text separate, optional, immutable and safe to render.

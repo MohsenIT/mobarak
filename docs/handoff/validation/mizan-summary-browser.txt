@@ -1,0 +1,1 @@
+PASS: source-checked AI-labelled sample appears without full download; explicit download shows shared 2–3 source range; escaped text; offline fetch succeeds. Coverage remains 1/6236.

@@ -1,0 +1,1 @@
+Source-checked summaries: 1/6236; missing 6235. Evidence matches validate provenance, not semantic correctness.

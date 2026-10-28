@@ -1,0 +1,25 @@
+bun test v1.3.4 (5eb2145b)
+
+src/lib/i18n.test.ts:
+(pass) language and translation contracts > language matching uses supported device language before unsupported fallbacks [0.36ms]
+(pass) language and translation contracts > all UI catalogues have the same keys and interpolation placeholders [53.67ms]
+(pass) language and translation contracts > reader labels are externalized instead of hardcoded in JSX [235.68ms]
+(pass) language and translation contracts > language names have a native and English label even when ICU lacks the locale [0.38ms]
+(pass) language and translation contracts > only registered translations can be restored from a link [0.18ms]
+(pass) language and translation contracts > translations preserve complete ordered source arrays and recorded empty verses [212.59ms]
+(pass) language and translation contracts > fallback stays Persian and substitution never injects markup [12.18ms]
+
+src/lib/resources.test.ts:
+(pass) resource catalogue > all selectable reciters and translations have unique profiles [0.54ms]
+(pass) resource catalogue > search combines country nationality style and author without matching a different reciter [2.23ms]
+(pass) resource catalogue > language kind title and era remain searchable [6.24ms]
+(pass) portraits are bundled and the two original reciters have photographs [0.16ms]
+
+src/lib/mizan.test.ts:
+(pass) Mizan covers every canonical ayah with unchanged, hashed source-linked ranges [196.46ms]
+(pass) commentary requests are bounded and a failed fetch can be retried [2.30ms]
+
+ 13 pass
+ 0 fail
+ 93709 expect() calls
+Ran 13 tests across 3 files. [1301.00ms]
