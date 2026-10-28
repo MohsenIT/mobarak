@@ -1,0 +1,16 @@
+{
+  "reviewedAyahs": 179,
+  "remainingAyahs": 6057,
+  "batchSurahs": [
+    92,
+    93,
+    94,
+    95,
+    96
+  ],
+  "batchAyahs": 67,
+  "validatorPassed": true,
+  "mizanTestsPassed": 4,
+  "sourceUnchanged": true,
+  "paidCalls": 0
+}

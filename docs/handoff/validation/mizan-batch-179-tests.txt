@@ -1,0 +1,12 @@
+bun test v1.3.4 (5eb2145b)
+
+src/lib/mizan.test.ts:
+(pass) Mizan covers every canonical ayah with unchanged, hashed source-linked ranges [161.76ms]
+(pass) commentary requests are bounded and a failed fetch can be retried [2.45ms]
+(pass) all bundled openings are exact source excerpts and cover every ayah without the full download [81.99ms]
+(pass) small source openings load independently when summary is absent and never fetch full commentary [2.34ms]
+
+ 4 pass
+ 0 fail
+ 11340 expect() calls
+Ran 4 tests across 1 file. [284.00ms]

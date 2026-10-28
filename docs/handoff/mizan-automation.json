@@ -6,9 +6,11 @@
   "enabledConfirmed": true,
   "completionConfirmed": false,
   "stopWhenReviewedAyahs": 6236,
-  "latestReviewedAyahs": 112,
-  "remainingAyahs": 6124,
+  "latestReviewedAyahs": 179,
+  "remainingAyahs": 6057,
   "notes": "Read current.md/status.md, inspect real files and active runs before writing. Each run composes and source-checks a meaningful pending batch; no paid API, no account/paid dictionary work. Do not report scheduling as completed execution. Disable this automation when complete.",
   "immediateRunRequest": "failed: tool returned 404 Action not found",
-  "executionConfirmed": false
+  "continuationRequestHandled": true,
+  "latestBatchAyahs": 67,
+  "independentBackgroundRunConfirmed": false
 }
