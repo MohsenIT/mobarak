@@ -1,5 +1,5 @@
 import meta from '../../../../public/data/meta.json'
-import { RECITERS, recitationSourceUrl } from '@/lib/recitation'
+import { AUDIO_SOURCES, recitationSourceUrl } from '@/lib/recitation'
 
 const cors = { 'Access-Control-Allow-Origin':'*', 'X-Content-Type-Options':'nosniff' }
 const fail=(status:number)=>Response.json({error:'audio-unavailable'},{status,headers:cors})
@@ -7,7 +7,7 @@ const fail=(status:number)=>Response.json({error:'audio-unavailable'},{status,he
 export async function GET(request:Request) {
   const params=new URL(request.url).searchParams
   const s=Number(params.get('s')), a=Number(params.get('a'))
-  const reciter=RECITERS.find(item=>item.id===params.get('r')&&item.tanzilDirectory)
+  const reciter=AUDIO_SOURCES.find(item=>item.id===params.get('r')&&item.tanzilDirectory)
   if(!reciter||!Number.isInteger(s)||s<1||s>114||!Number.isInteger(a)||a<1||a>meta.surahs[s-1].vc)return fail(400)
   try {
     const upstream=await fetch(recitationSourceUrl(s,a,reciter),{signal:AbortSignal.timeout(20000),redirect:'error',cache:'force-cache'})

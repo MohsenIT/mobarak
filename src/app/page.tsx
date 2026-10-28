@@ -22,6 +22,7 @@ import RecitationPlayer,{type RecitationTransportStatus} from '@/components/qura
 import { rootHue } from '@/lib/comparison-colors'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import {revealReadingTarget,revealReadingVerse} from '@/lib/reading-visibility'
+import CarStudySync from '@/components/quran/CarStudySync'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
@@ -498,6 +499,7 @@ export default function Home() {
     <>
     {!startupComplete && <StartupSplash leaving={startupLeaving} onHoldChange={held => { setStartupHeld(held); if (held) setStartupLeaving(false) }} />}
     {meta && <div className={`reader-app h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
+      <CarStudySync reader={mainRef} revision={`${mode}:${surah}:${page}:${mushafContentRevision}:${showTrans}:${flowSurah?.n}:${loadingPage}`} />
       <PatternBG />
 
       <QuranSearch onNavigate={navigateDestination} key={searchStart?.revision ?? 0} onStateChange={writeSearchState} initialSearch={searchStart} occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {

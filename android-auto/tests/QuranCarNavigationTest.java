@@ -109,6 +109,82 @@ public class QuranCarNavigationTest {
     controller.destroy();controller=Robolectric.buildService(QuranCarService.class);service=controller.get();controller.create();
     assertEquals("الرئيسية",children("root").get(0).mediaMetadata.title.toString());
   }
+  Object field(String name)throws Exception{Field f=QuranCarService.class.getDeclaredField(name);f.setAccessible(true);return f.get(service);}
+  void option(String key,String value)throws Exception{Method m=QuranCarService.class.getDeclaredMethod("applySetting",String.class,String.class);m.setAccessible(true);m.invoke(service,key,value);}
+  MediaSession.ControllerInfo own(){return MediaSession.ControllerInfo.createTestOnlyControllerInfo("app.quranmubarak.reader",100,100,1,1,true,android.os.Bundle.EMPTY);}
+  @Test public void listeningLibraryMergesFavoritesAndValidatesBeforeSaving()throws Exception{
+    QuranCarLibrary data=(QuranCarLibrary)field("library");
+    data.mutate(new org.json.JSONObject("{\"action\":\"favorite\",\"s\":20,\"a\":72}"));
+    data.mutate(new org.json.JSONObject("{\"action\":\"favorite\",\"s\":20,\"a\":72}"));assertEquals(1,data.array("favorites").length());
+    data.mutate(new org.json.JSONObject("{\"action\":\"favorite\",\"s\":20,\"a\":73}"));assertEquals(2,data.array("favorites").length());
+    try{data.mutate(new org.json.JSONObject("{\"action\":\"favorite\",\"s\":1,\"a\":8}"));fail();}catch(IllegalArgumentException expected){}assertEquals(2,data.array("favorites").length());
+    data.mutate(new org.json.JSONObject("{\"action\":\"favorite\",\"s\":20,\"a\":72,\"add\":false}"));assertFalse(data.favorite(20,72));assertTrue(data.favorite(20,73));
+    assertEquals(1,children("favorites").size());
+  }
+  @Test public void phoneReadingAndNamedPlaylistsResolveWithoutMutatingPlaybackOnSave()throws Exception{
+    QuranCarLibrary data=(QuranCarLibrary)field("library");Player player=(Player)field("player");
+    data.mutate(new org.json.JSONObject("{\"action\":\"reading\",\"s\":20,\"a\":72}"));assertEquals(0,player.getMediaItemCount());
+    MediaSession.MediaItemsWithStartPosition point=callback().onSetMediaItems(null,own(),Arrays.asList(new MediaItem.Builder().setMediaId("reading").build()),0,0).get();assertEquals(71,point.startIndex);assertTrue(point.mediaItems.get(71).mediaId.endsWith("/20/72"));
+    data.mutate(new org.json.JSONObject("{\"action\":\"saveList\",\"listId\":\"commute\",\"title\":\"Morning\",\"surahs\":[20,114]}"));
+    assertEquals("Morning",children("playlists").get(0).mediaMetadata.title.toString());
+    MediaSession.MediaItemsWithStartPosition plan=callback().onSetMediaItems(null,own(),children("playlists"),0,0).get();assertEquals(135,plan.mediaItems.size());assertTrue(plan.mediaItems.get(0).mediaId.endsWith("/20/1"));
+    assertEquals("commute",field("activeList"));
+  }
+  @Test public void repeatAndNormalPlaybackAreExplicitAndRestoreTheFullSurah()throws Exception{
+    Player player=(Player)field("player");MediaSession.MediaItemsWithStartPosition start=callback().onSetMediaItems(null,own(),Arrays.asList(children("s/minshawi-murattal/20").get(71)),0,1234).get();player.setMediaItems(start.mediaItems,start.startIndex,start.startPositionMs);
+    callback().onCustomCommand(null,own(),new SessionCommand("repeatVerse",android.os.Bundle.EMPTY),android.os.Bundle.EMPTY).get();assertEquals(3,field("verseRepeats"));
+    callback().onCustomCommand(null,own(),new SessionCommand("repeatVerse",android.os.Bundle.EMPTY),android.os.Bundle.EMPTY).get();assertEquals(1,field("verseRepeats"));
+    option("range","5");assertEquals(5,player.getMediaItemCount());assertEquals(72,field("rangeFrom"));assertEquals(76,field("rangeTo"));assertEquals(5,field("pauseSeconds"));
+    option("speed","1.5");option("verse","0");option("normal","off");
+    assertEquals(135,player.getMediaItemCount());assertEquals(71,player.getCurrentMediaItemIndex());assertEquals(1f,player.getPlaybackParameters().speed,0);assertEquals(1,field("verseRepeats"));assertEquals(1,field("surahRepeats"));assertEquals(0,field("pauseSeconds"));assertEquals(0,field("rangeSurah"));
+    for(MediaItem item:children("settings/speed")){assertEquals(Boolean.FALSE,item.mediaMetadata.isPlayable);assertTrue(item.mediaMetadata.supportedCommands.contains("applySetting"));}
+  }
+  @Test public void explicitPauseCancelsPracticeResumeAndTimerStopsPlayback()throws Exception{
+    Player player=(Player)field("player");option("pause","5");Method gap=QuranCarService.class.getDeclaredMethod("playAfterGap");gap.setAccessible(true);gap.invoke(service);
+    ((MediaLibrarySession)field("session")).getPlayer().pause();org.robolectric.Shadows.shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(6));assertFalse(player.getPlayWhenReady());assertNull(field("pendingGap"));
+    option("timer","15");player.play();org.robolectric.Shadows.shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofMinutes(15));assertFalse(player.getPlayWhenReady());assertEquals(0L,field("sleepDeadline"));
+    option("timer","end");player.play();Method finish=QuranCarService.class.getDeclaredMethod("finishQueue");finish.setAccessible(true);finish.invoke(service);assertFalse(player.getPlayWhenReady());assertEquals(false,field("sleepAtEnd"));
+  }
+  @Test public void normalPlaybackResumesAnAutomaticGapButPreservesExplicitPause()throws Exception{
+    Player player=(Player)field("player");player.setMediaItem(children("s/minshawi-murattal/20").get(71));
+    option("pause","5");Method gap=QuranCarService.class.getDeclaredMethod("playAfterGap");gap.setAccessible(true);gap.invoke(service);
+    option("speed","1.25");assertNotNull(field("pendingGap"));option("normal","off");assertNull(field("pendingGap"));assertTrue(player.getPlayWhenReady());
+    player.pause();option("normal","off");assertFalse(player.getPlayWhenReady());
+  }
+  @Test public void personalPlaylistAdvancesInOrderThenStops()throws Exception{
+    QuranCarLibrary data=(QuranCarLibrary)field("library");Player player=(Player)field("player");
+    data.mutate(new org.json.JSONObject("{\"action\":\"saveList\",\"listId\":\"route\",\"title\":\"Route\",\"surahs\":[20,114]}"));
+    MediaSession.MediaItemsWithStartPosition start=callback().onSetMediaItems(null,own(),children("playlists"),0,0).get();player.setMediaItems(start.mediaItems,start.startIndex,0);
+    Method finish=QuranCarService.class.getDeclaredMethod("finishQueue");finish.setAccessible(true);finish.invoke(service);assertTrue(player.getCurrentMediaItem().mediaId.endsWith("/114/1"));assertEquals(6,player.getMediaItemCount());
+    finish.invoke(service);assertFalse(player.getPlayWhenReady());assertEquals("",field("activeList"));
+  }
+  @Test public void untrustedAppsCannotEditPrivateListeningData()throws Exception{
+    MediaSession.ControllerInfo other=MediaSession.ControllerInfo.createTestOnlyControllerInfo("example.other",200,200,1,1,false,android.os.Bundle.EMPTY);
+    assertEquals(SessionError.ERROR_PERMISSION_DENIED,callback().onCustomCommand(null,other,new SessionCommand("favoriteCurrent",android.os.Bundle.EMPTY),android.os.Bundle.EMPTY).get().resultCode);
+    assertEquals(SessionError.ERROR_PERMISSION_DENIED,callback().onGetChildren(null,other,"favorites",0,10,null).get().resultCode);
+  }
+  @Test public void recordedTranslationUsesOneAyahIdentityAndQuranFirstOrdering()throws Exception{
+    MediaItem verse=children("s/minshawi-murattal/20").get(71);List<String> requested=new ArrayList<>();
+    androidx.media3.exoplayer.source.MediaSource.Factory base=new androidx.media3.exoplayer.source.MediaSource.Factory(){
+      public androidx.media3.exoplayer.source.MediaSource.Factory setDrmSessionManagerProvider(androidx.media3.exoplayer.drm.DrmSessionManagerProvider p){return this;}
+      public androidx.media3.exoplayer.source.MediaSource.Factory setLoadErrorHandlingPolicy(androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy p){return this;}
+      public int[] getSupportedTypes(){return new int[]{C.CONTENT_TYPE_OTHER};}
+      public androidx.media3.exoplayer.source.MediaSource createMediaSource(MediaItem item){requested.add(item.localConfiguration.uri.toString());return new androidx.media3.exoplayer.source.ProgressiveMediaSource.Factory(new androidx.media3.datasource.DefaultDataSource.Factory(service)).createMediaSource(item);}
+    };
+    String translation="https://tanzil.net/res/audio/fa.fooladvand/020072.mp3";
+    androidx.media3.exoplayer.source.MediaSource paired=new QuranVerseMediaSourceFactory(base,item->translation).createMediaSource(verse);
+    assertEquals(Arrays.asList("https://verses.quran.com/Minshawi/Murattal/mp3/020072.mp3",translation),requested);assertEquals(verse.mediaId,paired.getMediaItem().mediaId);
+    requested.clear();new QuranVerseMediaSourceFactory(base,item->null).createMediaSource(verse);assertEquals(1,requested.size());
+    option("translation","translation-fa-fooladvand");assertEquals("translation-fa-fooladvand",field("translationAudioId"));
+    try{option("translation","https://example.com/audio.mp3");fail();}catch(InvocationTargetException expected){}assertEquals("translation-fa-fooladvand",field("translationAudioId"));
+    option("translation","off");assertEquals("",field("translationAudioId"));
+  }
+  @Test @SuppressWarnings("unchecked") public void searchCanChooseReciterAndNumericAyah()throws Exception{
+    Method search=QuranCarService.class.getDeclaredMethod("search",String.class);search.setAccessible(true);
+    for(String query:Arrays.asList("سوره ۲۰ آیه ۷۲ پرهیزگار","طه آیه ۷۲ پرهیزگار","Surah 20 verse 72 parhizgar")){
+      List<MediaItem> matches=(List<MediaItem>)search.invoke(service,query);assertEquals(query,1,matches.size());assertEquals("v/parhizgar/20/72",matches.get(0).mediaId);
+    }
+  }
   @Test public void downloadsRequireEveryVerseAndExplicitPin()throws Exception{
     String r=children("reciters").get(0).mediaId.substring(5);
     assertTrue(children("downloads").isEmpty());

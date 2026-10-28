@@ -1,3 +1,4 @@
+import {nativeCommand,nativeRecitationAvailable} from './native-recitation'
 export type VerseAddress = { s: number; a: number; pos: number }
 const integer = (value: string | null | undefined, max: number) => {
   const n = Number(value)
@@ -39,6 +40,7 @@ export function readingUrl(current: string, mode: 'flow' | 'mushaf', surah: numb
   return url
 }
 export function writeVerseAddress(address: VerseAddress, replace = false) {
+  if(nativeRecitationAvailable())void nativeCommand({op:"library",action:"reading",s:address.s,a:address.a}).catch(()=>{})
   const url = readingUrl(window.location.href, 'flow', address.s, 1, process.env.NEXT_PUBLIC_DESKTOP === '1')
   if (process.env.NEXT_PUBLIC_DESKTOP === '1') {
     url.searchParams.set('a', String(address.a))

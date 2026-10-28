@@ -3,8 +3,9 @@ import {t,uiDirection} from '@/lib/i18n'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Pause, Play, SkipBack, SkipForward, SlidersHorizontal, X, Download, Check, LoaderCircle, Trash2 } from 'lucide-react'
+import CarStudyControls from './CarStudyControls'
 import ResourcePicker from './ResourcePicker'
-import {NativeRecitationAudio,nativeRecitationAvailable,cacheNativeVerse,nativeCommand} from '@/lib/native-recitation'
+import {NativeRecitationAudio,nativeRecitationAvailable,cacheNativeVerse,nativeCommand,subscribeNativePlaybackState,type CarOptions} from '@/lib/native-recitation'
 import { useRecitationMediaSession } from './useRecitationMediaSession'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import type { SurahMeta } from '@/lib/quran'
@@ -19,6 +20,7 @@ const repeatOptions = [1,2,3,5,10,0]
 export default function RecitationPlayer({ onNativeActive,playRequest=0,onStatusChange,controlsVisible=true, open, surah, startAyah, onClose, onFollow, selectedAyah, onPlaying, onNextSurah, previousSurahVerses }: Props) {
   const audio = useRef<HTMLAudioElement|null>(null)
   const nativeAudio=useRef<NativeRecitationAudio|null>(null)
+  const nativeOptions=useRef<CarOptions|null>(null)
   const nativeAdopting=useRef<{r:string;s:number;a:number}|null>(null)
   const nativePositionCallback=useRef<(p:{r:string;s:number;a:number},state:{playing:boolean;speed:number})=>void>(()=>{})
   const attachAudio=useCallback((element:HTMLAudioElement|null)=>{
@@ -83,7 +85,12 @@ export default function RecitationPlayer({ onNativeActive,playRequest=0,onStatus
   const saveSetting = (key: string, value: number | boolean | string) => {
     try { const saved = JSON.parse(localStorage.getItem('quran-recitation-settings') || '{}'); localStorage.setItem('quran-recitation-settings', JSON.stringify({ ...saved, [key]: value })) } catch {}
   }
-  useEffect(() => { if (audio.current) audio.current.playbackRate = speed }, [speed])
+  useEffect(()=>subscribeNativePlaybackState(state=>{
+    if(!state.options)return
+    nativeOptions.current=state.options
+    setSpeed(state.options.speed);setVerseRepeats(state.options.verse);setSurahRepeats(state.options.surah)
+  }),[])
+  useEffect(() => { if(nativeAudio.current&&(!nativeOptions.current||nativeOptions.current.speed===speed))return;if (audio.current) audio.current.playbackRate = speed }, [speed])
   useEffect(() => {
     const starting=open && !wasOpen.current
     wasOpen.current=open
@@ -137,7 +144,7 @@ export default function RecitationPlayer({ onNativeActive,playRequest=0,onStatus
   }, [open, surah.n, positionSurah, position.ayah, retry,reciter.id])
   const currentSpeed = useRef(speed); currentSpeed.current = speed
   // Same verse repeats do not reload or download its audio.
-  useEffect(()=>{nativeAudio.current?.configure(verseRepeats,surahRepeats)},[verseRepeats,surahRepeats])
+  useEffect(()=>{const o=nativeOptions.current;if(o&&(o.verse!==verseRepeats||o.surah!==surahRepeats))nativeAudio.current?.configure(verseRepeats,surahRepeats)},[verseRepeats,surahRepeats])
   const ended = () => {
     if(nativeAudio.current)return
     if(!background && document.hidden){intent.current=false;setPlaying(false);return}
@@ -238,9 +245,9 @@ export default function RecitationPlayer({ onNativeActive,playRequest=0,onStatus
       <DialogHeader><DialogTitle>{t("ui.2ea8f68e72")}{' '}{surah.fa}</DialogTitle><DialogDescription>{reciter.name}{' '}{t("ui.328fa816d6")}</DialogDescription></DialogHeader>
       <div><span className="text-xs">{t("ui.48288575ed")}</span><ResourcePicker label={t("ui.48288575ed")} ids={RECITERS.map(item=>`reciter:${item.id}`)} value={`reciter:${reciter.id}`} onChange={id=>{const value=id.replace(/^reciter:/,'');setReciterId(value);saveSetting('reciter',value)}}/></div>
       <label>{t("ui.1dde68b6a8")}<select aria-label={t("ui.1dde68b6a8")} value={position.ayah} onChange={e=>move(Number(e.target.value))}>{Array.from({length:surah.vc},(_,i)=><option key={i+1} value={i+1}>{toFa(i+1)}</option>)}</select></label>
-      <label>{t("ui.991d782fda")}<select aria-label={t("ui.991d782fda")} value={speed} onChange={e=>{const n=Number(e.target.value);setSpeed(n);saveSetting('speed',n)}}>{[0.75,1,1.25,1.5,2].map(n=><option key={n} value={n}>{toFa(n)}×</option>)}</select></label>
-      <label>{t("ui.9645b5c54f")}<select aria-label={t("ui.9645b5c54f")} value={verseRepeats} onChange={e=>{const n=Number(e.target.value);setVerseRepeats(n);saveSetting('verseRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n?t("ui.d303a8c08f",{p0:(toFa(n))}):t("ui.12fab10c2c")}</option>)}</select></label>
-      <label>{t("ui.2cfa25518d")}<select aria-label={t("ui.2cfa25518d")} value={surahRepeats} onChange={e=>{const n=Number(e.target.value);setSurahRepeats(n);saveSetting('surahRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n?t("ui.d303a8c08f",{p0:(toFa(n))}):t("ui.12fab10c2c")}</option>)}</select></label>
+      <label>{t("ui.991d782fda")}<select aria-label={t("ui.991d782fda")} value={speed} onChange={e=>{const n=Number(e.target.value);setSpeed(n);saveSetting('speed',n)}}>{[0.75,1,1.25,1.5,2].map(n=><option key={n} value={n}>{n===1?t('auto.normalSpeed'):`${toFa(n)}×`}</option>)}</select></label>
+      <label>{t("ui.9645b5c54f")}<select aria-label={t("ui.9645b5c54f")} value={verseRepeats} onChange={e=>{const n=Number(e.target.value);setVerseRepeats(n);saveSetting('verseRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n===1?t('auto.noRepeat'):n===0?t('auto.forever'):t("ui.d303a8c08f",{p0:(toFa(n))})}</option>)}</select></label>
+      <label>{t("ui.2cfa25518d")}<select aria-label={t("ui.2cfa25518d")} value={surahRepeats} onChange={e=>{const n=Number(e.target.value);setSurahRepeats(n);saveSetting('surahRepeats',n)}}>{repeatOptions.map(n=><option key={n} value={n}>{n===1?t('auto.noRepeat'):n===0?t('auto.forever'):t("ui.d303a8c08f",{p0:(toFa(n))})}</option>)}</select></label>
       <label className="recitation-follow choice-row"><input type="checkbox" checked={follow} onChange={e=>{setFollow(e.target.checked);saveSetting('follow',e.target.checked)}}/>{t("ui.e3bdacb9c9")}</label>
       <label className="recitation-follow choice-row"><input type="checkbox" checked={background} onChange={e=>{setBackground(e.target.checked);saveSetting('background',e.target.checked)}}/>{t("ui.f357dd405c")}</label>
       <div className="recitation-download">
@@ -250,6 +257,7 @@ export default function RecitationPlayer({ onNativeActive,playRequest=0,onStatus
         <small>{t("ui.27e353abc8")}</small>
         {notice&&<p role="status">{notice}</p>}
       </div>
+      <CarStudyControls s={surah.n} a={position.ayah} onNormal={()=>{setSpeed(1);setVerseRepeats(1);setSurahRepeats(1);saveSetting('speed',1);saveSetting('verseRepeats',1);saveSetting('surahRepeats',1)}}/>
       <a href={reciter.sourcePage} target="_blank" rel="noreferrer" className="recitation-source">{t("ui.bb4cb4db3d")}{' '}{reciter.source}</a>
     </DialogContent></Dialog>
   </>

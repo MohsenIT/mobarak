@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.20',date:'2026-10-28',title:'مطالعه و حفظ در خودرو',changeKinds:['feature','fix','feature'],changes:[
+    'ادامه از محل مطالعهٔ گوشی، آیه‌های دلخواه، فهرست شخصی سوره‌ها، بازهٔ حفظ با مکث و تایمر توقف به پخش خودرو اضافه شد.',
+    'انتخاب سرعت و تکرار روشن‌تر شد و دکمهٔ جداگانه برای بازگشت به سرعت معمولی و پخش بدون تکرار در دسترس است.',
+    'ترجمهٔ صوتی فولادوند و مکارم به‌صورت اختیاری پس از هر آیه پخش می‌شود و دریافت جداگانه برای استفادهٔ آفلاین دارد.',
+  ],
+},{
   version:'0.4.19',date:'2026-10-27',title:'دنبال‌کردن تمام آیه هنگام پخش',changeKinds:['fix'],changes:[
     'قابل‌دیدن‌بودنِ تمام آیه و ترجمهٔ نمایش‌داده‌شده بررسی می‌شود؛ آیهٔ نیمه‌پنهان با کمترین حرکت نمایان می‌شود و آیهٔ کاملاً بیرون صفحه از بالا نشان داده می‌شود.',
   ],

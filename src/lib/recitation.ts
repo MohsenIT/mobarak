@@ -1,7 +1,10 @@
+import translationAudio from '../../public/data/translation-audio-sources.json'
 import sources from '../../public/data/recitation-sources.json'
 /** Verified ayah sources; each recording keeps its own cache identity. */
 export const RECITERS=sources as {id:string;name:string;source:string;sourcePage:string;tanzilDirectory?:string}[]
 export type Reciter = typeof RECITERS[number]
+export const AUDIO_TRANSLATIONS=translationAudio as (Reciter&{language:string})[]
+export const AUDIO_SOURCES=[...RECITERS,...AUDIO_TRANSLATIONS]
 export const RECITER: Reciter = RECITERS[0]
 export const AUDIO_ORIGIN = 'https://verses.quran.com'
 export function recitationSourceUrl(surah:number,ayah:number,reciter:Reciter=RECITER) {

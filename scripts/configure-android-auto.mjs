@@ -6,6 +6,8 @@ const repo=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..')
 export async function configureAndroidAuto(root=repo,android=path.join(root,'src-tauri/gen/android')){
   const app=path.join(android,'app'),main=path.join(app,'src/main')
   const reciters=JSON.parse(await readFile(path.join(root,'public/data/recitation-sources.json'),'utf8'))
+  const translationAudio=JSON.parse(await readFile(path.join(root,'public/data/translation-audio-sources.json'),'utf8'))
+  if(translationAudio.some(item=>!/^translation-[a-z0-9-]+$/.test(item.id)||!/^fa\.[a-z]+$/.test(item.tanzilDirectory)))throw Error('Invalid translation audio source')
   const {surahs}=JSON.parse(await readFile(path.join(root,'public/data/meta.json'),'utf8'))
   if(surahs.length!==114 || surahs.reduce((n,s)=>n+s.vc,0)!==6236)throw Error('Invalid Quran catalogue')
   if(new Set(reciters.map(r=>r.id)).size!==reciters.length || reciters.some(r=>!/^[-a-z0-9]+$/.test(r.id) || (r.tanzilDirectory&&!/^[a-z0-9]+$/.test(r.tanzilDirectory))))throw Error('Invalid recitation source')
@@ -21,6 +23,7 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
     const m=JSON.parse(await readFile(path.join(root,'src/messages',f),'utf8'))
     labels[f.slice(0,-5)]={app:brand.APP_NAME,verse:m['ui.b1b168c791'],resume:m['auto.resume'],home:m['auto.home'],library:m['auto.library'],chooseVerse:m['auto.chooseVerse'],chooseReciter:m['auto.chooseReciter'],downloads:m['auto.downloads'],surahs:m['ui.a1e320e16e'],recent:m['ui.d8c76d09ca'],repeatVerse:m['ui.9645b5c54f'],repeatSurah:m['ui.2cfa25518d'],speed:m['ui.991d782fda']}
   }
+  for(const [lang,messages] of Object.entries(labels)){const full=JSON.parse(await readFile(path.join(root,'src/messages',lang+'.json'),'utf8'));for(const [key,value] of Object.entries(full))if(key.startsWith('auto.'))messages[key.slice(5)]=value}
   await mkdir(path.join(main,'assets'),{recursive:true})
   // Tauri init regenerates placeholder launchers; install the actual app branding afterwards.
   for(const density of ['mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi']){
@@ -35,9 +38,9 @@ export async function configureAndroidAuto(root=repo,android=path.join(root,'src
   const values=path.join(main,'res/values');await mkdir(values,{recursive:true});
   await writeFile(path.join(values,'quran_launcher_background.xml'),'<?xml version="1.0" encoding="utf-8"?><resources><color name="quran_launcher_background">#fbf7e7</color></resources>\n');
   for(const surah of surahs){const name=String(surah.n).padStart(3,'0')+'.png';await mkdir(path.join(main,'assets/surah-artwork'),{recursive:true});await copyFile(path.join(root,'public/images/surahs',name),path.join(main,'assets/surah-artwork',name))}
-  await writeFile(path.join(main,'assets/quran-auto.json'),JSON.stringify({reciters,surahs,labels,numberingSystems:JSON.parse(await readFile(path.join(root,'src/messages/numbering-systems.json'),'utf8')).languages}))
+  await writeFile(path.join(main,'assets/quran-auto.json'),JSON.stringify({reciters,translationAudio,surahs,labels,numberingSystems:JSON.parse(await readFile(path.join(root,'src/messages/numbering-systems.json'),'utf8')).languages}))
   const java=path.join(main,'java/app/quranmubarak/reader/auto');await mkdir(java,{recursive:true})
-  for(const file of ['QuranCarService.java','QuranAudioBridge.java','QuranArtworkProvider.java'])await copyFile(path.join(root,'android-auto',file),path.join(java,file))
+  for(const file of ['QuranCarService.java','QuranAudioBridge.java','QuranArtworkProvider.java','QuranCarLibrary.java','QuranVerseMediaSourceFactory.java'])await copyFile(path.join(root,'android-auto',file),path.join(java,file))
   const activity=path.join(main,'java/app/quranmubarak/reader/MainActivity.kt')
   let kotlin=await readFile(activity,'utf8')
   kotlin=kotlin.replace(/\s*\/\/ quran-audio:start[\s\S]*?\/\/ quran-audio:end/g,'')

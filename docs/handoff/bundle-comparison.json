@@ -1,0 +1,282 @@
+{
+  "base": "b2ec5196418b88050cb58570dfd344d777e9d8a0",
+  "initialTree": "clean",
+  "files": [
+    {
+      "path": "android-auto/QuranAudioBridge.java",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "android-auto/QuranCarLibrary.java",
+      "action": "restored-new"
+    },
+    {
+      "path": "android-auto/QuranCarService.java",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "android-auto/QuranVerseMediaSourceFactory.java",
+      "action": "restored-new"
+    },
+    {
+      "path": "android-auto/tests/QuranCarNavigationTest.java",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "docs/android-auto.md",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "public/data/translation-audio-sources.json",
+      "action": "restored-new"
+    },
+    {
+      "path": "scripts/configure-android-auto.mjs",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/app/api/recitation/route.ts",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/app/globals.css",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/app/page.tsx",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/components/quran/CarStudyControls.tsx",
+      "action": "restored-new"
+    },
+    {
+      "path": "src/components/quran/CarStudySync.tsx",
+      "action": "restored-new"
+    },
+    {
+      "path": "src/components/quran/RecitationPlayer.tsx",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/lib/app-releases.ts",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/lib/car-library.ts",
+      "action": "restored-new"
+    },
+    {
+      "path": "src/lib/native-recitation.ts",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/lib/recitation.ts",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/lib/translation-audio.test.ts",
+      "action": "restored-new"
+    },
+    {
+      "path": "src/lib/verse-link.ts",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/am.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ar.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/az.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ber.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/bg.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/bn.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/bs.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/cs.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/de.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/dv.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/en.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/es.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/fa.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/fr.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ha.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/hi.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/id.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/it.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ja.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ko.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ku.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/language-names.json",
+      "action": "unchanged"
+    },
+    {
+      "path": "src/messages/languages.json",
+      "action": "unchanged"
+    },
+    {
+      "path": "src/messages/ml.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ms.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/nl.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/no.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/numbering-systems.json",
+      "action": "unchanged"
+    },
+    {
+      "path": "src/messages/pl.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ps.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/pt.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/regions.json",
+      "action": "unchanged"
+    },
+    {
+      "path": "src/messages/ro.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ru.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/sd.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/so.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/sq.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/sv.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/sw.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ta.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/tg.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/th.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/tr.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/tt.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ug.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/ur.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/uz.json",
+      "action": "restored-from-bundle"
+    },
+    {
+      "path": "src/messages/zh.json",
+      "action": "restored-from-bundle"
+    }
+  ],
+  "excluded": [
+    "full-working-tree.patch",
+    "untracked-wip"
+  ]
+}

@@ -1588,3 +1588,10 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .resource-filter-chip[aria-pressed='true'] { background:var(--word-root); border-color:var(--sage); color:var(--ink); }
 .resource-filter-chip:focus-visible { outline:2px solid var(--sage); outline-offset:2px; }
 .resource-picker-dialog [data-slot='dialog-header'] { text-align:start; padding-inline-end:24px; }
+
+.car-study-controls { display:grid; gap:10px; border-top:1px solid var(--line); padding-top:12px; font-size:12px; }
+.car-study-controls summary { cursor:pointer; font-weight:600; padding:6px 0; }
+.car-study-controls li { display:flex; align-items:center; gap:6px; margin-block:6px; }
+.car-study-controls li > span { flex:1; min-width:0; }
+.car-playlist-editor { display:grid; gap:8px; }
+.car-playlist-editor input { width:100%; min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:8px; }

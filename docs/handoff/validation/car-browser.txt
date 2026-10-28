@@ -1,0 +1,1 @@
+PASS: reading is passive; favorite and playlist CRUD/reorder are passive; practice, timer, translation download, reset and native state sync; HTML fallback.

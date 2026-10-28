@@ -1,16 +1,21 @@
 import {RECITERS} from './recitation'
 export type NativePosition={r:string;s:number;a:number}
-export type NativePlaybackState={type:'state';connected:boolean;playing:boolean;playWhenReady:boolean;ready:boolean;ended:boolean;position:number;duration:number;speed:number;item?:string;error?:string}
+export type CarOptions={speed:number;verse:number;surah:number;pause:number;rangeSurah:number;from:number;to:number;sleepDeadline:number;sleepAtEnd:boolean;translationAudio:string}
+export type NativePlaybackState={type:'state';connected:boolean;playing:boolean;playWhenReady:boolean;ready:boolean;ended:boolean;position:number;duration:number;speed:number;item?:string;error?:string;options?:CarOptions}
 type Bridge={postMessage:(message:string)=>void;onmessage:((event:{data:string})=>void)|null}
 declare global{interface Window{QuranNativeAudio?:Bridge}}
 let serial=0,bound:Bridge|undefined,connected=false
+const libraryListeners=new Set<(data:unknown)=>void>()
+export const subscribeNativeLibrary=(listener:(data:unknown)=>void)=>{libraryListeners.add(listener);return()=>{libraryListeners.delete(listener)}}
 const pending=new Map<number,{resolve:()=>void;reject:(error:Error)=>void;timer:ReturnType<typeof setTimeout>}>(),listeners=new Set<(state:NativePlaybackState)=>void>()
+export const subscribeNativePlaybackState=(listener:(state:NativePlaybackState)=>void)=>{listeners.add(listener);return()=>{listeners.delete(listener)}}
 export const nativeRecitationAvailable=()=>typeof window!=='undefined'&&typeof window.QuranNativeAudio?.postMessage==='function'
 export function nativeCommand(command:Record<string,unknown>):Promise<void>{
  const bridge=typeof window!=='undefined'?window.QuranNativeAudio:undefined
  if(!bridge)return Promise.reject(new Error('native-unavailable'))
  if(bound!==bridge){bound=bridge;connected=false;bridge.onmessage=event=>{
   let data:Record<string,unknown>;try{data=JSON.parse(event.data)}catch{return}
+  if(data.type==='library'){for(const listener of libraryListeners)listener(data.data);return}
   if(data.type==='state'){connected=data.connected===true;for(const listener of listeners)listener(data as unknown as NativePlaybackState);return}
   const p=pending.get(Number(data.id));if(!p)return
   clearTimeout(p.timer);pending.delete(Number(data.id));if(data.error)p.reject(new Error(String(data.error)));else p.resolve()
