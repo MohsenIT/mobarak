@@ -12,6 +12,7 @@ import {RESOURCES} from '@/lib/resources'
 import ReadingScreenSettings from './ReadingScreen'
 import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
+import DownloadsManager from './DownloadsManager'
 import SurahShortcuts from './SurahShortcuts'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
@@ -54,6 +55,7 @@ const TABS = [
   { id: 'juz', label: t("ui.87453fc867") },
   { id: 'recent', label: t("ui.c6bdd72afe") },
   { id: 'settings', label: t("ui.6badcac8c1") },
+  { id: 'downloads', label: t('downloads.manage') },
 ] as const
 
 
@@ -147,7 +149,7 @@ export default function NavDrawer(props: Props) {
         <details className="px-4 pb-3 text-xs leading-7"><summary>{t("ui.f4bf9b146f")}</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl><p>{t("ui.a8175202e6")}</p></details>
         </>}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
-          {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'settings' : t.id === 'surah' || t.id === 'juz').map(t => (
+          {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'settings' || t.id === 'downloads' : t.id === 'surah' || t.id === 'juz').map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
               {tText(t.label)}
             </button>
@@ -250,12 +252,14 @@ export default function NavDrawer(props: Props) {
             </div>
           )}
 
+          {tab === 'downloads' && <DownloadsManager meta={meta}/>}
           {tab === 'settings' && (
             <div className="p-4 flex flex-col gap-6">
               <LanguageSettings translator={props.translator} onTranslation={props.onTranslator}/>
               <CalendarSettings/>
               <ReadingScreenSettings />
               <UpdateSettings />
+              <button type="button" className="chip min-h-11" onClick={()=>setTab('downloads')}>{t('downloads.manage')}</button>
               <OfflineSettings />
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>

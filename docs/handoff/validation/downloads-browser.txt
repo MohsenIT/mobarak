@@ -1,0 +1,3 @@
+BUTTONS [ 'منبع', '…بیشتر' ]
+PASS preview has no full request, expands inline and collapses.
+PASS downloads page lists partial book/audio downloads and deletes each separately; unrelated data kept.

@@ -74,3 +74,25 @@ export async function downloadRecitation(s: number, total: number, signal: Abort
   for (let a=1; a<=total; a++) { signal.throwIfAborted(); await getVerseAudio(s,a,signal,true,reciter); progress(a) }
   await navigator.storage?.persist?.().catch(() => false)
 }
+
+export interface DownloadedRecitation {reciterId:string;surah:number;count:number;bytes:number}
+/** Cursor aggregation avoids retaining every downloaded audio Blob in memory. */
+export async function listDownloadedRecitations():Promise<DownloadedRecitation[]>{
+ const db=await database()
+ try{return await new Promise((resolve,reject)=>{
+  const rows=new Map<string,DownloadedRecitation>(),tx=db.transaction('verses','readonly')
+  const request=tx.objectStore('verses').openCursor()
+  request.onsuccess=()=>{
+   const cursor=request.result
+   if(!cursor)return
+   const item=cursor.value as AudioEntry
+   if(item.pinned){
+    const reciterId=item.id.slice(0,item.id.lastIndexOf(':',item.id.lastIndexOf(':')-1)),id=`${reciterId}:${item.surah}`
+    const row=rows.get(id)??{reciterId,surah:item.surah,count:0,bytes:0}
+    row.count++;row.bytes+=item.audio.size;rows.set(id,row)
+   }
+   cursor.continue()
+  }
+  tx.oncomplete=()=>resolve([...rows.values()]);tx.onabort=tx.onerror=()=>reject(tx.error)
+ })}finally{db.close()}
+}

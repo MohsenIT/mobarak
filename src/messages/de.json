@@ -697,5 +697,10 @@
   "calendar.indian": "Indian national",
   "calendar.japanese": "Japanese era",
   "calendar.example": "Example: {date}",
-  "mizan.excerpt": "Auszug aus Al-Mizan"
+  "mizan.excerpt": "Auszug aus Al-Mizan",
+  "downloads.manage": "Manage downloads",
+  "downloads.empty": "No optional downloads saved yet.",
+  "downloads.files": "{count} of {total} files",
+  "downloads.bundled": "Quran text and essential app data are kept. Sizes refer to stored files.",
+  "downloads.failed": "Could not read or remove downloads. Please retry."
 }

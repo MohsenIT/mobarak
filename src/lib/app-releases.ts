@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.24',date:'2026-10-28',title:'مدیریت دانلودها و بازکردن تفسیر',changeKinds:['feature','improvement','improvement'],changes:[
+    'بخش مدیریت دانلودها، کتاب‌ها و ترجمه‌ها و صوت‌های ذخیره‌شده را با حجم و تعداد فایل نشان می‌دهد و حذف جداگانه دارد.',
+    'المیزان ابتدا در سه خط نمایش داده می‌شود؛ با بیشتر و فلش پایین، ادامهٔ متن همان‌جا باز می‌شود.',
+    'عکس ۹ قاری دیگر اضافه شد؛ همهٔ قاری‌های فعلی عکس دارند.',
+  ],
+},{
   version:'0.4.23',date:'2026-10-28',title:'دیدن انتهای سوره با پنل باز',changeKinds:['fix','fix','improvement'],changes:[
     'با بازشدن یا بزرگ‌شدن پنل پایین، پایان سوره و ترجمه و تفسیر آن بالای پنل قابل دیدن است؛ با بستن پنل فضای اضافه جمع می‌شود.',
     'اسکرول دستی در حالت صفحه‌ای، هنگام بارگذاری صفحه‌ها یا تغییر اندازهٔ پنل به انتخاب قبلی برنمی‌گردد.',

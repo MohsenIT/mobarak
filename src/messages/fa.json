@@ -697,5 +697,10 @@
   "calendar.indian": "ملی هند",
   "calendar.japanese": "دوره‌های ژاپنی",
   "calendar.example": "نمونه: {date}",
-  "mizan.excerpt": "بخشی از متن المیزان"
+  "mizan.excerpt": "بخشی از متن المیزان",
+  "downloads.manage": "مدیریت دانلودها",
+  "downloads.empty": "هنوز مورد اختیاری دانلود نشده است.",
+  "downloads.files": "{count} از {total} فایل",
+  "downloads.bundled": "متن قرآن و داده‌های ضروری برنامه حفظ می‌شوند. حجم‌ها مربوط به فایل‌های ذخیره‌شده‌اند.",
+  "downloads.failed": "خواندن یا حذف دانلودها ممکن نشد. دوباره تلاش کنید."
 }

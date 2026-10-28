@@ -697,5 +697,10 @@
   "calendar.indian": "الهندي الوطني",
   "calendar.japanese": "العصور اليابانية",
   "calendar.example": "مثال: {date}",
-  "mizan.excerpt": "مقتطف من نص الميزان"
+  "mizan.excerpt": "مقتطف من نص الميزان",
+  "downloads.manage": "إدارة التنزيلات",
+  "downloads.empty": "لا توجد تنزيلات اختيارية محفوظة بعد.",
+  "downloads.files": "{count} من {total} ملف",
+  "downloads.bundled": "يبقى نص القرآن وبيانات التطبيق الأساسية محفوظة. الأحجام تخص الملفات المخزنة.",
+  "downloads.failed": "تعذرت قراءة التنزيلات أو حذفها. حاول مجددًا."
 }

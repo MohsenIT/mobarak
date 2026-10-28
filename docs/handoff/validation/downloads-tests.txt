@@ -1,0 +1,208 @@
+bun test v1.3.4 (5eb2145b)
+
+src/lib/analysis.test.ts:
+(pass) root and form select different sets, word selects one location, verse selects all its words [0.52ms]
+(pass) missing form does not select unannotated words [0.06ms]
+(pass) each tab moves between its own units rather than changing the other selections [0.29ms]
+(pass) Alqa in Taha shows ilqa and selects only lqy in form IV [0.80ms]
+(pass) navigation separates a root from its repetitions and exposes bounded positions [0.38ms]
+(pass) verse and context navigation count units rather than every word [0.11ms]
+(pass) waw and stem have independent word-unit positions and repetitions [1.87ms]
+(pass) root neighbors follow the current occurrence rather than the first occurrence of that root [0.63ms]
+(pass) adjacent root navigation skips the same root and stops at the surah boundaries [0.07ms]
+
+src/lib/app-releases.test.ts:
+(pass) release history > every skipped release is retained, newest first, with numeric semver order [1.18ms]
+(pass) release history > parses legacy build-only responses and rejects malformed history [0.51ms]
+(pass) release history > typed icons preserve old text-only release payloads [0.05ms]
+(pass) release history > published versions are unique and newest first with nonempty change notes [0.14ms]
+
+src/lib/contexts.test.ts:
+(pass) every explicit source partition covers its surah exactly once [2.51ms]
+(pass) context boundaries follow the context column, not daily reading sections [0.09ms]
+(pass) whole-surah clarification and aggregate ranges retain their provenance [0.06ms]
+(pass) context navigation and highlighting stay within the provided boundaries [0.13ms]
+
+src/lib/dictation.test.ts:
+(pass) dictation inserts at selection without replacing unrelated text [0.15ms]
+(pass) speech uses a full locale and respects matching device region [1.80ms]
+
+src/lib/i18n.test.ts:
+(pass) language and translation contracts > language matching uses supported device language before unsupported fallbacks [0.48ms]
+(pass) language and translation contracts > all UI catalogues have the same keys and interpolation placeholders [215.76ms]
+(pass) language and translation contracts > reader labels are externalized instead of hardcoded in JSX [673.28ms]
+(pass) language and translation contracts > language names have a native and English label even when ICU lacks the locale [0.47ms]
+(pass) language and translation contracts > only registered translations can be restored from a link [0.18ms]
+(pass) language and translation contracts > translations preserve complete ordered source arrays and recorded empty verses [629.88ms]
+(pass) language and translation contracts > fallback stays Persian and substitution never injects markup [1.41ms]
+
+src/lib/locale-numbers.test.ts:
+(pass) UI numbers use explicit native digits and can be parsed back without changing addresses [1.56ms]
+
+src/lib/native-recitation.test.ts:
+(pass) native session identifiers accept known recordings and Quran locations only [1.13ms]
+(pass) native state drives audio events and ignores a stale item while a new selection is pending [8.29ms]
+
+src/lib/native-ui-language.test.ts:
+(pass) native menu language follows app selection before opening the audio player [1.45ms]
+
+src/lib/navigation.test.ts:
+(pass) surah search accepts Arabic names, diacritics and both digit sets [5.96ms]
+(pass) page and juz destinations are bounded and use the actual juz boundary [0.25ms]
+(pass) verse jumps support current surah, named references and explicit prefixes [1.29ms]
+(pass) one navigation field suggests named surahs, explicit references and numeric alternatives [2.15ms]
+(pass) common aliases rank before substring matches but retain useful alternatives [1.53ms]
+(pass) alternate names and opening phrases support Persian/Arabic spelling and verse references [12.73ms]
+(pass) compact commands accept attached or spaced Persian, Arabic and Latin digits [1.13ms]
+(pass) context commands use the recorded ranges and keep first and last alefs distinct [1.32ms]
+(pass) explicit cross-surah context/verse references and edge destinations are bounded [1.51ms]
+(pass) search navigation never intercepts ordinary words or standalone surah initials [0.24ms]
+
+src/lib/occurrence-context.test.ts:
+(pass) an opening word includes the preceding ayah and its marker [1.22ms]
+(pass) the full target verse remains available for horizontal reading [0.45ms]
+(pass) waw and stem targets stay distinct, and surah edges do not wrap [0.36ms]
+(pass) three occurrences in Taha 72 occupy one ayah row without losing locations [0.42ms]
+
+src/lib/quran-display.test.ts:
+(pass) the sakin-sin hamza seat retains its tooth in the Hafs display [0.10ms]
+(pass) unrelated hamza carriers and letters are not rewritten [0.02ms]
+(pass) the compatibility fix covers the same pattern across all 114 surahs [139.45ms]
+(pass) hidden pause signs do not leave whitespace inside selectable words [0.12ms]
+(pass) superscript alef and real yeh remain distinct in the reported Saffat verses [0.02ms]
+(pass) Quran letters and supported pronunciation marks are preserved across the corpus [229.13ms]
+(pass) the font placeholder characters are omitted without stripping real letters [0.19ms]
+(pass) all occurrences of the three audited placeholder glyphs are covered [91.26ms]
+(pass) optional meem annotations stay hidden throughout all surahs, preserving real meem [119.74ms]
+
+src/lib/quran-search-session.test.ts:
+(pass) multiple surahs constrain textual results together [117.44ms]
+(pass) same-root expansion uses attested roots and can find a different form within the scope [98.63ms]
+(pass) occurrence filter supports changing scope and toggling root vs lemma [18.38ms]
+(pass) attached pronouns match one lemma while independent waw remains separate [1.67ms]
+(pass) a directly typed root works without a seed verse, including spaced letters [17.40ms]
+(pass) direct lemma search groups inflections while keeping different lemmas separate [3.75ms]
+(pass) رحم does not invent a word from الجوارح مكلبين or other adjacent word edges [110.15ms]
+
+src/lib/quran-search.test.ts:
+(pass) search keys normalize Persian/Arabic forms, marks, wasla and presentation forms [0.16ms]
+(pass) a real Quran phrase accepts Persian letters and ignores diacritics [89.47ms]
+(pass) Uthmani small letters accept common modern spelling without changing original text [168.01ms]
+(pass) spaces inside and between words can be omitted or added [168.63ms]
+(pass) small typos and transpositions return nearby original verses with an explicit kind [651.13ms]
+(pass) verse count and optional scope are correct; noise and short queries do not match everything [40.15ms]
+(pass) search corpus preserves every canonical verse and word [79.62ms]
+(pass) long phrases are matched in full rather than silently truncated [0.34ms]
+(pass) search snippets detach corpus-tagged waw without changing canonical positions or lexical waw [2.65ms]
+(pass) a phrase starting after independent waw is exact, including omitted spaces [4.02ms]
+(pass) highlights select the matched stem and include waw only when it was queried [3.38ms]
+(pass) exact occurrences do not hide other literal occurrences within the same verse [41.76ms]
+(pass) partial matches and spelling tolerance can be controlled independently [54.24ms]
+(pass) default search includes literal partials but excludes spelling suggestions [72.96ms]
+
+src/lib/quran.test.ts:
+(pass) range comparison > counts words on each side, excludes roots present on only one side [1.03ms]
+(pass) range comparison > rejects empty complements and invalid ranges [0.13ms]
+(pass) range comparison > swapping complementary sections preserves connection strength [0.13ms]
+(pass) range comparison > real Maryam results have accurate disjoint occurrences and descending scores [8.82ms]
+(pass) morphology is per-word: علم contains both plain and intensified forms [7.47ms]
+
+src/lib/reading-visibility.test.ts:
+(pass) fully exposed selections do not move, including at the viewport edges [0.24ms]
+(pass) hidden and partially obscured selections align at the top with a reading gap [0.08ms]
+(pass) a bottom sheet and top bar define the exposed reading area, rather than the whole screen [0.06ms]
+(pass) a verse with its first word visible still moves when its end is covered [0.11ms]
+(pass) partly hidden verses move only to the nearest clear edge; fully visible verses stay still [0.05ms]
+(pass) a verse that cannot fit starts at the exposed top without changing font size [0.03ms]
+
+src/lib/recitation-proxy.test.ts:
+(pass) Tanzil audio endpoint > rejects unknown source and nonexistent ayah before any request [1.44ms]
+(pass) Tanzil audio endpoint > uses only the fixed Tanzil path and returns audio with native-client CORS [4.23ms]
+(pass) Tanzil audio endpoint > does not turn an upstream HTML error into saved audio [0.18ms]
+(pass) new reciters still use fixed catalogue directories and reject traversal [0.40ms]
+
+src/lib/recitation.test.ts:
+(pass) recitation playback > uses Minshawi verse URLs supplied by provider [0.08ms]
+(pass) recitation playback > Parhizgar uses Tanzil source and the download-safe endpoint [0.02ms]
+(pass) recitation playback > repeats each verse three times and the whole surah twice, then stops [0.07ms]
+(pass) recitation playback > infinite verse repeat stays on that verse [0.01ms]
+(pass) recitation playback > infinite surah repeat wraps to first verse [0.01ms]
+(pass) recitation playback > ordinary playback stops at end [0.01ms]
+(pass) each additional Tanzil reciter has a separate proxy and cache identity [0.20ms]
+
+src/lib/resources.test.ts:
+(pass) resource catalogue > all selectable reciters and translations have unique profiles [0.30ms]
+(pass) resource catalogue > search combines country nationality style and author without matching a different reciter [1.30ms]
+(pass) resource catalogue > language kind title and era remain searchable [5.28ms]
+(pass) portraits are bundled and the two original reciters have photographs [0.17ms]
+
+src/lib/search-facets.test.ts:
+(pass) facet OR within one group and AND across groups applies to the same matched word [0.17ms]
+(pass) facet counts include matching occurrences and leave alternatives selectable [0.15ms]
+
+src/lib/search-form-labels.test.ts:
+(pass) knowledge facets show علم, تعليم and تعلّم with the technical form in the description [0.38ms]
+(pass) unlisted weak-root forms use the technical name instead of a conjugated verb [0.04ms]
+(pass) multi-root searches show more than one family example rather than labeling every result as one root [0.11ms]
+(pass) دبر families use verbal nouns, not the conjugated verbs in the lemma facet [0.06ms]
+
+src/lib/search-link.test.ts:
+(pass) short search URLs omit defaults and remove reading/refresh parameters [0.93ms]
+(pass) all search settings and multiple facets round trip [0.40ms]
+(pass) occurrence links preserve lemma/form identity including prefix selection [0.50ms]
+(pass) invalid destinations are ignored and reading links shed search state [0.35ms]
+(pass) relative navigation commands keep their surah context when shared [0.06ms]
+
+src/lib/search-suggestions.test.ts:
+(pass) text autocomplete suggests attested Arabic words from partial input [4.86ms]
+(pass) phrase completions preserve the actual adjacent words and selected surah scope [5.36ms]
+(pass) root and lemma suggestions stay Arabic and support a single initial letter [11.96ms]
+
+src/lib/study.test.ts:
+(pass) personal boundaries stay contiguous and source stays immutable [1.75ms]
+(pass) splits keep IDs stable and merging carries notes/explanations without losing content [0.52ms]
+(pass) notes are independent single anchors and malformed backups are rejected [1.70ms]
+
+src/lib/tahqiq-format.test.ts:
+(pass) vocalized Quran quotes are separated from references and Persian translation [0.90ms]
+(pass) conservative fallback preserves prose and quoted words without a citation [0.11ms]
+(pass) real APK text remains byte-for-byte reconstructable after formatting [0.33ms]
+(pass) formatting preserves every original and supplemental Persian definition [66.45ms]
+
+src/lib/translation-loading.test.ts:
+(pass) source loading respects ayah offsets, source identity and retry after failure [12.88ms]
+
+src/lib/verse-link.test.ts:
+(pass) verse links accept surah, verse and optional word [0.21ms]
+(pass) readable verse paths and legacy query links identify the same word [0.09ms]
+(pass) canonical reading links consume refresh tokens and clear stale verse addresses [0.61ms]
+(pass) native reading addresses stay on the bundled entry point without server rewrites [0.06ms]
+(pass) short paths are canonical and full paths remain compatible [0.09ms]
+
+src/lib/word-parts.test.ts:
+(pass) only corpus-tagged waw is detachable; original text remains intact [0.29ms]
+(pass) amma and wa-amma share occurrences, while waw has independent occurrences and navigation [0.21ms]
+(pass) Taha ma occurrences include independent and prefixed ma [1.10ms]
+(pass) lemma repetitions include ala with attached pronouns, without merging unrelated words [0.98ms]
+
+src/lib/translation-audio.test.ts:
+(pass) recorded translations have separate identities and fixed verified Tanzil directories [0.20ms]
+(pass) translation proxy accepts catalogue IDs and rejects arbitrary audio destinations [1.05ms]
+
+src/lib/downloads.test.ts:
+(pass) partial downloads use actual cache entries; removal clears duplicate copies but preserves Quran data [1.73ms]
+
+src/lib/calendar.test.ts:
+(pass) calendar policy honours explicit device calendars then app language and territory [1.55ms]
+(pass) publication dates convert correctly, never change the source day, and allow manual override [2.53ms]
+
+src/lib/mizan.test.ts:
+(pass) Mizan covers every canonical ayah with unchanged, hashed source-linked ranges [301.88ms]
+(pass) commentary requests are bounded and a failed fetch can be retried [1.32ms]
+(pass) all bundled openings are exact source excerpts and cover every ayah without the full download [236.60ms]
+(pass) small source openings load independently when summary is absent and never fetch full commentary [1.33ms]
+
+ 140 pass
+ 0 fail
+ 1505440 expect() calls
+Ran 140 tests across 31 files. [6.26s]
