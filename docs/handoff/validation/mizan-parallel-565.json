@@ -1,0 +1,32 @@
+{
+  "reviewedAyahs": 565,
+  "remainingAyahs": 5671,
+  "previousReviewedAyahs": 179,
+  "addedAyahs": 386,
+  "newSurahs": [
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91
+  ],
+  "writers": 5,
+  "independentlyComparedNewAyahs": 386,
+  "corrections": [
+    "78:33 unsupported virginity claim removed",
+    "80:3 possible existing purification restored",
+    "80:20 apparent contextual interpretation restored",
+    "81:4 tentative metaphor restored"
+  ],
+  "provenanceValidatorPassed": true,
+  "paidCalls": 0
+}

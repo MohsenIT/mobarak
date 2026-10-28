@@ -1,0 +1,7 @@
+PASS /s/20 translated=false: final content reachable above normal panel.
+page.waitForFunction: Timeout 5000ms exceeded.
+    at checkEnd (/workspace/quran-vajeh/scripts/verify-reader-panel-space.cjs:22:16)
+    at /workspace/quran-vajeh/scripts/verify-reader-panel-space.cjs:46:10 {
+  log: [],
+  name: 'TimeoutError'
+}

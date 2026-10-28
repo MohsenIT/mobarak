@@ -1,0 +1,16 @@
+PASS /s/20 translated=false: final content reachable above normal panel.
+PASS /s/20 translated=false: final content reachable above expanded panel.
+PASS /s/20 translated=false: final content reachable above minimized panel.
+PASS /s/20: closing panel removes reserve; final gap 35px; no page errors.
+PASS /p/604 translated=false: final content reachable above normal panel.
+PASS /p/604 translated=false: final content reachable above expanded panel.
+PASS /p/604 translated=false: final content reachable above minimized panel.
+PASS /p/604: closing panel removes reserve; final gap 65px; no page errors.
+PASS /s/114 translated=true: final content reachable above normal panel.
+PASS /s/114 translated=true: final content reachable above expanded panel.
+PASS /s/114 translated=true: final content reachable above minimized panel.
+PASS /s/114: closing panel removes reserve; final gap 69px; no page errors.
+PASS /p/604 translated=true: final content reachable above normal panel.
+PASS /p/604 translated=true: final content reachable above expanded panel.
+PASS /p/604 translated=true: final content reachable above minimized panel.
+PASS /p/604: closing panel removes reserve; final gap 110px; no page errors.

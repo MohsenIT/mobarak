@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.23',date:'2026-10-28',title:'دیدن انتهای سوره با پنل باز',changeKinds:['fix','fix','improvement'],changes:[
+    'با بازشدن یا بزرگ‌شدن پنل پایین، پایان سوره و ترجمه و تفسیر آن بالای پنل قابل دیدن است؛ با بستن پنل فضای اضافه جمع می‌شود.',
+    'اسکرول دستی در حالت صفحه‌ای، هنگام بارگذاری صفحه‌ها یا تغییر اندازهٔ پنل به انتخاب قبلی برنمی‌گردد.',
+    '۳۸۶ خلاصهٔ تازهٔ المیزان نوشته و بازبینی شد؛ مجموع خلاصه‌های آماده به ۵۶۵ آیه رسید.',
+  ],
+},{
   version:'0.4.22',date:'2026-10-28',title:'المیزان پس از ترجمهٔ هر آیه',changeKinds:['feature','feature','feature'],changes:[
     'بخشی از ابتدای متن المیزان برای همهٔ آیه‌ها همراه برنامه و بدون دانلود جداگانه در دسترس است؛ مدخل‌های مشترک با بازهٔ آیات مشخص شده‌اند.',
     'خلاصه‌های بازبینی‌شده به‌تدریج جای گزیدهٔ متن را می‌گیرند و با برچسب هوش مصنوعی نمایش داده می‌شوند؛ هنوز برای همهٔ آیات آماده نیستند.',
