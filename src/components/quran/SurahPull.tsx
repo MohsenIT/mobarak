@@ -18,6 +18,7 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
 }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [pull, setPull] = useState(0)
+  const [wheelPull, setWheelPull] = useState(false)
   const [previous, setPrevious] = useState(true)
   const [settling, setSettling] = useState(false)
   const [committing, setCommitting] = useState(false)
@@ -72,10 +73,17 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
     let claimed = false
     let busy = false
     let suppressClickUntil = 0
+    let wheelEdge = 0
+    let lastWheel = 0
+    let wheelArmed = false
+    let wheelIdle: ReturnType<typeof setTimeout> | undefined
+    let wheelReset: ReturnType<typeof setTimeout> | undefined
     const reset = () => { start = null; distance = 0; claimed = false; setSettling(true); setPull(0) }
     const down = (event: TouchEvent) => {
       if (busy) return
       if (event.touches.length !== 1) { reset(); return }
+      clearTimeout(wheelIdle); clearTimeout(wheelReset); wheelEdge = 0; wheelArmed = false
+      setWheelPull(false)
       const touch = event.touches[0]
       const top = element.scrollTop <= 1
       const bottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 2
@@ -120,14 +128,48 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
         }
       }, reduced ? 0 : 240)
     }
+    // A burst reaching the edge only stops there. Require a fresh burst after
+    // a pause; inertial wheel events must never carry the reader into a surah.
+    const wheel = (event: WheelEvent) => {
+      if (busy || event.ctrlKey || Math.abs(event.deltaX) > Math.abs(event.deltaY) || !event.deltaY) return
+      if (event.target instanceof Element && event.target.closest('input,textarea,select,[contenteditable="true"]')) return
+      const now = performance.now()
+      const direction = event.deltaY < 0 ? 1 : -1
+      const edge = direction > 0 ? element.scrollTop <= 1 : element.scrollTop + element.clientHeight >= element.scrollHeight - 2
+      const available = direction > 0 ? surah > 1 : surah < 114
+      clearTimeout(wheelIdle)
+      if (!edge || !available) {
+        wheelEdge = 0; wheelArmed = false; reset(); return
+      }
+      if (event.cancelable) event.preventDefault()
+      if (wheelEdge !== direction) {
+        wheelEdge = direction; wheelArmed = false; distance = 0; setPull(0)
+      } else if (!wheelArmed && now - lastWheel >= 280) {
+        wheelArmed = true
+      }
+      lastWheel = now
+      clearTimeout(wheelReset)
+      wheelReset = setTimeout(() => { if (!busy) { wheelEdge = 0; wheelArmed = false; reset() } }, 1200)
+      if (!wheelArmed) return
+      setWheelPull(true); setPrevious(direction > 0); setSettling(false)
+      const pixels = Math.abs(event.deltaY) * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? element.clientHeight : 1)
+      distance = direction * Math.min(THRESHOLD, Math.abs(distance) + Math.min(60, pixels / 2))
+      claimed = true; setPull(distance)
+      // Commit only once this deliberate gesture stops. Reversing or leaving
+      // the edge before then cancels it; partial progress expires automatically.
+      if (Math.abs(distance) >= THRESHOLD) wheelIdle = setTimeout(end, 180)
+    }
     const cancel = () => { if (!busy) reset() }
     const click = (event: MouseEvent) => { if (claimed || busy || Date.now() < suppressClickUntil) { event.preventDefault(); event.stopPropagation() } }
+    element.addEventListener('wheel', wheel, { passive: false })
     element.addEventListener('touchstart', down, { passive: true })
     element.addEventListener('touchmove', move, { passive: false })
     element.addEventListener('touchend', end)
     element.addEventListener('touchcancel', cancel)
     element.addEventListener('click', click, true)
     return () => {
+      clearTimeout(wheelIdle); clearTimeout(wheelReset)
+      element.removeEventListener('wheel', wheel)
       element.removeEventListener('touchstart', down); element.removeEventListener('touchmove', move)
       element.removeEventListener('touchend', end); element.removeEventListener('touchcancel', cancel)
       element.removeEventListener('click', click, true)
@@ -135,13 +177,13 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
   }, [enabled, ready, surah])
   const target = surah + (previous ? -1 : 1)
   const progress = Math.min(1, Math.abs(pull) / THRESHOLD)
-  const offset = committing ? pull : Math.sign(pull) * Math.min(180, Math.abs(pull) * 0.65)
+  const offset = wheelPull ? 0 : committing ? pull : Math.sign(pull) * Math.min(180, Math.abs(pull) * 0.65)
   return <div className="surah-pull-shell flex-1 min-h-0 relative overflow-hidden">
     {[surah - 1, surah + 1].filter(n => n >= 1 && n <= 114).map(n => {
       const isPrevious = n < surah
       const active = n === target
       return <div key={n} data-preview-surah={n} aria-hidden="true" className={`surah-pull-preview ${isPrevious ? 'surah-pull-previous' : 'surah-pull-next'}`}
-        style={{ opacity: active ? progress : 0, transition: settling ? 'opacity 240ms ease, transform 240ms cubic-bezier(.22,.68,0,1)' : 'none', transform: `translateY(calc(${isPrevious ? '-100%' : '100%'} + ${active ? offset : 0}px))` }}>
+        style={{ opacity: !wheelPull && active ? progress : 0, transition: settling ? 'opacity 240ms ease, transform 240ms cubic-bezier(.22,.68,0,1)' : 'none', transform: `translateY(calc(${isPrevious ? '-100%' : '100%'} + ${active ? offset : 0}px))` }}>
         <div className="surah-pull-preview-surface">
           {neighbors[n] && <FlowSurface><AdjacentFlowPage sm={meta[n - 1]} surah={neighbors[n]} trans={translations[n] ?? null} showTrans={showTrans} translator={translator} fontSize={fontSize} selection={null} highlightRoot={null} flash={null} onWordTap={ignoreWordTap} /></FlowSurface>}
         </div>
@@ -152,6 +194,10 @@ export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, on
         </div>
       </div>
     })}
+    {wheelPull && progress > 0 && <div className="surah-wheel-hint" data-surah-wheel-progress={progress} style={{ [previous ? 'top' : 'bottom']: 12 }} role="status">
+      <span>{t(previous ? 'reader.previousSurah' : 'reader.nextSurah')}{' · '}{meta[target - 1]?.fa}</span>
+      <span className="surah-wheel-meter"><span style={{ width: `${progress * 100}%` }} /></span>
+    </div>}
     <div ref={scrollRef} data-reading-scroll className="surah-pull-scroll h-full overflow-y-auto nice-scroll" style={{ overscrollBehaviorY: 'contain' }}>
       <div className="surah-pull-content min-h-full" data-pull-ready={progress >= 1 && !committing ? 'true' : 'false'} style={{ transform: `translate3d(0, ${offset}px, 0)`, transition: settling ? 'transform 240ms cubic-bezier(.22,.68,0,1)' : 'none' }}>{children}</div>
     </div>

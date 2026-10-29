@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.28',date:'2026-10-29',title:'مکث در مرز سوره در دسکتاپ',changeKinds:['improvement'],changes:[
+    'ردیف بزرگ سورهٔ قبل و بعد حذف شد؛ در حالت سوره، اسکرول دوباره پس از مکث در مرز، نشان کوچک مقصد را ظاهر می‌کند و با ادامهٔ عمدی سوره عوض می‌شود.',
+  ],
+},{
   version:'0.4.27',date:'2026-10-29',title:'بازگشت ترجمهٔ زیرخطی',changeKinds:['fix'],changes:[
     'ترجمهٔ ریز دوباره زیر هر بخش از خط قرآن نمایش داده می‌شود؛ جریان پیوستهٔ آیات حفظ شده و تفسیر با دکمهٔ ترجمه باز نمی‌شود.',
   ],

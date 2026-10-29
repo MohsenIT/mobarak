@@ -588,11 +588,6 @@ export default function Home() {
         <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main"
           onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd}>
           <ReaderSearchHighlights value={quickSearchOpen?quickHighlights:null}>
-          <nav className="desktop-surah-navigation" aria-label={t('reader.surahNavigation')}>
-            <button type="button" disabled={curSurahN<=1} onClick={()=>{setDesktopSurah(curSurahN-1);goVerse(curSurahN-1,1,1,'start',false)}}><span>{t('reader.previousSurah')}</span><small>{meta.surahs[curSurahN-2]?.ar}</small></button>
-            <span className="desktop-current-surah">{meta.surahs[curSurahN-1]?.ar}</span>
-            <button type="button" disabled={curSurahN>=114} onClick={()=>{setDesktopSurah(curSurahN+1);goVerse(curSurahN+1,1,1,'start',false)}}><span>{t('reader.nextSurah')}</span><small>{meta.surahs[curSurahN]?.ar}</small></button>
-          </nav>
           {mode === 'mushaf' ? (
             <ContinuousMushaf meta={meta} page={page} navigationRevision={mushafNavigationRevision}
               onPageChange={setPage} onContentReady={onMushafContentReady} showTrans={showTrans} translator={translator} scale={scale}

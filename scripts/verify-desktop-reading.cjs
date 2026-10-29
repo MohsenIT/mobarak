@@ -6,7 +6,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'),assert=req
   page.setDefaultTimeout(15000);page.setDefaultNavigationTimeout(20000);
   await page.addInitScript(()=>localStorage.setItem('mubarak.ui-language.v1','fa'));
   await page.goto((process.env.READER_URL||'http://127.0.0.1:3018')+'/s/2',{waitUntil:'domcontentloaded'});
-  const nav=page.getByRole('navigation',{name:'رفت‌وبرگشت بین سوره‌ها'});await nav.waitFor();
+  await page.locator('[data-reading-scroll] .quran-word').first().waitFor();assert.equal(await page.locator('.desktop-surah-navigation').count(),0);
   await page.getByRole('button',{name:'بازکردن فهرست سوره‌ها',exact:true}).click();
   const drawer=page.locator('.drawer');await drawer.waitFor();
   const words=page.locator('[data-reading-scroll] .quran-word[data-word-part="stem"]');
@@ -21,8 +21,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'),assert=req
   const address=page.url();await page.keyboard.press('ArrowRight');assert.equal(page.url(),address,'arrows adjust native selection rather than switching surah');
   assert(await word.evaluate(e=>{const event=new MouseEvent('contextmenu',{bubbles:true,cancelable:true});return e.dispatchEvent(event)}),'native context menu remains available');
   await page.evaluate(()=>getSelection().removeAllRanges());await word.click();await panel.waitFor();await panel.getByRole('button',{name:'بستن',exact:true}).click();
-  await nav.getByRole('button',{name:/سورهٔ قبل/}).click();await page.waitForFunction(()=>document.querySelector('.desktop-current-surah')?.textContent==='الفاتحة');await assert.doesNotReject(()=>drawer.waitFor());
-  assert(await nav.getByRole('button',{name:/سورهٔ قبل/}).isDisabled());
-  await page.close();console.log(`PASS ${width}: three columns, native selection/context menu, word analysis, previous-surah navigation, persistent drawer.`);
+  await page.close();console.log(`PASS ${width}: three columns, native selection/context menu, word analysis, unobstructed reading.`);
  }
 }finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});
