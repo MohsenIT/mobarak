@@ -79,3 +79,15 @@ test('web plays Persian translation after Arabic before advancing the ayah',asyn
  await expect.poll(()=>requests.some(url=>url.endsWith('/001002.mp3'))).toBe(true);
  expect(requests.findIndex(url=>url.includes('r=translation-fa-fooladvand'))).toBeLessThan(requests.findIndex(url=>url.endsWith('/001002.mp3')));
 });
+
+for(const path of ['/s/1','/p/1'])test(`translation toggle does not open Mizan (${path})`,async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem('mubarak.ui-language.v1','fa'));
+ await page.route('**/api/version',r=>r.fulfill({json:{version:'fixture',releases:[]}}));
+ await page.route('**/offline-manifest.json',r=>r.fulfill({json:{groups:{core:[],tahqiq:[]}}}));
+ await page.goto(path,{waitUntil:'domcontentloaded'});
+ await page.getByRole('button',{name:'نمایش ترجمه',exact:true}).click();
+ const reader=page.locator('[data-reading-scroll]');await expect(reader.locator('[data-translation-verse]').first()).toBeVisible();
+ await expect(reader.locator('.mizan-commentary')).toHaveCount(0);
+ await reader.locator('.quran-word').first().click();const panel=page.locator('.root-panel');await expect(panel).toBeVisible();
+ await panel.getByRole('tab',{name:'آیه',exact:true}).click();await expect(panel.locator('.mizan-commentary')).toBeVisible();
+});

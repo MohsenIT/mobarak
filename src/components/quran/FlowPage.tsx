@@ -6,7 +6,6 @@ import { toFa } from '@/lib/quran'
 import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
 import SelectableWord from './SelectableWord'
 import { rootColorStyle } from '@/lib/comparison-colors'
-import MizanCommentary from './MizanCommentary'
 import {translationDirection,translationLanguage} from '@/lib/translations'
 import {t} from '@/lib/i18n'
 import { matchesAnalysis, type AnalysisSelection } from '@/lib/analysis'
@@ -74,7 +73,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
             })}
             <AyahMarker n={v.n} />{continues ? ' ' : null}
           </span>{!continues ? ' ' : null}
-          {showTrans&&<div className="verse-source-block"><p data-translation-verse={v.n} dir={translationDirection(translator)} lang={translationLanguage(translator)}>{trans?.[String(v.n)]?.[translator]??t('translation.unavailable')}</p><MizanCommentary s={surah.n} a={v.n}/></div>}
+          {showTrans&&<div className="verse-source-block"><p data-translation-verse={v.n} dir={translationDirection(translator)} lang={translationLanguage(translator)}>{trans?.[String(v.n)]?.[translator]??t('translation.unavailable')}</p></div>}
           </VerseContainer>
         )})}
       </div>

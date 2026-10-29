@@ -8,8 +8,8 @@ const base=process.env.READER_URL||'http://127.0.0.1:3000';
   for(const [path,lastSelector,translated] of [
    ['/s/20','[data-surah="20"][data-ayah="135"] .quran-word',false],
    ['/p/604','[data-surah="114"][data-ayah="6"] .quran-word',false],
-   ['/s/114','[data-verse="6"] .mizan-commentary > button',true],
-   ['/p/604','[data-verse="6"] .mizan-commentary > button',true],
+   ['/s/114','[data-translation-verse="6"]',true],
+   ['/p/604','[data-translation-verse="6"]',true],
   ]){
    const context=await browser.newContext({viewport:{width:400,height:850},reducedMotion:'reduce'}),page=await context.newPage();
    const errors=[];page.on('pageerror',e=>errors.push(e.message));

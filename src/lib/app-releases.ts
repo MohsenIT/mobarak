@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.26',date:'2026-10-29',title:'نمایش مستقل ترجمه و تفسیر',changeKinds:['fix'],changes:[
+    'دکمهٔ ترجمهٔ نوار بالا فقط ترجمهٔ زیر آیات را نشان می‌دهد؛ المیزان از بخش مستقل تفسیر آیه در دسترس است.',
+  ],
+},{
   version:'0.4.25',date:'2026-10-29',title:'صوت و مطالعهٔ بهتر در دسکتاپ',changeKinds:['fix','fix','feature','feature','feature','feature','fix'],changes:[
     'تایپ صوتی اندروید به تشخیص گفتار بومی و اجازهٔ میکروفون وصل شد؛ خطای اتصال سرویس در وب جداگانه نشان داده می‌شود.',
     'دکمهٔ بستن و عنوان پنجره‌ها در فارسی و عربی تداخل ندارند؛ کادر ورودی هنگام ضبط بزرگ نمی‌شود و تنظیمات خودرو مرتب‌تر شده است.',
