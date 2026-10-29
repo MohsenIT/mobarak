@@ -151,5 +151,26 @@
     "source": "تنزیل",
     "sourcePage": "https://tanzil.net/",
     "tanzilDirectory": "matrood"
+  },
+  {
+    "id": "everyayah-mansoori",
+    "name": "کریم منصوری",
+    "source": "EveryAyah",
+    "sourcePage": "https://everyayah.com/recitations_ayat.html",
+    "everyAyahDirectory": "Karim_Mansoori_40kbps"
+  },
+  {
+    "id": "everyayah-tunaiji",
+    "name": "خلیفهٔ طنیجی",
+    "source": "EveryAyah",
+    "sourcePage": "https://everyayah.com/recitations_ayat.html",
+    "everyAyahDirectory": "khalefa_al_tunaiji_64kbps"
+  },
+  {
+    "id": "everyayah-minshawi-mujawwad",
+    "name": "محمد صدیق منشاوی — تحقیق",
+    "source": "EveryAyah",
+    "sourcePage": "https://everyayah.com/recitations_ayat.html",
+    "everyAyahDirectory": "Minshawy_Mujawwad_64kbps"
   }
 ]

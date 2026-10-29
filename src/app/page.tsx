@@ -32,6 +32,7 @@ import RangeComparison from '@/components/quran/RangeComparison'
 import { ArrowRight, GitCompareArrows, Search, MoreHorizontal, ChevronDown, Play, LoaderCircle, AudioLines } from 'lucide-react'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
+import ReaderSearchHighlights,{type ReaderSearchState} from '@/components/quran/ReaderSearchHighlights'
 import {
   PatternBG, IconMenu,
   IconTranslate, IconSortIndex,
@@ -77,8 +78,10 @@ export default function Home() {
   const [recentSurahs, setRecentSurahs] = useState<number[]>(() => LS.get('mushaf.recent-surahs', []))
   const [drawerView, setDrawerView] = useState<'navigation' | 'tools'>('navigation')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [desktopSurah,setDesktopSurah]=useState<number|null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [quickSearchOpen, setQuickSearchOpen] = useState(false)
+  const [quickHighlights,setQuickHighlights]=useState<ReaderSearchState|null>(null)
   const [searchStart, setSearchStart] = useState<SearchStart | null>(null)
   const [occurrenceSearch, setOccurrenceSearch] = useState<AnalysisSelection | null>(null)
   const readingBeforeSearch = useRef<string | null>(null)
@@ -166,6 +169,13 @@ export default function Home() {
   }, [contextComparison, showComparison, comparisonRange])
 
   const mainRef = useRef<HTMLElement>(null)
+  useEffect(()=>{
+    const app=mainRef.current?.closest<HTMLElement>('.reader-app'),header=app?.querySelector<HTMLElement>('.reader-toolbar')
+    if(!app||!header)return
+    const measure=()=>{const height=`${header.getBoundingClientRect().height}px`;app.style.setProperty('--reader-toolbar-height',height);document.documentElement.style.setProperty('--reader-toolbar-height',height)}
+    const observer=new ResizeObserver(measure);observer.observe(header);measure()
+    return()=>{observer.disconnect();app.style.removeProperty('--reader-toolbar-height');document.documentElement.style.removeProperty('--reader-toolbar-height')}
+  },[!!meta])
   const followingVerse=!!(audioOpen&&audioVerse&&flash?.s===audioVerse.s&&flash?.a===audioVerse.a)
   useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, (!!sel||followingVerse) && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}:${mushafContentRevision}:${!!sel}:${audioOpen}:${audioControlsVisible}`, followingVerse||analysisSelection?.tab==='verse'||analysisSelection?.tab==='context')
   const focusComparisonRoot = useCallback((root: string) => { setSoloComparisonRoot(root); setSel(null) }, [])
@@ -202,7 +212,7 @@ export default function Home() {
   useEffect(() => { LS.set('mushaf.marks', bookmarks) }, [bookmarks])
 
   const segs = useMemo(() => (meta ? meta.pages[page - 1] || [] : []), [meta, page])
-  const curSurahN = mode === 'mushaf' ? (segs[0]?.s ?? 1) : surah
+  const curSurahN = mode === 'mushaf' ? (desktopSurah&&segs.some(segment=>segment.s===desktopSurah)?desktopSurah:segs[0]?.s??1) : surah
   useEffect(() => {
     if (!meta || loadingPage) return
     setRecentSurahs(previous => { const next = [curSurahN, ...previous.filter(n => n !== curSurahN && Number.isInteger(n) && n >= 1 && n <= 114)].slice(0, 12); LS.set('mushaf.recent-surahs', next); return next })
@@ -451,7 +461,7 @@ export default function Home() {
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if (searchOpen || drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select'))) return
-      if (sel) return
+      if (sel||window.getSelection()?.toString()) return
       // Mushaf follows native up/down scrolling; flow retains surah shortcuts.
       if (mode !== 'flow') return
       if (e.key === 'ArrowLeft') goSurah(surah + 1)
@@ -501,7 +511,7 @@ export default function Home() {
   return (
     <>
     {!startupComplete && <StartupSplash leaving={startupLeaving} onHoldChange={held => { setStartupHeld(held); if (held) setStartupLeaving(false) }} />}
-    {meta && <div className={`reader-app h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} style={{ background: 'var(--paper)' }}>
+    {meta && <div className={`reader-app h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} data-side-navigation={drawerOpen||showIndex||showComparison?'open':undefined} data-portaled-analysis={sel&&(showIndex||showComparison)&&!panelMax?'open':undefined} style={{ background: 'var(--paper)' }}>
       <CarStudySync reader={mainRef} revision={`${mode}:${surah}:${page}:${mushafContentRevision}:${showTrans}:${flowSurah?.n}:${loadingPage}`} />
       <PatternBG />
 
@@ -509,16 +519,14 @@ export default function Home() {
         setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); setComparisonRoot(null); goVerse(s, a, pos,undefined,false)
       }} />
 
-      {/* ===== Top bar =====
-          Removed the prev/next-surah chevrons (< >) — user said the
-          constant-surah-jumping UX was weird. Surah switching now happens
-          via the drawer (tap the title) or the slider in the drawer. */}
+      {/* Desktop has explicit previous/next controls in the reading pane below. */}
       <header dir="rtl" className="reader-toolbar relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
         style={{
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
           backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
         }}>
         {quickSearchOpen ? <QuickSurahSearch meta={meta} onNavigate={navigateDestination} surah={meta.surahs[curSurahN - 1]} onClose={() => setQuickSearchOpen(false)}
+          onHighlights={setQuickHighlights}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false) }}
           onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><MoreHorizontal size={22} /></button>
@@ -576,9 +584,15 @@ export default function Home() {
         </div>
       )}
       {/* ===== Main + side root panel ===== */}
-      <div className="relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row lg:items-stretch">
+      <div className="reader-workspace relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row lg:items-stretch">
         <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main"
           onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd}>
+          <ReaderSearchHighlights value={quickSearchOpen?quickHighlights:null}>
+          <nav className="desktop-surah-navigation" aria-label={t('reader.surahNavigation')}>
+            <button type="button" disabled={curSurahN<=1} onClick={()=>{setDesktopSurah(curSurahN-1);goVerse(curSurahN-1,1,1,'start',false)}}><span>{t('reader.previousSurah')}</span><small>{meta.surahs[curSurahN-2]?.ar}</small></button>
+            <span className="desktop-current-surah">{meta.surahs[curSurahN-1]?.ar}</span>
+            <button type="button" disabled={curSurahN>=114} onClick={()=>{setDesktopSurah(curSurahN+1);goVerse(curSurahN+1,1,1,'start',false)}}><span>{t('reader.nextSurah')}</span><small>{meta.surahs[curSurahN]?.ar}</small></button>
+          </nav>
           {mode === 'mushaf' ? (
             <ContinuousMushaf meta={meta} page={page} navigationRevision={mushafNavigationRevision}
               onPageChange={setPage} onContentReady={onMushafContentReady} showTrans={showTrans} translator={translator} scale={scale}
@@ -621,6 +635,7 @@ export default function Home() {
               </FlowSurface>
             </SurahPull>
           )}
+          </ReaderSearchHighlights>
         </main>
 
         {sel && (showIndex || showComparison
@@ -686,7 +701,7 @@ export default function Home() {
           currentSurah={curSurahN}
           onClose={() => setDrawerOpen(false)}
           onGoPage={goPage}
-          onGoSurah={goSurah}
+          onGoSurah={n=>{setDesktopSurah(n);goVerse(n,1,1,'start',false)}}
           onGoVerse={(s, a) => goVerse(s, a, 1, 'start')}
           onRemoveBookmark={p => setBookmarks(b => b.filter(x => x !== p))}
           onTheme={setTheme}

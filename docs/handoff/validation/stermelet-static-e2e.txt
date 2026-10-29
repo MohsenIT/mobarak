@@ -1,0 +1,21 @@
+
+Running 9 tests using 2 workers
+
+(node:12965) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium-phone] › tests/e2e/controls.spec.cjs:3:35 › fa: dialogs, controls and voice preserve geometry (10.8s)
+  ✓  2 [chromium-desktop] › tests/e2e/controls.spec.cjs:3:35 › fa: dialogs, controls and voice preserve geometry (11.8s)
+  ✓  3 [chromium-phone] › tests/e2e/controls.spec.cjs:3:35 › en: dialogs, controls and voice preserve geometry (10.7s)
+  ✓  4 [chromium-desktop] › tests/e2e/controls.spec.cjs:3:35 › en: dialogs, controls and voice preserve geometry (11.4s)
+  ✓  5 [chromium-phone] › tests/e2e/controls.spec.cjs:65:1 › web plays Persian translation after Arabic before advancing the ayah (3.5s)
+(node:13417) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  6 [chromium-desktop] › tests/e2e/controls.spec.cjs:65:1 › web plays Persian translation after Arabic before advancing the ayah (3.9s)
+  ✓  7 [android-bridge-phone] › tests/e2e/controls.spec.cjs:3:35 › fa: dialogs, controls and voice preserve geometry (10.3s)
+  ✓  8 [android-bridge-phone] › tests/e2e/controls.spec.cjs:3:35 › en: dialogs, controls and voice preserve geometry (11.0s)
+  -  9 [android-bridge-phone] › tests/e2e/controls.spec.cjs:65:1 › web plays Persian translation after Arabic before advancing the ayah
+
+  1 skipped
+  8 passed (48.9s)

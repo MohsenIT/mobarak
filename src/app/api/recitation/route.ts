@@ -7,7 +7,7 @@ const fail=(status:number)=>Response.json({error:'audio-unavailable'},{status,he
 export async function GET(request:Request) {
   const params=new URL(request.url).searchParams
   const s=Number(params.get('s')), a=Number(params.get('a'))
-  const reciter=AUDIO_SOURCES.find(item=>item.id===params.get('r')&&item.tanzilDirectory)
+  const reciter=AUDIO_SOURCES.find(item=>item.id===params.get('r')&&(item.tanzilDirectory||item.everyAyahDirectory))
   if(!reciter||!Number.isInteger(s)||s<1||s>114||!Number.isInteger(a)||a<1||a>meta.surahs[s-1].vc)return fail(400)
   try {
     const upstream=await fetch(recitationSourceUrl(s,a,reciter),{signal:AbortSignal.timeout(20000),redirect:'error',cache:'force-cache'})
@@ -18,6 +18,6 @@ export async function GET(request:Request) {
       while(true){const item=await reader.read();if(item.done)break;length+=item.value.byteLength;if(length>4*1024*1024){await reader.cancel();return fail(502)};chunks.push(new Uint8Array(item.value))}
     } finally {reader.releaseLock()}
     if(!length)return fail(502)
-    return new Response(new Blob(chunks,{type:'audio/mpeg'}),{headers:{...cors,'Content-Type':'audio/mpeg','Content-Length':String(length),'Cache-Control':'public, max-age=86400, s-maxage=2592000','X-Audio-Source':'tanzil.net'}})
+    return new Response(new Blob(chunks,{type:'audio/mpeg'}),{headers:{...cors,'Content-Type':'audio/mpeg','Content-Length':String(length),'Cache-Control':'public, max-age=86400, s-maxage=2592000','X-Audio-Source':reciter.everyAyahDirectory?'everyayah.com':'tanzil.net'}})
   } catch {return fail(502)}
 }

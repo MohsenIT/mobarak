@@ -1,4 +1,22 @@
 [
-  {"id":"translation-fa-fooladvand","name":"فولادوند","language":"fa","tanzilDirectory":"fa.fooladvand","source":"Tanzil","sourcePage":"https://tanzil.net/"},
-  {"id":"translation-fa-makarem","name":"مکارم شیرازی","language":"fa","tanzilDirectory":"fa.makarem","source":"Tanzil","sourcePage":"https://tanzil.net/"}
+  {
+    "id": "translation-fa-fooladvand",
+    "name": "ترجمهٔ فولادوند — هدایت‌فر",
+    "language": "fa",
+    "tanzilDirectory": "fa.fooladvand",
+    "source": "Tanzil",
+    "sourcePage": "https://tanzil.net/",
+    "narrator": "هدایت‌فر",
+    "referencePage": "https://everyayah.com/recitations_ayat.html"
+  },
+  {
+    "id": "translation-fa-makarem",
+    "name": "ترجمهٔ مکارم — کبیری",
+    "language": "fa",
+    "tanzilDirectory": "fa.makarem",
+    "source": "Tanzil",
+    "sourcePage": "https://tanzil.net/",
+    "narrator": "محمدرضا کبیری",
+    "referencePage": "https://everyayah.com/recitations_ayat.html"
+  }
 ]

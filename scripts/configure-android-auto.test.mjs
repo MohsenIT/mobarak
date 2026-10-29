@@ -12,7 +12,7 @@ test('generated Android build gets a complete browse library and idempotent mani
   await writeFile(path.join(main,'java/app/quranmubarak/reader/MainActivity.kt'),'package app.quranmubarak.reader\nclass MainActivity : TauriActivity()\n')
   await writeFile(path.join(main,'AndroidManifest.xml'),'<manifest xmlns:android="http://schemas.android.com/apk/res/android"><application android:label="Reader"></application></manifest>')
   await writeFile(path.join(temp,'app/build.gradle.kts'),'plugins { id("com.android.application") }\n')
-  assert.deepEqual(await configureAndroidAuto(process.cwd(),temp),{reciters:22,surahs:114,verses:6236})
+  assert.deepEqual(await configureAndroidAuto(process.cwd(),temp),{reciters:JSON.parse(await readFile('public/data/recitation-sources.json','utf8')).length,surahs:114,verses:6236})
   const activity=await readFile(path.join(main,'java/app/quranmubarak/reader/MainActivity.kt'),'utf8')
   assert.match(activity,/override fun onWebViewCreate/)
   const first=await readFile(path.join(main,'AndroidManifest.xml'),'utf8')

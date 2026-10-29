@@ -1,0 +1,2 @@
+PASS 1280: three columns, native selection/context menu, word analysis, previous-surah navigation, persistent drawer.
+PASS 1600: three columns, native selection/context menu, word analysis, previous-surah navigation, persistent drawer.

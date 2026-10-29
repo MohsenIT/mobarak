@@ -69,3 +69,7 @@ server.log
 /desktop-dist/
 /src-tauri/target/
 /src-tauri/gen/
+
+# Browser regression output
+/test-results/
+/playwright-report/

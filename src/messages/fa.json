@@ -601,7 +601,7 @@
   "resource.tafsir": "تفسیر",
   "resource.corpus": "دادهٔ زبانی",
   "resource.murattal": "ترتیل",
-  "resource.mujawwad": "تحقیق / مجوّد",
+  "resource.mujawwad": "تحقیق",
   "release.feature": "امکان تازه",
   "release.improvement": "بهبود",
   "release.fix": "رفع مشکل",
@@ -702,5 +702,11 @@
   "downloads.empty": "هنوز مورد اختیاری دانلود نشده است.",
   "downloads.files": "{count} از {total} فایل",
   "downloads.bundled": "متن قرآن و داده‌های ضروری برنامه حفظ می‌شوند. حجم‌ها مربوط به فایل‌های ذخیره‌شده‌اند.",
-  "downloads.failed": "خواندن یا حذف دانلودها ممکن نشد. دوباره تلاش کنید."
+  "downloads.failed": "خواندن یا حذف دانلودها ممکن نشد. دوباره تلاش کنید.",
+  "voice.network": "اتصال سرویس تشخیص گفتار برقرار نشد؛ اینترنت و دسترسی سرویس را بررسی کنید.",
+  "voice.capture": "میکروفون در دسترس نیست؛ اجازه و اتصال میکروفون را بررسی کنید.",
+  "voice.preparing": "در حال آماده‌سازی میکروفون…",
+  "reader.previousSurah": "سورهٔ قبل",
+  "reader.nextSurah": "سورهٔ بعد",
+  "reader.surahNavigation": "رفت‌وبرگشت بین سوره‌ها"
 }

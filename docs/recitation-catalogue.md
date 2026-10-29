@@ -36,3 +36,7 @@ Portraits are local assets shared by picker and profile, with a neutral icon whe
 | عبدالله المطرود | [تنزیل](https://tanzil.net/) | Yes |
 
 All 22 registered recording entries now have local portraits (21 people; Basfar has two recordings). Nine missing portraits were added from named Assabile profiles and Commons; attribution/source URLs remain in reciter-portraits-LICENSE.txt. No new playback source was added by this image change.
+
+## Release0.4.25
+25 recording entries now have separate cache IDs and portraits. EveryAyah adds KarimMansoori40kbps, KhalifaAlTunaiji64kbps and MinshawiMujawwad64kbps; Persian calls the last style «تحقیق» and Arabic «مجوّد». Index coverage is6236 canonical verses per source; only001001,020072,114006 were downloaded and probed. Existing MinshawiMurattal and Basfar recording IDs remain unchanged. Persian Fooladvand/Hedayatfar and Makarem/Kabiri retain their Tanzil cache IDs; each001001 file is byte-identical to the corresponding EveryAyah named translation source. The web player now plays translation after Arabic within each verse/repeat and can pin translation separately.
+MustafaIsmail's EveryAyah set is incomplete and is not registered as a complete recording. Saeedian,Dabbagh,Shakernژad andAbolghasemi still lack a confirmed complete ayah source. No paid service is used.

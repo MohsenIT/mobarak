@@ -95,11 +95,12 @@ export default function NavDrawer(props: Props) {
       surahFa: meta.surahs[s - 1]?.fa ?? '',
     })), [meta])
 
+  const closeAfterNavigation=()=>{if(!window.matchMedia('(min-width:1024px)').matches)onClose()}
   const goTo = (destination: Destination) => {
     if (destination.kind === 'page') onGoPage(destination.p)
     else if (destination.kind === 'surah') onGoSurah(destination.s)
     else onGoVerse(destination.s, destination.kind === 'context' ? destination.from : destination.a)
-    onClose()
+    closeAfterNavigation()
   }
   const submitPage = (e: React.FormEvent) => {
     e.preventDefault()
@@ -175,7 +176,7 @@ export default function NavDrawer(props: Props) {
                       } : { borderBottom: '1px solid var(--line)' }}
                       /* FIX: was onGoPage(s.pg) — broke flow mode. Use onGoSurah so
                          the current mode is respected (page in mushaf, surah in flow). */
-                      onClick={() => { onGoSurah(s.n); onClose() }}
+                      onClick={() => { onGoSurah(s.n); closeAfterNavigation() }}
                       onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--word-hover)' }}
                       onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
                     >
@@ -206,7 +207,7 @@ export default function NavDrawer(props: Props) {
                 <button key={j.j}
                   className="rounded-xl border px-3 py-3 text-right transition-colors"
                   style={{ borderColor: 'var(--line)' }}
-                  onClick={() => { onGoVerse(j.s, j.a); onClose() }}
+                  onClick={() => { onGoVerse(j.s, j.a); closeAfterNavigation() }}
                   onMouseEnter={e => (e.currentTarget.style.background = 'var(--word-hover)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
@@ -235,7 +236,7 @@ export default function NavDrawer(props: Props) {
                     return (
                       <div key={p} className="flex items-center gap-2 rounded-xl border px-3 py-2.5"
                         style={{ borderColor: 'var(--line)' }}>
-                        <button className="flex-1 text-right" onClick={() => { onGoPage(p); onClose() }}>
+                        <button className="flex-1 text-right" onClick={() => { onGoPage(p); closeAfterNavigation() }}>
                           <span className="block font-bold text-sm" style={{ color: 'var(--ink)' }}>{t("ui.0572e8936c")}{' '}{toFa(p)}</span>
                           <span className="block text-xs mt-0.5" style={{ color: 'var(--ink-faint)' }}>{names}</span>
                         </button>

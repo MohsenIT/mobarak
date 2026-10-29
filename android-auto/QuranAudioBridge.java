@@ -18,6 +18,7 @@ import org.json.*;
 /** Same-origin, main-frame bridge. Web playback and the car share one native session. */
 @UnstableApi
 public final class QuranAudioBridge implements AutoCloseable {
+  private final QuranSpeechBridge speech;
   private final Activity activity;
   private final WebView web;
   private final Handler handler=new Handler(Looper.getMainLooper());
@@ -61,6 +62,7 @@ public final class QuranAudioBridge implements AutoCloseable {
       try{command(new JSONObject(text));}catch(Exception e){try{sendError(new JSONObject(text).optInt("id"),"invalid-command");}catch(JSONException ignored){sendError(0,"invalid-command");}}
     });
     }else throw new IllegalStateException("WebView message listener unsupported");
+    speech=new QuranSpeechBridge(activity,web);
     future=new MediaController.Builder(activity,new SessionToken(activity,new ComponentName(activity,QuranCarService.class))).buildAsync();
     future.addListener(()->{try{controller=future.get();if(pendingLanguage!=null)applyLanguage(pendingLanguage);controller.addListener(new Player.Listener(){@Override public void onEvents(Player p,Player.Events e){state();}});state();}catch(Exception e){sendError(0,"connection-failed");}},activity::runOnUiThread);
     activity.getApplication().registerActivityLifecycleCallbacks(lifecycle);
@@ -83,6 +85,8 @@ public final class QuranAudioBridge implements AutoCloseable {
       MediaItem item=controller.getCurrentMediaItem();if(item!=null)s.put("item",item.mediaId);
       Bundle preferences=controller.getSessionExtras();JSONObject options=new JSONObject();for(String key:preferences.keySet())options.put(key,preferences.get(key));s.put("options",options);
       PlaybackException error=controller.getPlayerError();if(error!=null)s.put("error",error.getErrorCodeName());
+      androidx.core.view.WindowInsetsCompat insets=androidx.core.view.ViewCompat.getRootWindowInsets(activity.getWindow().getDecorView());
+      if(insets!=null){androidx.core.graphics.Insets bars=insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()|androidx.core.view.WindowInsetsCompat.Type.displayCutout());float density=activity.getResources().getDisplayMetrics().density;s.put("safeArea",new JSONObject().put("top",bars.top/density).put("bottom",bars.bottom/density).put("left",bars.left/density).put("right",bars.right/density));}
       post(s);
     }catch(JSONException ignored){}
   }
@@ -179,5 +183,5 @@ public final class QuranAudioBridge implements AutoCloseable {
   }
   private void validate(String r,int s,int a){if(!audioSources.contains(r)||s<1||s>114||a<1||a>counts[s-1])throw new IllegalArgumentException("Invalid verse");}
   static File audioFile(android.content.Context c,String r,int s,int a){return new File(new File(c.getFilesDir(),"recitation/"+r),String.format(Locale.ROOT,"%03d%03d.mp3",s,a));}
-  @Override public void close(){if(closed)return;closed=true;activity.getApplication().unregisterActivityLifecycleCallbacks(lifecycle);handler.removeCallbacks(tick);files.shutdownNow();MediaController.releaseFuture(future);if(WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER))try{WebViewCompat.removeWebMessageListener(web,"QuranNativeAudio");}catch(RuntimeException ignored){}}
+  @Override public void close(){if(closed)return;closed=true;speech.close();activity.getApplication().unregisterActivityLifecycleCallbacks(lifecycle);handler.removeCallbacks(tick);files.shutdownNow();MediaController.releaseFuture(future);if(WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER))try{WebViewCompat.removeWebMessageListener(web,"QuranNativeAudio");}catch(RuntimeException ignored){}}
 }

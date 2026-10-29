@@ -55,6 +55,24 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun test src/lib/*.test.ts
       - run: bun run build:desktop
+      - run: bunx playwright install --with-deps chromium
+      - name: Verify installer web UI before packaging
+        env:
+          READER_URL: http://127.0.0.1:3000
+        run: |
+          python3 scripts/serve-desktop-test.py desktop-dist 3000 > browser-server.log 2>&1 &
+          for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3000 > /dev/null && break; sleep 1; done
+          bunx playwright test --project=chromium-phone --project=chromium-desktop --project=android-bridge-phone
+          node scripts/verify-desktop-reading.cjs
+          node scripts/verify-quick-highlights.cjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: installer-browser-regression-report
+          path: |
+            playwright-report/
+            test-results/
+            browser-server.log
       - uses: actions/upload-artifact@v4
         with:
           name: offline-web
@@ -137,12 +155,16 @@ jobs:
         run: |
           set -o pipefail
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          if ! "$SDKMANAGER" 'platform-tools' 'ndk;27.2.12479018' 2>&1 | tee "$RUNNER_TEMP/android-sdk.log"; then
+          if ! "$SDKMANAGER" 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018' 2>&1 | tee "$RUNNER_TEMP/android-sdk.log"; then
             echo '### Android SDK setup failed' >> "$GITHUB_STEP_SUMMARY"
             tail -c 12000 "$RUNNER_TEMP/android-sdk.log" >> "$GITHUB_STEP_SUMMARY"
             node -e 'const fs=require("fs"); const text=fs.readFileSync(process.env.RUNNER_TEMP+"/android-sdk.log","utf8").slice(-3000).replaceAll("%","%25").replaceAll("\r","%0D").replaceAll("\n","%0A"); console.log("::error title=Android SDK setup::"+text)'
             exit 1
           fi
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - run: node scripts/test-android-auto.mjs
       - uses: dtolnay/rust-toolchain@1.90.0
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
@@ -209,7 +231,9 @@ jobs:
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
   publish:
-    needs: [prepare, desktop, android]
+    # A failed desktop target must not discard a tested, signed Android build.
+    if: ${{ always() && needs.prepare.result == 'success' && needs.web.result == 'success' && needs.android.result == 'success' }}
+    needs: [prepare, web, desktop, android]
     runs-on: ubuntu-22.04
     permissions:
       contents: write

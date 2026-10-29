@@ -61,8 +61,8 @@ public final class QuranCarService extends MediaLibraryService {
     ResolvingDataSource.Factory audioSource=new ResolvingDataSource.Factory(new DefaultDataSource.Factory(this),spec->{
       String url=spec.uri.toString();
       for(int i=0;i<audioSources.length();i++){
-        JSONObject r=audioSources.optJSONObject(i);String directory=r.optString("tanzilDirectory");
-        String base=directory.isEmpty()?"https://verses.quran.com/Minshawi/Murattal/mp3/":"https://tanzil.net/res/audio/"+directory+"/";
+        JSONObject r=audioSources.optJSONObject(i);
+        String base=audioBase(r);
         if(!url.startsWith(base))continue;
         String file=url.substring(base.length());if(!file.matches("[0-9]{6}\\.mp3"))continue;
         int surah=Integer.parseInt(file.substring(0,3)),ayah=Integer.parseInt(file.substring(3,6));
@@ -251,12 +251,16 @@ public final class QuranCarService extends MediaLibraryService {
     return b.build();
   }
   private android.net.Uri artwork(int surah){return android.net.Uri.parse("content://"+getPackageName()+".artwork/surah/"+String.format(Locale.ROOT,"%03d.png",surah));}
+  private String audioBase(JSONObject r){
+    String every=r.optString("everyAyahDirectory"),tanzil=r.optString("tanzilDirectory");
+    if(!every.isEmpty())return "https://everyayah.com/data/"+every+"/";
+    return tanzil.isEmpty()?"https://verses.quran.com/Minshawi/Murattal/mp3/":"https://tanzil.net/res/audio/"+tanzil+"/";
+  }
   private MediaItem verse(String reciterId, int surah, int ayah) {
     JSONObject r = reciter(reciterId), s = surahs.optJSONObject(surah-1);
     if (s == null || ayah < 1 || ayah > s.optInt("vc")) throw new IllegalArgumentException("Invalid verse");
     String file = String.format(Locale.ROOT, "%03d%03d.mp3", surah, ayah);
-    String directory = r.optString("tanzilDirectory");
-    String uri = directory.isEmpty() ? "https://verses.quran.com/Minshawi/Murattal/mp3/"+file : "https://tanzil.net/res/audio/"+directory+"/"+file;
+    String uri = audioBase(r)+file;
     MediaItem result=item("v/"+reciterId+"/"+surah+"/"+ayah, s.optString("ar")+" · "+label("verse")+" "+number(ayah), r.optString("name"), false, true, uri);
     return result.buildUpon().setMediaMetadata(result.mediaMetadata.buildUpon().setArtworkUri(artwork(surah)).setSubtitle(s.optJSONArray("texts").optString(ayah-1)).setDescription(s.optJSONArray("texts").optString(ayah-1)).setSupportedCommands(Arrays.asList("favoriteItem")).build()).build();
   }

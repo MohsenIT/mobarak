@@ -1,0 +1,75 @@
+Verbatim Al-Mizan openings: 6236 ayahs, 114 core files, 1944727 bytes. Full commentary remains optional.
+Offline manifest: {
+  core: 631,
+  tahqiq: 1642,
+  maqayis: 1525,
+  ishtiqaqi: 1640,
+  mizan: 115,
+  'translation:am.sadiq': 1,
+  'translation:ar.muyassar': 1,
+  'translation:az.mammadaliyev': 1,
+  'translation:ber.mensur': 1,
+  'translation:bg.theophanov': 1,
+  'translation:bn.bengali': 1,
+  'translation:bs.korkut': 1,
+  'translation:cs.hrbek': 1,
+  'translation:de.bubenheim': 1,
+  'translation:dv.divehi': 1,
+  'translation:en.sahih': 1,
+  'translation:es.garcia': 1,
+  'translation:fr.hamidullah': 1,
+  'translation:ha.gumi': 1,
+  'translation:hi.hindi': 1,
+  'translation:id.indonesian': 1,
+  'translation:it.piccardo': 1,
+  'translation:ja.japanese': 1,
+  'translation:ko.korean': 1,
+  'translation:ku.asan': 1,
+  'translation:ml.abdulhameed': 1,
+  'translation:ms.basmeih': 1,
+  'translation:nl.leemhuis': 1,
+  'translation:no.berg': 1,
+  'translation:pl.bielawskiego': 1,
+  'translation:ps.abdulwali': 1,
+  'translation:pt.elhayek': 1,
+  'translation:ro.grigore': 1,
+  'translation:ru.kuliev': 1,
+  'translation:sd.amroti': 1,
+  'translation:so.abduh': 1,
+  'translation:sq.ahmeti': 1,
+  'translation:sv.bernstrom': 1,
+  'translation:sw.barwani': 1,
+  'translation:ta.tamil': 1,
+  'translation:tg.ayati': 1,
+  'translation:th.thai': 1,
+  'translation:tr.diyanet': 1,
+  'translation:tt.nugman': 1,
+  'translation:ug.saleh': 1,
+  'translation:ur.jalandhry': 1,
+  'translation:uz.sodik': 1,
+  'translation:zh.jian': 1
+}
+▲ Next.js 16.1.3 (webpack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 8.4s
+  Skipping validation of types
+  Collecting page data using 2 workers ...
+  Generating static pages using 2 workers (0/5) ...
+  Generating static pages using 2 workers (1/5) 
+  Generating static pages using 2 workers (2/5) 
+  Generating static pages using 2 workers (3/5) 
+✓ Generating static pages using 2 workers (5/5) in 167.1ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /manifest.webmanifest
+└ ○ /study/taha
+
+
+○  (Static)  prerendered as static content
+
+Offline client ready in desktop-dist (Quran, translations, Tahqiq and summaries bundled; other books downloaded on demand).

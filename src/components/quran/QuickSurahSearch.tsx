@@ -12,15 +12,18 @@ import type { QuranSearchResult } from '@/lib/quran-search'
 import type { SearchMode } from '@/lib/quran-search-session'
 import type { SearchStart } from './QuranSearch'
 
-export default function QuickSurahSearch({ surah, meta, onNavigate, onClose, onPick, onAdvanced }: {
+export default function QuickSurahSearch({ surah, meta, onNavigate, onClose, onPick, onAdvanced, onHighlights }: {
   meta: Meta; onNavigate: (destination: Destination) => void; surah: SurahMeta; onClose: () => void; onPick: (s: number, a: number, pos: number) => void
   onAdvanced: (start: Omit<SearchStart, 'revision'>) => void
+  onHighlights:(value:{results:QuranSearchResult[];index:number})=>void
 }) {
   const [query, setQuery] = useState('')
   const [mode, setMode] = useState<SearchMode>('text')
   const destinations = mode === 'text' ? searchDestinations(meta, query, surah.n) : []
   const [results, setResults] = useState<QuranSearchResult[]>([])
   const [index, setIndex] = useState(0)
+  const report=useRef(onHighlights);report.current=onHighlights
+  useEffect(()=>{report.current({results,index})},[results,index])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(false)
   const input = useRef<HTMLInputElement>(null)

@@ -2,8 +2,8 @@ import {test,expect} from 'bun:test'
 import {AUDIO_TRANSLATIONS,RECITERS,recitationSourceUrl} from './recitation'
 import {GET} from '@/app/api/recitation/route'
 test('recorded translations have separate identities and fixed verified Tanzil directories',()=>{
- expect(RECITERS).toHaveLength(22);expect(AUDIO_TRANSLATIONS).toHaveLength(2)
- expect(new Set([...RECITERS,...AUDIO_TRANSLATIONS].map(r=>r.id)).size).toBe(24)
+ expect(RECITERS.some(r=>r.id==='everyayah-mansoori')).toBe(true);expect(AUDIO_TRANSLATIONS).toHaveLength(2)
+ expect(new Set([...RECITERS,...AUDIO_TRANSLATIONS].map(r=>r.id)).size).toBe(RECITERS.length+AUDIO_TRANSLATIONS.length)
  for(const source of AUDIO_TRANSLATIONS){expect(source.id).toStartWith('translation-fa-');expect(recitationSourceUrl(20,72,source)).toBe(`https://tanzil.net/res/audio/${source.tanzilDirectory}/020072.mp3`)}
 })
 test('translation proxy accepts catalogue IDs and rejects arbitrary audio destinations',async()=>{

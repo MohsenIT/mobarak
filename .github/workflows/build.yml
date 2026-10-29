@@ -14,4 +14,23 @@ jobs:
         with:
           bun-version: 1.3.4
       - run: bun install --frozen-lockfile
+      - run: bun test src/lib/*.test.ts
       - run: bun run build
+      - run: bunx playwright install --with-deps chromium
+      - name: Browser regressions across engines and RTL/LTR layouts
+        env:
+          READER_URL: http://127.0.0.1:3000
+        run: |
+          PORT=3000 HOSTNAME=127.0.0.1 node .next/standalone/server.js > browser-server.log 2>&1 &
+          for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/api/version > /dev/null && break; sleep 1; done
+          bunx playwright test --project=chromium-phone --project=chromium-desktop --project=android-bridge-phone
+          node scripts/verify-desktop-reading.cjs
+          node scripts/verify-quick-highlights.cjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-regression-report
+          path: |
+            playwright-report/
+            test-results/
+            browser-server.log

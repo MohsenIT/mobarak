@@ -600,7 +600,7 @@
   "resource.lexicon": "معجم",
   "resource.tafsir": "تفسير",
   "resource.corpus": "متن لغوي",
-  "resource.murattal": "مرتل",
+  "resource.murattal": "مرتّل",
   "resource.mujawwad": "مجوّد",
   "release.feature": "ميزة جديدة",
   "release.improvement": "تحسين",
@@ -702,5 +702,11 @@
   "downloads.empty": "لا توجد تنزيلات اختيارية محفوظة بعد.",
   "downloads.files": "{count} من {total} ملف",
   "downloads.bundled": "يبقى نص القرآن وبيانات التطبيق الأساسية محفوظة. الأحجام تخص الملفات المخزنة.",
-  "downloads.failed": "تعذرت قراءة التنزيلات أو حذفها. حاول مجددًا."
+  "downloads.failed": "تعذرت قراءة التنزيلات أو حذفها. حاول مجددًا.",
+  "voice.network": "تعذر الاتصال بخدمة التعرف على الكلام. تحقق من الإنترنت وإتاحة الخدمة.",
+  "voice.capture": "الميكروفون غير متاح. تحقق من الإذن والتوصيل.",
+  "voice.preparing": "جارٍ تجهيز الميكروفون…",
+  "reader.previousSurah": "السورة السابقة",
+  "reader.nextSurah": "السورة التالية",
+  "reader.surahNavigation": "التنقل بين السور"
 }

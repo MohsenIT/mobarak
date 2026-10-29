@@ -807,5 +807,94 @@
         "href": "https://quran.inoor.ir/"
       }
     ]
+  },
+  {
+    "id": "reciter:everyayah-mansoori",
+    "name": "کریم منصوری",
+    "title": "کریم منصوری — تلاوت آیه‌به‌آیه",
+    "kind": "recitation",
+    "language": "ar",
+    "creator": "کریم منصوری",
+    "country": "ایران",
+    "countryCode": "IR",
+    "nationality": "ایرانی",
+    "description": "تلاوت قرآن با صدای کریم منصوری؛ فایل‌های جداگانهٔ آیات از EveryAyah.",
+    "features": [
+      "فایل‌های آیه‌به‌آیه",
+      "کیفیت ۴۰ کیلوبیت بر ثانیه"
+    ],
+    "keywords": [
+      "کریم منصوری",
+      "Karim Mansoori"
+    ],
+    "links": [
+      {
+        "label": "EveryAyah",
+        "href": "https://everyayah.com/recitations_ayat.html"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/mansoori.webp",
+      "alt": "کریم منصوری"
+    }
+  },
+  {
+    "id": "reciter:everyayah-tunaiji",
+    "name": "خلیفهٔ طنیجی",
+    "title": "خلیفهٔ طنیجی — ترتیل",
+    "creator": "خلیفهٔ طنیجی",
+    "kind": "recitation",
+    "language": "ar",
+    "country": "امارات متحدهٔ عربی",
+    "countryCode": "AE",
+    "nationality": "اماراتی",
+    "style": "murattal",
+    "description": "ترتیل آیه‌به‌آیه با صدای خلیفهٔ طنیجی از EveryAyah.",
+    "features": [
+      "فایل‌های مستقل آیات",
+      "کیفیت ۶۴ کیلوبیت بر ثانیه"
+    ],
+    "keywords": [
+      "Khalefa Al Tunaiji",
+      "خلیفه تنجی",
+      "الطنيجي"
+    ],
+    "links": [
+      {
+        "label": "EveryAyah",
+        "href": "https://everyayah.com/recitations_ayat.html"
+      }
+    ],
+    "image": {
+      "src": "/images/reciters/tunaiji.webp",
+      "alt": "خلیفهٔ طنیجی"
+    }
+  },
+  {
+    "id": "reciter:everyayah-minshawi-mujawwad",
+    "name": "محمد صدیق منشاوی — تحقیق",
+    "title": "محمد صدیق منشاوی — تحقیق",
+    "creator": "محمد صدیق منشاوی",
+    "kind": "recitation",
+    "language": "ar",
+    "country": "مصر",
+    "countryCode": "EG",
+    "nationality": "مصری",
+    "style": "mujawwad",
+    "description": "تلاوت تحقیق منشاوی؛ نسخهٔ مستقل از ضبط ترتیل. نام فنی مجموعه در منبع: Minshawy Mujawwad.",
+    "features": [
+      "فایل‌های مستقل آیات",
+      "کیفیت ۶۴ کیلوبیت بر ثانیه"
+    ],
+    "image": {
+      "src": "/images/reciters/minshawi.jpg",
+      "alt": "محمد صدیق منشاوی"
+    },
+    "links": [
+      {
+        "label": "EveryAyah",
+        "href": "https://everyayah.com/recitations_ayat.html"
+      }
+    ]
   }
 ]

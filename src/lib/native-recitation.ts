@@ -1,3 +1,4 @@
+import {applyNativeSafeArea} from './safe-area'
 import {RECITERS} from './recitation'
 export type NativePosition={r:string;s:number;a:number}
 export type CarOptions={speed:number;verse:number;surah:number;pause:number;rangeSurah:number;from:number;to:number;sleepDeadline:number;sleepAtEnd:boolean;translationAudio:string}
@@ -16,7 +17,7 @@ export function nativeCommand(command:Record<string,unknown>):Promise<void>{
  if(bound!==bridge){bound=bridge;connected=false;bridge.onmessage=event=>{
   let data:Record<string,unknown>;try{data=JSON.parse(event.data)}catch{return}
   if(data.type==='library'){for(const listener of libraryListeners)listener(data.data);return}
-  if(data.type==='state'){connected=data.connected===true;for(const listener of listeners)listener(data as unknown as NativePlaybackState);return}
+  if(data.type==='state'){applyNativeSafeArea(data.safeArea);connected=data.connected===true;for(const listener of listeners)listener(data as unknown as NativePlaybackState);return}
   const p=pending.get(Number(data.id));if(!p)return
   clearTimeout(p.timer);pending.delete(Number(data.id));if(data.error)p.reject(new Error(String(data.error)));else p.resolve()
  }}

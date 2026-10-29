@@ -1601,3 +1601,48 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .mizan-commentary article { overflow-wrap: anywhere; margin-top: .75rem; }
 .verse-source-block { font-family: 'Vazirmatn', system-ui, sans-serif; font-size: 14px; line-height: 2; margin: .75rem 0 1.5rem; }
 .verse-source-block > p { color: var(--ink-soft); margin-bottom: .75rem; }
+
+/* Voice status must not stretch a search row or move its microphone. */
+.dictation-field { position:relative; flex:0 1 auto; margin-block-end:18px; }
+.dictation-input-shell { flex:0 0 auto; }
+.dictation-error { position:absolute; inset-inline:0; inset-block-start:100%; padding:2px; font-size:11px; line-height:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* Native select labels use the same bounded two-column layout at every depth. */
+.car-study-controls label,.car-playlist-editor label { display:grid; grid-template-columns:minmax(0,1fr) minmax(110px,45%); align-items:center; gap:8px; min-width:0; }
+.recitation-settings select { min-width:0; max-width:100%; min-height:44px; }
+.car-study-controls select,.car-playlist-editor select { width:100%; }
+.car-playlist-editor { display:grid; gap:8px; min-width:0; }
+[data-slot="dialog-content"] [data-slot="dialog-header"] { padding-inline-end:28px; }
+.resource-picker-search { margin-block-end:18px; }
+.resource-picker-search .dictation-field { margin-block-end:0; }
+.resource-picker-search .dictation-input-shell { min-height:36px; }
+.resource-picker-search .dictation-error { inset-block-start:calc(100% + 8px); }
+
+.desktop-surah-navigation { display:none; }
+@media (min-width:1024px) {
+  .reader-app { --desktop-navigation-width:clamp(240px,22vw,300px); --desktop-analysis-width:clamp(280px,27vw,380px); }
+  .reader-workspace { transition:margin 160ms ease; }
+  .reader-app[data-side-navigation='open'] .reader-workspace { margin-inline-start:var(--desktop-navigation-width); }
+  .reader-app[data-portaled-analysis='open'] .reader-workspace { margin-inline-end:var(--desktop-analysis-width); }
+  .reader-app > .sheet-backdrop { display:none; }
+  .reader-app > .drawer,.reader-app > .surah-index-drawer {
+    inset-block-start:calc(var(--reader-toolbar-height,64px) + var(--app-update-height,0px)); inset-block-end:0;
+    inset-inline-start:0; inset-inline-end:auto; width:var(--desktop-navigation-width); max-width:var(--desktop-navigation-width);
+    animation:none; padding-block-start:0;
+  }
+  .reader-workspace > .root-panel:not(.maximized) { flex:0 0 var(--desktop-analysis-width); width:var(--desktop-analysis-width); max-width:var(--desktop-analysis-width); min-width:0; }
+  .root-panel.stacked:not(.maximized) {
+    top:calc(var(--reader-toolbar-height,64px) + var(--app-update-height,0px)); bottom:0; left:0; right:auto; transform:none;
+    width:clamp(280px,27vw,380px); max-width:clamp(280px,27vw,380px); height:auto; max-height:none; margin:0; border-radius:0;
+  }
+  .desktop-surah-navigation { display:flex; flex-shrink:0; align-items:center; justify-content:space-between; gap:8px; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--paper); }
+  .desktop-surah-navigation button { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:44px; min-width:100px; padding:4px 12px; border:1px solid var(--line-strong); border-radius:10px; background:var(--paper-2); color:var(--ink); font-size:13px; }
+  .desktop-surah-navigation button:disabled { opacity:.35; cursor:default; }
+  .desktop-surah-navigation small { color:var(--ink-soft); font-size:11px; }
+  .desktop-current-surah { min-width:0; font-size:14px; }
+}
+@media (hover:hover) and (pointer:fine) {
+  .quran-main .quran-word,.quran-main .quran-word[data-comparison-root] { user-select:text; -webkit-user-select:text; -webkit-touch-callout:default; cursor:text; }
+  .quran-main ::selection { background:var(--word-selected); }
+}
+.reader-app .quran-main .quran-word[data-quick-search-match] { background:var(--word-root); animation:none; }
+.reader-app .quran-main .quran-word[data-quick-search-match='active'] { background:var(--word-active); box-shadow:inset 0 0 0 2px var(--gold-deep); animation:none; }

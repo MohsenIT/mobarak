@@ -26,3 +26,9 @@ test('new reciters still use fixed catalogue directories and reject traversal',a
  expect(url).toBe('https://tanzil.net/res/audio/husary/020072.mp3')
  expect((await GET(request('r=tanzil-..%2Fother&s=1&a=1'))).status).toBe(400)
 })
+
+test('Mansoori uses the registered EveryAyah origin through the bounded proxy',async()=>{
+ let url='';globalThis.fetch=(async(input)=>{url=String(input);return new Response(new Uint8Array([73,68,51]),{headers:{'Content-Type':'audio/mpeg'}})}) as unknown as typeof fetch
+ const result=await GET(request('r=everyayah-mansoori&s=20&a=72&url=https://other.test'))
+ expect(result.status).toBe(200);expect(url).toBe('https://everyayah.com/data/Karim_Mansoori_40kbps/020072.mp3');expect(result.headers.get('X-Audio-Source')).toBe('everyayah.com')
+})

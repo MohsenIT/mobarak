@@ -14,7 +14,7 @@ export function useComparisonHold(main: RefObject<HTMLElement | null>, enabled: 
     const cancel = () => { clearTimeout(timer); start = null }
     const down = (event: PointerEvent) => {
       cancel(); consumed = null
-      if (!event.isPrimary || event.button !== 0) return
+      if (event.pointerType==='mouse'||!event.isPrimary || event.button !== 0) return
       const element = word(event.target)
       if (!element) return
       start = { x: event.clientX, y: event.clientY, element }
@@ -26,7 +26,7 @@ export function useComparisonHold(main: RefObject<HTMLElement | null>, enabled: 
     const click = (event: MouseEvent) => {
       if (consumed && word(event.target) === consumed) { event.preventDefault(); event.stopPropagation(); consumed = null }
     }
-    const context = (event: MouseEvent) => { if (word(event.target)) event.preventDefault() }
+    const context = (event: MouseEvent) => { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches&&word(event.target)) event.preventDefault() }
     reader.addEventListener('pointerdown', down)
     reader.addEventListener('click', click, true)
     reader.addEventListener('contextmenu', context)

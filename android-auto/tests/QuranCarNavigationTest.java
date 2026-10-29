@@ -51,6 +51,12 @@ public class QuranCarNavigationTest {
     MediaSession.MediaItemsWithStartPosition result=callback().onSetMediaItems(null,null,Arrays.asList(new MediaItem.Builder().setMediaId("pick/"+r).build()),0,0).get();
     assertEquals(71,result.startIndex);assertEquals("v/"+r+"/20/72",result.mediaItems.get(71).mediaId);assertEquals(0,result.startPositionMs);
   }
+  @Test public void mansooriUsesEveryAyahWithoutChangingTheSelectedAyah()throws Exception{
+    service.getSharedPreferences("quran-auto",Context.MODE_PRIVATE).edit().putString("item","v/minshawi-murattal/20/72").commit();
+    MediaSession.MediaItemsWithStartPosition result=callback().onSetMediaItems(null,null,Arrays.asList(new MediaItem.Builder().setMediaId("pick/everyayah-mansoori").build()),0,0).get();
+    assertEquals(71,result.startIndex);
+    assertEquals("https://everyayah.com/data/Karim_Mansoori_40kbps/020072.mp3",result.mediaItems.get(71).localConfiguration.uri.toString());
+  }
   @Test public void resumeRestoresSavedAyahAndPosition()throws Exception{
     String r=children("reciters").get(0).mediaId.substring(5);
     service.getSharedPreferences("quran-auto",Context.MODE_PRIVATE).edit().putString("item","v/"+r+"/20/72").putLong("position",1234).commit();

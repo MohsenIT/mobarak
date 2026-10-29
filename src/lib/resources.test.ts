@@ -15,7 +15,7 @@ describe('resource catalogue',()=>{
   expect(egyptian.map(r=>r.id)).toContain('reciter:minshawi-murattal')
   expect(egyptian.map(r=>r.id)).toContain('reciter:tanzil-husary')
   expect(egyptian.every(r=>r.country==='مصر'&&r.style==='murattal')).toBe(true)
-  expect(filterResources(reciters,{style:'mujawwad'})).toHaveLength(0)
+  expect(filterResources(reciters,{style:'mujawwad'}).map(r=>r.id)).toContain('reciter:everyayah-minshawi-mujawwad')
  })
  test('language kind title and era remain searchable',()=>{
   expect(filterResources(RESOURCES,{language:'fa',kind:'translation'})).toHaveLength(4)

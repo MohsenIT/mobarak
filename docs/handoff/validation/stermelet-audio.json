@@ -1,0 +1,198 @@
+{
+  "sources": [
+    {
+      "directory": "Karim_Mansoori_40kbps",
+      "canonicalIndexCoverage": 6236,
+      "indexSha256": "8ab68a6f0f6bf2444ec8e449af086ffcdaabe94ff6ec9fd96795b2f3f722fbad",
+      "samples": [
+        {
+          "ayah": "001001",
+          "md5MatchesPublishedIndex": true,
+          "sha256": "649e4d8b40fc09e5776c0fbbab31569a8cdea498e4f8fc4ade013f3d73279ccf",
+          "bytes": 88077,
+          "probe": {
+            "programs": [],
+            "stream_groups": [],
+            "streams": [
+              {
+                "codec_name": "mp3"
+              }
+            ],
+            "format": {
+              "duration": "16.796200"
+            }
+          }
+        },
+        {
+          "ayah": "020072",
+          "md5MatchesPublishedIndex": true,
+          "sha256": "2d92e635ec277e34763e8d54be822df9131803536b2d3c272aec480619bb237b",
+          "bytes": 233579,
+          "probe": {
+            "programs": [],
+            "stream_groups": [],
+            "streams": [
+              {
+                "codec_name": "mp3"
+              }
+            ],
+            "format": {
+              "duration": "45.896600"
+            }
+          }
+        },
+        {
+          "ayah": "114006",
+          "md5MatchesPublishedIndex": true,
+          "sha256": "49664267ec6dcd342c7bbd7936fdda1095baaf877c9d0964702944e96026b335",
+          "bytes": 62080,
+          "probe": {
+            "programs": [],
+            "stream_groups": [],
+            "streams": [
+              {
+                "codec_name": "mp3"
+              }
+            ],
+            "format": {
+              "duration": "11.545600"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "directory": "khalefa_al_tunaiji_64kbps",
+      "canonicalIndexCoverage": 6236,
+      "indexSha256": "ec3e2bce98858d56cad1691161c327963ec428bb94151fb3d57d7c003d2bf13d",
+      "samples": [
+        {
+          "ayah": "001001",
+          "md5MatchesPublishedIndex": false,
+          "sha256": "7a762d2da25b7440adbbbe0a7f81724c4eb2857f4df72c3f00c25d238b3891b8",
+          "bytes": 79540,
+          "probe": {
+            "programs": [],
+            "stream_groups": [],
+            "streams": [
+              {
+                "codec_name": "mp3"
+              }
+            ],
+            "format": {
+              "duration": "4.971250"
+            }
+          }
+        },
+        {
+          "ayah": "020072",
+          "md5MatchesPublishedIndex": true,
+          "sha256": "a8ad8edd313a42a1ab909ff2002b77af4c03907faea8721389739200458638b1",
+          "bytes": 157812,
+          "probe": {
+            "programs": [],
+            "stream_groups": [],
+            "streams": [
+              {
+                "codec_name": "mp3"
+              }
+            ],
+            "format": {
+              "duration": "19.722375"
+            }
+          }
+        },
+        {
+          "ayah": "114006",
+          "md5MatchesPublishedIndex": true,
+          "sha256": "6d4986fc73f89955a3c13300b40a8de90e9d0ad21d16157470100403613a62e9",
+          "bytes": 50649,
+          "probe": {
+            "programs": [],
+            "stream_groups": [],
+            "streams": [
+              {
+                "codec_name": "mp3"
+              }
+            ],
+            "format": {
+              "duration": "6.321625"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "directory": "Minshawy_Mujawwad_64kbps",
+      "canonicalIndexCoverage": 6236,
+      "indexSha256": "aa61d603ea34a11c72963c842070cfe12fb3446924dbcb288926f7f4ea132aed",
+      "samples": [
+        {
+          "ayah": "001001",
+          "md5MatchesPublishedIndex": true,
+          "sha256": "140a2c911f08faa959e2049aebb1ab9aa17fa5e5b62820e8ba40eaacba612f73",
+          "bytes": 107205,
+          "probe": {
+            "programs": [],
+            "stream_groups": [],
+            "streams": [
+              {
+                "codec_name": "mp3",
+                "side_data_list": [
+                  {}
+                ]
+              }
+            ],
+            "format": {
+              "duration": "13.374694"
+            }
+          }
+        },
+        {
+          "ayah": "020072",
+          "md5MatchesPublishedIndex": true,
+          "sha256": "83ccab5d20c520ba5763941657dcc60a31fec9aaffca1125918a7b67b29817e5",
+          "bytes": 351293,
+          "probe": {
+            "programs": [],
+            "stream_groups": [],
+            "streams": [
+              {
+                "codec_name": "mp3",
+                "side_data_list": [
+                  {}
+                ]
+              }
+            ],
+            "format": {
+              "duration": "43.885714"
+            }
+          }
+        },
+        {
+          "ayah": "114006",
+          "md5MatchesPublishedIndex": true,
+          "sha256": "e5d34f8b8d98858308f43a018c4b079eddbf6618e1b1cabfebe4432a8139d76f",
+          "bytes": 63319,
+          "probe": {
+            "programs": [],
+            "stream_groups": [],
+            "streams": [
+              {
+                "codec_name": "mp3",
+                "side_data_list": [
+                  {}
+                ]
+              }
+            ],
+            "format": {
+              "duration": "7.888980"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "allRemoteFilesDownloaded": false,
+  "translation001001HashesMatchEveryAyah": true
+}

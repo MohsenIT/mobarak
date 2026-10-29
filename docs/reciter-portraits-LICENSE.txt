@@ -56,3 +56,10 @@ Retrieved from the named reciter profile; no open license asserted. Resized to 2
 matrood.webp: https://www.assabile.com/abdullah-matrood
 Image: https://www.assabile.com/media/portraits/5-200.webp
 Retrieved from the named reciter profile; no open license asserted. Resized to 200px.
+
+Additional portraits for 0.4.25:
+mansoori.webp: https://hadiapp.net/quran-farsi/ (named Karim Mansoori card, recitation-8.jpg).
+Image: https://hadiapp.net/quran-farsi/img/reciters/recitation-8.jpg
+tunaiji.webp: https://www.assabile.com/khalifa-al-tunaiji (named Khalifa Al-Tunaiji profile).
+Image: https://www.assabile.com/media/portraits/73-200.webp
+Both resized to200px and encoded asWebP. Source attribution retained; no open license asserted.

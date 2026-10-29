@@ -1,0 +1,2 @@
+PASS 1280: all matches highlighted, active result updates, closing clears highlights.
+PASS 400: all matches highlighted, active result updates, closing clears highlights.

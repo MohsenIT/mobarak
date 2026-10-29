@@ -702,5 +702,11 @@
   "downloads.empty": "No optional downloads saved yet.",
   "downloads.files": "{count} of {total} files",
   "downloads.bundled": "Quran text and essential app data are kept. Sizes refer to stored files.",
-  "downloads.failed": "Could not read or remove downloads. Please retry."
+  "downloads.failed": "Could not read or remove downloads. Please retry.",
+  "voice.network": "Could not connect to speech recognition. Check your internet connection and service availability.",
+  "voice.capture": "Microphone unavailable. Check microphone permission and connection.",
+  "voice.preparing": "Preparing microphone…",
+  "reader.previousSurah": "Previous surah",
+  "reader.nextSurah": "Next surah",
+  "reader.surahNavigation": "Surah navigation"
 }
