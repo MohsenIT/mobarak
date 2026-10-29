@@ -29,7 +29,11 @@ public final class QuranDictationActivity extends Activity implements Recognitio
     }else listeners.remove(id);
   }
   @Override public void onCreate(Bundle saved){
-    super.onCreate(saved);id=getIntent().getStringExtra("id");current=new WeakReference<>(this);
+    super.onCreate(saved);
+    // Keep the existing WebView microphone/stop control interactive while recording.
+    getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE|android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+    QuranSystemBars.restore(this);
+    id=getIntent().getStringExtra("id");current=new WeakReference<>(this);
     if(id==null||!listeners.containsKey(id)){finish();return;}
     if(!SpeechRecognizer.isRecognitionAvailable(this)){complete("service-not-allowed");return;}
     if(checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)!=PackageManager.PERMISSION_GRANTED)requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO},71);

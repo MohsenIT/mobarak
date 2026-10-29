@@ -1,0 +1,109 @@
+{
+  "url": "https://quran-vajeh.vercel.app",
+  "release": "0.4.25",
+  "verifiedSource": "6021496c43d4368c8cb324b4e5ea7988b7a3fafe",
+  "publicManifestMatches": true,
+  "publicMizan66StillEmpty": true,
+  "audio": [
+    {
+      "id": "everyayah-mansoori",
+      "ok": true,
+      "bytes": 233579,
+      "sha256": "2d92e635ec277e34763e8d54be822df9131803536b2d3c272aec480619bb237b",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3"
+          }
+        ],
+        "format": {
+          "duration": "45.896600"
+        }
+      }
+    },
+    {
+      "id": "everyayah-tunaiji",
+      "ok": true,
+      "bytes": 157812,
+      "sha256": "a8ad8edd313a42a1ab909ff2002b77af4c03907faea8721389739200458638b1",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3"
+          }
+        ],
+        "format": {
+          "duration": "19.722375"
+        }
+      }
+    },
+    {
+      "id": "everyayah-minshawi-mujawwad",
+      "ok": true,
+      "bytes": 351293,
+      "sha256": "83ccab5d20c520ba5763941657dcc60a31fec9aaffca1125918a7b67b29817e5",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "side_data_list": [
+              {}
+            ]
+          }
+        ],
+        "format": {
+          "duration": "43.885714"
+        }
+      }
+    },
+    {
+      "id": "translation-fa-fooladvand",
+      "ok": true,
+      "bytes": 102400,
+      "sha256": "084d469a09d1c54764e225f8de28f261449881685518f05f15151fb98bc19ca2",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3"
+          },
+          {
+            "codec_name": "mjpeg"
+          }
+        ],
+        "format": {
+          "duration": "18.755400"
+        }
+      }
+    },
+    {
+      "id": "translation-fa-makarem",
+      "ok": true,
+      "bytes": 49152,
+      "sha256": "fdd35a62f8caeae4bb7d47b633cddc94211ba61a39575b880941b8d0c731ab9e",
+      "probe": {
+        "programs": [],
+        "stream_groups": [],
+        "streams": [
+          {
+            "codec_name": "mp3"
+          },
+          {
+            "codec_name": "mjpeg"
+          }
+        ],
+        "format": {
+          "duration": "19.616000"
+        }
+      }
+    }
+  ],
+  "nativeDeviceMicrophoneTested": false
+}

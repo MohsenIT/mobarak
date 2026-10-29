@@ -22,6 +22,9 @@ public class QuranDictationTest {
   QuranDictationActivity.launch(parent,"fa-IR",(type,value)->events.add(type+":"+value));
   Intent intent=Shadows.shadowOf(parent).getNextStartedActivity();
   var controller=Robolectric.buildActivity(QuranDictationActivity.class,intent).setup();
+  int flags=controller.get().getWindow().getAttributes().flags;
+  assertTrue((flags&android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)!=0);
+  assertTrue((flags&android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)!=0);
   controller.get().onRequestPermissionsResult(71,new String[]{android.Manifest.permission.RECORD_AUDIO},new int[]{PackageManager.PERMISSION_DENIED});
   assertEquals(Arrays.asList("error:not-allowed","end:"),events);controller.destroy();parent.finish();
  }
