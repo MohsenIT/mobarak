@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.27',date:'2026-10-29',title:'بازگشت ترجمهٔ زیرخطی',changeKinds:['fix'],changes:[
+    'ترجمهٔ ریز دوباره زیر هر بخش از خط قرآن نمایش داده می‌شود؛ جریان پیوستهٔ آیات حفظ شده و تفسیر با دکمهٔ ترجمه باز نمی‌شود.',
+  ],
+},{
   version:'0.4.26',date:'2026-10-29',title:'نمایش مستقل ترجمه و تفسیر',changeKinds:['fix'],changes:[
     'دکمهٔ ترجمهٔ نوار بالا فقط ترجمهٔ زیر آیات را نشان می‌دهد؛ المیزان از بخش مستقل تفسیر آیه در دسترس است.',
   ],

@@ -88,6 +88,11 @@ for(const path of ['/s/1','/p/1'])test(`translation toggle does not open Mizan (
  await page.getByRole('button',{name:'نمایش ترجمه',exact:true}).click();
  const reader=page.locator('[data-reading-scroll]');await expect(reader.locator('[data-translation-verse]').first()).toBeVisible();
  await expect(reader.locator('.mizan-commentary')).toHaveCount(0);
+ await expect(reader.locator('.verse-source-block')).toHaveCount(0);
+ const fragment=reader.locator('.verse-translation').first();await expect(fragment).toBeVisible();
+ expect(await reader.locator('[data-verse]').first().evaluate(el=>getComputedStyle(el).display)).toBe('inline');
+ const geometry=await fragment.evaluate(el=>{const r=el.getBoundingClientRect();const host=el.parentElement.getBoundingClientRect();return {left:r.left,right:r.right,hostLeft:host.left,hostRight:host.right}});
+ expect(geometry.left).toBeGreaterThanOrEqual(geometry.hostLeft-1);expect(geometry.right).toBeLessThanOrEqual(geometry.hostRight+1);
  await reader.locator('.quran-word').first().click();const panel=page.locator('.root-panel');await expect(panel).toBeVisible();
  await panel.getByRole('tab',{name:'آیه',exact:true}).click();await expect(panel.locator('.mizan-commentary')).toBeVisible();
 });
