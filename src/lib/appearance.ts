@@ -5,8 +5,8 @@ export type ColorField = typeof COLOR_FIELDS[number]
 export type Palette = Record<ColorField, string>
 export type Appearance = Record<ReaderTheme, Partial<Palette>>
 export const DEFAULT_PALETTES: Record<ReaderTheme, Palette> = {
-  paper: { background: '#f2ecdc', surface: '#f6f1e3', text: '#0e2a22', accent: '#2a9d8f', gold: '#e9c46a', highlight: '#daddce', selected: '#c6d1c1' },
-  night: { background: '#0e2a22', surface: '#123028', text: '#f2ecdc', accent: '#2a9d8f', gold: '#e9c46a', highlight: '#26443a', selected: '#38584d' },
+  paper: { background: '#f2ecdc', surface: '#f6f1e3', text: '#0e2a22', accent: '#2a9d8f', gold: '#e9c46a', highlight: '#bfd3b7', selected: '#95b596' },
+  night: { background: '#0e2a22', surface: '#123028', text: '#f2ecdc', accent: '#2a9d8f', gold: '#e9c46a', highlight: '#2d5241', selected: '#426f56' },
 }
 export function parseAppearance(value: unknown): Appearance {
   const result: Appearance = { paper: {}, night: {} }
@@ -52,6 +52,6 @@ export function paletteVariables(palette: Partial<Palette>): Record<string, stri
 export function appearanceCss(value: Appearance): string {
   return (['paper', 'night'] as const).map(theme => {
     const selector = theme === 'paper' ? ':root:not([data-theme]),:root[data-theme="paper"]' : ':root[data-theme="night"]'
-    return `${selector}{${Object.entries(paletteVariables(value[theme])).map(([key, color]) => `${key}:${color}`).join(';')}}`
+    return `${selector}{${Object.entries(paletteVariables({ highlight: DEFAULT_PALETTES[theme].highlight, selected: DEFAULT_PALETTES[theme].selected, ...value[theme] })).map(([key, color]) => `${key}:${color}`).join(';')}}`
   }).join('\n')
 }

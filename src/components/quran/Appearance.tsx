@@ -60,6 +60,7 @@ export function AppearanceColors() {
         <span>{t(`appearance.${field}`)}</span>
         <input type="color" value={colors[theme][field] || DEFAULT_PALETTES[theme][field]}
           aria-label={`${t(theme === 'paper' ? 'ui.a97a005a42' : 'ui.95b1ddc4a1')} — ${t(`appearance.${field}`)}`}
+          onInput={event => update(theme, field, event.currentTarget.value)}
           onChange={event => update(theme, field, event.target.value)} />
       </label>)}
       <button type="button" className="chip min-h-11" onClick={() => reset(theme)}>{t('appearance.reset')}</button>

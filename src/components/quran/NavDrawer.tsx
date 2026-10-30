@@ -58,6 +58,7 @@ const TABS = [
   { id: 'appearance', label: t('appearance.title') },
   { id: 'settings', label: t("ui.6badcac8c1") },
   { id: 'downloads', label: t('downloads.manage') },
+  { id: 'about', label: t('about.title') },
 ] as const
 
 
@@ -152,7 +153,7 @@ export default function NavDrawer(props: Props) {
         <details className="px-4 pb-3 text-xs leading-7"><summary>{t("ui.f4bf9b146f")}</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl><p>{t("ui.a8175202e6")}</p></details>
         </>}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
-          {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'appearance' || t.id === 'settings' || t.id === 'downloads' : t.id === 'surah' || t.id === 'juz').map(t => (
+          {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'appearance' || t.id === 'settings' || t.id === 'downloads' || t.id === 'about' : t.id === 'surah' || t.id === 'juz').map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
               {tText(t.label)}
             </button>
@@ -256,6 +257,11 @@ export default function NavDrawer(props: Props) {
           )}
 
           {tab === 'downloads' && <DownloadsManager meta={meta}/>}
+          {tab === 'about' && <section className="p-4 flex flex-col gap-4" aria-label={t('about.title')}>
+            <h3 className="text-lg font-bold">{APP_NAME}</h3>
+            <p className="text-sm leading-7" style={{ color: 'var(--ink-soft)' }}>{t('about.description')}</p>
+            <a className="chip min-h-11" href="https://github.com/MohsenIT/quran-vajeh" target="_blank" rel="noopener noreferrer">{t('about.github')}</a>
+          </section>}
           {tab === 'appearance' && <div className="p-4 flex flex-col gap-6">
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>

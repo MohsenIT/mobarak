@@ -718,5 +718,8 @@
   "appearance.gold": "Ornaments",
   "appearance.highlight": "Highlight",
   "appearance.selected": "Selected highlight",
-  "appearance.reset": "Reset theme colors"
+  "appearance.reset": "Reset theme colors",
+  "about.title": "About us",
+  "about.description": "A Quran reader with translations, study tools, and word-root analysis. Source code and project updates are available on GitHub.",
+  "about.github": "View the project on GitHub"
 }

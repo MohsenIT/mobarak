@@ -127,9 +127,9 @@
   --gold-deep: #a8842f;
   --gold-faint: rgba(168, 132, 47, 0.16);
   --sheet: #f6f1e3;
-  --word-hover: rgba(42, 157, 143, 0.14);
-  --word-active: rgba(95, 145, 131, 0.16);
-  --word-selected: rgba(95, 145, 131, 0.3);
+  --word-hover: color-mix(in srgb, #bfd3b7 70%, transparent);
+  --word-active: #bfd3b7;
+  --word-selected: #95b596;
   --word-root: var(--word-active);
   --radius: 12px;
 }
@@ -148,9 +148,9 @@
   --gold-deep: #e9c46a;
   --gold-faint: rgba(233, 196, 106, 0.14);
   --sheet: #123028;
-  --word-hover: rgba(233, 196, 106, 0.12);
-  --word-active: rgba(145, 186, 168, 0.18);
-  --word-selected: rgba(145, 186, 168, 0.32);
+  --word-hover: color-mix(in srgb, #2d5241 70%, transparent);
+  --word-active: #2d5241;
+  --word-selected: #426f56;
   --word-root: var(--word-active);
 }
 
