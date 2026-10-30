@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.31',date:'2026-10-30',title:'کپی پیوستهٔ آیات و انتخاب یکپارچه',changeKinds:['fix','improvement'],changes:[
+    'بسم‌الله از نام سوره فاصلهٔ بیشتری دارد.',
+    'کپی و اشتراک آیات و انتخاب بخشی از متن، آدرس آیه یا بازه را در انتهای متن و بدون خط جدید قرار می‌دهد؛ بخش‌ها با ویرگول جدا می‌شوند.',
+    'انتخاب متن با موس پس‌زمینهٔ پیوسته دارد و نشانه‌های پنهان تجویدی و حرکت‌های تنها از خروجی کپی حذف می‌شوند.',
+  ],
+},{
   version:'0.4.30',date:'2026-10-30',title:'هماهنگی انتخاب رنگ و وضوح هایلایت',changeKinds:['fix','improvement'],changes:[
     'رنگ پیش‌فرض انتخابگر سفارشی و هایلایت نمایش‌داده‌شده از یک منبع استفاده می‌کنند؛ تغییر رنگ همان لحظه ذخیره و اعمال می‌شود.',
     'بخش درباره ما با لینک مخزن گیت‌هاب به منوی سه‌نقطه اضافه شد.',

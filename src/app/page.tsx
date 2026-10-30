@@ -25,6 +25,7 @@ import {revealReadingTarget,revealReadingVerse} from '@/lib/reading-visibility'
 import CarStudySync from '@/components/quran/CarStudySync'
 import {syncNativeAppearance} from '@/lib/native-appearance'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
+import QuranClipboard from '@/components/quran/QuranClipboard'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
@@ -587,6 +588,7 @@ export default function Home() {
       <div className="reader-workspace relative z-10 flex-1 min-h-0 flex flex-col lg:flex-row lg:items-stretch">
         <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main"
           onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd}>
+          <QuranClipboard root={mainRef} meta={meta} />
           <ReaderSearchHighlights value={quickSearchOpen?quickHighlights:null}>
           {mode === 'mushaf' ? (
             <ContinuousMushaf meta={meta} page={page} navigationRevision={mushafNavigationRevision}

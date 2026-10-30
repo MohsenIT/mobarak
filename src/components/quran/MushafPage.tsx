@@ -144,7 +144,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
 
   return (
     <div
-      ref={frameRef}
+      ref={frameRef} data-quran-copy-surface
       className="font-quran relative h-full w-full flex flex-col justify-between px-3 py-2 sm:px-6 sm:py-3"
       style={{ fontSize, lineHeight: 1.75, color: 'var(--ink)' }}
       dir="rtl"

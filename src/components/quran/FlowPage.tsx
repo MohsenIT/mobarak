@@ -42,7 +42,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
         <SurahBand sm={sm} onNavigate={onOpenSurahs} />
         {sm.b && <Bismillah size={`${fontSize}px`} />}
       </div>
-      <div ref={textRef} className="font-quran text-justify mt-2 relative" dir="rtl"
+      <div ref={textRef} data-quran-copy-surface className="font-quran text-justify mt-2 relative" dir="rtl"
         style={{ fontSize, lineHeight: 2.05, color: 'var(--ink)' }}>
         {surah.v.map(v => {
           const isRange = analysisSelection && (analysisSelection.tab === 'verse' || analysisSelection.tab === 'context') && matchesAnalysis(analysisSelection, surah.n, v.n, 1, v.w[0])
