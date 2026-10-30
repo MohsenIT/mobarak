@@ -5,7 +5,7 @@ async function setup(page,context){
  await page.route('**/api/version',r=>r.fulfill({json:{version:'fixture',releases:[]}}));
  await page.route('**/offline-manifest.json',r=>r.fulfill({json:{groups:{core:[],tahqiq:[]}}}));
 }
-for(const mode of ['flow','mushaf'])test(`native copy: ${mode} keeps partial words and appends a verse range`,async({page,context})=>{
+for(const mode of ['flow','mushaf'])test(`native copy: ${mode} keeps partial words and adds a heading and verse numbers`,async({page,context})=>{
  await setup(page,context);
  await page.goto(mode==='flow'?'/s/2':'/p/2',{waitUntil:'domcontentloaded'});
  const selector=mode==='flow'?'[data-reading-scroll] [data-quran-copy-surface]':'[data-mushaf-page="2"] [data-quran-copy-surface]';
@@ -19,7 +19,7 @@ for(const mode of ['flow','mushaf'])test(`native copy: ${mode} keeps partial wor
  });
  await page.keyboard.press('Control+C');
  const copied=await page.evaluate(()=>navigator.clipboard.readText());
- expect(copied).toMatch(/\(بقره، 2-4\)$/);expect(copied).not.toContain('\n');expect(copied).toContain('، ');
+ expect(copied).toMatch(/^سوره بقره، آیات ۲-۴:\n/);expect(copied).toMatch(/\(۴\)$/);expect(copied.split('\n')).toHaveLength(2);expect(copied).toContain('(۲) ');expect(copied).toContain('(۳) ');
  expect(copied).not.toMatch(/^[\p{M}]/u);expect(copied).not.toMatch(/[\u06D6-\u06DC\u06DF\u06E2\u06E3\u06EB\u06ED]/u);
  if(await page.evaluate(()=>matchMedia('(hover:hover) and (pointer:fine)').matches)){
   await expect(surface.locator('.quran-native-selection > span').first()).toBeAttached();
@@ -36,9 +36,9 @@ test('share dialog copies consecutive and separate verses without hidden glyphs'
  await dialog.locator('.verse-share-verse').nth(1).click();
  await dialog.getByRole('button',{name:'کپی',exact:true}).click();
  let copied=await page.evaluate(()=>navigator.clipboard.readText());
- expect(copied).toMatch(/\(حج، 1-2\)$/);expect(copied).not.toContain('\n');expect(copied).not.toMatch(/[\u06D6-\u06DC\u06DF\u06E2\u06E3\u06EB\u06ED]/u);
+ expect(copied).toMatch(/^سوره حج، آیات ۱-۲:\n/);expect(copied).toMatch(/\(۲\)$/);expect(copied.split('\n')).toHaveLength(2);expect(copied).not.toMatch(/[\u06D6-\u06DC\u06DF\u06E2\u06E3\u06EB\u06ED]/u);
  await dialog.getByRole('button',{name:'نمایش آیات بعد',exact:true}).click();
  await dialog.locator('.verse-share-verse').nth(1).click();await dialog.locator('.verse-share-verse').nth(2).click();
  await dialog.getByRole('button',{name:'کپی',exact:true}).click();
- copied=await page.evaluate(()=>navigator.clipboard.readText());expect(copied).toContain('(حج، 1)، ');expect(copied).toMatch(/\(حج، 3\)$/);expect(copied).not.toContain('\n');
+ copied=await page.evaluate(()=>navigator.clipboard.readText());expect(copied).toMatch(/^سوره حج، آیات ۱، ۳:\n/);expect(copied).toContain('(۱) ');expect(copied).toMatch(/\(۳\)$/);expect(copied.split('\n')).toHaveLength(2);
 });

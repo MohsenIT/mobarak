@@ -721,5 +721,7 @@
   "appearance.reset": "Reset theme colors",
   "about.title": "About us",
   "about.description": "A Quran reader with translations, study tools, and word-root analysis. Source code and project updates are available on GitHub.",
-  "about.github": "View the project on GitHub"
+  "about.github": "View the project on GitHub",
+  "copy.verseHeading": "Surah {surah}, verse {verses}:",
+  "copy.versesHeading": "Surah {surah}, verses {verses}:"
 }

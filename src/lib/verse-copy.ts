@@ -1,3 +1,5 @@
+import { t, currentLanguage } from './i18n'
+import { formatDigits } from './locale-numbers'
 import { quranDisplayText } from './quran-display'
 
 export function quranCopyText(text: string): string {
@@ -13,22 +15,29 @@ export interface CopiedVerse {
   translation?: string
 }
 
-/** Consecutive verses share a reference; gaps and surah boundaries start a new group. */
-export function formatVerseCopy(verses: CopiedVerse[]): string {
+/** Each surah has a heading; every copied verse keeps its own inline number. */
+export function formatVerseCopy(verses: CopiedVerse[], intro?: string): string {
   const groups: CopiedVerse[][] = []
   for (const verse of verses) {
-    if (!verse.text.trim()) continue
+    if (!quranCopyText(verse.text)) continue
     const group = groups[groups.length - 1]
-    const previous = group?.[group.length - 1]
-    if (previous && previous.surah === verse.surah && verse.ayah === previous.ayah + 1) group.push(verse)
+    if (group?.[0].surah === verse.surah) group.push(verse)
     else groups.push([verse])
   }
-  return groups.map(group => {
-    const first = group[0], last = group[group.length - 1]
-    const address = first.ayah === last.ayah ? String(first.ayah) : `${first.ayah}-${last.ayah}`
-    const text = group.map(verse => [quranCopyText(verse.text), verse.translation?.trim()].filter(Boolean).join(' — ')).join('، ')
-    return `${text} (${first.name}، ${address})`
-  }).join('، ')
+  const digits = (number: number) => formatDigits(number, currentLanguage())
+  return groups.map((group, index) => {
+    const ranges: number[][] = []
+    for (const verse of group) {
+      const previous = ranges[ranges.length - 1]
+      if (previous && verse.ayah === previous[1] + 1) previous[1] = verse.ayah
+      else ranges.push([verse.ayah, verse.ayah])
+    }
+    const address = ranges.map(([from, to]) => from === to ? digits(from) : `${digits(from)}-${digits(to)}`).join('، ')
+    const heading = t(group.length === 1 ? 'copy.verseHeading' : 'copy.versesHeading', { surah: group[0].name, verses: address })
+    const text = group.map(verse => `${quranCopyText(verse.text)} (${digits(verse.ayah)})${verse.translation?.trim() ? ` — ${verse.translation.trim()}` : ''}`).join(' ')
+    const body = [index === 0 && intro ? quranCopyText(intro) : '', text].filter(Boolean).join(' ')
+    return `${heading}\n${body}`
+  }).join('\n\n')
 }
 
 export interface SelectionRect { left: number; top: number; right: number; bottom: number }

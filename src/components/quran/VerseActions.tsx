@@ -40,7 +40,7 @@ export default function VerseActions({ surah, verse, translator }: { surah: Sura
   const [failed, setFailed] = useState(false)
   const chosen = surah.v.filter(v => selected.includes(v.n))
   const reference = t("ui.0d7cba2b23",{p0:(surah.fa),p1:(chosen.length === 1 ? t("ui.1723d54443") : t("ui.d83f4af983")),p2:(chosen.map(v => toFa(v.n)).join('، '))})
-  const text = [bismillah ? BISMILLAH : '', formatVerseCopy(chosen.map(v => ({ surah: surah.n, name: surah.fa, ayah: v.n, text: v.w.map(w => w.t).join(' '), translation: withTranslation ? translations?.[String(v.n)]?.[translator] : undefined })))].filter(Boolean).join('، ')
+  const text = formatVerseCopy(chosen.map(v => ({ surah: surah.n, name: surah.fa, ayah: v.n, text: v.w.map(w => w.t).join(' '), translation: withTranslation ? translations?.[String(v.n)]?.[translator] : undefined })), bismillah ? BISMILLAH : undefined)
   const ready = chosen.length > 0 && (!withTranslation || chosen.every(v => translations?.[String(v.n)]?.[translator]))
   const links = () => chosen.map(v => new URL(versePath({ s: surah.n, a: v.n, pos: 1 }), process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app/' : window.location.origin).href).join('\n')
   const copy = async (value: string) => {

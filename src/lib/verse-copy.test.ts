@@ -1,25 +1,29 @@
-import { describe, expect, test } from 'bun:test'
+import { beforeEach, describe, expect, test } from 'bun:test'
 import { formatVerseCopy, mergeSelectionRects, type CopiedVerse } from './verse-copy'
+
+import { setUiLanguage } from './i18n'
+beforeEach(async () => { await setUiLanguage('fa', false) })
 
 const verse = (ayah: number, text = `نص ${ayah}`): CopiedVerse => ({ surah: 2, name: 'بقره', ayah, text })
 describe('copied Quran references', () => {
-  test('a single verse or fragment ends with an inline address', () => {
-    expect(formatVerseCopy([verse(5, 'بخشی از آیه')])).toBe('بخشی از آیه (بقره، 5)')
+  test('a single verse or fragment has a heading and an inline verse number', () => {
+    expect(formatVerseCopy([verse(5, 'بخشی از آیه')])).toBe('سوره بقره، آیه ۵:\nبخشی از آیه (۵)')
   })
-  test('consecutive verses are joined with commas and one range reference', () => {
-    expect(formatVerseCopy([verse(2), verse(3)])).toBe('نص 2، نص 3 (بقره، 2-3)')
+  test('consecutive verses share a range heading and retain individual numbers', () => {
+    expect(formatVerseCopy([verse(2), verse(3)])).toBe('سوره بقره، آیات ۲-۳:\nنص 2 (۲) نص 3 (۳)')
   })
-  test('gaps and different surahs retain separate addresses', () => {
+  test('gaps stay explicit in the heading and different surahs have separate sections', () => {
     expect(formatVerseCopy([verse(2), verse(3), verse(215), { surah: 3, name: 'آل عمران', ayah: 1, text: 'الم' }]))
-      .toBe('نص 2، نص 3 (بقره، 2-3)، نص 215 (بقره، 215)، الم (آل عمران، 1)')
+      .toBe('سوره بقره، آیات ۲-۳، ۲۱۵:\nنص 2 (۲) نص 3 (۳) نص 215 (۲۱۵)\n\nسوره آل عمران، آیه ۱:\nالم (۱)')
   })
   test('copy omits hidden recitation annotations but retains letters and pronunciation', () => {
-    expect(formatVerseCopy([verse(5, 'ٱتَّقُوا۟ رَبَّكُمْ ۚ عَظِيمٌۭ')])).toBe('ٱتَّقُوا رَبَّكُمْ عَظِيمٌ (بقره، 5)')
-    expect(formatVerseCopy([verse(5, 'ْكِتَـٰبُ')])).toBe('كِتَـٰبُ (بقره، 5)')
-    expect(formatVerseCopy([verse(5, 'نَادَىٰ وَأَهْلَهُۥ')])).toBe('نَادَىٰ وَأَهْلَهُۥ (بقره، 5)')
+    expect(formatVerseCopy([verse(5, 'ٱتَّقُوا۟ رَبَّكُمْ ۚ عَظِيمٌۭ')])).toBe('سوره بقره، آیه ۵:\nٱتَّقُوا رَبَّكُمْ عَظِيمٌ (۵)')
+    expect(formatVerseCopy([verse(5, 'ْكِتَـٰبُ')])).toBe('سوره بقره، آیه ۵:\nكِتَـٰبُ (۵)')
+    expect(formatVerseCopy([verse(5, 'نَادَىٰ وَأَهْلَهُۥ')])).toBe('سوره بقره، آیه ۵:\nنَادَىٰ وَأَهْلَهُۥ (۵)')
   })
-  test('optional translations stay with their verse and do not introduce line breaks', () => {
-    expect(formatVerseCopy([{ ...verse(5, 'عَرَبِيّ'), translation: 'ترجمه' }])).toBe('عَرَبِيّ — ترجمه (بقره، 5)')
+  test('optional translations and bismillah remain in the body below the heading', () => {
+    expect(formatVerseCopy([{ ...verse(5, 'عَرَبِيّ'), translation: 'ترجمه' }])).toBe('سوره بقره، آیه ۵:\nعَرَبِيّ (۵) — ترجمه')
+    expect(formatVerseCopy([verse(5, 'نص')], 'بسم الله')).toBe('سوره بقره، آیه ۵:\nبسم الله نص (۵)')
     expect(formatVerseCopy([])).toBe('')
   })
 })

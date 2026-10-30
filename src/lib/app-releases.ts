@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.32',date:'2026-10-30',title:'سرعنوان و شمارهٔ آیات در کپی',changeKinds:['improvement'],changes:[
+    'کپی و اشتراک متن قرآن با نام سوره و بازهٔ آیات در خط اول شروع می‌شود؛ متن آیات در خط بعد پیوسته است و شمارهٔ هر آیه در پرانتز می‌آید.',
+  ],
+},{
   version:'0.4.31',date:'2026-10-30',title:'کپی پیوستهٔ آیات و انتخاب یکپارچه',changeKinds:['fix','improvement'],changes:[
     'بسم‌الله از نام سوره فاصلهٔ بیشتری دارد.',
     'کپی و اشتراک آیات و انتخاب بخشی از متن، آدرس آیه یا بازه را در انتهای متن و بدون خط جدید قرار می‌دهد؛ بخش‌ها با ویرگول جدا می‌شوند.',
