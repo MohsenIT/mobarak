@@ -1,0 +1,18 @@
+const {test,expect}=require('@playwright/test');
+test('advanced search keeps total and current result visible while scrolling and resets for a new query',async({page})=>{
+ await page.addInitScript(()=>{localStorage.setItem('mubarak.ui-language.v1','fa');localStorage.setItem('mushaf.safavi-default.v1','true')});
+ await page.route('**/api/version',r=>r.fulfill({json:{version:'fixture',releases:[]}}));
+ await page.route('**/offline-manifest.json',r=>r.fulfill({json:{groups:{core:[],tahqiq:[]}}}));
+ await page.goto('/q?q=الله&h=0',{waitUntil:'domcontentloaded'});
+ const position=page.locator('.search-results-position');await expect(position).toBeVisible();
+ const total=Number(await position.getAttribute('data-total-results'));expect(total).toBeGreaterThan(40);
+ await expect(page.locator('.search-results-total')).toContainText('نتیجه');await expect(position).toHaveAttribute('data-current-result','1');
+ await expect(page.locator('.search-result-card')).toHaveCount(20);
+ const tenth=page.locator('[data-search-result-index="10"]');await expect(tenth.locator('.search-result-position')).toContainText('مورد ۱۰ از');
+ await page.locator('.search-page-results').evaluate(el=>{const card=el.querySelector('[data-search-result-index="10"]');el.scrollTop+=card.getBoundingClientRect().top-el.getBoundingClientRect().top+1});
+ await expect(position).toHaveAttribute('data-current-result','10');await expect(position).toBeInViewport();await expect(position).toHaveAttribute('data-total-results',String(total));
+ await page.locator('.search-more').click();await expect(page.locator('.search-result-card')).toHaveCount(40);await expect(position).toHaveAttribute('data-total-results',String(total));
+ await page.locator('.search-page-input input').fill('قُلْ هُوَ ٱللَّهُ أَحَدٌ');
+ await expect(position).toHaveAttribute('data-total-results','1');await expect(position).toHaveAttribute('data-current-result','1');await expect(page.locator('.search-result-card')).toHaveCount(1);
+ await page.locator('.search-page-input input').fill('zzzzzzzzzz');await expect(page.locator('.search-results-total')).toHaveText('۰ نتیجه');await expect(position).toHaveCount(0);
+});

@@ -723,5 +723,7 @@
   "about.description": "قرآن‌خوان با ترجمه و ابزارهای مطالعه و تحلیل ریشهٔ واژه‌ها. کد منبع و تغییرات پروژه در گیت‌هاب در دسترس است.",
   "about.github": "مشاهده پروژه در گیت‌هاب",
   "copy.verseHeading": "سوره {surah}، آیه {verses}:",
-  "copy.versesHeading": "سوره {surah}، آیات {verses}:"
+  "copy.versesHeading": "سوره {surah}، آیات {verses}:",
+  "search.totalResults": "{total} نتیجه",
+  "search.resultPosition": "مورد {current} از {total}"
 }

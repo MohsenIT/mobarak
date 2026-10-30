@@ -81,6 +81,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const [error, setError] = useState(false)
   const [retry, setRetry] = useState(0)
   const [visible, setVisible] = useState(20)
+  const [currentResult, setCurrentResult] = useState(1)
   const page = useRef<HTMLElement>(null)
   const input = useRef<HTMLInputElement>(null)
   const list = useRef<HTMLDivElement>(null)
@@ -136,7 +137,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     const options = { mode, includePartial, includeNear, includeRoots: includeRoots && canExpandRoots, surahs }
     const key = JSON.stringify({ query, options, filter: occurrenceFilter })
     if (!error && completed.current === key) { setBusy(false); return }
-    pending.current = key; setVisible(20); scroll.current = 0; setError(false)
+    pending.current = key; setCurrentResult(1); setVisible(20); scroll.current = 0; setError(false)
     if (list.current) list.current.scrollTop = 0
     if (!valid && normalizeQuranSearch(query).length === 0) { completed.current = ''; setResults([]); setSuggestions([]); setBusy(false); return }
     setBusy(true)
@@ -157,6 +158,22 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     return () => { clearTimeout(timer); request.current++ }
   }, [query, mode, scopeKey, includePartial, includeNear, includeRoots, canExpandRoots, valid, retry, open, occurrenceFilter])
 
+  useEffect(() => {
+    const container = list.current
+    if (!open || busy || error || !valid || !container) return
+    const seen = new Set<number>()
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        const index = Number((entry.target as HTMLElement).dataset.searchResultIndex)
+        if (entry.isIntersecting && entry.intersectionRect.height > 1) seen.add(index)
+        else seen.delete(index)
+      }
+      if (seen.size) setCurrentResult(Math.min(...seen))
+    }, { root: container, threshold: [0, 0.01] })
+    container.querySelectorAll('[data-search-result-index]').forEach(card => observer.observe(card))
+    return () => observer.disconnect()
+  }, [open, busy, error, valid, visible, rawResults, lemmas, forms])
+
   const visibleSurahs = showTranslation && open ? [...new Set(results.slice(0, visible).map(r => r.s))].join(',') : ''
   useEffect(() => {
     if (!visibleSurahs) return
@@ -170,7 +187,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
 
   const toggleFacet = (kind: 'lemmas' | 'forms', value: string) => {
     const setter = kind === 'lemmas' ? setLemmas : setForms
-    setter(current => current.includes(value) ? current.filter(x => x !== value) : [...current, value]); setVisible(20); scroll.current = 0; if (list.current) list.current.scrollTop = 0
+    setter(current => current.includes(value) ? current.filter(x => x !== value) : [...current, value]); setCurrentResult(1); setVisible(20); scroll.current = 0; if (list.current) list.current.scrollTop = 0
   }
   const setScope = (s: number, checked: boolean) => setSurahs(current => checked ? [...current, s].sort((a, b) => a - b) : current.filter(n => n !== s))
   const destinations = mode === 'text' && !occurrenceFilter ? searchDestinations(meta,query,restored?.contextSurah??currentSurah) : []
@@ -218,7 +235,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? t("ui.0b6f9a295b",{p0:(occurrenceFilter.root ?? '')}) : occurrenceFilter.tab === 'form' ? t("ui.b87b342872",{p0:(occurrenceFilter.form),p1:(occurrenceFilter.root ?? '')}) : t("ui.108e40c64f",{p0:(occurrenceFilter.text)})}</span><button type="button" aria-label={t("ui.96ad94b293")} onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
       </header>
       {onNavigate&&destinations.length>0&&<div className="search-jump-options" aria-label={t("ui.d289fa208b")}>{destinations.map((item,i)=><button type="button" key={i} onClick={()=>onNavigate(item.destination)}>{t("ui.b7b6972c78")}{' '}{toFa(item.label)} ←</button>)}</div>}
-      <div className="search-results-summary" role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />{t("ui.63509f3da4")}</span> : !valid ? t("ui.4bfc7b8a3d") : error ? t("ui.12287cefbb") : t("ui.9ec9176e66",{p0:(toFa(results.length)),p1:(toFa(results.reduce((sum, r) => sum + r.positions.length, 0)))})}</div>
+      <div className="search-results-summary">
+        <div role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />{t("ui.63509f3da4")}</span> : !valid ? t("ui.4bfc7b8a3d") : error ? t("ui.12287cefbb") : <><strong className="search-results-total">{t('search.totalResults', { total: results.length })}</strong><span className="search-results-detail">{t("ui.9ec9176e66",{p0:(toFa(results.length)),p1:(toFa(results.reduce((sum, r) => sum + r.positions.length, 0)))})}</span></>}</div>
+        {!busy && !error && valid && results.length > 0 && <span className="search-results-position" data-current-result={Math.min(currentResult, results.length)} data-total-results={results.length} aria-live="off">{t('search.resultPosition', { current: Math.min(currentResult, results.length), total: results.length })}</span>}
+      </div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label={t("ui.57f03a82b0")} aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
         {!busy && rawResults.length > 0 && <div className="search-facets-inline" aria-label={t("ui.07093a152e")}>
           {(['forms', 'lemmas'] as const).map(kind => <SearchFacetGroup key={`${mode}:${query}:${kind}`} kind={kind} formLabels={formLabels} counts={searchFacetCounts(rawResults, facets, kind)} selected={facets[kind]} onToggle={value => toggleFacet(kind, value)} />)}
@@ -229,8 +249,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         {!busy && !error && valid && !results.length && <div className="search-empty"><Search size={30} /><h2>{t("ui.b548ad6007")}</h2><p>{t("ui.d0c738e420")}</p></div>}
         {!busy && !error && valid && results.slice(0, visible).map((result, index) => <div key={`${result.s}:${result.a}`}>
           {!occurrenceFilter && (index === 0 || results[index - 1].kind !== result.kind) && <h2 className="search-result-group">{t(labels[result.kind])}</h2>}
-          <article className="search-result-card"><button type="button" className="search-result-open" aria-label={t("ui.a55b5ca0c4",{p0:(meta.surahs[result.s - 1]?.fa),p1:(toFa(result.a))})} onClick={() => { scroll.current = list.current?.scrollTop ?? scroll.current; onPick(result.s, result.a, result.positions[0] ?? 1) }}>
-            <span className="search-result-meta"><b>{meta.surahs[result.s - 1]?.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(result.a)}</b><span>{t("ui.1abf27acd0")}</span></span><span className="search-result-text font-quran" lang="ar">{snippet(result, true)}</span>
+          <article className="search-result-card" data-search-result-index={index + 1}><button type="button" className="search-result-open" aria-label={t("ui.a55b5ca0c4",{p0:(meta.surahs[result.s - 1]?.fa),p1:(toFa(result.a))})} onClick={() => { scroll.current = list.current?.scrollTop ?? scroll.current; onPick(result.s, result.a, result.positions[0] ?? 1) }}>
+            <span className="search-result-meta"><b>{meta.surahs[result.s - 1]?.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(result.a)}</b><span className="search-result-position">{t('search.resultPosition', { current: index + 1, total: results.length })}</span><span>{t("ui.1abf27acd0")}</span></span><span className="search-result-text font-quran" lang="ar">{snippet(result, true)}</span>
           </button>
           {showTranslation && <div className="search-result-translation" dir={translationDirection(translator)} lang={translationLanguage(translator)}>{translations[result.s]?.[String(result.a)]?.[translator] ?? (translationErrors.includes(result.s) ? <button type="button" onClick={() => setTranslationRetry(n => n + 1)}>{t("ui.76f0fc62b1")}</button> : <span role="status">{t("ui.ad34b65e87")}</span>)}</div>}
           </article>

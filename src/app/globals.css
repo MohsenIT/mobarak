@@ -1664,3 +1664,12 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   .quran-main .has-native-selection ::selection { background:transparent; }
   .quran-main .has-native-selection .quran-word:hover { background:transparent; }
 }
+
+.search-results-summary { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px 16px; color:var(--ink); background:var(--paper-2); border-bottom:1px solid var(--line); padding-block:9px; }
+.search-results-summary > div { display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 12px; }
+.search-results-summary > div > span { display:inline-flex; align-items:center; gap:7px; }
+.search-results-total { font-size:14px; font-weight:700; }
+.search-results-detail { color:var(--ink-soft); font-size:11px; }
+.search-results-position { font-size:12px; font-weight:600; }
+.search-result-meta { flex-wrap:wrap; }
+.search-result-meta > .search-result-position { color:var(--ink); font-size:11px; background:var(--word-active); border-radius:8px; padding:3px 7px; }
