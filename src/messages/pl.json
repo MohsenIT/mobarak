@@ -708,5 +708,15 @@
   "voice.preparing": "Preparing microphone…",
   "reader.previousSurah": "Previous surah",
   "reader.nextSurah": "Next surah",
-  "reader.surahNavigation": "Surah navigation"
+  "reader.surahNavigation": "Surah navigation",
+  "appearance.title": "Appearance",
+  "appearance.colors": "Theme colors",
+  "appearance.background": "Background",
+  "appearance.surface": "Panel background",
+  "appearance.text": "Text",
+  "appearance.accent": "Accent",
+  "appearance.gold": "Ornaments",
+  "appearance.highlight": "Highlight",
+  "appearance.selected": "Selected highlight",
+  "appearance.reset": "Reset theme colors"
 }

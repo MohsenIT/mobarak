@@ -29,7 +29,7 @@ import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, GitCompareArrows, Search, MoreHorizontal, ChevronDown, Play, LoaderCircle, AudioLines } from 'lucide-react'
+import { ArrowRight, GitCompareArrows, Search, MoreVertical, ChevronDown, Play, LoaderCircle, AudioLines } from 'lucide-react'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import ReaderSearchHighlights,{type ReaderSearchState} from '@/components/quran/ReaderSearchHighlights'
@@ -192,7 +192,7 @@ export default function Home() {
     LS.set('mushaf.theme', theme)
   }, [theme])
   useEffect(() => {
-    const color = !startupComplete ? '#faf4df' : theme === 'night' ? '#0e2a22' : '#f2ecdc'
+    const color = !startupComplete ? '#faf4df' : getComputedStyle(document.documentElement).getPropertyValue('--paper').trim()
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color)
   }, [theme, startupComplete])
   useEffect(() => {
@@ -529,7 +529,7 @@ export default function Home() {
           onHighlights={setQuickHighlights}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false) }}
           onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
-        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><MoreHorizontal size={22} /></button>
+        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><MoreVertical size={22} /></button>
 
         <button className="reader-surah-link flex-1 min-w-0" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
           <span className="font-bold text-[14px] sm:text-[15px] truncate" style={{ color: 'var(--ink)' }}>

@@ -6,7 +6,7 @@ import {t,uiDirection} from '@/lib/i18n'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {IconTranslate} from './Ornaments'
-import { Search, X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreHorizontal, Link, Check } from 'lucide-react'
+import { Search, X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreVertical, Link, Check } from 'lucide-react'
 import type { Meta, Translator, Translations } from '@/lib/quran'
 import { loadTrans, toFa, morphologyLabel } from '@/lib/quran'
 import { type AnalysisSelection } from '@/lib/analysis'
@@ -209,7 +209,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           <details className="search-scope"><summary aria-label={t("ui.d67a8d9786")}><Funnel size={14} /><span>{scopeLabel}</span></summary>
             <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>{t("ui.5ad7b9b0af")}</button><button type="button" onClick={() => setSurahs([currentSurah])}>{t("ui.35fa085c5c")}</button></div><DictationInput type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder={t("ui.51b594c97e")} aria-label={t("ui.c8c0719ae1")} /><p>{t("ui.831ac25576")}</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label className="choice-row" key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
           </details>
-          <details className="search-extra-options"><summary aria-label={t("ui.ba7db1f34f")}><MoreHorizontal size={19} /></summary><div>
+          <details className="search-extra-options"><summary aria-label={t("ui.ba7db1f34f")}><MoreVertical size={19} /></summary><div>
             <label className="choice-row"><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />{t("ui.5105840a21")}</label>
             <label className="choice-row"><input type="checkbox" checked={includeNear} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludeNear(e.target.checked)} />{t("ui.8a8b5ac72e")}</label>
           </div></details>

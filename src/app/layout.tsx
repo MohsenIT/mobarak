@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { APP_NAME } from "@/lib/branding";
 import { ReadingScreenProvider } from "@/components/quran/ReadingScreen";
+import { AppearanceProvider } from "@/components/quran/Appearance";
 import PwaRegistration from "@/components/quran/PwaRegistration";
 
 export const metadata: Metadata = {
@@ -23,10 +24,10 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <body className="antialiased" style={{ background: "var(--paper)", color: "var(--ink)" }}>
-        <ReadingScreenProvider>
+        <AppearanceProvider><ReadingScreenProvider>
           {children}
           <PwaRegistration />
-        </ReadingScreenProvider>
+        </ReadingScreenProvider></AppearanceProvider>
       </body>
     </html>
   );

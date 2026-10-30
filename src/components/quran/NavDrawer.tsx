@@ -9,6 +9,7 @@ import CalendarSettings from './CalendarSettings'
 import {TRANSLATION_IDS} from '@/lib/translations'
 import ResourcePicker from './ResourcePicker'
 import {RESOURCES} from '@/lib/resources'
+import { AppearanceColors } from './Appearance'
 import ReadingScreenSettings from './ReadingScreen'
 import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
@@ -54,6 +55,7 @@ const TABS = [
   { id: 'surah', label: t("ui.a1e320e16e") },
   { id: 'juz', label: t("ui.87453fc867") },
   { id: 'recent', label: t("ui.c6bdd72afe") },
+  { id: 'appearance', label: t('appearance.title') },
   { id: 'settings', label: t("ui.6badcac8c1") },
   { id: 'downloads', label: t('downloads.manage') },
 ] as const
@@ -150,7 +152,7 @@ export default function NavDrawer(props: Props) {
         <details className="px-4 pb-3 text-xs leading-7"><summary>{t("ui.f4bf9b146f")}</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl><p>{t("ui.a8175202e6")}</p></details>
         </>}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
-          {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'settings' || t.id === 'downloads' : t.id === 'surah' || t.id === 'juz').map(t => (
+          {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'appearance' || t.id === 'settings' || t.id === 'downloads' : t.id === 'surah' || t.id === 'juz').map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
               {tText(t.label)}
             </button>
@@ -254,14 +256,7 @@ export default function NavDrawer(props: Props) {
           )}
 
           {tab === 'downloads' && <DownloadsManager meta={meta}/>}
-          {tab === 'settings' && (
-            <div className="p-4 flex flex-col gap-6">
-              <LanguageSettings translator={props.translator} onTranslation={props.onTranslator}/>
-              <CalendarSettings/>
-              <ReadingScreenSettings />
-              <UpdateSettings />
-              <button type="button" className="chip min-h-11" onClick={()=>setTab('downloads')}>{t('downloads.manage')}</button>
-              <OfflineSettings />
+          {tab === 'appearance' && <div className="p-4 flex flex-col gap-6">
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
                   {props.theme === 'night' ? <IconMoon /> : <IconSun />}{t("ui.90ec529f45")}</h3>
@@ -281,14 +276,7 @@ export default function NavDrawer(props: Props) {
                 </div>
               </section>
 
-              <section>
-                <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
-                  <IconTranslate />{t("ui.52baa2cbee")}</h3>
-                <ResourcePicker label={t("ui.37e2fdb79c")} ids={TRANSLATION_IDS.map(id=>`translation:${id}`)} value={`translation:${props.translator}`} onChange={id=>props.onTranslator(id.replace(/^translation:/,'') as Translator)}/>
-              </section>
-
-              <section><h3 className="text-sm font-bold mb-3" style={{color:'var(--ink)'}}>{t("ui.b6a850cc59")}</h3><ResourcePicker browse label={t("ui.8a52f7bc3f")} ids={RESOURCES.map(r=>r.id)} value="" onChange={()=>{}}/></section>
-
+              <AppearanceColors />
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
                   <IconBook />{t("ui.1fe7007e7e")}</h3>
@@ -333,6 +321,25 @@ export default function NavDrawer(props: Props) {
                   ))}
                 </div>
               </section>
+
+              <ReadingScreenSettings />
+          </div>}
+          {tab === 'settings' && (
+            <div className="p-4 flex flex-col gap-6">
+              <LanguageSettings translator={props.translator} onTranslation={props.onTranslator}/>
+              <CalendarSettings/>
+              <UpdateSettings />
+              <button type="button" className="chip min-h-11" onClick={()=>setTab('downloads')}>{t('downloads.manage')}</button>
+              <OfflineSettings />
+
+              <section>
+                <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
+                  <IconTranslate />{t("ui.52baa2cbee")}</h3>
+                <ResourcePicker label={t("ui.37e2fdb79c")} ids={TRANSLATION_IDS.map(id=>`translation:${id}`)} value={`translation:${props.translator}`} onChange={id=>props.onTranslator(id.replace(/^translation:/,'') as Translator)}/>
+              </section>
+
+              <section><h3 className="text-sm font-bold mb-3" style={{color:'var(--ink)'}}>{t("ui.b6a850cc59")}</h3><ResourcePicker browse label={t("ui.8a52f7bc3f")} ids={RESOURCES.map(r=>r.id)} value="" onChange={()=>{}}/></section>
+
 
               <p className="text-xs leading-6 pt-2 border-t" style={{ color: 'var(--ink-faint)', borderColor: 'var(--line)' }}>{t("ui.9f4b86895b")}</p>
             </div>

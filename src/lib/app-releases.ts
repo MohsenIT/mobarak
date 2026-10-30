@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.29',date:'2026-10-29',title:'تنظیمات ظاهر و رنگ‌های دلخواه',changeKinds:['feature','improvement'],changes:[
+    'تب ظاهر در منوی سه‌نقطهٔ عمودی اضافه شد؛ تنظیمات تم، اندازه متن، حالت خواندن و روشن‌ماندن صفحه در آن قرار دارند.',
+    'رنگ‌های تم روشن و تاریک، هایلایت و هایلایت انتخاب‌شده جداگانه قابل تغییر و بازنشانی‌اند و در سراسر برنامه ذخیره و اعمال می‌شوند.',
+  ],
+},{
   version:'0.4.28',date:'2026-10-29',title:'مکث در مرز سوره در دسکتاپ',changeKinds:['improvement'],changes:[
     'ردیف بزرگ سورهٔ قبل و بعد حذف شد؛ در حالت سوره، اسکرول دوباره پس از مکث در مرز، نشان کوچک مقصد را ظاهر می‌کند و با ادامهٔ عمدی سوره عوض می‌شود.',
   ],
