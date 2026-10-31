@@ -21,7 +21,10 @@ self.addEventListener('fetch', event => {
     try { cache = await caches.open(CACHE) } catch { /* Storage may be unavailable. */ }
     const packs = await caches.open(PACKS).catch(() => null)
     const packed = packs && await packs.match(request)
-    if (packed) return packed
+    // Page metadata can be corrected between releases. Refresh these files
+    // online even when an older offline pack contains the same URL.
+    const layoutData = url.pathname === '/data/meta.json' || /^\/data\/surah\/\d+\.json$/.test(url.pathname)
+    if (packed && !layoutData) return packed
     // Content-hashed bundles are immutable, including those used by a saved page.
     if (url.pathname.startsWith('/_next/static/') && cache) {
       const saved = await cache.match(request)
@@ -29,12 +32,23 @@ self.addEventListener('fetch', event => {
     }
     try {
       const response = await fetch(request, navigation ? { cache: 'no-store' } : undefined)
-      if (navigation && response.status >= 500) throw new Error('Navigation unavailable')
+      if ((navigation || (layoutData && packed)) && response.status >= 500) throw new Error('Navigation unavailable')
+      if (response.ok && packed && layoutData && packs) {
+        try {
+          const bytes = await response.clone().arrayBuffer()
+          const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), b => b.toString(16).padStart(2, '0')).join('')
+          const headers = new Headers(response.headers)
+          headers.delete('content-encoding'); headers.delete('content-length')
+          headers.set('x-content-sha256', hash)
+          await packs.put(request, new Response(bytes, { headers }))
+        } catch { /* A pack update must not interrupt online reading. */ }
+      }
       if (response.ok && cache) {
         try { await cache.put(navigation ? shellFor(url) : request, response.clone()) } catch { /* Quota must not interrupt reading. */ }
       }
       return response
     } catch (error) {
+      if (packed) return packed
       const saved = cache && await cache.match(navigation ? shellFor(url) : request)
       if (saved) return saved
       if (navigation) return unavailable()
