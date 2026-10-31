@@ -22,3 +22,9 @@ fails closed on failed/cancelled checks, unavailable GitHub results, or timeout.
 GitHub Actions calls the normal build directly, so it does not wait on Vercel.
 No GitHub or Vercel token is needed for this public repository's status lookup.
 Local pre-push checks do not replace this production gate.
+
+`SelectionPreview` owns compact header truncation and responsive measurement;
+`selectedContentText` derives content from the shared analysis range contract.
+`QuranHighlight` and selectable reader words share `reader-highlight` state
+styles, including quick-search matches and advanced-search results. Add new
+selection sources through these contracts instead of per-tab formatting.

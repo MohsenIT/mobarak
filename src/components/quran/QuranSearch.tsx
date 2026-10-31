@@ -1,4 +1,5 @@
 'use client'
+import QuranHighlight from './QuranHighlight'
 import {DictationInput} from './DictationInput'
 import {translationDirection,translationLanguage} from '@/lib/translations'
 import {t,uiDirection} from '@/lib/i18n'
@@ -53,7 +54,7 @@ function snippet(result: QuranSearchResult, full = false) {
     if (previous?.selected === token.selected) previous.words.push(token.text)
     else runs.push({ selected: token.selected, words: [token.text] })
   }
-  return <>{from > 0 && '… '}{runs.map((run, i) => <span key={i}><span data-search-match={run.selected ? 'true' : undefined} className={run.selected ? 'rounded px-0.5' : undefined} style={run.selected ? { background: 'var(--word-selected)', color: 'var(--ink)', boxDecorationBreak: 'clone', WebkitBoxDecorationBreak: 'clone' } : undefined}><QuranText text={run.words.join(' ')} /></span>{i < runs.length - 1 ? ' ' : null}</span>)}{to < result.words.length && ' …'}</>
+  return <>{from > 0 && '… '}{runs.map((run, i) => <span key={i}>{run.selected ? <QuranHighlight text={run.words.join(' ')} /> : <QuranText text={run.words.join(' ')} />}{i < runs.length - 1 ? ' ' : null}</span>)}{to < result.words.length && ' …'}</>
 }
 const labels = { exact: t("ui.e3aee9c005"), partial: t("ui.b3541360ab"), near: t("ui.8a95e90fb6"), root: t("ui.702b74fe3e") }
 

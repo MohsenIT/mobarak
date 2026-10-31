@@ -1,8 +1,10 @@
 'use client'
+import SelectionPreview from './SelectionPreview'
+import {selectedContentText} from '@/lib/selection-presentation'
 import {StudyNoteLink} from './StudyLinks'
 import {useStudyWorkspace} from '@/lib/study-store'
 import {t} from '@/lib/i18n'
-import { displayWordText, lexicalKey, wordTarget, type WordPart } from '@/lib/word-parts'
+import { lexicalKey, wordTarget, type WordPart } from '@/lib/word-parts'
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Translator, SurahData, Meta } from '@/lib/quran'
@@ -61,6 +63,7 @@ function RootPanelContent({
   const {work:studyWorkspace}=useStudyWorkspace()
   const [tab, setTab] = useState<AnalysisTab>(() => { const saved = readAnalysisView().tab ?? 'root'; return (!anchor.root || anchor.part === 'prefix') && (saved === 'root' || saved === 'form') ? 'word' : saved })
   const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor, surah: anchor })
+  const [pickerOpen, setPickerOpen] = useState(false)
   useEffect(()=>{
     if(!playbackTarget)return
     let live=true
@@ -81,7 +84,6 @@ function RootPanelContent({
   const navigationRef = useRef<HTMLElement>(null)
   const [minimized, setMinimized] = useState(() => readAnalysisView().minimized ?? false)
   const [minimumHeight, setMinimumHeight] = useState(180)
-  const [pickerOpen, setPickerOpen] = useState(false)
   const [previousAnchor, setPreviousAnchor] = useState(anchor)
   // Retarget an existing sheet without remounting its DOM or replaying sheetUp.
   if (anchor !== previousAnchor) {
@@ -205,13 +207,8 @@ function RootPanelContent({
   const nextUnit = tab === 'root' ? rootNeighbors?.next : nav && nav.unitIndex >= 0 ? nav.units[nav.unitIndex + 1] : undefined
   const canUnitPrevious = !!previousUnit
   const canUnitNext = !!nextUnit
-  const headingAyah = tab === 'context' ? selectedContext?.from ?? sel.a : sel.a
-  const headingVerse = surah?.n === sel.s ? surah.v.find(verse => verse.n === headingAyah) : undefined
-  const headingPreview = tab === 'verse' || tab === 'context'
-  const headingWords = tab === 'context' && selectedContext ? (surah?.n === sel.s ? surah.v.filter(verse => verse.n >= selectedContext.from && verse.n <= selectedContext.to).flatMap(verse => verse.w) : undefined) : headingVerse?.w
-  const headingText = headingPreview ? headingWords?.slice(0, 2).map(displayWordText).join(' ') ?? sel.text : sel.text
-  const headingHasMore = headingPreview && (headingWords?.length ?? 0) > 2
-  const headingReference = tab === 'context' && selectedContext ? `${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : toFa(sel.a)
+  const headingText = selectedContentText({ ...sel, tab, from: selectedContext?.from, to: selectedContext?.to }, surah)
+  const headingReference = tab === 'surah' ? toFa(sel.s) : tab === 'context' && selectedContext ? `${toFa(selectedContext.from)}–${toFa(selectedContext.to)}` : toFa(sel.a)
   const unitTitle = (location?: [number, number, WordPart?]) => {
     if (!location || !surah || surah.n !== sel.s) return '—'
     const [a, pos, part] = location
@@ -297,8 +294,8 @@ function RootPanelContent({
 
         <div className="panel-header" style={{ borderColor: 'var(--line)' }}>
           <div className="panel-selection">
-            <span className={`font-quran panel-word${headingPreview ? ' panel-word-preview' : ''}`} dir="rtl" title={`${headingText}${headingHasMore ? '…' : ''}`}>{headingPreview ? <><span className="panel-preview-text"><QuranText text={headingText} /></span>{headingHasMore && <span className="panel-preview-ellipsis">…</span>}</> : <QuranText text={headingText} />}</span>
-            <span className="chip panel-reference" title={t("ui.408d79b89b",{p0:(meta.surahs[sel.s - 1]?.fa),p1:(tab === 'context' ? t("ui.d83f4af983") : t("ui.b1b168c791")),p2:(headingReference)})}>
+            <SelectionPreview text={headingText} />
+            <span className="chip panel-reference" title={t("ui.408d79b89b",{p0:(meta.surahs[sel.s - 1]?.fa),p1:(tab === 'surah' ? t("ui.53376bea8f") : tab === 'context' ? t("ui.d83f4af983") : t("ui.b1b168c791")),p2:(headingReference)})}>
               <span className="panel-reference-surah">{meta.surahs[sel.s - 1]?.fa}</span><span>· {headingReference}</span>
             </span>
           </div>

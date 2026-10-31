@@ -260,13 +260,7 @@ body {
   background: var(--word-selected);
   box-shadow: none;
 }
-.quran-word.flash {
-  animation: wordFlash 2.4s ease-out 1;
-}
-@keyframes wordFlash {
-  0%, 55% { background: var(--word-active); box-shadow: 0 0 0 4px var(--gold-faint); }
-  100% { background: transparent; box-shadow: none; }
-}
+.quran-word.flash { animation: none; background: var(--word-selected); }
 
 /* root map tick on frame edge */
 .root-tick {
@@ -846,7 +840,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 
 @media (prefers-reduced-motion: reduce) {
   .page-enter, .root-panel, .drawer, .surah-index-panel { animation: none; }
-  .quran-word.flash { animation: none; background: var(--word-active); }
+  .quran-word.flash { animation: none; background: var(--word-selected); }
 }
 
 @media (max-width: 640px) {
@@ -1641,8 +1635,6 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   .quran-main .quran-word,.quran-main .quran-word[data-comparison-root] { user-select:text; -webkit-user-select:text; -webkit-touch-callout:default; cursor:text; }
   .quran-main ::selection { background:var(--word-selected); }
 }
-.reader-app .quran-main .quran-word[data-quick-search-match] { background:var(--word-root); animation:none; }
-.reader-app .quran-main .quran-word[data-quick-search-match='active'] { background:var(--word-selected); box-shadow:none; animation:none; }
 
 .appearance-colors { display:grid; gap:12px; min-width:0; }
 .appearance-colors fieldset { display:grid; gap:10px; padding:12px; border:1px solid var(--line); border-radius:12px; min-width:0; }
@@ -1682,9 +1674,15 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 
 /* Shared contract for Quran selection in every reading surface. Only background
    color conveys highlight state; no local selection style may add decoration. */
-.reader-app .quran-main .reader-highlight {
+.reader-highlight {
   text-decoration: none;
   border: 0;
   box-shadow: none;
   outline: none;
 }
+
+.selection-preview { flex: 1 1 0; min-width: 0; display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.reader-highlight[data-highlight-state] { animation: none; box-decoration-break: clone; -webkit-box-decoration-break: clone; border-radius: 3px; }
+.reader-highlight[data-highlight-state='match'] { background: var(--word-root); }
+.reader-highlight[data-highlight-state='selected'] { background: var(--word-selected); }
