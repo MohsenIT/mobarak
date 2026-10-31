@@ -2,7 +2,7 @@
 import {t} from '@/lib/i18n'
 import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
 import { Arrow as PopoverArrow } from '@radix-ui/react-popover'
-import { List, Search, X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type { SurahData } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
@@ -10,11 +10,13 @@ import type { AnalysisLocation } from '@/lib/analysis'
 import { groupOccurrencesByAyah, occurrenceTokens, occurrenceWindow, type ContextToken } from '@/lib/occurrence-context'
 import { AyahMarker } from './Ornaments'
 import QuranText from './QuranText'
+import QuranHighlight from './QuranHighlight'
+import {occurrenceScopeSurahs,type OccurrenceScope} from '@/lib/occurrence-scope'
 
 export default function OccurrencePicker({ open, onOpenChange, items, index, surah, groupKey, label, title, onSelect, onFull }: {
   open: boolean; onOpenChange: (open: boolean) => void; items: AnalysisLocation[]; index: number
   surah: SurahData | null; groupKey: string; label: string; title: ReactNode
-  onSelect: (location: AnalysisLocation) => void; onFull?: (scope: 'surah' | 'quran') => void
+  onSelect: (location: AnalysisLocation) => void; onFull?: (scope: OccurrenceScope) => void
 }) {
   const list = useRef<HTMLDivElement>(null)
   const memory = useRef<{ group: string; top: number | null }>({ group: groupKey, top: null })
@@ -33,13 +35,16 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
           else selected?.scrollIntoView({ block: 'nearest' })
         })
       }}>
-      <div className="occurrence-picker-heading"><p className="sr-only">{t("ui.ace85fd091")}</p><div>
-        {onFull && <>
-          <button type="button" className="occurrence-search-shortcut" title={t("ui.a6e697e2b2")} onClick={() => { onOpenChange(false); onFull('surah') }}><List size={14} aria-hidden="true" /><span>{t("ui.9918f2233f")}</span></button>
-          <button type="button" className="occurrence-search-shortcut" title={t("ui.6a85b3a2ca")} onClick={() => { onOpenChange(false); onFull('quran') }}><Search size={14} aria-hidden="true" /><span>{t("ui.cd32ebbeba")}</span></button>
-        </>}
-        <button type="button" aria-label={t("ui.510fc4baec")} onClick={() => onOpenChange(false)}><X size={18} /></button>
-      </div></div>
+      <div className="occurrence-picker-heading">
+        {onFull && <div className="occurrence-search-scopes">
+          <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.searchIn')}</span>
+          <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.searchIn')}>
+            {([['previous','reader.previousSurah'],['surah','occurrence.thisSurah'],['next','reader.nextSurah'],['quran','occurrence.wholeQuran']] as const).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
+              disabled={!surah || occurrenceScopeSurahs(scope,surah.n) === null} onClick={() => { onOpenChange(false); onFull(scope) }}>{t(key)}</button>)}
+          </div>
+        </div>}
+        <button type="button" className="occurrence-picker-close" aria-label={t("ui.510fc4baec")} onClick={() => onOpenChange(false)}><X size={18} /></button>
+      </div>
       <div ref={list} className="occurrence-picker-list nice-scroll" onScroll={event => { memory.current.top = event.currentTarget.scrollTop }}>
         {groups.map(group => {
           const selected = group.indexes.includes(index)
@@ -94,7 +99,7 @@ function OccurrenceRow({ tokens, a, pos, part, locations, selected, onPick }: {
       }}
       onPointerUp={() => { drag.current = null }} onPointerCancel={() => { drag.current = null }} onLostPointerCapture={event => { if (event.target === event.currentTarget) drag.current = null }}
       onContextMenu={event => event.preventDefault()}>
-      <span className="occurrence-pan-text">{excerpt.tokens.map((token, i) => <span key={i}>{i > 0 && ' '}{token.kind === 'marker' ? <AyahMarker n={token.a} /> : <span ref={i === excerpt.target ? target : undefined} className={locations.some(([ayah, position, wordPart]) => token.a === ayah && token.pos === position && token.part === (wordPart ?? 'stem')) ? 'analysis-occurrence-match' : undefined}><QuranText text={token.text} /></span>}</span>)}</span>
+      <span className="occurrence-pan-text">{excerpt.tokens.map((token, i) => <span key={i}>{i > 0 && ' '}{token.kind === 'marker' ? <AyahMarker n={token.a} /> : <span ref={i === excerpt.target ? target : undefined}>{locations.some(([ayah, position, wordPart]) => token.a === ayah && token.pos === position && token.part === (wordPart ?? 'stem')) ? <QuranHighlight text={token.text} state={selected && token.pos === pos && token.part === (part ?? 'stem') ? 'selected' : 'match'} /> : <QuranText text={token.text} />}</span>}</span>)}</span>
     </span>
   </button>
 }

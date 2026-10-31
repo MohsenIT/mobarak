@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.36',date:'2026-10-31',title:'بن‌واژه و محدودهٔ جست‌وجوی تکرارها',changeKinds:['fix','improvement'],changes:[
+    'نوار پیمایش بن‌واژه صورت پایهٔ ثبت‌شده در دادهٔ صرفی را نشان می‌دهد؛ صورت انتخاب‌شدهٔ آیه در بالای بخش تحلیل حفظ می‌شود.',
+    'جست‌وجوی تکرارها با چهار محدودهٔ سورهٔ قبل، این سوره، سورهٔ بعد و کل قرآن در دسترس است و معیار ریشه یا بن‌واژه را حفظ می‌کند.',
+  ],
+},{
   version:'0.4.35',date:'2026-10-31',title:'اصلاح انتخاب سوره و نمایش مصحف',changeKinds:['fix','fix','fix','fix'],changes:[
     'نوار بالای بخش تحلیل برای انتخاب کوتاه متن کامل و برای انتخاب بلند آغاز متن را متناسب با فضا و همراه سه‌نقطه نشان می‌دهد.',
     'انتخاب سوره مانند انتخاب آیه و سیاق به‌صورت پیوسته و با رنگ انتخاب‌شدهٔ تنظیمات نمایش داده می‌شود.',

@@ -1,4 +1,5 @@
 'use client'
+import {occurrenceScopeSurahs,type OccurrenceScope} from '@/lib/occurrence-scope'
 import {useStudyWorkspace} from '@/lib/study-store'
 import {t,useUiLanguage} from '@/lib/i18n'
 import {isTranslator} from '@/lib/translations'
@@ -355,6 +356,14 @@ export default function Home() {
     })
   }, [mode, requestMushafVerse])
 
+  const openOccurrenceSearch = (selection: AnalysisSelection, scope: OccurrenceScope) => {
+    const surahs = occurrenceScopeSurahs(scope, selection.s)
+    if (!surahs) return
+    setSearchStart({ query: selection.tab === 'root' ? selection.root || selection.text : selection.text, mode: selection.tab === 'root' ? 'root' : selection.tab === 'word' ? 'lemma' : 'text', surahs, revision: Date.now() })
+    setOccurrenceSearch(selection)
+    setSearchOpen(true)
+  }
+
   const navigateDestination = (destination: Destination) => {
     setQuickSearchOpen(false);setSel(null)
     if(searchOpen){setReturnToSearch(true);setSearchOpen(false)}
@@ -639,7 +648,7 @@ export default function Home() {
           ? createPortal(
               <RootPanel
             playbackTarget={playbackTarget}
-            onOpenOccurrences={(selection, scope) => { setSearchStart({ query: selection.root || selection.text, mode: selection.tab === 'root' ? 'root' : 'text', surahs: scope === 'surah' ? [selection.s] : [], revision: Date.now() }); setOccurrenceSearch(selection); setSearchOpen(true) }}
+            onOpenOccurrences={openOccurrenceSearch}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}
@@ -660,7 +669,7 @@ export default function Home() {
           : (
               <RootPanel
             playbackTarget={playbackTarget}
-            onOpenOccurrences={(selection, scope) => { setSearchStart({ query: selection.root || selection.text, mode: selection.tab === 'root' ? 'root' : 'text', surahs: scope === 'surah' ? [selection.s] : [], revision: Date.now() }); setOccurrenceSearch(selection); setSearchOpen(true) }}
+            onOpenOccurrences={openOccurrenceSearch}
             onSelectionChange={setAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}

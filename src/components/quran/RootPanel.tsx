@@ -1,4 +1,6 @@
 'use client'
+import {wordLemma} from '@/lib/lemma-display'
+import type {OccurrenceScope} from '@/lib/occurrence-scope'
 import SelectionPreview from './SelectionPreview'
 import {selectedContentText} from '@/lib/selection-presentation'
 import {StudyNoteLink} from './StudyLinks'
@@ -25,7 +27,7 @@ import { IconClose, IconMaximize, IconRestore } from './Ornaments'
 
 interface Props {
   playbackTarget?: {s:number;a:number}|null
-  onOpenOccurrences: (selection: AnalysisSelection, scope: 'surah' | 'quran') => void
+  onOpenOccurrences: (selection: AnalysisSelection, scope: OccurrenceScope) => void
   comparisonRange?: { s: number; from: number; to: number } | null
   onCompareContext: (s: number, from: number, to: number) => void
   onSelectionChange: (selection: AnalysisSelection) => void
@@ -198,7 +200,7 @@ function RootPanelContent({
   const selectTarget = (a: number, pos: number, part?: WordPart) => selectTargetFor(tab, a, pos, part)
 
   const nav = useMemo(() => surah?.n === sel.s ? analysisNavigation(surah, { ...sel, tab, form: selectedForm }) : null, [surah, sel, tab, selectedForm,studyWorkspace])
-  const noun = tab === 'context' ? t("ui.16836d5471") : tab === 'verse' ? t("ui.b1b168c791") : tab === 'word' ? t("ui.9f06b558df") : tab === 'form' ? t("ui.12706fd406") : t("ui.eecfc08eb8")
+  const noun = tab === 'context' ? t("ui.16836d5471") : tab === 'verse' ? t("ui.b1b168c791") : tab === 'word' ? t("ui.8d5e58ddd8") : tab === 'form' ? t("ui.12706fd406") : t("ui.eecfc08eb8")
   const items = nav?.repetitions ?? []
   const index = nav?.repetitionIndex ?? -1
   const hasRepetitions = nav?.hasRepetitions ?? (tab !== 'verse' && tab !== 'context')
@@ -216,14 +218,16 @@ function RootPanelContent({
     if (!word) return '—'
     if (tab === 'root') return word.r ? word.r : '—'
     if (tab === 'form') return word.form ? morphologyLabel(word.form) : '—'
-    if (tab === 'word') return wordTarget(word, part).text
+    if (tab === 'word') return wordLemma(word, part) ?? '—'
     if (tab === 'verse') return t("ui.91e40f6b9f",{p0:(toFa(a))})
     const range = getContext(sel.s, a)
     return range ? t("ui.38a59f34c0",{p0:(toFa(range.from)),p1:(toFa(range.to))}) : t("ui.91e40f6b9f",{p0:(toFa(a))})
   }
   const previousUnitTitle = unitTitle(previousUnit)
   const nextUnitTitle = unitTitle(nextUnit)
-  const currentUnitTitle = tab === 'root' ? root ? root : '—' : tab === 'form' ? selectedForm ? morphologyLabel(selectedForm) : t("ui.12706fd406") : tab === 'word' ? sel.text : tab === 'verse' ? t("ui.91e40f6b9f",{p0:(toFa(sel.a))}) : selectedContext ? t("ui.38a59f34c0",{p0:(toFa(selectedContext.from)),p1:(toFa(selectedContext.to))}) : t("ui.16836d5471")
+  const selectedWord = surah?.n === sel.s ? surah.v[sel.a - 1]?.w[sel.pos - 1] : undefined
+  const selectedLemma = selectedWord ? wordLemma(selectedWord, sel.part) : null
+  const currentUnitTitle = tab === 'root' ? root ? root : '—' : tab === 'form' ? selectedForm ? morphologyLabel(selectedForm) : t("ui.12706fd406") : tab === 'word' ? selectedLemma ?? '—' : tab === 'verse' ? t("ui.91e40f6b9f",{p0:(toFa(sel.a))}) : selectedContext ? t("ui.38a59f34c0",{p0:(toFa(selectedContext.from)),p1:(toFa(selectedContext.to))}) : t("ui.16836d5471")
   const unitQuranFont = tab === 'root' || tab === 'word'
   const positionTitle = <><span className={`analysis-position-title${tab === 'context' ? ' analysis-position-range' : ''}${unitQuranFont ? ' font-quran' : ''}`}>{tab === 'context' && selectedContext ? <>{t("ui.d83f4af983")}{' '}<bdi dir="ltr">{toFa(selectedContext.from)}–{toFa(selectedContext.to)}</bdi></> : <QuranText text={currentUnitTitle} />}</span><span className="analysis-position-count" dir="rtl">{index >= 0 ? tab === 'verse' ? t("ui.5e5b087595",{p0:(toFa(items.length))}) : t("ui.53b89ec77a",{p0:(toFa(index + 1)),p1:(toFa(items.length))}) : '—'}</span></>
   const navigateUnit = (direction: number) => {
@@ -338,7 +342,7 @@ function RootPanelContent({
             groupKey={`${tab}:${sel.s}:${tab === 'root' ? root : tab === 'form' ? `${root}:${selectedForm}` : surah?.n === sel.s ? lexicalKey(surah.v[sel.a - 1].w[sel.pos - 1], sel.part) : sel.text}`}
             title={positionTitle}
             label={t("ui.f511eddde8",{p0:(toFa(index + 1)),p1:(toFa(items.length))})}
-            onSelect={location => selectTarget(...location)} onFull={scope => onOpenOccurrences({ ...sel, tab: scope === 'quran' && sel.root ? 'root' : tab, form: selectedForm }, scope)} /> : <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+            onSelect={location => selectTarget(...location)} onFull={scope => onOpenOccurrences({ ...sel, tab, form: selectedForm }, scope)} /> : <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
             <PopoverTrigger asChild>
               <button className="analysis-position-button" disabled={index < 0 || !items.length}
                 aria-label={t("ui.66f35797f5",{p0:(hasRepetitions ? t("ui.61cf4e03c8") : noun),p1:(toFa(index + 1)),p2:(toFa(items.length)),p3:(hasRepetitions ? t("ui.61cf4e03c8") : noun)})}>

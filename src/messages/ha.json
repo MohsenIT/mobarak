@@ -735,5 +735,8 @@
   "surah.roots": "Distinct roots",
   "surah.pages": "Page range",
   "surah.makkah": "Meccan",
-  "surah.madinah": "Medinan"
+  "surah.madinah": "Medinan",
+  "occurrence.searchIn": "Nema a:",
+  "occurrence.thisSurah": "Wannan sura",
+  "occurrence.wholeQuran": "Dukan Alƙur’ani"
 }

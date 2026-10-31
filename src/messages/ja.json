@@ -735,5 +735,8 @@
   "surah.roots": "Distinct roots",
   "surah.pages": "Page range",
   "surah.makkah": "Meccan",
-  "surah.madinah": "Medinan"
+  "surah.madinah": "Medinan",
+  "occurrence.searchIn": "検索範囲:",
+  "occurrence.thisSurah": "この章",
+  "occurrence.wholeQuran": "クルアーン全体"
 }
