@@ -32,7 +32,11 @@ test('quick and advanced search use ordinary and selected colors without borders
  await page.goto('/q?q=الله&h=0',{waitUntil:'domcontentloaded'});
  await colorOnly(page.locator('.search-result-card [data-search-match]').first(),'rgb(204, 187, 170)');
  await page.locator('.search-result-open').first().click();
- const chosen=page.locator('[data-reading-scroll] .quran-word.flash').first();await colorOnly(chosen,'rgb(68, 119, 153)');
+ const flash=page.locator('[data-reading-scroll] .quran-word.flash').first();
+ const address=await flash.evaluate(el=>{const word=el.closest('[data-surah][data-ayah][data-pos]');return {s:word.dataset.surah,a:word.dataset.ayah,pos:word.dataset.pos,part:el.dataset.wordPart}});
+ const chosen=page.locator(`[data-reading-scroll] [data-surah="${address.s}"][data-ayah="${address.a}"][data-pos="${address.pos}"] [data-word-part="${address.part}"]`);
+ await colorOnly(chosen,'rgb(68, 119, 153)');
+ await expect(flash).toHaveCount(0);
  const text=await chosen.innerText();await chosen.click();await page.locator('#analysis-tab-word').click();
  await expect(page.locator('[data-selection-preview]')).toHaveText(text);
 });
