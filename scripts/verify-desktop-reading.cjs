@@ -17,7 +17,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'),assert=req
   const word=words.first();await word.scrollIntoViewIfNeeded();const b=await word.boundingBox();
   await page.mouse.move(b.x+b.width*.9,b.y+b.height*.5);await page.mouse.down();await page.mouse.move(b.x+b.width*.1,b.y+b.height*.5,{steps:12});await page.mouse.up();
   assert((await page.evaluate(()=>getSelection().toString())).length>0,'mouse drag selects Quran text');assert.equal(await panel.count(),0,'selection must not open analysis');
-  const selected=await page.evaluate(()=>getSelection().toString());await page.keyboard.press('Control+C');const copied=await page.evaluate(()=>navigator.clipboard.readText());assert(copied.startsWith('سوره بقره، آیه ۱:\n'+selected.trim()));assert(copied.endsWith('(۱)'));assert.equal(copied.split('\n').length,2);
+  const selected=await page.evaluate(()=>getSelection().toString());await page.keyboard.press('Control+C');const copied=await page.evaluate(()=>navigator.clipboard.readText());assert(copied.startsWith('سوره بقره، آیه ۱:\n'+selected.replace(/\u0653/g,'').replace(/^\p{M}+/u,'').trim()));assert(copied.endsWith('(۱)'));assert.equal(copied.split('\n').length,2);
   const address=page.url();await page.keyboard.press('ArrowRight');assert.equal(page.url(),address,'arrows adjust native selection rather than switching surah');
   assert(await word.evaluate(e=>{const event=new MouseEvent('contextmenu',{bubbles:true,cancelable:true});return e.dispatchEvent(event)}),'native context menu remains available');
   await page.evaluate(()=>getSelection().removeAllRanges());await word.click();await panel.waitFor();await panel.getByRole('button',{name:'بستن',exact:true}).click();

@@ -42,3 +42,24 @@ test('share dialog copies consecutive and separate verses without hidden glyphs'
  await dialog.getByRole('button',{name:'کپی',exact:true}).click();
  copied=await page.evaluate(()=>navigator.clipboard.readText());expect(copied).toMatch(/^سوره حج، آیات ۱، ۳:\n/);expect(copied).toContain('(۱) ');expect(copied).toMatch(/\(۳\)$/);expect(copied.split('\n')).toHaveLength(2);
 });
+
+test('share preview uses the reader font compatibility rules and native share exports clean text',async({page,context})=>{
+ await setup(page,context);
+ await page.addInitScript(()=>{window.sharedText=null;Object.defineProperty(navigator,'share',{configurable:true,value:async value=>{window.sharedText=value.text}})});
+ await page.goto('/s/20',{waitUntil:'domcontentloaded'});
+ const word=page.locator('[data-reading-scroll] [data-surah="20"][data-ayah="2"] .quran-word').first();
+ await expect(word).toBeVisible();await word.click();
+ await page.getByRole('button',{name:'کپی و اشتراک آیات',exact:true}).click();
+ const dialog=page.locator('.verse-share-dialog');await expect(dialog).toBeVisible();
+ const preview=dialog.locator('.verse-share-verse .font-quran');
+ await expect(preview.first()).toBeVisible();
+ // The raw source has recitation marks mapped to placeholder glyphs by Hafs.
+ // Preview must use the same audited compatibility rendering as the reader.
+ expect(await preview.allTextContents()).not.toEqual([]);
+ for(const text of await preview.allTextContents())expect(text).not.toMatch(/[\u06D6-\u06DC\u06DE\u06DF\u06E2\u06E3\u06E9\u06EB\u06ED\u25CC\uFFFD]/u);
+ await dialog.getByRole('button',{name:'کپی',exact:true}).click();
+ const copied=await page.evaluate(()=>navigator.clipboard.readText());
+ expect(copied).toContain('لِتَشْقَى');expect(copied).not.toMatch(/[\u0653\u25CC\uFFFD]/u);
+ await dialog.getByRole('button',{name:'ارسال',exact:true}).click();
+ await expect.poll(()=>page.evaluate(()=>window.sharedText)).toBe(copied);
+});

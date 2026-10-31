@@ -14,7 +14,11 @@
     "build:desktop": "bun scripts/build-desktop.mjs",
     "tauri": "tauri",
     "desktop:dev": "tauri dev",
-    "desktop:build": "tauri build"
+    "desktop:build": "tauri build",
+    "test:unit": "bun test src/lib",
+    "test:e2e": "playwright test --project=chromium-phone --project=chromium-desktop --project=android-bridge-phone",
+    "verify:release": "node scripts/verify-release.mjs",
+    "hooks:install": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

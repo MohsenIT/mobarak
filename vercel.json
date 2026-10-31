@@ -1,0 +1,3 @@
+{
+  "buildCommand": "node scripts/await-ci.mjs && bun run build"
+}

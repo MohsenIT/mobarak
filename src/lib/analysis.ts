@@ -16,15 +16,27 @@ export interface AnalysisSelection {
   to?: number
 }
 
+/** Shared range contract for every reading surface and its verse markers. */
+export function isAnalysisRange(selection: AnalysisSelection | null | undefined): selection is AnalysisSelection & { tab: 'verse' | 'context' | 'surah' } {
+  return !!selection && ['verse', 'context', 'surah'].includes(selection.tab)
+}
+
+export function analysisRangeContains(selection: AnalysisSelection | null | undefined, s: number, a: number): boolean {
+  if (!isAnalysisRange(selection) || selection.s !== s) return false
+  if (selection.tab === 'surah') return true
+  if (selection.tab === 'verse') return selection.a === a
+  return selection.from !== undefined && selection.to !== undefined && a >= selection.from && a <= selection.to
+}
+
 export function matchesAnalysis(selection: AnalysisSelection | null | undefined, s: number, a: number, pos: number, word: Word): boolean {
   if (!selection || selection.s !== s) return false
   switch (selection.tab) {
     case 'root': return !!selection.root && word.r === selection.root
     case 'form': return !!selection.form && !!selection.root && word.form === selection.form && word.r === selection.root
     case 'word': return selection.a === a && selection.pos === pos
-    case 'surah': return true
-    case 'verse': return selection.a === a
-    case 'context': return selection.from !== undefined && selection.to !== undefined && a >= selection.from && a <= selection.to
+    case 'surah':
+    case 'verse':
+    case 'context': return analysisRangeContains(selection, s, a)
   }
 }
 

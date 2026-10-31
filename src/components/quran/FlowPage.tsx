@@ -7,7 +7,7 @@ import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
 import SelectableWord from './SelectableWord'
 import { rootColorStyle } from '@/lib/comparison-colors'
 import FlowTranslations from './FlowTranslations'
-import { matchesAnalysis, type AnalysisSelection } from '@/lib/analysis'
+import { analysisRangeContains, isAnalysisRange, matchesAnalysis, type AnalysisSelection } from '@/lib/analysis'
 import type { Selection } from './MushafPage'
 
 interface Props {
@@ -45,17 +45,17 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
       <div ref={textRef} data-quran-copy-surface className="font-quran text-justify mt-2 relative" dir="rtl"
         style={{ fontSize, lineHeight: 2.05, color: 'var(--ink)' }}>
         {surah.v.map(v => {
-          const isRange = analysisSelection && (analysisSelection.tab === 'verse' || analysisSelection.tab === 'context') && matchesAnalysis(analysisSelection, surah.n, v.n, 1, v.w[0])
+          const isRange = analysisRangeContains(analysisSelection, surah.n, v.n)
           const isComparisonRange = comparisonRange?.s === surah.n && v.n >= comparisonRange.from && v.n <= comparisonRange.to
           const continues = isComparisonRange ? v.n < comparisonRange.to
-            : isRange && v.n < surah.vc && matchesAnalysis(analysisSelection, surah.n, v.n + 1, 1, v.w[0])
+            : isRange && v.n < surah.vc && analysisRangeContains(analysisSelection, surah.n, v.n + 1)
           return (
           <span key={v.n} data-verse={v.n}>
           <span className={`${isRange ? 'analysis-range' : ''}${isComparisonRange ? ' comparison-range-band' : ''}`} data-comparison-range={isComparisonRange ? 'true' : undefined}>
             {v.w.map((w, i) => {
               const hue = comparisonRange?.s === surah.n && w.r ? comparisonRoots?.[w.r] : undefined
               const isFlash = flash && flash.s === surah.n && flash.a === v.n && flash.pos === i + 1
-              const activeSelection = analysisSelection?.tab === 'verse' || analysisSelection?.tab === 'context' ? null : analysisSelection?.tab === 'word' ? analysisSelection : selection
+              const activeSelection = isAnalysisRange(analysisSelection) ? null : analysisSelection?.tab === 'word' ? analysisSelection : selection
               const isSelected = activeSelection?.s === surah.n && activeSelection.a === v.n && activeSelection.pos === i + 1
               const isSameRoot = highlightRoot && w.r === highlightRoot
               const isAnalysis = analysisSelection?.tab !== 'root' && matchesAnalysis(analysisSelection, surah.n, v.n, i + 1, w)

@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.35',date:'2026-10-31',title:'اصلاح انتخاب سوره و نمایش مصحف',changeKinds:['fix','fix','fix'],changes:[
+    'انتخاب سوره مانند انتخاب آیه و سیاق به‌صورت پیوسته و با رنگ انتخاب‌شدهٔ تنظیمات نمایش داده می‌شود.',
+    'عنوان سوره‌هایی که متنشان از خط دوم شروع می‌شود حفظ می‌شود و اندازهٔ متن مصحف برای جلوگیری از بیرون‌زدن کلمات دقیق‌تر تنظیم می‌شود.',
+    'پیش‌نمایش اشتراک آیات همان اصلاحات سازگاری قلم صفحهٔ خواندن را اعمال می‌کند تا علائم ناسازگار نمایش داده نشوند.',
+  ],
+},{
   version:'0.4.34',date:'2026-10-31',title:'اصلاح سراسری صفحه‌بندی مصحف',changeKinds:['fix','feature','fix'],changes:[
     'صفحه‌بندی همهٔ ۶۰۴ صفحه با ترتیب سطرها و شروع ۱۱۴ سوره تطبیق داده شد؛ آیات شرح، علق، عادیات و دیگر موارد دیگر در صفحه یا سطر نادرست نمی‌آیند.',
     'تب باب با تب سوره جایگزین شد؛ مشخصات کلی، آمار و کپی و اشتراک کل سوره در دسترس است.',

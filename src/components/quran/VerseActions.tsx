@@ -9,6 +9,7 @@ import { Content as DialogContentPrimitive } from '@radix-ui/react-dialog'
 import { Copy, Link, Share2, X } from 'lucide-react'
 import type { SurahData, Verse, Translator, Translations } from '@/lib/quran'
 import { formatVerseCopy } from '@/lib/verse-copy'
+import { quranDisplayText } from '@/lib/quran-display'
 import { versePath } from '@/lib/verse-link'
 import { toFa, loadTrans } from '@/lib/quran'
 
@@ -80,7 +81,7 @@ export default function VerseActions({ surah, verse, translator, wholeSurah = fa
           {bismillah && <p className="font-quran text-center text-2xl py-3">{BISMILLAH}</p>}
           {surah.v.filter(v => v.n >= visible[0] && v.n <= visible[1]).map(v => <button key={v.n} aria-pressed={selected.includes(v.n)} className="verse-share-verse" onClick={() => setSelected(old => old.includes(v.n) ? old.filter(n => n !== v.n) : [...old,v.n])}>
             <span className="text-xs flex justify-between mb-2"><span>{surah.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(v.n)}</span><span>{selected.includes(v.n) ? t("ui.b87afe7141") : t("ui.e53a7e34a8")}</span></span>
-            <span className="font-quran block text-2xl leading-loose">{v.w.map(w => w.t).join(' ')}</span>
+            <span className="font-quran block text-2xl leading-loose">{v.w.map(w => quranDisplayText(w.t)).join(' ')}</span>
             {withTranslation && <span className="block text-sm leading-8 mt-2" dir={translationDirection(translator)} lang={translationLanguage(translator)}>{translations?.[String(v.n)]?.[translator] || (failed ? t("ui.4468be1c43") : t("ui.bcd4159e9d"))}</span>}
           </button>)}
           {visible[1] < surah.v.length && <button className="chip min-h-11 w-full" onClick={() => setVisible(([a,b]) => [a,Math.min(surah.v.length,b+3)])}>{t("ui.36a9d4da70")}</button>}
