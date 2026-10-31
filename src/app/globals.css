@@ -1673,3 +1673,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-results-position { font-size:12px; font-weight:600; }
 .search-result-meta { flex-wrap:wrap; }
 .search-result-meta > .search-result-position { color:var(--ink); font-size:11px; background:var(--word-active); border-radius:8px; padding:3px 7px; }
+
+/* Keep dictation status space from stretching the search toolbar. */
+.search-command-row .search-page-input > .dictation-field { flex: 1; margin-block-end: 0; width: auto; }
+.search-command-row .search-page-input .dictation-input-shell { min-height: 44px; }

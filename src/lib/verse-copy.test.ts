@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
-import { formatVerseCopy, mergeSelectionRects, type CopiedVerse } from './verse-copy'
+import { quranCopyText, formatVerseCopy, mergeSelectionRects, type CopiedVerse } from './verse-copy'
 
 import { setUiLanguage } from './i18n'
 beforeEach(async () => { await setUiLanguage('fa', false) })
@@ -19,7 +19,7 @@ describe('copied Quran references', () => {
   test('copy omits hidden recitation annotations but retains letters and pronunciation', () => {
     expect(formatVerseCopy([verse(5, 'ٱتَّقُوا۟ رَبَّكُمْ ۚ عَظِيمٌۭ')])).toBe('سوره بقره، آیه ۵:\nٱتَّقُوا رَبَّكُمْ عَظِيمٌ (۵)')
     expect(formatVerseCopy([verse(5, 'ْكِتَـٰبُ')])).toBe('سوره بقره، آیه ۵:\nكِتَـٰبُ (۵)')
-    expect(formatVerseCopy([verse(5, 'نَادَىٰ وَأَهْلَهُۥ')])).toBe('سوره بقره، آیه ۵:\nنَادَىٰ وَأَهْلَهُۥ (۵)')
+    expect(formatVerseCopy([verse(5, 'نَادَىٰ وَأَهْلَهُۥ')])).toBe('سوره بقره، آیه ۵:\nنَادَى وَأَهْلَهُۥ (۵)')
   })
   test('optional translations and bismillah remain in the body below the heading', () => {
     expect(formatVerseCopy([{ ...verse(5, 'عَرَبِيّ'), translation: 'ترجمه' }])).toBe('سوره بقره، آیه ۵:\nعَرَبِيّ (۵) — ترجمه')
@@ -39,4 +39,12 @@ test('selection bands bridge word gaps on the same line without joining separate
 test('browser DOMRect getters are copied into each selection band', () => {
   const rect = Object.create({ get left() { return 10 }, get top() { return 20 }, get right() { return 40 }, get bottom() { return 60 } })
   expect(mergeSelectionRects([rect])).toEqual([{ left: 10, top: 20, right: 40, bottom: 60 }])
+})
+
+test('Taha copy omits Word-incompatible lengthening annotations without removing hamza or vowels', () => {
+  const source = ['طه', 'مَآ أَنزَلْنَا عَلَيْكَ ٱلْقُرْءَانَ لِتَشْقَىٰٓ', 'إِلَّا تَذْكِرَةًۭ لِّمَن يَخْشَىٰ']
+  const copied = formatVerseCopy(source.map((text, i) => ({ surah: 20, name: 'طه', ayah: i + 1, text })))
+  expect(copied).toBe('سوره طه، آیات ۱-۳:\nطه (۱) مَا أَنزَلْنَا عَلَيْكَ ٱلْقُرْءَانَ لِتَشْقَى (۲) إِلَّا تَذْكِرَةً لِّمَن يَخْشَى (۳)')
+  expect(copied).not.toMatch(/[\u0653\u06D6-\u06ED]/u)
+  expect(quranCopyText('آمَنَ أَحَدٌ إِلَّا سُـِٔلَ الرَّحْمَـٰنُ')).toBe('آمَنَ أَحَدٌ إِلَّا سُـِٔلَ الرَّحْمَـٰنُ')
 })

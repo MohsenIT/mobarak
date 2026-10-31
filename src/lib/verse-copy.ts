@@ -3,7 +3,13 @@ import { formatDigits } from './locale-numbers'
 import { quranDisplayText } from './quran-display'
 
 export function quranCopyText(text: string): string {
-  return quranDisplayText(text).replace(/^\p{M}+/u, '').replace(/\s+/g, ' ').trim()
+  return quranDisplayText(text)
+    // Lengthening annotations can render as boxes or dotted circles in Word.
+    // Keep real hamza letters (آ/أ/إ) and combining hamza; only omit the
+    // recitation maddah and the redundant dagger alef on alef maksura.
+    .replace(/\u0653/g, '')
+    .replace(/ى\u0670/g, 'ى')
+    .replace(/^\p{M}+/u, '').replace(/\s+/g, ' ').trim()
 }
 
 /** Source text and references for one copied verse (including partial verses). */

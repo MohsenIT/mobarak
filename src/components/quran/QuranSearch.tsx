@@ -248,7 +248,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         {error && <button type="button" className="chip" onClick={() => setRetry(value => value + 1)}>{t("ui.be9b8b4f2b")}</button>}
         {!busy && !error && valid && !results.length && <div className="search-empty"><Search size={30} /><h2>{t("ui.b548ad6007")}</h2><p>{t("ui.d0c738e420")}</p></div>}
         {!busy && !error && valid && results.slice(0, visible).map((result, index) => <div key={`${result.s}:${result.a}`}>
-          {!occurrenceFilter && (index === 0 || results[index - 1].kind !== result.kind) && <h2 className="search-result-group">{t(labels[result.kind])}</h2>}
+          {!occurrenceFilter && (index === 0 || results[index - 1].kind !== result.kind) && <h2 className="search-result-group">{t(labels[result.kind])}{' · '}{t('search.totalResults', { total: results.filter(item => item.kind === result.kind).length })}</h2>}
           <article className="search-result-card" data-search-result-index={index + 1}><button type="button" className="search-result-open" aria-label={t("ui.a55b5ca0c4",{p0:(meta.surahs[result.s - 1]?.fa),p1:(toFa(result.a))})} onClick={() => { scroll.current = list.current?.scrollTop ?? scroll.current; onPick(result.s, result.a, result.positions[0] ?? 1) }}>
             <span className="search-result-meta"><b>{meta.surahs[result.s - 1]?.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(result.a)}</b><span className="search-result-position">{t('search.resultPosition', { current: index + 1, total: results.length })}</span><span>{t("ui.1abf27acd0")}</span></span><span className="search-result-text font-quran" lang="ar">{snippet(result, true)}</span>
           </button>
