@@ -725,5 +725,15 @@
   "copy.verseHeading": "سوره {surah}، آیه {verses}:",
   "copy.versesHeading": "سوره {surah}، آیات {verses}:",
   "search.totalResults": "{total} نتیجه",
-  "search.resultPosition": "مورد {current} از {total}"
+  "search.resultPosition": "مورد {current} از {total}",
+  "surah.tab": "سوره",
+  "surah.share": "کپی و اشتراک کل سوره",
+  "surah.number": "شمارهٔ سوره",
+  "surah.revelation": "محل نزول",
+  "surah.verses": "تعداد آیات",
+  "surah.words": "تعداد واژه‌ها",
+  "surah.roots": "ریشه‌های متمایز",
+  "surah.pages": "محدودهٔ صفحات",
+  "surah.makkah": "مکی",
+  "surah.madinah": "مدنی"
 }

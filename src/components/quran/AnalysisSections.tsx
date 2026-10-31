@@ -15,6 +15,7 @@ export const ROOT_BOOKS = [
 type Kind = 'meaning' | 'stats'
 type Option = { id: string; label: string }
 export const STAT_OPTIONS: Record<AnalysisTab, Option[]> = {
+  surah: [],
   root: [{ id: 'surahCount', label: t("ui.7218e3f8bd") }, { id: 'total', label: t("ui.a9b480b287") }, { id: 'hosts', label: t("ui.0703147d39") }, { id: 'keyword', label: t("ui.22512cfbfe") }, { id: 'share', label: t("ui.79c5d4ab13") }, { id: 'distribution', label: t("ui.b09c0633d0") }],
   form: [{ id: 'surahCount', label: t("ui.7218e3f8bd") }, { id: 'total', label: t("ui.a9b480b287") }, { id: 'ayahCount', label: t("ui.e9544cd504") }, { id: 'hosts', label: t("ui.0703147d39") }],
   word: [{ id: 'surahCount', label: t("ui.7218e3f8bd") }, { id: 'total', label: t("ui.a9b480b287") }, { id: 'ayahCount', label: t("ui.e9544cd504") }, { id: 'hosts', label: t("ui.0703147d39") }],
@@ -22,6 +23,7 @@ export const STAT_OPTIONS: Record<AnalysisTab, Option[]> = {
   context: [{ id: 'verses', label: t("ui.e9544cd504") }, { id: 'words', label: t("ui.2f5035260e") }, { id: 'roots', label: t("ui.a7a0a346a5") }],
 }
 const MEANING_OPTIONS: Record<AnalysisTab, Option[]> = {
+  surah: [],
   root: [...ROOT_BOOKS],
   form: [{ id: 'morphology', label: t("ui.03df2a037d") }],
   word: [{ id: 'lemma', label: t("ui.2c292327c8") }],

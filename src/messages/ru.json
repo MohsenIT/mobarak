@@ -725,5 +725,15 @@
   "copy.verseHeading": "Surah {surah}, verse {verses}:",
   "copy.versesHeading": "Surah {surah}, verses {verses}:",
   "search.totalResults": "{total} results",
-  "search.resultPosition": "Result {current} of {total}"
+  "search.resultPosition": "Result {current} of {total}",
+  "surah.tab": "Surah",
+  "surah.share": "Copy and share the entire surah",
+  "surah.number": "Surah number",
+  "surah.revelation": "Place of revelation",
+  "surah.verses": "Verses",
+  "surah.words": "Words",
+  "surah.roots": "Distinct roots",
+  "surah.pages": "Page range",
+  "surah.makkah": "Meccan",
+  "surah.madinah": "Medinan"
 }

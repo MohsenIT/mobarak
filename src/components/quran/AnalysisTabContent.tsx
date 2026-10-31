@@ -7,6 +7,7 @@ import type { Selection } from './MushafPage'
 import type { AnalysisTab } from '@/lib/analysis'
 import { wordTarget, type WordPart } from '@/lib/word-parts'
 import SelectionDetails from './SelectionDetails'
+import SurahDetails from './SurahDetails'
 import ContextDetails from './ContextDetails'
 import RootMeaning from './RootMeaning'
 import { AnalysisSection, STAT_OPTIONS, useAnalysisPreferences } from './AnalysisSections'
@@ -26,7 +27,7 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
   const [globalRoots, setGlobalRoots] = useState<Record<string, Record<string, number>> | null>(null)
   useEffect(() => {
     let live = true
-    Promise.all([loadSurah(sel.s), tab === 'root' || tab === 'context' ? Promise.resolve(null) : loadTrans(sel.s,translator).catch(()=>({}))]).then(([surah, trans]) => { if (live) setData({ surah, trans }) })
+    Promise.all([loadSurah(sel.s), tab === 'root' || tab === 'context' || tab === 'surah' ? Promise.resolve(null) : loadTrans(sel.s,translator).catch(()=>({}))]).then(([surah, trans]) => { if (live) setData({ surah, trans }) })
     if (tab === 'root') loadGlobalRoots().then(data => { if (live) setGlobalRoots(data) })
     return () => { live = false }
   }, [sel.s, tab, translator])
@@ -56,6 +57,8 @@ export default function AnalysisTabContent({ tab, selection: sel, meta, translat
   }, [root, surah, globalRoots, sel.s])
 
   const selectedForm = sel.part !== 'prefix' && surah?.n === sel.s ? surah.v.find(v => v.n === sel.a)?.w[sel.pos - 1]?.form : undefined
+
+  if (tab === 'surah') return surah ? <SurahDetails surah={surah} meta={meta.surahs[sel.s - 1]} translator={translator} /> : <p role="status">{t('ui.0cfb741f7a')}</p>
 
   return <>          {tab !== 'root' ? (surah?.n !== sel.s ? <p role="status">{t("ui.0cfb741f7a")}</p> : tab === 'context' ? <ContextDetails selection={sel} surah={surah} onPick={selectTarget} onCompare={onCompareContext} /> : trans ? <SelectionDetails tab={tab} selection={{ ...sel, tab, form: selectedForm }} surah={surah} trans={trans} translator={translator} /> : <p role="status">{t("ui.0cfb741f7a")}</p>) : <>
           {!root ? (

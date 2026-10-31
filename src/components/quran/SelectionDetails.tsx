@@ -19,7 +19,7 @@ function loadIndex() {
 }
 
 interface Props {
-  tab: Exclude<AnalysisTab, 'root' | 'context'>
+  tab: Exclude<AnalysisTab, 'root' | 'context' | 'surah'>
   selection: AnalysisSelection
   surah: SurahData
   trans: Translations

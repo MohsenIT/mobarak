@@ -29,7 +29,7 @@ async function copyText(text: string) {
   if (!copied) throw new Error('copy unavailable')
 }
 
-export default function VerseActions({ surah, verse, translator }: { surah: SurahData; verse: Verse; translator: Translator }) {
+export default function VerseActions({ surah, verse, translator, wholeSurah = false }: { wholeSurah?: boolean; surah: SurahData; verse: Verse; translator: Translator }) {
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<number[]>([verse.n])
   const [visible, setVisible] = useState<[number, number]>([Math.max(1, verse.n - 1), Math.min(surah.v.length, verse.n + 1)])
@@ -42,7 +42,7 @@ export default function VerseActions({ surah, verse, translator }: { surah: Sura
   const reference = t("ui.0d7cba2b23",{p0:(surah.fa),p1:(chosen.length === 1 ? t("ui.1723d54443") : t("ui.d83f4af983")),p2:(chosen.map(v => toFa(v.n)).join('، '))})
   const text = formatVerseCopy(chosen.map(v => ({ surah: surah.n, name: surah.fa, ayah: v.n, text: v.w.map(w => w.t).join(' '), translation: withTranslation ? translations?.[String(v.n)]?.[translator] : undefined })), bismillah ? BISMILLAH : undefined)
   const ready = chosen.length > 0 && (!withTranslation || chosen.every(v => translations?.[String(v.n)]?.[translator]))
-  const links = () => chosen.map(v => new URL(versePath({ s: surah.n, a: v.n, pos: 1 }), process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app/' : window.location.origin).href).join('\n')
+  const links = () => wholeSurah ? new URL(`/s/${surah.n}`, process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://mobarak.app/' : window.location.origin).href : chosen.map(v => new URL(versePath({ s: surah.n, a: v.n, pos: 1 }), process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app/' : window.location.origin).href).join('\n')
   const copy = async (value: string) => {
     try { await copyText(value); setStatus(t("ui.2d3a29b875")) } catch { setStatus(t("ui.fe0cbd12e3")) }
   }
@@ -54,12 +54,12 @@ export default function VerseActions({ surah, verse, translator }: { surah: Sura
     await copy(text)
   }
   const begin = () => {
-    setSelected([verse.n]); setVisible([Math.max(1, verse.n - 1), Math.min(surah.v.length, verse.n + 1)]); setStatus(''); setOpen(true)
+    setSelected(wholeSurah ? surah.v.map(v => v.n) : [verse.n]); setVisible(wholeSurah ? [1, Math.min(20, surah.v.length)] : [Math.max(1, verse.n - 1), Math.min(surah.v.length, verse.n + 1)]); setStatus(''); setOpen(true)
     setFailed(false); setTranslations(null)
     loadTrans(surah.n,translator).then(setTranslations).catch(() => setFailed(true))
   }
   return <Dialog open={open} onOpenChange={setOpen}>
-    <button className="icon-btn sm" aria-label={t("ui.f23b76eb4e")} title={t("ui.f23b76eb4e")} onClick={begin}><Share2 size={18} /></button>
+    <button className="icon-btn sm" aria-label={t(wholeSurah ? "surah.share" : "ui.f23b76eb4e")} title={t(wholeSurah ? "surah.share" : "ui.f23b76eb4e")} onClick={begin}><Share2 size={18} /></button>
     <DialogPortal>
       <DialogOverlay style={{ zIndex: 10000 }} />
       <DialogContentPrimitive dir={uiDirection()} aria-describedby="share-help" className="verse-share-dialog">

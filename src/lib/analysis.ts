@@ -2,7 +2,7 @@ import { lexicalKey, splitWord, wordKey, type WordPart } from './word-parts'
 import type { SurahData, Word } from './quran'
 import { nextContext, getContext, getSurahContexts } from './contexts'
 
-export type AnalysisTab = 'root' | 'form' | 'word' | 'verse' | 'context'
+export type AnalysisTab = 'root' | 'form' | 'word' | 'verse' | 'context' | 'surah'
 export interface AnalysisSelection {
   part?: WordPart
   tab: AnalysisTab
@@ -22,6 +22,7 @@ export function matchesAnalysis(selection: AnalysisSelection | null | undefined,
     case 'root': return !!selection.root && word.r === selection.root
     case 'form': return !!selection.form && !!selection.root && word.form === selection.form && word.r === selection.root
     case 'word': return selection.a === a && selection.pos === pos
+    case 'surah': return true
     case 'verse': return selection.a === a
     case 'context': return selection.from !== undefined && selection.to !== undefined && a >= selection.from && a <= selection.to
   }
@@ -42,6 +43,7 @@ export function analysisOccurrences(surah: SurahData, selection: AnalysisSelecti
 
 /** Each tab navigates its own unit, preserving the other tabs' targets. */
 export function nextAnalysisLocation(surah: SurahData, selection: AnalysisSelection, direction: number): [number, number, WordPart?] | null {
+  if (selection.tab === 'surah') return null
   if (selection.tab === 'context') {
     const next = nextContext(selection.s, selection.a, direction)
     return next ? [next.from, 1] : null
@@ -78,7 +80,9 @@ export type AnalysisLocation = [number, number, WordPart?]
 export function analysisNavigation(surah: SurahData, selection: AnalysisSelection) {
   const units: AnalysisLocation[] = []
   const seen = new Set<string>()
-  if (selection.tab === 'verse') {
+  if (selection.tab === 'surah') {
+    units.push([selection.a, selection.pos])
+  } else if (selection.tab === 'verse') {
     for (const verse of surah.v) units.push([verse.n, 1])
   } else if (selection.tab === 'context') {
     for (const range of getSurahContexts(surah.n)?.ranges ?? []) units.push([range.from, 1])

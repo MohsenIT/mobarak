@@ -46,7 +46,7 @@ interface Props {
   stackedOverIndex?: boolean
 }
 
-const TABS = [['root', t("ui.eecfc08eb8")], ['form', t("ui.12706fd406")], ['word', t("ui.8d5e58ddd8")], ['verse', t("ui.b1b168c791")], ['context', t("ui.16836d5471")]] as const
+const TABS = [['root', t("ui.eecfc08eb8")], ['word', t("ui.8d5e58ddd8")], ['verse', t("ui.b1b168c791")], ['context', t("ui.16836d5471")], ['surah', t('surah.tab')]] as const
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
@@ -60,7 +60,7 @@ function RootPanelContent({
 }: Props) {
   const {work:studyWorkspace}=useStudyWorkspace()
   const [tab, setTab] = useState<AnalysisTab>(() => { const saved = readAnalysisView().tab ?? 'root'; return (!anchor.root || anchor.part === 'prefix') && (saved === 'root' || saved === 'form') ? 'word' : saved })
-  const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
+  const [targets, setTargets] = useState<Record<AnalysisTab, Selection>>({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor, surah: anchor })
   useEffect(()=>{
     if(!playbackTarget)return
     let live=true
@@ -86,7 +86,7 @@ function RootPanelContent({
   // Retarget an existing sheet without remounting its DOM or replaying sheetUp.
   if (anchor !== previousAnchor) {
     setPreviousAnchor(anchor)
-    setTargets({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor })
+    setTargets({ root: anchor, form: anchor, word: anchor, verse: anchor, context: anchor, surah: anchor })
     setTab(current => (!anchor.root || anchor.part === 'prefix') && (current === 'root' || current === 'form') ? 'word' : current)
     setPickerOpen(false)
   }
@@ -304,7 +304,7 @@ function RootPanelContent({
           </div>
           <div className="panel-actions">
             {surah?.n===20&&<StudyNoteLink surah={surah} a={sel.a} pos={sel.pos} tab={tab} contextId={selectedContext?.stableId??(selectedContext?`s20:${selectedContext.id}`:undefined)}/>}
-            {surah?.n === sel.s && surah.v.find(v => v.n === sel.a) && <VerseActions key={`${sel.s}:${sel.a}`} surah={surah} verse={surah.v.find(v => v.n === sel.a)!} translator={translator} />}
+            {surah?.n === sel.s && surah.v.find(v => v.n === sel.a) && <VerseActions wholeSurah={tab === 'surah'} key={`${sel.s}:${sel.a}`} surah={surah} verse={surah.v.find(v => v.n === sel.a)!} translator={translator} />}
             <AnalysisSettings tab={tab} />
             <button className="icon-btn sm" onClick={minimize} aria-label={minimized ? t("ui.b9228a4d01") : t("ui.c516d98418")} title={minimized ? t("ui.f3429230a3") : t("ui.71cf3491e7")}>
               {minimized ? <IconRestore /> : <Minus size={18} />}
@@ -322,13 +322,13 @@ function RootPanelContent({
         <div ref={tabStrip} className="analysis-tab-strip flex border-b px-2" role="tablist" aria-label={t("ui.b8d7d4a720")} style={{ borderColor: 'var(--line)' }}>
           {TABS.map(([key, label]) => (
             <button key={key} role="tab" id={`analysis-tab-${key}`} aria-controls={`analysis-panel-${key}`} aria-selected={tab === key}
-              disabled={(key === 'form' && !formAvailable) || (key === 'root' && !rootAvailable)}
-              title={key === 'root' && !rootAvailable ? t("ui.193af3aadc") : key === 'form' && !formAvailable ? (formAvailable === null ? t("ui.0fbe48d291") : t("ui.2cd99b4a99")) : undefined}
+              disabled={key === 'root' && !rootAvailable}
+              title={key === 'root' && !rootAvailable ? t("ui.193af3aadc") : undefined}
               className={`tab-btn flex-1${tab === key ? ' active' : ''}`} onClick={() => switchTab(key)}>{t(label)}</button>
           ))}
           <div ref={indicatorTrack} className="analysis-tab-indicator-track" aria-hidden="true"><span ref={indicator} /><span ref={indicatorCopy} /></div>
         </div>
-        <nav ref={navigationRef} className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={t("ui.90c50672b6",{p0:(noun)})}>
+        <nav hidden={tab === 'surah'} ref={navigationRef} className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={t("ui.90c50672b6",{p0:(noun)})}>
           <button className="analysis-unit-button" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={t("ui.17017bfab8",{p0:(noun)})} title={t("ui.04529abbdc",{p0:(noun),p1:(previousUnitTitle)})}>
             {hasRepetitions ? <ChevronsRight size={15} aria-hidden="true" /> : <ChevronRight size={15} aria-hidden="true" />}
             <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={previousUnitTitle} /></span>
@@ -373,7 +373,7 @@ function RootPanelContent({
             {hasRepetitions ? <ChevronsLeft size={15} aria-hidden="true" /> : <ChevronLeft size={15} aria-hidden="true" />}
           </button>
         </nav>
-        <SwipeTabPages contentKey={`${anchor.s}:${anchor.a}:${anchor.pos}:${anchor.part ?? 'stem'}`} active={tab} onChange={switchTab} onProgress={paintTabIndicator} panes={TABS.filter(([key]) => (key !== 'form' || formAvailable) && (key !== 'root' || rootAvailable)).map(([key]) => ({
+        <SwipeTabPages contentKey={`${anchor.s}:${anchor.a}:${anchor.pos}:${anchor.part ?? 'stem'}`} active={tab} onChange={switchTab} onProgress={paintTabIndicator} panes={TABS.filter(([key]) => key !== 'root' || rootAvailable).map(([key]) => ({
           key,
           content: <AnalysisTabContent tab={key} selection={targets[key]} meta={meta} translator={translator} comparisonRange={comparisonRange}
             onPick={(a, pos, part) => selectTargetFor(key, a, pos, part)} onCompareContext={onCompareContext}
