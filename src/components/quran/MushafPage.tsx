@@ -178,7 +178,7 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
                 const inRange = preceding?.kind === 'word' && comparisonRange?.s === preceding.s && it.n >= comparisonRange.from && it.n <= comparisonRange.to
                 const analysisMarker = preceding?.kind === 'word' && analysisRangeContains(analysisSelection, preceding.s, preceding.a)
                 const kind = preceding?.kind === 'word' ? sujudKind(preceding.s, it.n) : null
-                return <span key={i} data-analysis-marker={analysisMarker?'true':undefined} data-comparison-range={inRange ? 'true' : undefined}><AyahMarker n={it.n} />{kind&&<SujudMark kind={kind}/>}</span>
+                return <span key={i} data-analysis-marker={analysisMarker?'true':undefined} data-comparison-range={inRange ? 'true' : undefined}>{kind&&<SujudMark kind={kind}/>}<AyahMarker n={it.n} /></span>
               }
               if (it.kind !== 'word') return null
               const isFlash = flash && flash.s === it.s && flash.a === it.a && flash.pos === it.pos

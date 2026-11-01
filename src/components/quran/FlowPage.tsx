@@ -70,7 +70,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
                 </span>
               )
             })}
-            <AyahMarker n={v.n} />{sujudKind(surah.n,v.n) && <SujudMark kind={sujudKind(surah.n,v.n)!} />}{continues ? ' ' : null}
+            {sujudKind(surah.n,v.n) && <SujudMark kind={sujudKind(surah.n,v.n)!} />}<AyahMarker n={v.n} />{continues ? ' ' : null}
           </span>{!continues ? ' ' : null}
           </span>
         )})}

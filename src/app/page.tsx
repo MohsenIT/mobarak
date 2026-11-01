@@ -708,7 +708,7 @@ export default function Home() {
           currentSurah={curSurahN}
           onClose={() => setDrawerOpen(false)}
           onGoPage={goPage}
-          onGoSurah={n=>{setDesktopSurah(n);goVerse(n,1,1,'start',false)}}
+          onGoSurah={n=>{setDesktopSurah(n);goSurah(n);writeVerseAddress({s:n,a:1,pos:1})}}
           onGoVerse={(s, a) => goVerse(s, a, 1, 'start')}
           onRemoveBookmark={p => setBookmarks(b => b.filter(x => x !== p))}
           onTheme={setTheme}
