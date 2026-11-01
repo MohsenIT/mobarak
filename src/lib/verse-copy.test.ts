@@ -9,6 +9,7 @@ const verse = (ayah: number, text = `نص ${ayah}`): CopiedVerse => ({ surah: 2,
 describe('copied Quran references', () => {
   test('the default is a paragraph-safe compact reference with no leading line break', () => {
     expect(formatVerseCopy([verse(5, 'بخشی از آیه')])).toBe('بخشی از آیه {بقره، ۵}')
+    expect(formatVerseCopy([verse(2), verse(3)])).toBe('نص 2، نص 3 {بقره، ۲-۳}')
   })
   test('the complete preset leads with one reference and keeps each verse number', () => {
     expect(formatVerseCopy([verse(2), verse(3)], undefined, { ...DEFAULT_COPY_SETTINGS, format: 'full' })).toBe('سوره بقره، آیات ۲-۳: نص 2 (۲) نص 3 (۳)')
@@ -49,7 +50,7 @@ test('browser DOMRect getters are copied into each selection band', () => {
 test('Taha copy omits Word-incompatible lengthening annotations without removing hamza or vowels', () => {
   const source = ['طه', 'مَآ أَنزَلْنَا عَلَيْكَ ٱلْقُرْءَانَ لِتَشْقَىٰٓ', 'إِلَّا تَذْكِرَةًۭ لِّمَن يَخْشَىٰ']
   const copied = formatVerseCopy(source.map((text, i) => ({ surah: 20, name: 'طه', ayah: i + 1, text })))
-  expect(copied).toBe('طه مَا أَنزَلْنَا عَلَيْكَ ٱلْقُرْءَانَ لِتَشْقَى إِلَّا تَذْكِرَةً لِّمَن يَخْشَى {طه، ۱-۳}')
+  expect(copied).toBe('طه، مَا أَنزَلْنَا عَلَيْكَ ٱلْقُرْءَانَ لِتَشْقَى، إِلَّا تَذْكِرَةً لِّمَن يَخْشَى {طه، ۱-۳}')
   expect(copied).not.toMatch(/[\u0653\u06D6-\u06ED]/u)
   expect(quranCopyText('آمَنَ أَحَدٌ إِلَّا سُـِٔلَ الرَّحْمَـٰنُ')).toBe('آمَنَ أَحَدٌ إِلَّا سُـِٔلَ الرَّحْمَـٰنُ')
 })

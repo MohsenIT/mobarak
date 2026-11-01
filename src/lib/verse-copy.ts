@@ -46,7 +46,7 @@ export function formatVerseCopy(verses: CopiedVerse[], intro?: string, settings:
     const address = ranges.map(([from, to]) => from === to ? digits(from) : `${digits(from)}-${digits(to)}`).join('، ')
     const fullReference = t(group.length === 1 ? 'copy.verseHeading' : 'copy.versesHeading', { surah: group[0].name, verses: address })
     const shortReference = t('copy.shortReference', { surah: group[0].name, verses: address })
-    const text = group.map(verse => `${quranCopyText(verse.text)}${verseNumbers ? ` (${digits(verse.ayah)})` : ''}${verse.translation?.trim() ? ` — ${verse.translation.trim()}` : ''}`).join(' ')
+    const text = group.map(verse => `${quranCopyText(verse.text)}${verseNumbers ? ` (${digits(verse.ayah)})` : ''}${verse.translation?.trim() ? ` — ${verse.translation.trim()}` : ''}`).join(settings.format === 'compact' ? '، ' : ' ')
     const body = [index === 0 && intro ? quranCopyText(intro) : '', text].filter(Boolean).join(' ')
     if (heading === 'start') return `${fullReference} ${body}`
     if (heading === 'end') return `${body} {${shortReference}}`
