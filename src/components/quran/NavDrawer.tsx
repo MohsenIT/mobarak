@@ -117,7 +117,7 @@ export default function NavDrawer(props: Props) {
     <>
       <div className="sheet-backdrop" onClick={onClose} />
       <aside className="drawer" role="dialog" aria-label={props.view === 'tools' ? t("ui.b563f0690c") : t("ui.38a1e75271")}>
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <div className="drawer-header flex items-center justify-between px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <img src="/icons/logo-5-192.png" width="34" height="34" alt="" className="shrink-0 rounded-full" />
             <h2 className="font-bold text-lg" style={{ color: 'var(--ink)' }}>{APP_NAME}</h2>
@@ -130,7 +130,7 @@ export default function NavDrawer(props: Props) {
         <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>{t("ui.c51349274d")}</span><span>{t("ui.b390c6bcd0")}</span></button>
         </>}
         {props.view !== 'tools' && <>
-        <form onSubmit={submitPage} className="flex items-center gap-2 px-4 pb-3">
+        <form onSubmit={submitPage} className="drawer-navigation-form flex items-center gap-2 px-4 pb-3">
           <DictationInput
             value={pageInput}
             onChange={e => { setPageInput(e.target.value); setPageError(false) }}
@@ -139,10 +139,10 @@ export default function NavDrawer(props: Props) {
             aria-describedby={pageError ? 'page-jump-error' : undefined}
             inputMode="text"
             placeholder={t("ui.5bb212ac5e")}
-            className="flex-1 min-w-0 rounded-xl border px-3 py-2.5 text-sm bg-transparent outline-none"
+            className="flex-1 min-w-0 rounded-xl border px-3 py-2 text-sm bg-transparent outline-none"
             style={{ borderColor: 'var(--line-strong)', color: 'var(--ink)' }}
           />
-          <button type="submit" className="rounded-xl px-4 py-2.5 text-sm font-bold text-white flex-none"
+          <button type="submit" className="drawer-navigation-submit rounded-xl px-4 py-2 text-sm font-bold text-white flex-none"
             style={{ background: 'var(--sage)' }}>{t("ui.f06ccf3d9b")}</button>
         </form>
         {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onTogglePin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
@@ -154,7 +154,10 @@ export default function NavDrawer(props: Props) {
         <details className="px-4 pb-3 text-xs leading-7"><summary>{t("ui.f4bf9b146f")}</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl><p>{t("ui.a8175202e6")}</p></details>
         </>}
         <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
-          {TABS.filter(t => props.view === 'tools' ? t.id === 'recent' || t.id === 'appearance' || t.id === 'settings' || t.id === 'downloads' || t.id === 'about' : t.id === 'surah' || t.id === 'juz').map(t => (
+          {TABS.filter(t => props.view === 'tools'
+            ? t.id === 'appearance' || t.id === 'settings' || t.id === 'downloads' || t.id === 'about'
+            : t.id === 'surah' || t.id === 'juz' || t.id === 'recent'
+          ).map(t => (
             <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
               {tText(t.label)}
             </button>
