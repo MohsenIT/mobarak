@@ -4,7 +4,7 @@ import {DictationInput} from './DictationInput'
 import {translationDirection,translationLanguage} from '@/lib/translations'
 import {t,uiDirection} from '@/lib/i18n'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {IconTranslate} from './Ornaments'
 import { Search, X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreVertical, Link, Check } from 'lucide-react'
@@ -20,6 +20,7 @@ import { searchFormLabels } from '@/lib/search-form-labels'
 import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
 import { searchLink, type SearchLinkState } from '@/lib/search-link'
 import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
+import { useDismissiblePanel } from './useDismissiblePanel'
 export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number; state?: SearchLinkState }
 
 interface Props {
@@ -73,6 +74,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const [includeRoots, setIncludeRoots] = useState(restored?.includeRoots ?? true)
   const [surahs, setSurahs] = useState<number[]>(restored?.surahs ?? initialSearch?.surahs ?? [])
   const [surahQuery, setSurahQuery] = useState('')
+  const [scopeOpen, setScopeOpen] = useState(false)
+  const [extraOptionsOpen, setExtraOptionsOpen] = useState(false)
   const [showTranslation, setShowTranslation] = useState(restored?.showTranslation ?? false)
   const [translations, setTranslations] = useState<Record<number, Translations>>({})
   const [translationErrors, setTranslationErrors] = useState<number[]>([])
@@ -87,6 +90,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const input = useRef<HTMLInputElement>(null)
   const list = useRef<HTMLDivElement>(null)
   const scroll = useRef(0)
+  const dismissScope = useCallback(() => setScopeOpen(false), [])
+  const dismissExtraOptions = useCallback(() => setExtraOptionsOpen(false), [])
+  const scopePanel = useDismissiblePanel(scopeOpen, dismissScope)
+  const extraOptionsPanel = useDismissiblePanel(extraOptionsOpen, dismissExtraOptions)
   const worker = useRef<Worker | null>(null)
   const request = useRef(0)
   const completed = useRef('')
@@ -224,10 +231,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         <div className="search-controls-row">
           <div className="search-mode-tabs" role="group" aria-label={t("ui.50ca6c9156")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={mode === key && !occurrenceFilter} onClick={() => { onClearOccurrenceFilter?.(); setSuggestions([]); setMode(key); input.current?.focus({ preventScroll: true }) }}>{label}</button>)}</div>
           {(mode === 'text' || !!occurrenceFilter) && <button type="button" className="search-roots-toggle" aria-pressed={includeRoots && canExpandRoots} disabled={!canExpandRoots} title={!canExpandRoots ? t("ui.a85026f74c") : t("ui.099da0d424")} onClick={() => setIncludeRoots(value => !value)}>{t("ui.702b74fe3e")}</button>}
-          <details className="search-scope"><summary aria-label={t("ui.d67a8d9786")}><Funnel size={14} /><span>{scopeLabel}</span></summary>
+          <details ref={scopePanel} open={scopeOpen} onToggle={event => setScopeOpen(event.currentTarget.open)} className="search-scope"><summary aria-label={t("ui.d67a8d9786")}><Funnel size={14} /><span>{scopeLabel}</span></summary>
             <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>{t("ui.5ad7b9b0af")}</button><button type="button" onClick={() => setSurahs([currentSurah])}>{t("ui.35fa085c5c")}</button></div><DictationInput type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder={t("ui.51b594c97e")} aria-label={t("ui.c8c0719ae1")} /><p>{t("ui.831ac25576")}</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label className="choice-row" key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
           </details>
-          <details className="search-extra-options"><summary aria-label={t("ui.ba7db1f34f")}><MoreVertical size={19} /></summary><div>
+          <details ref={extraOptionsPanel} open={extraOptionsOpen} onToggle={event => setExtraOptionsOpen(event.currentTarget.open)} className="search-extra-options"><summary aria-label={t("ui.ba7db1f34f")}><MoreVertical size={19} /></summary><div>
             <label className="choice-row"><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />{t("ui.5105840a21")}</label>
             <label className="choice-row"><input type="checkbox" checked={includeNear} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludeNear(e.target.checked)} />{t("ui.8a8b5ac72e")}</label>
           </div></details>
