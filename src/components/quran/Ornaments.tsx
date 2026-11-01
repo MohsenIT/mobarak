@@ -7,7 +7,7 @@ export function AyahMarker({ n }: { n: number }) {
 }
 
 export function SujudMark({kind}:{kind:'obligatory'|'recommended'}) {
-  return <span className={`sujud-mark sujud-${kind}`} title={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'} aria-label={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M5 18h8l-3-4M10 14 8 11M14 18h5"/><path d="M5 10c1.5-3.5 4-5.5 7-5.5s5.5 2 7 5.5"/></svg></span>
+  return <span className={`sujud-mark sujud-${kind}`} title={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'} aria-label={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'}><svg viewBox="0 0 48 48" aria-hidden="true"><path className="sujud-arch" d="M7 30V21c0-5 3-8 8-9 1-5 5-8 9-10 5 2 9 5 10 10 5 1 8 4 8 9v9"/><path className="sujud-person" d="M8 38h13l-8-9c-2-2 1-6 4-4l14 10-5 4h7a4 4 0 1 1 0 8H8Z"/><path className="sujud-ground" d="M5 45h38"/></svg></span>
 }
 
 function RevelationIcon({ makki }: { makki: boolean }) {

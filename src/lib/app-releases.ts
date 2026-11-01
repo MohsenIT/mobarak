@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.44',date:'2026-11-01',title:'یک‌دست‌شدن نشان سجده',changeKinds:['fix'],changes:[
+    'نشان سجده با همان طرح مسجد و حالت سجدهٔ تأییدشده نمایش داده می‌شود؛ پس‌زمینه ندارد و پیش از شمارهٔ آیه می‌آید.',
+  ],
+},{
   version:'0.4.43',date:'2026-11-01',title:'نشان سجده و رفتن مستقیم به سوره',changeKinds:['fix','fix'],changes:[
     'نشان سجده بدون پس‌زمینه، در جای درست کنار شمارهٔ آیه و با شکل یک‌دست‌تر نمایش داده می‌شود.',
     'انتخاب سوره از پنل دسکتاپ مستقیم انجام می‌شود و به انتظار بارگذاری آیهٔ نخست وابسته نیست.',
