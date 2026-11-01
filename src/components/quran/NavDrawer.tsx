@@ -16,6 +16,7 @@ import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
 import DownloadsManager from './DownloadsManager'
 import SurahShortcuts from './SurahShortcuts'
+import DesktopPaneResizeHandle from './DesktopPaneResizeHandle'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
@@ -117,6 +118,7 @@ export default function NavDrawer(props: Props) {
     <>
       <div className="sheet-backdrop" onClick={onClose} />
       <aside className="drawer" role="dialog" aria-label={props.view === 'tools' ? t("ui.b563f0690c") : t("ui.38a1e75271")}>
+        <DesktopPaneResizeHandle pane="navigation" edge="start" min={240} max={420} />
         <div className="drawer-header flex items-center justify-between px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <img src="/icons/logo-5-192.png" width="34" height="34" alt="" className="shrink-0 rounded-full" />

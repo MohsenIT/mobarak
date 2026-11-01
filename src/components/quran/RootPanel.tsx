@@ -24,6 +24,7 @@ import { getContext } from '@/lib/contexts'
 import QuranText from './QuranText'
 import { readAnalysisView, saveAnalysisView } from '@/lib/analysis-view'
 import { IconClose, IconMaximize, IconRestore } from './Ornaments'
+import DesktopPaneResizeHandle from './DesktopPaneResizeHandle'
 
 interface Props {
   playbackTarget?: {s:number;a:number}|null
@@ -285,6 +286,7 @@ function RootPanelContent({
         aria-label={t("ui.b603cb8ff2")}
         style={{ touchAction: 'pan-y', ['--sheet-min-height' as string]: `${minimumHeight}px`, ...(!maximized ? { ['--sheet-h' as string]: `${sheetH}dvh` } : {}) }}
       >
+        {!maximized && <DesktopPaneResizeHandle pane="analysis" edge="end" min={280} max={520} />}
         <div className="panel-handle" role="slider" tabIndex={maximized ? -1 : 0}
           aria-label={t("ui.703fe8d1bc")} aria-orientation="vertical" aria-valuemin={Math.ceil(minimumPercent)} aria-valuemax={88}
           aria-valuenow={Math.round(minimized ? minimumPercent : sheetH)} aria-valuetext={minimized ? t("ui.f7a50fd14e") : t("ui.d916f90539",{p0:(toFa(Math.round(sheetH)))})}

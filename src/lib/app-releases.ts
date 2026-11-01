@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.37',date:'2026-11-01',title:'پنل‌های دسکتاپ و کپی آمادهٔ انتشار',changeKinds:['improvement','fix','improvement'],changes:[
+    'پنل‌های ناوبری و تحلیل در دسکتاپ با دستگیرهٔ مشترک و محدودهٔ مشخص بزرگ و کوچک می‌شوند.',
+    'کادر ناوبری فضای اضافی مربوط به وضعیت دیکته را نمی‌گیرد؛ بخش اخیر به همان پنل منتقل شده و شمارندهٔ نتیجه آرام‌تر نمایش داده می‌شود.',
+    'کپی پیش‌فرض برای چسباندن در متن، مرجع کوتاه را بدون خط جدید در انتهای متن می‌آورد؛ قالب سفارشی تا آماده‌شدن ویرایشگر قالب غیرفعال است.',
+  ],
+},{
   version:'0.4.36',date:'2026-10-31',title:'بن‌واژه و محدودهٔ جست‌وجوی تکرارها',changeKinds:['fix','improvement'],changes:[
     'نوار پیمایش بن‌واژه صورت پایهٔ ثبت‌شده در دادهٔ صرفی را نشان می‌دهد؛ صورت انتخاب‌شدهٔ آیه در بالای بخش تحلیل حفظ می‌شود.',
     'جست‌وجوی تکرارها با چهار محدودهٔ سورهٔ قبل، این سوره، سورهٔ بعد و کل قرآن در دسترس است و معیار ریشه یا بن‌واژه را حفظ می‌کند.',

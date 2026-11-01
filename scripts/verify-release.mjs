@@ -2,6 +2,7 @@ import {spawn} from 'node:child_process';
 const run=(command,args,env={})=>new Promise((resolve,reject)=>{const child=spawn(command,args,{stdio:'inherit',env:{...process.env,...env}});child.on('error',reject);child.on('exit',code=>code===0?resolve():reject(new Error(`${command} exited ${code}`)))});
 let server;
 try {
+ await run(process.execPath,['scripts/verify-release-notes.mjs']);
  await run('bun',['test','src/lib']);
  await run('bun',['run','build']);
  server=spawn(process.execPath,['.next/standalone/server.js'],{stdio:'inherit',env:{...process.env,PORT:'3017',HOSTNAME:'127.0.0.1'}});

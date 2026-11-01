@@ -54,6 +54,7 @@ export default function Home() {
   useUiLanguage()
   useStudyWorkspace()
   const [knownPersianReader]=useState(()=>LS.get('mushaf.safavi-default.v1',false)&&['s','f','a','m'].includes(LS.get('mushaf.tr','s')))
+  const [desktopPaneWidths] = useState(() => ({ navigation: clamp(LS.get('mushaf.desktop-navigation-width', 300), 240, 420), analysis: clamp(LS.get('mushaf.desktop-analysis-width', 360), 280, 520) }))
   const [meta, setMeta] = useState<Meta | null>(null)
   const [page, setPage] = useState(() => {
     if (typeof window === 'undefined') return LS.get('mushaf.page', 1)
@@ -521,7 +522,7 @@ export default function Home() {
   return (
     <>
     {!startupComplete && <StartupSplash leaving={startupLeaving} onHoldChange={held => { setStartupHeld(held); if (held) setStartupLeaving(false) }} />}
-    {meta && <div className={`reader-app h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} data-side-navigation={drawerOpen||showIndex||showComparison?'open':undefined} data-portaled-analysis={sel&&(showIndex||showComparison)&&!panelMax?'open':undefined} style={{ background: 'var(--paper)' }}>
+    {meta && <div className={`reader-app h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} data-side-navigation={drawerOpen||showIndex||showComparison?'open':undefined} data-portaled-analysis={sel&&(showIndex||showComparison)&&!panelMax?'open':undefined} style={{ background: 'var(--paper)', ['--desktop-navigation-width' as string]: `${desktopPaneWidths.navigation}px`, ['--desktop-analysis-width' as string]: `${desktopPaneWidths.analysis}px` }}>
       <CarStudySync reader={mainRef} revision={`${mode}:${surah}:${page}:${mushafContentRevision}:${showTrans}:${flowSurah?.n}:${loadingPage}`} />
       <PatternBG />
 

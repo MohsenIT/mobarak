@@ -14,7 +14,7 @@ export default function CopyFormatSettings() {
     <h3 className="text-sm font-bold mb-3">{t('copy.settingsTitle')}</h3>
     <p className="text-xs leading-6 mb-3" style={{ color: 'var(--ink-soft)' }}>{t('copy.settingsHelp')}</p>
     <label><span>{t('copy.formatLabel')}</span><select aria-label={t('copy.formatLabel')} value={settings.format} onChange={event => update({ ...settings, format: event.target.value as CopySettings['format'] })}>
-      <option value="compact">{t('copy.formatCompact')}</option><option value="full">{t('copy.formatFull')}</option><option value="custom">{t('copy.formatCustom')}</option>
+      <option value="compact">{t('copy.formatCompact')}</option><option value="full">{t('copy.formatFull')}</option><option value="custom" disabled>{t('copy.formatCustom')}</option>
     </select></label>
     {settings.format === 'custom' && <fieldset><legend>{t('copy.customTitle')}</legend>
       <label><span>{t('copy.referencePosition')}</span><select aria-label={t('copy.referencePosition')} value={custom.heading} onChange={event => update({ ...settings, custom: { ...custom, heading: event.target.value as typeof custom.heading } })}><option value="start">{t('copy.referenceStart')}</option><option value="end">{t('copy.referenceEnd')}</option><option value="none">{t('copy.referenceNone')}</option></select></label>
