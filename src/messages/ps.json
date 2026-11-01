@@ -738,5 +738,21 @@
   "surah.madinah": "Medinan",
   "occurrence.searchIn": "لټون په:",
   "occurrence.thisSurah": "دا سورت",
-  "occurrence.wholeQuran": "ټول قرآن"
+  "occurrence.wholeQuran": "ټول قرآن",
+  "copy.shortReference": "{surah}، {verses}",
+  "copy.settingsTitle": "قالب کپی و اشتراک‌گذاری",
+  "copy.settingsHelp": "این قالب هم برای کپی متن و هم برای ارسال استفاده می‌شود.",
+  "copy.formatLabel": "قالب",
+  "copy.formatCompact": "مرجع کوتاه در انتهای متن",
+  "copy.formatFull": "عنوان کامل در ابتدای متن",
+  "copy.formatCustom": "قالب سفارشی",
+  "copy.customTitle": "اجزای قالب سفارشی",
+  "copy.referencePosition": "جای مرجع",
+  "copy.referenceStart": "ابتدای متن",
+  "copy.referenceEnd": "انتهای متن",
+  "copy.referenceNone": "بدون مرجع",
+  "copy.verseNumbers": "شمارهٔ آیه کنار متن بیاید",
+  "copy.includeTranslation": "ترجمه هم بیاید",
+  "copy.lineBreaks": "میان بخش‌ها خط جدید بگذار",
+  "copy.restoreDefault": "بازگرداندن قالب مناسب متن"
 }

@@ -19,7 +19,7 @@ for(const mode of ['flow','mushaf'])test(`native copy: ${mode} keeps partial wor
  });
  await page.keyboard.press('Control+C');
  const copied=await page.evaluate(()=>navigator.clipboard.readText());
- expect(copied).toMatch(/^سوره بقره، آیات ۲-۴:\n/);expect(copied).toMatch(/\(۴\)$/);expect(copied.split('\n')).toHaveLength(2);expect(copied).toContain('(۲) ');expect(copied).toContain('(۳) ');
+ expect(copied).not.toMatch(/^سوره/);expect(copied).toMatch(/\{بقره، ۲-۴\}$/);expect(copied).not.toContain('\n');
  expect(copied).not.toMatch(/^[\p{M}]/u);expect(copied).not.toMatch(/[\u06D6-\u06DC\u06DF\u06E2\u06E3\u06EB\u06ED]/u);
  if(await page.evaluate(()=>matchMedia('(hover:hover) and (pointer:fine)').matches)){
   await expect(surface.locator('.quran-native-selection > span').first()).toBeAttached();
@@ -36,11 +36,11 @@ test('share dialog copies consecutive and separate verses without hidden glyphs'
  await dialog.locator('.verse-share-verse').nth(1).click();
  await dialog.getByRole('button',{name:'کپی',exact:true}).click();
  let copied=await page.evaluate(()=>navigator.clipboard.readText());
- expect(copied).toMatch(/^سوره حج، آیات ۱-۲:\n/);expect(copied).toMatch(/\(۲\)$/);expect(copied.split('\n')).toHaveLength(2);expect(copied).not.toMatch(/[\u06D6-\u06DC\u06DF\u06E2\u06E3\u06EB\u06ED]/u);
+ expect(copied).not.toMatch(/^سوره/);expect(copied).toMatch(/\{حج، ۱-۲\}$/);expect(copied).not.toContain('\n');expect(copied).not.toMatch(/[\u06D6-\u06DC\u06DF\u06E2\u06E3\u06EB\u06ED]/u);
  await dialog.getByRole('button',{name:'نمایش آیات بعد',exact:true}).click();
  await dialog.locator('.verse-share-verse').nth(1).click();await dialog.locator('.verse-share-verse').nth(2).click();
  await dialog.getByRole('button',{name:'کپی',exact:true}).click();
- copied=await page.evaluate(()=>navigator.clipboard.readText());expect(copied).toMatch(/^سوره حج، آیات ۱، ۳:\n/);expect(copied).toContain('(۱) ');expect(copied).toMatch(/\(۳\)$/);expect(copied.split('\n')).toHaveLength(2);
+ copied=await page.evaluate(()=>navigator.clipboard.readText());expect(copied).toMatch(/\{حج، ۱، ۳\}$/);expect(copied).not.toContain('\n');
 });
 
 test('share preview uses the reader font compatibility rules and native share exports clean text',async({page,context})=>{

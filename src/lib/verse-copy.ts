@@ -1,6 +1,7 @@
 import { t, currentLanguage } from './i18n'
 import { formatDigits } from './locale-numbers'
 import { quranDisplayText } from './quran-display'
+import { DEFAULT_COPY_SETTINGS, type CopySettings } from './copy-settings'
 
 export function quranCopyText(text: string): string {
   return quranDisplayText(text)
@@ -21,8 +22,8 @@ export interface CopiedVerse {
   translation?: string
 }
 
-/** Each surah has a heading; every copied verse keeps its own inline number. */
-export function formatVerseCopy(verses: CopiedVerse[], intro?: string): string {
+/** Formats both clipboard and native-share text without an accidental leading line break. */
+export function formatVerseCopy(verses: CopiedVerse[], intro?: string, settings: CopySettings = DEFAULT_COPY_SETTINGS): string {
   const groups: CopiedVerse[][] = []
   for (const verse of verses) {
     if (!quranCopyText(verse.text)) continue
@@ -31,6 +32,10 @@ export function formatVerseCopy(verses: CopiedVerse[], intro?: string): string {
     else groups.push([verse])
   }
   const digits = (number: number) => formatDigits(number, currentLanguage())
+  const custom = settings.custom
+  const heading = settings.format === 'full' ? 'start' : settings.format === 'compact' ? 'end' : custom.heading
+  const verseNumbers = settings.format === 'full' || (settings.format === 'custom' && custom.verseNumbers)
+  const lineBreaks = settings.format === 'custom' && custom.lineBreaks
   return groups.map((group, index) => {
     const ranges: number[][] = []
     for (const verse of group) {
@@ -39,11 +44,14 @@ export function formatVerseCopy(verses: CopiedVerse[], intro?: string): string {
       else ranges.push([verse.ayah, verse.ayah])
     }
     const address = ranges.map(([from, to]) => from === to ? digits(from) : `${digits(from)}-${digits(to)}`).join('، ')
-    const heading = t(group.length === 1 ? 'copy.verseHeading' : 'copy.versesHeading', { surah: group[0].name, verses: address })
-    const text = group.map(verse => `${quranCopyText(verse.text)} (${digits(verse.ayah)})${verse.translation?.trim() ? ` — ${verse.translation.trim()}` : ''}`).join(' ')
+    const fullReference = t(group.length === 1 ? 'copy.verseHeading' : 'copy.versesHeading', { surah: group[0].name, verses: address })
+    const shortReference = t('copy.shortReference', { surah: group[0].name, verses: address })
+    const text = group.map(verse => `${quranCopyText(verse.text)}${verseNumbers ? ` (${digits(verse.ayah)})` : ''}${verse.translation?.trim() ? ` — ${verse.translation.trim()}` : ''}`).join(' ')
     const body = [index === 0 && intro ? quranCopyText(intro) : '', text].filter(Boolean).join(' ')
-    return `${heading}\n${body}`
-  }).join('\n\n')
+    if (heading === 'start') return `${fullReference} ${body}`
+    if (heading === 'end') return `${body} {${shortReference}}`
+    return body
+  }).join(lineBreaks ? '\n' : ' ')
 }
 
 export interface SelectionRect { left: number; top: number; right: number; bottom: number }

@@ -10,6 +10,7 @@ import {TRANSLATION_IDS} from '@/lib/translations'
 import ResourcePicker from './ResourcePicker'
 import {RESOURCES} from '@/lib/resources'
 import { AppearanceColors } from './Appearance'
+import CopyFormatSettings from './CopyFormatSettings'
 import ReadingScreenSettings from './ReadingScreen'
 import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
@@ -334,6 +335,7 @@ export default function NavDrawer(props: Props) {
             <div className="p-4 flex flex-col gap-6">
               <LanguageSettings translator={props.translator} onTranslation={props.onTranslator}/>
               <CalendarSettings/>
+              <CopyFormatSettings />
               <UpdateSettings />
               <button type="button" className="chip min-h-11" onClick={()=>setTab('downloads')}>{t('downloads.manage')}</button>
               <OfflineSettings />

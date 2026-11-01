@@ -3,6 +3,7 @@
 import { useEffect, type RefObject } from 'react'
 import type { Meta } from '@/lib/quran'
 import { formatVerseCopy, quranCopyText, mergeSelectionRects, type CopiedVerse, type SelectionRect } from '@/lib/verse-copy'
+import { readCopySettings } from '@/lib/copy-settings'
 
 function intersection(range: Range, element: Element): Range | null {
   if (!range.intersectsNode(element)) return null
@@ -81,7 +82,7 @@ export default function QuranClipboard({ root, meta }: { root: RefObject<HTMLEle
         if (previous?.surah === surah && previous.ayah === ayah) previous.text += ` ${text}`
         else verses.push({ surah, name, ayah, text })
       }
-      const text = formatVerseCopy(verses)
+      const text = formatVerseCopy(verses, undefined, readCopySettings())
       if (!text) return
       event.clipboardData.setData('text/plain', text)
       event.preventDefault()

@@ -9,6 +9,7 @@ import { Content as DialogContentPrimitive } from '@radix-ui/react-dialog'
 import { Copy, Link, Share2, X } from 'lucide-react'
 import type { SurahData, Verse, Translator, Translations } from '@/lib/quran'
 import { formatVerseCopy } from '@/lib/verse-copy'
+import { useCopySettings } from '@/lib/copy-settings'
 import { quranDisplayText } from '@/lib/quran-display'
 import { versePath } from '@/lib/verse-link'
 import { toFa, loadTrans } from '@/lib/quran'
@@ -39,10 +40,12 @@ export default function VerseActions({ surah, verse, translator, wholeSurah = fa
   const [translations, setTranslations] = useState<Translations | null>(null)
   const [status, setStatus] = useState('')
   const [failed, setFailed] = useState(false)
+  const copySettings = useCopySettings()
   const chosen = surah.v.filter(v => selected.includes(v.n))
   const reference = t("ui.0d7cba2b23",{p0:(surah.fa),p1:(chosen.length === 1 ? t("ui.1723d54443") : t("ui.d83f4af983")),p2:(chosen.map(v => toFa(v.n)).join('، '))})
-  const text = formatVerseCopy(chosen.map(v => ({ surah: surah.n, name: surah.fa, ayah: v.n, text: v.w.map(w => w.t).join(' '), translation: withTranslation ? translations?.[String(v.n)]?.[translator] : undefined })), bismillah ? BISMILLAH : undefined)
-  const ready = chosen.length > 0 && (!withTranslation || chosen.every(v => translations?.[String(v.n)]?.[translator]))
+  const includeTranslation = withTranslation || (copySettings.format === 'custom' && copySettings.custom.translation)
+  const text = formatVerseCopy(chosen.map(v => ({ surah: surah.n, name: surah.fa, ayah: v.n, text: v.w.map(w => w.t).join(' '), translation: includeTranslation ? translations?.[String(v.n)]?.[translator] : undefined })), bismillah ? BISMILLAH : undefined, copySettings)
+  const ready = chosen.length > 0 && (!includeTranslation || chosen.every(v => translations?.[String(v.n)]?.[translator]))
   const links = () => wholeSurah ? new URL(`/s/${surah.n}`, process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://mobarak.app/' : window.location.origin).href : chosen.map(v => new URL(versePath({ s: surah.n, a: v.n, pos: 1 }), process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app/' : window.location.origin).href).join('\n')
   const copy = async (value: string) => {
     try { await copyText(value); setStatus(t("ui.2d3a29b875")) } catch { setStatus(t("ui.fe0cbd12e3")) }
