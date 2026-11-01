@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.42',date:'2026-11-01',title:'نشان سجده و نمایش دقیق‌تر دسکتاپ',changeKinds:['feature','fix','improvement'],changes:[
+    'نشان سجده در هر دو نمایش مصحف و پیوسته آمده است؛ سجدهٔ واجب برجسته‌تر و سجدهٔ مستحب آرام‌تر است و در کپی و اشتراک وارد نمی‌شود.',
+    'عنوان صفحهٔ آغاز در دسکتاپ از فونت فارسی برنامه استفاده می‌کند.',
+    'شمارندهٔ مورد جست‌وجو با چیپ هم‌خانوادهٔ نشان صفحه نمایش داده می‌شود.',
+  ],
+},{
   version:'0.4.41',date:'2026-11-01',title:'دستگیرهٔ پنل تحلیل در دسکتاپ',changeKinds:['fix'],changes:[
     'دستگیرهٔ تغییر عرض پنل تحلیل داخل لبهٔ قابل‌گرفتن آن قرار گرفت و در حالت پنل‌های هم‌زمان نیز همان محدودهٔ اندازه را رعایت می‌کند.',
   ],

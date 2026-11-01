@@ -3,7 +3,8 @@
 import { useRef, type ReactNode } from 'react'
 import type { Translator, SurahData, SurahMeta, Translations } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
-import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
+import { AyahMarker, Bismillah, SujudMark, SurahBand } from './Ornaments'
+import { sujudKind } from '@/lib/sujud'
 import SelectableWord from './SelectableWord'
 import { rootColorStyle } from '@/lib/comparison-colors'
 import FlowTranslations from './FlowTranslations'
@@ -69,7 +70,7 @@ export default function FlowPage({ sm, surah, trans, showTrans, translator, font
                 </span>
               )
             })}
-            <AyahMarker n={v.n} />{continues ? ' ' : null}
+            <AyahMarker n={v.n} />{sujudKind(surah.n,v.n) && <SujudMark kind={sujudKind(surah.n,v.n)!} />}{continues ? ' ' : null}
           </span>{!continues ? ' ' : null}
           </span>
         )})}

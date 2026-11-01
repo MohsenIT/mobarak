@@ -2,7 +2,8 @@
 
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import type { Meta, SurahData, SurahMeta } from '@/lib/quran'
-import { AyahMarker, Bismillah, SurahBand } from './Ornaments'
+import { AyahMarker, Bismillah, SujudMark, SurahBand } from './Ornaments'
+import { sujudKind } from '@/lib/sujud'
 import SelectableWord from './SelectableWord'
 import { rootColorStyle } from '@/lib/comparison-colors'
 import { analysisRangeContains, isAnalysisRange, matchesAnalysis, type AnalysisSelection } from '@/lib/analysis'
@@ -176,7 +177,8 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
                 const preceding = items.slice(0, i).reverse().find(item => item.kind === 'word')
                 const inRange = preceding?.kind === 'word' && comparisonRange?.s === preceding.s && it.n >= comparisonRange.from && it.n <= comparisonRange.to
                 const analysisMarker = preceding?.kind === 'word' && analysisRangeContains(analysisSelection, preceding.s, preceding.a)
-                return <span key={i} data-analysis-marker={analysisMarker?'true':undefined} data-comparison-range={inRange ? 'true' : undefined}><AyahMarker n={it.n} /></span>
+                const kind = preceding?.kind === 'word' ? sujudKind(preceding.s, it.n) : null
+                return <span key={i} data-analysis-marker={analysisMarker?'true':undefined} data-comparison-range={inRange ? 'true' : undefined}><AyahMarker n={it.n} />{kind&&<SujudMark kind={kind}/>}</span>
               }
               if (it.kind !== 'word') return null
               const isFlash = flash && flash.s === it.s && flash.a === it.a && flash.pos === it.pos
