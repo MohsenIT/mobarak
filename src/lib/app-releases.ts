@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.41',date:'2026-11-01',title:'دستگیرهٔ پنل تحلیل در دسکتاپ',changeKinds:['fix'],changes:[
+    'دستگیرهٔ تغییر عرض پنل تحلیل داخل لبهٔ قابل‌گرفتن آن قرار گرفت و در حالت پنل‌های هم‌زمان نیز همان محدودهٔ اندازه را رعایت می‌کند.',
+  ],
+},{
   version:'0.4.40',date:'2026-11-01',title:'یک‌دست‌شدن جهت عنوان پنجره‌ها',changeKinds:['fix'],changes:[
     'دیالوگ‌های عادی و هشدار، از جمله پنجرهٔ به‌روزرسانی، از یک قاعدهٔ نوشتاری مشترک استفاده می‌کنند؛ عنوان و زیرعنوان فارسی راست‌چین است.',
   ],

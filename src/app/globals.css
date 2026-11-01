@@ -1645,13 +1645,14 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   .reader-workspace > .root-panel:not(.maximized) { flex:0 0 var(--desktop-analysis-width); width:var(--desktop-analysis-width); max-width:var(--desktop-analysis-width); min-width:0; }
   .root-panel.stacked:not(.maximized) {
     top:calc(var(--reader-toolbar-height,64px) + var(--app-update-height,0px)); bottom:0; left:0; right:auto; transform:none;
-    width:clamp(280px,27vw,380px); max-width:clamp(280px,27vw,380px); height:auto; max-height:none; margin:0; border-radius:0;
+    width:var(--desktop-analysis-width); max-width:var(--desktop-analysis-width); height:auto; max-height:none; margin:0; border-radius:0;
   }
   .desktop-pane-resize-handle { display:block; position:absolute; z-index:30; inset-block:0; width:12px; cursor:col-resize; touch-action:none; }
   .desktop-pane-resize-handle::after { content:''; position:absolute; inset-block:0; inset-inline:5px; width:1px; background:transparent; transition:background 120ms ease; }
   .desktop-pane-resize-handle:hover::after,.desktop-pane-resize-handle:focus-visible::after,.desktop-pane-resizing .desktop-pane-resize-handle::after { background:var(--line-strong); }
   .desktop-pane-resize-start { inset-inline-end:-6px; }
-  .desktop-pane-resize-end { inset-inline-start:-6px; }
+  /* Analysis panels clip their content; keep this grip inside that edge. */
+  .root-panel .desktop-pane-resize-end { inset-inline-start:0; }
   .desktop-pane-resizing { cursor:col-resize; user-select:none; }
 }
 @media (hover:hover) and (pointer:fine) {
