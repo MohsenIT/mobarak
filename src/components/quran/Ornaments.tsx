@@ -10,12 +10,17 @@ export function SujudMark({kind}:{kind:'obligatory'|'recommended'}) {
   return <span className={`sujud-mark sujud-${kind}`} title={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'} aria-label={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'}><SujudIcon /></span>
 }
 
-/** Single canonical mark traced from the approved sujud artwork. */
+/** The exact SVG supplied for the Quran reader. Color comes from its wrapper. */
 function SujudIcon() {
-  return <svg viewBox="0 0 64 64" aria-hidden="true">
-    <path d="M12 40V30c0-5.7 3.4-9.5 8.8-10.3C22.1 13.1 27 10.6 32 6c5 4.6 9.9 7.1 11.2 13.7C48.6 20.5 52 24.3 52 30v10" />
-    <path d="M10 51h19l-12-13c-2.4-2.7.8-7 4-5l18.5 11.2-6.1 6.8h8.1a4.7 4.7 0 1 1 0 9.4H10a4.7 4.7 0 1 1 0-9.4Z" />
-    <path d="M8 62h48" />
+  return <svg viewBox="0 0 1024 1024" fill="none" aria-hidden="true">
+    <g stroke="currentColor" strokeWidth="39" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M218 651V469Q218 391 319 377Q322 316 398 277Q481 237 512 184Q544 237 626 277Q702 316 705 377Q806 391 806 469V651" />
+      <path d="M183 787H841" strokeWidth="35" />
+      <path d="M409 652L342 567Q311 526 347 479Q400 413 477 453L638 546Q701 583 660 653L624 705" />
+      <path d="M409 652H276Q233 652 233 692Q233 732 276 732H460Q510 732 493 681L438 597" />
+      <path d="M561 657L529 703Q514 732 546 732H581" />
+      <circle cx="722" cy="673" r="53" />
+    </g>
   </svg>
 }
 
