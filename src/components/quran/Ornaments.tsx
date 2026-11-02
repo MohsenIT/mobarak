@@ -12,7 +12,7 @@ export function SujudMark({kind}:{kind:'obligatory'|'recommended'}) {
 
 /** The exact SVG supplied for the Quran reader. Color comes from its wrapper. */
 function SujudIcon() {
-  return <svg viewBox="0 0 1024 1024" fill="none" aria-hidden="true">
+  return <svg viewBox="128 152 768 680" fill="none" aria-hidden="true">
     <g stroke="currentColor" strokeWidth="39" strokeLinecap="round" strokeLinejoin="round">
       <path d="M218 651V469Q218 391 319 377Q322 316 398 277Q481 237 512 184Q544 237 626 277Q702 316 705 377Q806 391 806 469V651" />
       <path d="M183 787H841" strokeWidth="35" />
