@@ -7,7 +7,16 @@ export function AyahMarker({ n }: { n: number }) {
 }
 
 export function SujudMark({kind}:{kind:'obligatory'|'recommended'}) {
-  return <span className={`sujud-mark sujud-${kind}`} title={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'} aria-label={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'}><svg viewBox="0 0 48 48" aria-hidden="true"><path className="sujud-arch" d="M7 30V21c0-5 3-8 8-9 1-5 5-8 9-10 5 2 9 5 10 10 5 1 8 4 8 9v9"/><path className="sujud-person" d="M8 38h13l-8-9c-2-2 1-6 4-4l14 10-5 4h7a4 4 0 1 1 0 8H8Z"/><path className="sujud-ground" d="M5 45h38"/></svg></span>
+  return <span className={`sujud-mark sujud-${kind}`} title={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'} aria-label={kind==='obligatory'?'سجدهٔ واجب':'سجدهٔ مستحب'}><SujudIcon /></span>
+}
+
+/** Single canonical mark traced from the approved sujud artwork. */
+function SujudIcon() {
+  return <svg viewBox="0 0 64 64" aria-hidden="true">
+    <path d="M12 40V30c0-5.7 3.4-9.5 8.8-10.3C22.1 13.1 27 10.6 32 6c5 4.6 9.9 7.1 11.2 13.7C48.6 20.5 52 24.3 52 30v10" />
+    <path d="M10 51h19l-12-13c-2.4-2.7.8-7 4-5l18.5 11.2-6.1 6.8h8.1a4.7 4.7 0 1 1 0 9.4H10a4.7 4.7 0 1 1 0-9.4Z" />
+    <path d="M8 62h48" />
+  </svg>
 }
 
 function RevelationIcon({ makki }: { makki: boolean }) {

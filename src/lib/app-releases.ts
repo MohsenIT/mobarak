@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.45',date:'2026-11-02',title:'نشان سجده از طرح تأییدشده',changeKinds:['fix'],changes:[
+    'همهٔ جای‌های نمایش قرآن فقط از یک SVG برگرفته از طرح تأییدشدهٔ سجده استفاده می‌کنند؛ شکل جایگزین حذف شد.',
+  ],
+},{
   version:'0.4.44',date:'2026-11-01',title:'یک‌دست‌شدن نشان سجده',changeKinds:['fix'],changes:[
     'نشان سجده با همان طرح مسجد و حالت سجدهٔ تأییدشده نمایش داده می‌شود؛ پس‌زمینه ندارد و پیش از شمارهٔ آیه می‌آید.',
   ],
