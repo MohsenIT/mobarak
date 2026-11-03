@@ -29,7 +29,7 @@ test('quick and advanced search use ordinary and selected colors without borders
  await page.getByRole('searchbox',{name:'جست‌وجو در همین سوره',exact:true}).fill('الله');
  await colorOnly(page.locator('[data-reading-scroll] [data-quick-search-match="active"]').first(),'rgb(68, 119, 153)');
  await colorOnly(page.locator('[data-reading-scroll] [data-quick-search-match="match"]').first(),'rgb(204, 187, 170)');
- await page.goto('/q?q=الله&h=0',{waitUntil:'domcontentloaded'});
+ await page.goto('/?search=1&q=الله&h=0',{waitUntil:'domcontentloaded'});
  await colorOnly(page.locator('.search-result-card [data-search-match]').first(),'rgb(204, 187, 170)');
  await page.locator('.search-result-open').first().click();
  const flash=page.locator('[data-reading-scroll] .quran-word.flash').first();
