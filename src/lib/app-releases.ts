@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.62',date:'2026-11-03',title:'بازگشت پنل تحلیل به ستون چپ',changeKinds:['fix'],changes:[
+    'پس از اتصال دستگیره به پنل، آفستِ مخصوص باتم‌شیت موبایل در دسکتاپ پاک شد تا پنل تحلیل دوباره در ستون چپ بماند.',
+  ],
+},{
   version:'0.4.61',date:'2026-11-03',title:'دستگیرهٔ درست پنل تحلیل در دسکتاپ',changeKinds:['fix'],changes:[
     'دستگیرهٔ تغییر عرض پنل تحلیل به مرز میان پنل چپ و متن قرآن منتقل شد؛ اکنون همان پنل را با کشیدن لبهٔ مشترک بزرگ و کوچک می‌کند.',
   ],

@@ -465,6 +465,10 @@ body {
        its containing block; otherwise the grip attaches to the workspace's
        far edge instead of the border between the analysis pane and Quran. */
     position: relative;
+    /* Clear the mobile sheet's centering offsets. With position:relative,
+       its base left:50% would otherwise move the desktop side pane inward. */
+    left: auto;
+    bottom: auto;
     transform: none;
     width: 400px;
     max-width: 400px;
