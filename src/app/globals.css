@@ -1473,20 +1473,19 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .settings-scale output{min-width:4rem;text-align:center;}
 .drawer-tool-actions{display:flex;flex-direction:column;gap:.5rem;padding:.5rem 0;}
 
-/* The reading navigator has fixed geometry on every tab.  The centre group is
-   independent from long neighbour labels, so a missing item cannot reflow it. */
-.analysis-navigation,.analysis-navigation-simple{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;min-height:54px;gap:0;padding-inline:8px;}
-.analysis-unit-previous{grid-column:2;grid-row:1;justify-self:end;max-width:22vw;}
-.analysis-unit-next{grid-column:1;grid-row:1;justify-self:start;max-width:22vw;}
-.analysis-repetition-navigation{position:absolute;inset-inline-start:50%;top:50%;transform:translate(-50%,-50%);width:min(58vw,238px);display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;min-width:0;}
-.analysis-repetition-navigation .analysis-repeat-button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.analysis-repetition-navigation .analysis-repeat-button:first-child{justify-self:start;}
-.analysis-repetition-navigation .analysis-repeat-button:last-child{justify-self:end;}
-.analysis-repetition-navigation .analysis-repeat-button[aria-hidden="true"]{visibility:hidden;pointer-events:none;}
-.analysis-repetition-navigation .analysis-position-button{grid-column:2;justify-self:center;white-space:nowrap;}
+/* One durable five-column contract: unit, occurrence, selected occurrence,
+   occurrence, unit.  Columns never collapse or wrap when an edge is empty. */
+.analysis-navigation,.analysis-navigation-simple{display:grid;grid-template-columns:minmax(0,1fr) max-content max-content max-content minmax(0,1fr);align-items:center;min-height:54px;gap:2px;padding-inline:8px;}
+.analysis-unit-previous{grid-column:5;justify-self:end;max-width:18vw;}
+.analysis-repeat-previous{grid-column:4;justify-self:end;}
+.analysis-navigation .analysis-position-button{grid-column:3;justify-self:center;white-space:nowrap;}
+.analysis-repeat-next{grid-column:2;justify-self:start;}
+.analysis-unit-next{grid-column:1;justify-self:start;max-width:18vw;}
+.analysis-navigation .analysis-repeat-button{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.analysis-navigation .analysis-repeat-button[aria-hidden="true"]{visibility:hidden;pointer-events:none;}
 .panel-selection{flex:0 1 auto;max-width:calc(100% - 178px);}
 .panel-selection .selection-preview{flex:0 1 auto;min-width:0;}
-@media (max-width:380px){.analysis-repetition-navigation{width:min(62vw,220px);}.analysis-unit-previous,.analysis-unit-next{max-width:18vw;}.analysis-unit-title{max-width:100%;}.panel-selection{max-width:calc(100% - 150px);}}
+@media (max-width:380px){.analysis-unit-previous,.analysis-unit-next{max-width:17vw;}.analysis-unit-title{max-width:100%;}.analysis-navigation .analysis-repeat-button{font-size:10px;padding-inline:1px;}.panel-selection{max-width:calc(100% - 150px);}}
 
 /* Scope choices are a compact control row, never a detached second line. */
 .occurrence-picker-heading{display:flex;align-items:center;gap:6px;}

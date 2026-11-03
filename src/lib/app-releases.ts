@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.58',date:'2026-11-03',title:'پنج‌ستونِ نوار تحلیل',changeKinds:['fix'],changes:[
+    'ناوبری باتم‌شیت دوباره با قرارداد ثابت پنج‌ستونی نمایش داده می‌شود: دو واحد در لبه‌ها، دو تکرار در کنار چیپ، و شمارندهٔ فعلی داخل چیپ مرکزی.',
+  ],
+},{
   version:'0.4.57',date:'2026-11-03',title:'نوار ناوبری پایدار در باتم‌شیت',changeKinds:['fix'],changes:[
     'نوار ناوبری تحلیل در موبایل ناحیه‌های ثابت دارد؛ متن بلند یا نبودن موردها دیگر آن را به چند خط نمی‌شکند و چیپ وسط صفحه می‌ماند.',
   ],
