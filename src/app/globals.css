@@ -461,7 +461,10 @@ body {
 @media (min-width: 1024px) {
   .panel-backdrop { display: none; }
   .root-panel {
-    position: static;
+    /* The desktop splitter is an absolutely positioned child.  This must be
+       its containing block; otherwise the grip attaches to the workspace's
+       far edge instead of the border between the analysis pane and Quran. */
+    position: relative;
     transform: none;
     width: 400px;
     max-width: 400px;
@@ -1704,8 +1707,9 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   .desktop-pane-resize-handle::after { content:''; position:absolute; inset-block:0; inset-inline:5px; width:1px; background:transparent; transition:background 120ms ease; }
   .desktop-pane-resize-handle:hover::after,.desktop-pane-resize-handle:focus-visible::after,.desktop-pane-resizing .desktop-pane-resize-handle::after { background:var(--line-strong); }
   .desktop-pane-resize-start { inset-inline-end:-6px; }
-  /* Analysis panels clip their content; keep this grip inside that edge. */
-  .root-panel .desktop-pane-resize-end { inset-inline-start:0; }
+  /* The analysis pane lives on the physical left of the desktop workspace.
+     Its width changes at this right-hand boundary, next to the Quran. */
+  .root-panel .desktop-pane-resize-end { left:auto; right:-6px; }
   .desktop-pane-resizing { cursor:col-resize; user-select:none; }
 }
 @media (hover:hover) and (pointer:fine) {
