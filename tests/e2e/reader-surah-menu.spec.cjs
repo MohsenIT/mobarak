@@ -10,5 +10,5 @@ test('desktop surah menu opens from the toolbar and navigates to a different sur
  await expect(drawer.getByRole('button',{name:'اخیر'})).toBeVisible();
  await expect(drawer.locator('.drawer-navigation-form .dictation-field')).toHaveCSS('margin-bottom','0px');
  await drawer.locator('.nav-surah-row').filter({hasText:'بقره'}).click();
- await expect(page).toHaveURL(/\/s\/2(?:$|\/)/);
+ await expect(page.locator('.reader-surah-link')).toContainText('البقرة');
 });

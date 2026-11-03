@@ -1473,6 +1473,22 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .settings-scale output{min-width:4rem;text-align:center;}
 .drawer-tool-actions{display:flex;flex-direction:column;gap:.5rem;padding:.5rem 0;}
 
+/* The bottom-sheet navigator keeps five stable positions even when an edge has
+   no result: unit neighbours at the edges, occurrence neighbours around a
+   genuinely centred picker. */
+.analysis-navigation{grid-template-columns:minmax(0,1fr) minmax(154px,1.35fr) minmax(0,1fr);gap:4px;}
+.analysis-navigation-simple{grid-template-columns:minmax(0,1fr) minmax(154px,1.35fr) minmax(0,1fr);}
+.analysis-unit-previous{grid-column:3;}
+.analysis-unit-next{grid-column:1;}
+.analysis-repetition-navigation{grid-column:2;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;min-width:0;}
+.analysis-repetition-navigation .analysis-repeat-button:first-child{justify-self:start;}
+.analysis-repetition-navigation .analysis-repeat-button:last-child{justify-self:end;}
+.analysis-repetition-navigation .analysis-repeat-button[aria-hidden="true"]{visibility:hidden;pointer-events:none;}
+.analysis-repetition-navigation .analysis-position-button{grid-column:2;justify-self:center;}
+.panel-selection{flex:0 1 auto;max-width:calc(100% - 178px);}
+.panel-selection .selection-preview{flex:0 1 auto;min-width:0;}
+@media (max-width:380px){.analysis-navigation,.analysis-navigation-simple{grid-template-columns:minmax(0,1fr) minmax(130px,1.2fr) minmax(0,1fr);}.panel-selection{max-width:calc(100% - 150px);}}
+
 
 .resource-picker-trigger { display:flex; align-items:center; gap:6px; min-width:0; }
 .resource-select { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; min-width:0; border:1px solid var(--line); border-radius:10px; padding:9px 10px; background:var(--paper); color:var(--ink); text-align:right; font-size:12px; }

@@ -331,24 +331,26 @@ function RootPanelContent({
           <div ref={indicatorTrack} className="analysis-tab-indicator-track" aria-hidden="true"><span ref={indicator} /><span ref={indicatorCopy} /></div>
         </div>
         <nav hidden={tab === 'surah'} ref={navigationRef} className={`analysis-navigation${hasRepetitions ? '' : ' analysis-navigation-simple'}`} aria-label={t("ui.90c50672b6",{p0:(noun)})}>
-          <button className="analysis-unit-button" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={t("ui.17017bfab8",{p0:(noun)})} title={t("ui.04529abbdc",{p0:(noun),p1:(previousUnitTitle)})}>
+          <button className="analysis-unit-button analysis-unit-previous" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={t("ui.17017bfab8",{p0:(noun)})} title={t("ui.04529abbdc",{p0:(noun),p1:(previousUnitTitle)})}>
             {hasRepetitions ? <ChevronsRight size={15} aria-hidden="true" /> : <ChevronRight size={15} aria-hidden="true" />}
             <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={previousUnitTitle} /></span>
           </button>
-          {hasRepetitions && index > 0 && <button className="analysis-repeat-button" onClick={() => navigate(-1)}
-            aria-label={t("ui.018f4cd57b")} title={t("ui.3f6b25ba14",{p0:(toFa(Math.max(0, index)))})}>
-            <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))}{' '}{t("ui.61cf4e03c8")}</span>
-          </button>}
-          <OccurrencePicker open={pickerOpen} onOpenChange={setPickerOpen} items={items} index={index} surah={surah}
-            groupKey={`${tab}:${sel.s}:${tab === 'root' ? root : tab === 'form' ? `${root}:${selectedForm}` : surah?.n === sel.s ? lexicalKey(surah.v[sel.a - 1].w[sel.pos - 1], sel.part) : sel.text}`}
-            title={positionTitle}
-            label={hasRepetitions ? t("ui.f511eddde8",{p0:(toFa(index + 1)),p1:(toFa(items.length))}) : t("ui.66f35797f5",{p0:(noun),p1:(toFa(index + 1)),p2:(toFa(items.length)),p3:(noun)})}
-            onSelect={location => selectTarget(...location)} onFull={hasRepetitions ? scope => onOpenOccurrences({ ...sel, tab, form: selectedForm }, scope) : undefined} />
-          {hasRepetitions && index >= 0 && index < items.length - 1 && <button className="analysis-repeat-button" onClick={() => navigate(1)}
-            aria-label={t("ui.672f6aee92")} title={t("ui.ce8844aa99",{p0:(toFa(Math.max(0, items.length - index - 1)))})}>
-            <span>{toFa(Math.max(0, items.length - index - 1))}{' '}{t("ui.61cf4e03c8")}</span><ChevronLeft size={17} aria-hidden="true" />
-          </button>}
-          <button className="analysis-unit-button" onClick={() => navigateUnit(1)} disabled={!canUnitNext} aria-label={t("ui.56d11bcaf2",{p0:(noun)})} title={t("ui.55c52eb6d5",{p0:(noun),p1:(nextUnitTitle)})}>
+          <div className="analysis-repetition-navigation">
+            <button className="analysis-repeat-button" aria-hidden={!hasRepetitions || index <= 0} disabled={!hasRepetitions || index <= 0} onClick={() => navigate(-1)}
+              aria-label={t("ui.018f4cd57b")} title={t("ui.3f6b25ba14",{p0:(toFa(Math.max(0, index)))})}>
+              <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))}{' '}{t("ui.61cf4e03c8")}</span>
+            </button>
+            <OccurrencePicker open={pickerOpen} onOpenChange={setPickerOpen} items={items} index={index} surah={surah}
+              groupKey={`${tab}:${sel.s}:${tab === 'root' ? root : tab === 'form' ? `${root}:${selectedForm}` : surah?.n === sel.s ? lexicalKey(surah.v[sel.a - 1].w[sel.pos - 1], sel.part) : sel.text}`}
+              title={positionTitle}
+              label={hasRepetitions ? t("ui.f511eddde8",{p0:(toFa(index + 1)),p1:(toFa(items.length))}) : t("ui.66f35797f5",{p0:(noun),p1:(toFa(index + 1)),p2:(toFa(items.length)),p3:(noun)})}
+              onSelect={location => selectTarget(...location)} onFull={hasRepetitions ? scope => onOpenOccurrences({ ...sel, tab, form: selectedForm }, scope) : undefined} />
+            <button className="analysis-repeat-button" aria-hidden={!hasRepetitions || index < 0 || index >= items.length - 1} disabled={!hasRepetitions || index < 0 || index >= items.length - 1} onClick={() => navigate(1)}
+              aria-label={t("ui.672f6aee92")} title={t("ui.ce8844aa99",{p0:(toFa(Math.max(0, items.length - index - 1)))})}>
+              <span>{toFa(Math.max(0, items.length - index - 1))}{' '}{t("ui.61cf4e03c8")}</span><ChevronLeft size={17} aria-hidden="true" />
+            </button>
+          </div>
+          <button className="analysis-unit-button analysis-unit-next" onClick={() => navigateUnit(1)} disabled={!canUnitNext} aria-label={t("ui.56d11bcaf2",{p0:(noun)})} title={t("ui.55c52eb6d5",{p0:(noun),p1:(nextUnitTitle)})}>
             <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={nextUnitTitle} /></span>
             {hasRepetitions ? <ChevronsLeft size={15} aria-hidden="true" /> : <ChevronLeft size={15} aria-hidden="true" />}
           </button>
