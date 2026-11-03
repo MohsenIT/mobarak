@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.54',date:'2026-11-03',title:'چیپ‌های دامنه در یک ردیف',changeKinds:['fix'],changes:[
+    'چیپ‌های «این سوره» و «کل قرآن» کنار عنوان جست‌وجو می‌مانند و به خط جدا نمی‌روند.',
+  ],
+},{
   version:'0.4.53',date:'2026-11-03',title:'پایداری نوار باتم‌شیت و انتشار',changeKinds:['fix'],changes:[
     'ناوبری باتم‌شیت پنج جایگاه ثابت دارد: قبلی و بعدی در دو لبه، موردهای پیش و پس در کنار چیپِ مرکزی؛ نبودن مورد، چیدمان را جابه‌جا نمی‌کند.',
     'چیپ مرجع آیه پس از متن انتخاب‌شده و چسبیده به آن نمایش داده می‌شود.',
