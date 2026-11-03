@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.57',date:'2026-11-03',title:'نوار ناوبری پایدار در باتم‌شیت',changeKinds:['fix'],changes:[
+    'نوار ناوبری تحلیل در موبایل ناحیه‌های ثابت دارد؛ متن بلند یا نبودن موردها دیگر آن را به چند خط نمی‌شکند و چیپ وسط صفحه می‌ماند.',
+  ],
+},{
   version:'0.4.56',date:'2026-11-03',title:'رفع انسداد انتشار',changeKinds:['fix'],changes:[
     'انتشار Vercel دیگر به انتظار هم‌زمانِ گردش‌کار GitHub وابسته نیست؛ بررسی‌های CI مستقل اجرا می‌شوند و build سایت را قفل نمی‌کنند.',
   ],
