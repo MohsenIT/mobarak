@@ -336,7 +336,7 @@ function RootPanelContent({
             {hasRepetitions ? <ChevronsRight size={15} aria-hidden="true" /> : <ChevronRight size={15} aria-hidden="true" />}
             <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={previousUnitTitle} /></span>
           </button>
-          {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(-1)} disabled={index <= 0}
+          {hasRepetitions && index > 0 && <button className="analysis-repeat-button" onClick={() => navigate(-1)}
             aria-label={t("ui.018f4cd57b")} title={t("ui.3f6b25ba14",{p0:(toFa(Math.max(0, index)))})}>
             <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))}{' '}{t("ui.61cf4e03c8")}</span>
           </button>}
@@ -367,7 +367,7 @@ function RootPanelContent({
               </button>)}
             </PopoverContent>
           </Popover>}
-          {hasRepetitions && <button className="analysis-repeat-button" onClick={() => navigate(1)} disabled={index < 0 || index >= items.length - 1}
+          {hasRepetitions && index >= 0 && index < items.length - 1 && <button className="analysis-repeat-button" onClick={() => navigate(1)}
             aria-label={t("ui.672f6aee92")} title={t("ui.ce8844aa99",{p0:(toFa(Math.max(0, items.length - index - 1)))})}>
             <span>{toFa(Math.max(0, items.length - index - 1))}{' '}{t("ui.61cf4e03c8")}</span><ChevronLeft size={17} aria-hidden="true" />
           </button>}

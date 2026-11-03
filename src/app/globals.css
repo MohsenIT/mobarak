@@ -1140,7 +1140,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 .analysis-position-option { display: flex; align-items: center; width: 100%; gap: 6px; min-height: 40px; padding: 3px 6px; border-radius: 7px; font-size: 12px; text-align: right; }
 .analysis-position-option[aria-current="true"] { background: var(--word-selected); }
 @media (hover: hover) and (pointer: fine) { .analysis-position-option:hover { background: var(--word-hover); } }
-.analysis-navigation .analysis-position-button { min-height: 28px; border: 0; border-radius: 14px; }
+.analysis-navigation .analysis-position-button { min-height: 28px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--paper); }
 
 .analysis-position-option.has-excerpt { display: grid; grid-template-columns: 76px minmax(0, 1fr); overflow: hidden; }
 .analysis-occurrence-reference { font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
@@ -1182,7 +1182,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 .occurrence-picker-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px; padding: 8px; border-bottom: 1px solid var(--line); font-size: 11px; }
 .occurrence-picker-heading > .occurrence-search-scopes { display: contents; }
 .occurrence-search-label { grid-column: 1; grid-row: 1; display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
-.occurrence-search-chips { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 4px; }
+.occurrence-search-chips { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px; }
 .occurrence-picker-heading button { min-height: 34px; min-width: 0; font-size: 10px; font-weight: 400; }
 .occurrence-picker-heading .occurrence-search-shortcut { border: 1px solid var(--line); border-radius: 999px; padding: 3px 5px; line-height: 1.5; }
 .occurrence-search-shortcut:disabled { opacity: .35; cursor: not-allowed; }
@@ -1195,7 +1195,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 .occurrence-pan:active { cursor: grabbing; }
 .occurrence-pan .ayah-marker { color: var(--gold-deep); }
 .occurrence-picker-arrow { fill: var(--sheet); stroke: var(--line-strong); stroke-width: 1px; }
-.analysis-navigation .analysis-position-button[data-state='open'] { background: var(--word-selected); outline: none; box-shadow: none; }
+.analysis-navigation .analysis-position-button[data-state='open'] { background: var(--word-selected); border-color: var(--word-active); outline: none; box-shadow: none; }
 .quran-filtered-search { z-index: 160; }
 
 /* Full-page search is a reader destination, not a floating dialog. */

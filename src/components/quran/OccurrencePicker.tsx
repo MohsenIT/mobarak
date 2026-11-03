@@ -11,7 +11,7 @@ import { groupOccurrencesByAyah, occurrenceTokens, occurrenceWindow, type Contex
 import { AyahMarker } from './Ornaments'
 import QuranText from './QuranText'
 import QuranHighlight from './QuranHighlight'
-import {occurrenceScopeSurahs,type OccurrenceScope} from '@/lib/occurrence-scope'
+import type {OccurrenceScope} from '@/lib/occurrence-scope'
 
 export default function OccurrencePicker({ open, onOpenChange, items, index, surah, groupKey, label, title, onSelect, onFull }: {
   open: boolean; onOpenChange: (open: boolean) => void; items: AnalysisLocation[]; index: number
@@ -39,8 +39,8 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
         {onFull && <div className="occurrence-search-scopes">
           <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.searchIn')}</span>
           <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.searchIn')}>
-            {([['previous','reader.previousSurah'],['surah','occurrence.thisSurah'],['next','reader.nextSurah'],['quran','occurrence.wholeQuran']] as const).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
-              disabled={!surah || occurrenceScopeSurahs(scope,surah.n) === null} onClick={() => { onOpenChange(false); onFull(scope) }}>{t(key)}</button>)}
+            {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
+              disabled={!surah} onClick={() => { onOpenChange(false); onFull(scope) }}>{t(key)}</button>)}
           </div>
         </div>}
         <button type="button" className="occurrence-picker-close" aria-label={t("ui.510fc4baec")} onClick={() => onOpenChange(false)}><X size={18} /></button>
