@@ -1456,6 +1456,23 @@ html[data-app-update] .quran-search-page { top:var(--app-update-height); height:
 
 html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 
+/* Full-screen settings is a destination, not a side drawer. */
+.settings-screen{position:fixed;z-index:80;inset:0;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);}
+.settings-screen-header{min-height:64px;display:flex;align-items:center;justify-content:space-between;padding:max(.5rem,env(safe-area-inset-top)) 1rem .5rem;border-bottom:1px solid var(--line);}
+.settings-screen-header h2{display:flex;align-items:center;gap:.55rem;font-size:1.125rem;font-weight:700;}
+.settings-screen-tabs{display:flex;overflow-x:auto;gap:.25rem;padding:.5rem .75rem;border-bottom:1px solid var(--line);}
+.settings-screen-tabs button{white-space:nowrap;border-radius:.7rem;padding:.55rem .8rem;font-size:.875rem;color:var(--ink-soft);}
+.settings-screen-tabs button.active{color:var(--sage);background:var(--word-root);font-weight:700;}
+.settings-screen-content{flex:1;overflow:auto;padding:1rem;}
+.settings-stack{width:min(100%,46rem);margin-inline:auto;display:flex;flex-direction:column;gap:1.5rem;}
+.settings-stack section>h3,.settings-stack>section>h3{display:flex;align-items:center;gap:.45rem;margin-bottom:.75rem;font-weight:700;font-size:.9375rem;}
+.settings-theme-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem;}
+.settings-theme-choices button{min-height:3rem;border:1px solid var(--line);border-radius:.8rem;color:var(--ink);}
+.settings-theme-choices button[aria-pressed="true"]{border-color:var(--sage);background:var(--word-root);color:var(--sage);font-weight:700;}
+.settings-scale{display:flex;align-items:center;justify-content:center;gap:1rem;}
+.settings-scale output{min-width:4rem;text-align:center;}
+.drawer-tool-actions{display:flex;flex-direction:column;gap:.5rem;padding:.5rem 0;}
+
 
 .resource-picker-trigger { display:flex; align-items:center; gap:6px; min-width:0; }
 .resource-select { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; min-width:0; border:1px solid var(--line); border-radius:10px; padding:9px 10px; background:var(--paper); color:var(--ink); text-align:right; font-size:12px; }

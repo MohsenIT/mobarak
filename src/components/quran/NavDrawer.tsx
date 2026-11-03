@@ -21,7 +21,8 @@ import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { destinationSuggestions, resolveDestination, normalizeSearch, NAVIGATION_HELP, searchSurahs, type Destination } from '@/lib/navigation'
-import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate } from './Ornaments'
+import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate, IconSortIndex } from './Ornaments'
+import { GitCompareArrows } from 'lucide-react'
 
 export type { Translator } from '@/lib/quran'
 
@@ -34,6 +35,8 @@ interface Props {
   onTogglePin: (n: number) => void
   onClearRecent: () => void
   onAdvancedSearch: () => void
+  onOpenKeywords: () => void
+  onOpenComparison: () => void
   theme: 'paper' | 'night'
   mode: 'mushaf' | 'flow'
   onMode: (mode: 'mushaf' | 'flow') => void
@@ -66,7 +69,7 @@ const TABS = [
 
 export default function NavDrawer(props: Props) {
   const { meta, onClose, onGoPage, onGoSurah, onGoVerse, currentSurah } = props
-  const [tab, setTab] = useState<(typeof TABS)[number]['id']>(props.view === 'tools' ? 'settings' : 'surah')
+  const [tab, setTab] = useState<(typeof TABS)[number]['id']>('surah')
   const [pageInput, setPageInput] = useState('')
   const q = pageInput
   const contentRef = useRef<HTMLDivElement>(null)
@@ -130,6 +133,10 @@ export default function NavDrawer(props: Props) {
         {props.view === 'tools' && <>
         <StudyEntry/>
         <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>{t("ui.c51349274d")}</span><span>{t("ui.b390c6bcd0")}</span></button>
+        <div className="drawer-tool-actions">
+          <button type="button" className="drawer-advanced-search" onClick={props.onOpenKeywords}><IconSortIndex /><span>{t("ui.cc9c59a2c4")}</span></button>
+          <button type="button" className="drawer-advanced-search" onClick={props.onOpenComparison}><GitCompareArrows size={20} /><span>{t("ui.1f253d9ad1")}</span></button>
+        </div>
         </>}
         {props.view !== 'tools' && <>
         <form onSubmit={submitPage} className="drawer-navigation-form flex items-center gap-2 px-4 pb-3">
@@ -155,7 +162,7 @@ export default function NavDrawer(props: Props) {
         </div>}
         <details className="px-4 pb-3 text-xs leading-7"><summary>{t("ui.f4bf9b146f")}</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl><p>{t("ui.a8175202e6")}</p></details>
         </>}
-        <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
+        {props.view !== 'tools' && <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
           {TABS.filter(t => props.view === 'tools'
             ? t.id === 'appearance' || t.id === 'settings' || t.id === 'downloads' || t.id === 'about'
             : t.id === 'surah' || t.id === 'juz' || t.id === 'recent'
@@ -164,9 +171,9 @@ export default function NavDrawer(props: Props) {
               {tText(t.label)}
             </button>
           ))}
-        </div>
+        </div>}
 
-        <div ref={contentRef} className="flex-1 overflow-y-auto nice-scroll">
+        {props.view !== 'tools' && <div ref={contentRef} className="flex-1 overflow-y-auto nice-scroll">
           {tab === 'surah' && (
             <div className="p-3">
               {surahs.length === 0 && !suggestions.length && <p role="status" className="text-center py-4 text-sm">{t("ui.68f830ec5c")}</p>}
@@ -357,7 +364,7 @@ export default function NavDrawer(props: Props) {
               <p className="text-xs leading-6 pt-2 border-t" style={{ color: 'var(--ink-faint)', borderColor: 'var(--line)' }}>{t("ui.9f4b86895b")}</p>
             </div>
           )}
-        </div>
+        </div>}
       </aside>
     </>
   )

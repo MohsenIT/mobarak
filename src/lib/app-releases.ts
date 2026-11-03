@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.52',date:'2026-11-03',title:'چیدمان تازهٔ منو و تنظیمات',changeKinds:['improvement'],changes:[
+    'نوار مطالعه خلوت شد: قابلیت‌های تحلیلی و جست‌وجوی پیشرفته در منوی همبرگری هستند و تنظیمات با چرخ‌دنده در یک صفحهٔ تمام‌صفحه باز می‌شود.',
+    'پوسته‌های روشن و شب در تنظیمات کنار هم قرار گرفتند.',
+  ],
+},{
   version:'0.4.51',date:'2026-11-03',title:'پایداری بررسی انتخاب‌گر',changeKinds:['fix'],changes:[
     'بررسی رابط انتخاب‌گر بر پایهٔ قرارداد ساختاری آن انجام می‌شود تا تغییر متن یا چیدمانِ دکمه‌ها انتشار را متوقف نکند.',
   ],

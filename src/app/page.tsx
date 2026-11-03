@@ -28,16 +28,17 @@ import {syncNativeAppearance} from '@/lib/native-appearance'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
 import QuranClipboard from '@/components/quran/QuranClipboard'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
+import SettingsScreen from '@/components/quran/SettingsScreen'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, GitCompareArrows, Search, MoreVertical, ChevronDown, Play, LoaderCircle, AudioLines } from 'lucide-react'
+import { ArrowRight, Search, Settings, ChevronDown, Play, LoaderCircle, AudioLines } from 'lucide-react'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import ReaderSearchHighlights,{type ReaderSearchState} from '@/components/quran/ReaderSearchHighlights'
 import {
   PatternBG, IconMenu,
-  IconTranslate, IconSortIndex,
+  IconTranslate,
 } from '@/components/quran/Ornaments'
 
 const LS = {
@@ -81,6 +82,7 @@ export default function Home() {
   const [recentSurahs, setRecentSurahs] = useState<number[]>(() => LS.get('mushaf.recent-surahs', []))
   const [drawerView, setDrawerView] = useState<'navigation' | 'tools'>('navigation')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [desktopSurah,setDesktopSurah]=useState<number|null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [quickSearchOpen, setQuickSearchOpen] = useState(false)
@@ -540,7 +542,7 @@ export default function Home() {
           onHighlights={setQuickHighlights}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false) }}
           onAdvanced={start => { setOccurrenceSearch(null); setSearchStart({ ...start, revision: Date.now() }); setSearchOpen(true) }} /> : <>
-        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><MoreVertical size={22} /></button>
+        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><IconMenu /></button>
 
         <button className="reader-surah-link flex-1 min-w-0" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
           <span className="font-bold text-[14px] sm:text-[15px] truncate" style={{ color: 'var(--ink)' }}>
@@ -552,15 +554,6 @@ export default function Home() {
 
         <button className="icon-btn" aria-label={!audioOpen?t("ui.facfd50c31"):audioControlsVisible?t("ui.feabb65c6a"):audioStatus==='playing'?t("ui.7851ddb1df"):t("ui.f432f383bf")} title={!audioOpen?t("ui.1f7cc9473a"):audioControlsVisible?t("ui.0b17cf0f81"):t("ui.0884ec3e62")} aria-expanded={audioOpen&&audioControlsVisible} aria-busy={audioStatus==='loading'} style={audioOpen?{color:'var(--sage)',background:'var(--word-root)'}:undefined} onClick={()=>{if(!audioOpen){setAudioControlsVisible(true);setAudioOpen(true)}else if(audioControlsVisible)setAudioControlsVisible(false);else{setAudioControlsVisible(true);if(audioStatus!=='loading')setAudioPlayRequest(value=>value+1)}}}>{audioStatus==='playing'&&audioOpen?<span className="recitation-activity" aria-hidden="true">{[0,1,2,3,4].map(i=><i key={i} style={{animationDelay:`${i*0.12}s`}}/>)}</span>:audioStatus==='loading'&&audioOpen?<LoaderCircle size={20} className="recitation-start-spinner animate-spin"/>:audioOpen&&audioControlsVisible?<AudioLines size={20}/>:<Play size={20} fill="currentColor"/>}</button>
 
-        {/* surah keyword index — opens the sorted-keywords page */}
-        <button className="icon-btn" onClick={() => setShowIndex(true)} aria-label={t("ui.cc9c59a2c4")} title={t("ui.cc9c59a2c4")}>
-          <IconSortIndex />
-        </button>
-        <button className="icon-btn" onClick={() => { setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }} aria-label={t("ui.1f253d9ad1")} title={t("ui.1f253d9ad1")}>
-          <GitCompareArrows size={20} />
-        </button>
-
-
           <button className="icon-btn" aria-label={t("ui.2d6258b160")}
             title={t("ui.37e2fdb79c")}
             aria-pressed={showTrans}
@@ -568,6 +561,7 @@ export default function Home() {
             onClick={() => setShowTrans(v => !v)}>
             <IconTranslate />
           </button>
+          <button className="icon-btn" onClick={() => setSettingsOpen(true)} aria-label={t("ui.6badcac8c1")} title={t("ui.6badcac8c1")}><Settings size={20} /></button>
 
 
         </>}
@@ -700,6 +694,8 @@ export default function Home() {
           onTogglePin={n => setPinnedSurahs(old => { const next = old.includes(n) ? old.filter(s => s !== n) : [...old, n]; LS.set('mushaf.pinned-surahs', next); return next })}
           onClearRecent={() => { setRecentSurahs([]); LS.set('mushaf.recent-surahs', []) }}
           onAdvancedSearch={() => { setDrawerOpen(false); setOccurrenceSearch(null); setSel(null); setSearchStart({ query: '', mode: 'text', surahs: [], revision: Date.now() }); setSearchOpen(true) }}
+          onOpenKeywords={() => { setDrawerOpen(false); setShowIndex(true) }}
+          onOpenComparison={() => { setDrawerOpen(false); setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }}
           theme={theme}
           mode={mode}
           onMode={switchMode}
@@ -716,6 +712,7 @@ export default function Home() {
           onScale={setScale}
         />
       )}
+      {settingsOpen && <SettingsScreen meta={meta} theme={theme} onTheme={setTheme} translator={translator} onTranslator={setTranslator} scale={scale} onScale={setScale} onClose={() => setSettingsOpen(false)} />}
 
       {/* ===== Sorted Surah Index drawer =====
           Rendered as a right-side drawer that stays open while the
