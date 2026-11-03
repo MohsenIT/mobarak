@@ -1488,12 +1488,13 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 /* Durable five-slot navigation contract.  The picker has the actual centre
    column; every other slot is one equal fraction, so empty occurrence controls
    retain their place without moving the chip or either unit control. */
-.analysis-navigation{display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) max-content repeat(2,minmax(0,1fr));align-items:center;min-height:54px;gap:2px;padding-inline:8px;}
-.analysis-unit-previous{grid-column:5;justify-self:end;min-width:0;max-width:100%;}
-.analysis-repeat-previous{grid-column:4;justify-self:end;min-width:0;max-width:100%;}
+.analysis-navigation{display:grid;direction:rtl;grid-template-columns:repeat(2,minmax(0,1fr)) max-content repeat(2,minmax(0,1fr));align-items:center;min-height:54px;gap:2px;padding-inline:8px;}
+.analysis-navigation>*{grid-row:1;}
+.analysis-unit-previous{grid-column:1;justify-self:start;min-width:0;max-width:100%;}
+.analysis-repeat-previous{grid-column:2;justify-self:start;min-width:0;max-width:100%;}
 .analysis-navigation .analysis-position-button{grid-column:3;justify-self:center;white-space:nowrap;}
-.analysis-repeat-next{grid-column:2;justify-self:start;min-width:0;max-width:100%;}
-.analysis-unit-next{grid-column:1;justify-self:start;min-width:0;max-width:100%;}
+.analysis-repeat-next{grid-column:4;justify-self:end;min-width:0;max-width:100%;}
+.analysis-unit-next{grid-column:5;justify-self:end;min-width:0;max-width:100%;}
 .analysis-navigation .analysis-unit-button,.analysis-navigation .analysis-repeat-button{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .analysis-navigation .analysis-repeat-button[aria-hidden="true"]{visibility:hidden;pointer-events:none;}
 .panel-selection{flex:0 1 auto;max-width:calc(100% - 178px);}

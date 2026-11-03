@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.60',date:'2026-11-03',title:'رفع قطعی ردیف ناوبری تحلیل',changeKinds:['fix'],changes:[
+    'پنج کنترل ناوبری تحلیل در یک ردیف قفل شدند: واحد قبلی، مورد قبلی، چیپ مرکزی، مورد بعدی و واحد بعدی. نبودن مورد فقط همان کنترل را نامرئی می‌کند و جای هیچ کنترل دیگری را تغییر نمی‌دهد.',
+  ],
+},{
   version:'0.4.59',date:'2026-11-03',title:'منوی یک‌دست و نوار تحلیل پایدار',changeKinds:['fix','improvement'],changes:[
     'منوی همبرگری به بخش‌های مطالعه، یافتن و تحلیل سوره با ردیف‌های یک‌شکل و برچسب‌های خوانا تبدیل شد.',
     'نوار ناوبری تحلیل پنج جایگاه هم‌اندازه دارد؛ چیپ انتخاب دقیقاً وسط می‌ماند و نبودن موردهای قبلی یا بعدی چیدمان را جابه‌جا نمی‌کند.',
