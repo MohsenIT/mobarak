@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.56',date:'2026-11-03',title:'رفع انسداد انتشار',changeKinds:['fix'],changes:[
+    'انتشار Vercel دیگر به انتظار هم‌زمانِ گردش‌کار GitHub وابسته نیست؛ بررسی‌های CI مستقل اجرا می‌شوند و build سایت را قفل نمی‌کنند.',
+  ],
+},{
   version:'0.4.55',date:'2026-11-03',title:'انتشار قابل‌اعتماد در همهٔ نسخه‌ها',changeKinds:['fix'],changes:[
     'بررسی‌های مرورگر از نشانی مشترک جست‌وجو در وب و نسخهٔ دسکتاپ استفاده می‌کنند تا مسیر مخصوص وب انتشار نسخهٔ دسکتاپ را متوقف نکند.',
   ],
