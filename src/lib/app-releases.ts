@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.50',date:'2026-11-03',title:'انتشار پایدار انتخاب‌گر مشترک',changeKinds:['fix'],changes:[
+    'بررسی مرورگر با محدودهٔ تازهٔ «این سوره» و «کل قرآن» هماهنگ شد تا انتشار نسخهٔ انتخاب‌گر مشترک پس از تأیید CI انجام شود.',
+  ],
+},{
   version:'0.4.49',date:'2026-11-03',title:'انتخاب‌گر مشترک باتم‌شیت',changeKinds:['improvement'],changes:[
     'چیپ مرکزی و فهرست زیر آن در ریشه، واژه، آیه و سیاق از یک انتخاب‌گر مشترک استفاده می‌کنند؛ هر حالت فقط عملیات و محدوده‌های مجازش را مشخص می‌کند.',
   ],
