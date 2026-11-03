@@ -14,7 +14,6 @@ import { loadSurah, toFa, morphologyLabel } from '@/lib/quran'
 import type { Selection } from './MushafPage'
 import { adjacentRootLocations, analysisNavigation, type AnalysisTab, type AnalysisSelection } from '@/lib/analysis'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Minus } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import AnalysisTabContent from './AnalysisTabContent'
 import OccurrencePicker from './OccurrencePicker'
 import VerseActions from './VerseActions'
@@ -340,33 +339,11 @@ function RootPanelContent({
             aria-label={t("ui.018f4cd57b")} title={t("ui.3f6b25ba14",{p0:(toFa(Math.max(0, index)))})}>
             <ChevronRight size={17} aria-hidden="true" /><span>{toFa(Math.max(0, index))}{' '}{t("ui.61cf4e03c8")}</span>
           </button>}
-          {hasRepetitions ? <OccurrencePicker open={pickerOpen} onOpenChange={setPickerOpen} items={items} index={index} surah={surah}
+          <OccurrencePicker open={pickerOpen} onOpenChange={setPickerOpen} items={items} index={index} surah={surah}
             groupKey={`${tab}:${sel.s}:${tab === 'root' ? root : tab === 'form' ? `${root}:${selectedForm}` : surah?.n === sel.s ? lexicalKey(surah.v[sel.a - 1].w[sel.pos - 1], sel.part) : sel.text}`}
             title={positionTitle}
-            label={t("ui.f511eddde8",{p0:(toFa(index + 1)),p1:(toFa(items.length))})}
-            onSelect={location => selectTarget(...location)} onFull={scope => onOpenOccurrences({ ...sel, tab, form: selectedForm }, scope)} /> : <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-            <PopoverTrigger asChild>
-              <button className="analysis-position-button" disabled={index < 0 || !items.length}
-                aria-label={t("ui.66f35797f5",{p0:(hasRepetitions ? t("ui.61cf4e03c8") : noun),p1:(toFa(index + 1)),p2:(toFa(items.length)),p3:(hasRepetitions ? t("ui.61cf4e03c8") : noun)})}>
-                {positionTitle}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="analysis-position-picker" dir="rtl" data-analysis-picker
-              aria-label={hasRepetitions ? t("ui.b55272cf13") : t("ui.9aa27a3098",{p0:(noun)})}
-              onOpenAutoFocus={event => {
-                event.preventDefault()
-                requestAnimationFrame(() => {
-                  const selected = document.querySelector<HTMLButtonElement>('[data-analysis-picker] [aria-current="true"]')
-                  selected?.focus({ preventScroll: true }); selected?.scrollIntoView({ block: 'nearest' })
-                })
-              }}>
-              <p className="text-xs font-bold px-3 py-2">{hasRepetitions ? t("ui.ace85fd091") : t("ui.92ad094faf",{p0:(noun)})}</p>
-              {items.map(([a, pos, part], i) => <button key={`${a}:${pos}:${part ?? 'stem'}`} className={`analysis-position-option${hasRepetitions ? ' has-excerpt' : ''}`} aria-current={i === index ? 'true' : undefined}
-                onClick={() => { selectTarget(a, pos, part); setPickerOpen(false) }}>
-                <span className="analysis-occurrence-reference">{toFa(i + 1)} · {tab === 'context' ? (() => { const range = getContext(sel.s, a); return range ? t("ui.0dd91a4fc6",{p0:(toFa(range.from)),p1:(toFa(range.to))}) : t("ui.91e40f6b9f",{p0:(toFa(a))}) })() : t("ui.91e40f6b9f",{p0:(toFa(a))})}</span>
-              </button>)}
-            </PopoverContent>
-          </Popover>}
+            label={hasRepetitions ? t("ui.f511eddde8",{p0:(toFa(index + 1)),p1:(toFa(items.length))}) : t("ui.66f35797f5",{p0:(noun),p1:(toFa(index + 1)),p2:(toFa(items.length)),p3:(noun)})}
+            onSelect={location => selectTarget(...location)} onFull={hasRepetitions ? scope => onOpenOccurrences({ ...sel, tab, form: selectedForm }, scope) : undefined} />
           {hasRepetitions && index >= 0 && index < items.length - 1 && <button className="analysis-repeat-button" onClick={() => navigate(1)}
             aria-label={t("ui.672f6aee92")} title={t("ui.ce8844aa99",{p0:(toFa(Math.max(0, items.length - index - 1)))})}>
             <span>{toFa(Math.max(0, items.length - index - 1))}{' '}{t("ui.61cf4e03c8")}</span><ChevronLeft size={17} aria-hidden="true" />

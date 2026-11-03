@@ -13,10 +13,14 @@ import QuranText from './QuranText'
 import QuranHighlight from './QuranHighlight'
 import type {OccurrenceScope} from '@/lib/occurrence-scope'
 
-export default function OccurrencePicker({ open, onOpenChange, items, index, surah, groupKey, label, title, onSelect, onFull }: {
+export type PickerOperation = 'exact' | 'similarity'
+
+export default function OccurrencePicker({ open, onOpenChange, items, index, surah, groupKey, label, title, onSelect, onFull, operation = 'exact', scopes = ['surah','quran'] }: {
   open: boolean; onOpenChange: (open: boolean) => void; items: AnalysisLocation[]; index: number
   surah: SurahData | null; groupKey: string; label: string; title: ReactNode
   onSelect: (location: AnalysisLocation) => void; onFull?: (scope: OccurrenceScope) => void
+  /** Shared contract: tabs only supply the operation and supported scopes. */
+  operation?: PickerOperation; scopes?: readonly Extract<OccurrenceScope, 'surah' | 'quran'>[]
 }) {
   const list = useRef<HTMLDivElement>(null)
   const memory = useRef<{ group: string; top: number | null }>({ group: groupKey, top: null })
@@ -36,10 +40,10 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
         })
       }}>
       <div className="occurrence-picker-heading">
-        {onFull && <div className="occurrence-search-scopes">
+        {onFull && <div className="occurrence-search-scopes" data-picker-operation={operation}>
           <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.searchIn')}</span>
           <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.searchIn')}>
-            {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
+            {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).filter(([scope]) => scopes.includes(scope)).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
               disabled={!surah} onClick={() => { onOpenChange(false); onFull(scope) }}>{t(key)}</button>)}
           </div>
         </div>}

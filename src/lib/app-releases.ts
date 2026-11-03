@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.49',date:'2026-11-03',title:'انتخاب‌گر مشترک باتم‌شیت',changeKinds:['improvement'],changes:[
+    'چیپ مرکزی و فهرست زیر آن در ریشه، واژه، آیه و سیاق از یک انتخاب‌گر مشترک استفاده می‌کنند؛ هر حالت فقط عملیات و محدوده‌های مجازش را مشخص می‌کند.',
+  ],
+},{
   version:'0.4.48',date:'2026-11-03',title:'چیپ انتخاب و محدودهٔ جست‌وجوی تکرار',changeKinds:['improvement','fix'],changes:[
     'انتخاب فعال در نوار باتم‌شیت همیشه به‌شکل چیپ قابل‌کلیک نمایش داده می‌شود و دکمهٔ سمت چپ یا راستِ بدون مورد پنهان است.',
     'برای ریشه، بن‌واژه و واژه، محدودهٔ جست‌وجوی تکرارها به «این سوره» و «کل قرآن» محدود شد.',
