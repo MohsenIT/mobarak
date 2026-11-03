@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.59',date:'2026-11-03',title:'منوی یک‌دست و نوار تحلیل پایدار',changeKinds:['fix','improvement'],changes:[
+    'منوی همبرگری به بخش‌های مطالعه، یافتن و تحلیل سوره با ردیف‌های یک‌شکل و برچسب‌های خوانا تبدیل شد.',
+    'نوار ناوبری تحلیل پنج جایگاه هم‌اندازه دارد؛ چیپ انتخاب دقیقاً وسط می‌ماند و نبودن موردهای قبلی یا بعدی چیدمان را جابه‌جا نمی‌کند.',
+  ],
+},{
   version:'0.4.58',date:'2026-11-03',title:'پنج‌ستونِ نوار تحلیل',changeKinds:['fix'],changes:[
     'ناوبری باتم‌شیت دوباره با قرارداد ثابت پنج‌ستونی نمایش داده می‌شود: دو واحد در لبه‌ها، دو تکرار در کنار چیپ، و شمارندهٔ فعلی داخل چیپ مرکزی.',
   ],

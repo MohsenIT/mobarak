@@ -22,7 +22,7 @@ import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { destinationSuggestions, resolveDestination, normalizeSearch, NAVIGATION_HELP, searchSurahs, type Destination } from '@/lib/navigation'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate, IconSortIndex } from './Ornaments'
-import { GitCompareArrows } from 'lucide-react'
+import { ChevronLeft, GitCompareArrows } from 'lucide-react'
 
 export type { Translator } from '@/lib/quran'
 
@@ -130,14 +130,29 @@ export default function NavDrawer(props: Props) {
           <button className="icon-btn" onClick={onClose} aria-label={t("ui.313cbecb4d")}><IconClose /></button>
         </div>
 
-        {props.view === 'tools' && <>
-        <StudyEntry/>
-        <button type="button" className="drawer-advanced-search" onClick={props.onAdvancedSearch}><IconSearch /><span>{t("ui.c51349274d")}</span><span>{t("ui.b390c6bcd0")}</span></button>
-        <div className="drawer-tool-actions">
-          <button type="button" className="drawer-advanced-search" onClick={props.onOpenKeywords}><IconSortIndex /><span>{t("ui.cc9c59a2c4")}</span></button>
-          <button type="button" className="drawer-advanced-search" onClick={props.onOpenComparison}><GitCompareArrows size={20} /><span>{t("ui.1f253d9ad1")}</span></button>
-        </div>
-        </>}
+        {props.view === 'tools' && <div className="drawer-tools">
+          <section className="drawer-tool-section" aria-labelledby="drawer-study-heading">
+            <h3 id="drawer-study-heading">{t('ui.2e49f1d53a')}</h3>
+            <StudyEntry className="drawer-tool-row" />
+          </section>
+          <section className="drawer-tool-section" aria-labelledby="drawer-find-heading">
+            <h3 id="drawer-find-heading">{t('ui.3906317c3a')}</h3>
+            <button type="button" className="drawer-tool-row" onClick={props.onAdvancedSearch}>
+              <IconSearch /><span>{t("ui.c51349274d")}</span><small>{t("ui.b390c6bcd0")}</small><ChevronLeft size={17} aria-hidden="true" />
+            </button>
+          </section>
+          <section className="drawer-tool-section" aria-labelledby="drawer-analysis-heading">
+            <h3 id="drawer-analysis-heading">{t('ui.5edb2177af')}</h3>
+            <div className="drawer-tool-list">
+              <button type="button" className="drawer-tool-row" onClick={props.onOpenKeywords}>
+                <IconSortIndex /><span>{t("ui.cc9c59a2c4")}</span><ChevronLeft size={17} aria-hidden="true" />
+              </button>
+              <button type="button" className="drawer-tool-row" onClick={props.onOpenComparison}>
+                <GitCompareArrows size={20} /><span>{t("ui.1f253d9ad1")}</span><ChevronLeft size={17} aria-hidden="true" />
+              </button>
+            </div>
+          </section>
+        </div>}
         {props.view !== 'tools' && <>
         <form onSubmit={submitPage} className="drawer-navigation-form flex items-center gap-2 px-4 pb-3">
           <DictationInput

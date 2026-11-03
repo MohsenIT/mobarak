@@ -4,9 +4,9 @@ import { studyT as st } from "@/lib/study-messages";
 import { studyUrl, useStudyWorkspace } from "@/lib/study-store";
 import type { AnalysisTab } from "@/lib/analysis";
 import type { SurahData } from "@/lib/quran";
-export function StudyEntry() {
+export function StudyEntry({ className = "drawer-advanced-search" }: { className?: string }) {
   return (
-    <a className="drawer-advanced-search" href={studyUrl()}>
+    <a className={className} href={studyUrl()}>
       <NotebookPen size={18} />
       <span>{st("entry")}</span>
     </a>
