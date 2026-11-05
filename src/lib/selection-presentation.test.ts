@@ -7,7 +7,7 @@ const surah=data as SurahData
 const selection:AnalysisSelection={tab:'word',s:90,a:19,pos:1,root:null,text:'واژه'}
 test('short words stay complete while long selections keep their beginning and adapt at word boundaries',()=>{
  expect(selectionPreview('واژه',()=>false)).toBe('واژه')
- expect(selectionPreview('یک دو سه چهار')).toBe('یک دو سه…')
+ expect(selectionPreview('یک دو سه چهار')).toBe('یک دو…')
  expect(selectionPreview('یک دو سه چهار',text=>text.length<=7)).toBe('یک دو…')
  expect(selectionPreview('یک دو سه چهار',()=>false)).toBe('یک…')
  expect(selectionPreview('یک دو')).toBe('یک دو')

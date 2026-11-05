@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.63',date:'2026-11-05',title:'پیش‌نمایش انتخاب و جست‌وجوی هم‌تراز',changeKinds:['fix'],changes:[
+    'هدر پنل تحلیل فضای باقی‌مانده را به متن انتخاب‌شده می‌دهد تا واژه‌های بیشتری پیش از کوتاه‌شدن دیده شوند؛ مرجع همچنان بلافاصله پس از متن می‌آید.',
+    'فلش بازگشت، کادر جست‌وجو و دکمه‌های نوار جست‌وجو در همهٔ حالت‌های بالای صفحه ارتفاع مشترک دارند.',
+  ],
+},{
   version:'0.4.62',date:'2026-11-03',title:'بازگشت پنل تحلیل به ستون چپ',changeKinds:['fix'],changes:[
     'پس از اتصال دستگیره به پنل، آفستِ مخصوص باتم‌شیت موبایل در دسکتاپ پاک شد تا پنل تحلیل دوباره در ستون چپ بماند.',
   ],

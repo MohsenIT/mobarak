@@ -9,11 +9,15 @@ export function selectedContentText(selection:AnalysisSelection,surah?:SurahData
   .flatMap(verse=>verse.w.map(displayWordText)).join(' ')||selection.text
 }
 
-/** Keep word boundaries and the beginning of long selections in compact UI. */
+/** Keep word boundaries: one word on narrow headers, at most two on roomy ones. */
 export function selectionPreview(text:string,fits:(candidate:string)=>boolean=()=>true):string {
  const words=text.trim().split(/\s+/).filter(Boolean)
  if(words.length<=1)return words.join(' ')
- let count=Math.min(3,words.length)
- while(count>1&&!fits(words.slice(0,count).join(' ')+(count<words.length?'…':'')))count--
+ let count=1
+ while(count<Math.min(2,words.length)){
+  const next=count+1
+  if(!fits(words.slice(0,next).join(' ')+(next<words.length?'…':'')))break
+  count=next
+ }
  return words.slice(0,count).join(' ')+(count<words.length?'…':'')
 }
