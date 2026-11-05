@@ -1260,7 +1260,9 @@ input[type='range'].page-slider::-moz-range-thumb {
 .panel-selection { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1; }
 .panel-reference { display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0; font-size: 10px; padding: 3px 6px; white-space: nowrap; }
 .panel-reference-surah { max-width: 60px; overflow: hidden; text-overflow: ellipsis; }
-.analysis-unit-title { display: block; max-width: 70px; overflow: hidden; text-overflow: ellipsis; }
+/* The five slots already constrain unit labels. Do not add a second arbitrary
+   70px cap: on roomy sheets a complete context/ayah label should be visible. */
+.analysis-unit-title { display: block; max-width:100%; overflow: hidden; text-overflow: ellipsis; }
 .analysis-unit-title.font-quran { font-size: 18px; line-height: 1.5; }
 .analysis-navigation .analysis-position-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding-inline: 7px; }
 .analysis-position-title { display: block; max-width: 60px; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
@@ -1300,7 +1302,9 @@ button.surah-band { width: 100%; cursor: pointer; }
 button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
 
 .quick-surah-search { width: 100%; padding: 0 2px; }
-.quick-surah-search form { display: flex; align-items: center; gap: 6px; }
+.quick-surah-search form { display:flex; align-items:center; gap:6px; min-height:44px; }
+.quick-surah-search .dictation-field { flex:1 1 0; min-width:0; margin-block-end:0; }
+.quick-surah-search .dictation-input-shell { min-height:44px; }
 .quick-surah-search input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-2); padding: 8px 10px; font-size: 14px; color: var(--ink); }
 .quick-search-status { display: flex; align-items: center; gap: 8px; padding: 3px 5px; font-size: 11px; color: var(--ink-soft); }
 .quick-search-status > span:first-child { flex: 1; }

@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.65',date:'2026-11-05',title:'عنوان کامل‌تر و جست‌وجوی سریع هم‌تراز',changeKinds:['fix'],changes:[
+    'عنوان‌های دو لبهٔ نوار تحلیل دیگر سقف ثابت و زودهنگام ندارند و تا محدودهٔ واقعی جایگاه خود دیده می‌شوند.',
+    'فلش و فیلد جست‌وجوی سریع هم از قرارداد مشترک ارتفاع ۴۴ پیکسل استفاده می‌کنند.',
+  ],
+},{
   version:'0.4.64',date:'2026-11-05',title:'کوتاه‌سازی متن انتخاب با مرز واژه',changeKinds:['fix'],changes:[
     'پیش‌نمایش انتخاب دیگر سقف تعداد واژه ندارد؛ تا بودجهٔ خوانای کاراکترها پیش می‌رود، واژهٔ آخر را کامل نگه می‌دارد و سپس سه‌نقطه می‌گذارد.',
   ],
