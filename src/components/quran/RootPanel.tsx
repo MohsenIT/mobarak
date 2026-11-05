@@ -330,7 +330,7 @@ function RootPanelContent({
           ))}
           <div ref={indicatorTrack} className="analysis-tab-indicator-track" aria-hidden="true"><span ref={indicator} /><span ref={indicatorCopy} /></div>
         </div>
-        <nav hidden={tab === 'surah'} ref={navigationRef} className="analysis-navigation" data-analysis-navigation="five-slot" aria-label={t("ui.90c50672b6",{p0:(noun)})}>
+        <nav hidden={tab === 'surah'} ref={navigationRef} className="analysis-navigation" data-analysis-navigation="five-slot" data-unit-only={!hasRepetitions || undefined} aria-label={t("ui.90c50672b6",{p0:(noun)})}>
           <button data-analysis-nav-slot="unit-previous" className="analysis-unit-button analysis-unit-previous" onClick={() => navigateUnit(-1)} disabled={!canUnitPrevious} aria-label={t("ui.17017bfab8",{p0:(noun)})} title={t("ui.04529abbdc",{p0:(noun),p1:(previousUnitTitle)})}>
             {hasRepetitions ? <ChevronsRight size={15} aria-hidden="true" /> : <ChevronRight size={15} aria-hidden="true" />}
             <span className={`analysis-unit-title${unitQuranFont ? ' font-quran' : ''}`}><QuranText text={previousUnitTitle} /></span>
