@@ -17,11 +17,14 @@ export default function SelectionPreview({text}:{text:string}) {
    if(!live)return
    const style=getComputedStyle(element)
    if(context)context.font=`${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
-   const next=selectionPreview(text,candidate=>!context||context.measureText(quranDisplayText(candidate)).width<=element.clientWidth)
+   const parent=element.parentElement
+   const reference=parent?.querySelector<HTMLElement>('.panel-reference')
+   const available=parent ? parent.clientWidth-(reference?.getBoundingClientRect().width??0)-parseFloat(getComputedStyle(parent).columnGap||'0') : element.clientWidth
+   const next=selectionPreview(text,candidate=>!context||context.measureText(quranDisplayText(candidate)).width<=available)
    setPreview(previous=>previous===next?previous:next)
   }
   measure()
-  const observer=new ResizeObserver(measure);observer.observe(element)
+  const observer=new ResizeObserver(measure);observer.observe(element.parentElement??element)
   document.fonts.ready.then(measure)
   return()=>{live=false;observer.disconnect()}
  },[text])

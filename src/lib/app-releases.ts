@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.67',date:'2026-11-05',title:'مرجع چسبیده به متن انتخاب',changeKinds:['fix'],changes:[
+    'چیپ مرجع بلافاصله پس از متن انتخاب‌شده می‌آید؛ پیش‌نمایش فضای خالی میان متن و مرجع ایجاد نمی‌کند و اندازه‌گیری متن از فضای واقعی هدر انجام می‌شود.',
+  ],
+},{
   version:'0.4.66',date:'2026-11-05',title:'نمایش بازهٔ سیاق‌های مجاور',changeKinds:['fix'],changes:[
     'در ناوبری آیه و سیاق، جایگاه‌های بدون شمارنده به عنوان‌های کناری اختصاص می‌یابند تا بازهٔ آیات کامل دیده شود و چیپ در مرکز ثابت بماند.',
   ],

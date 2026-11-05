@@ -1515,7 +1515,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .panel-selection{flex:1 1 0;max-width:none;min-width:0;}
 /* Reserve the header's remaining width for the selected text first. The
    reference stays immediately after it, while the preview retains words. */
-.panel-selection .selection-preview{flex:1 1 0;min-width:7ch;}
+.panel-selection .selection-preview{flex:0 1 auto;min-width:0;width:max-content;}
 @media (max-width:380px){.analysis-unit-title{max-width:100%;}.analysis-navigation .analysis-repeat-button{font-size:10px;padding-inline:1px;}.panel-selection{min-width:5ch;}}
 
 /* Scope choices are a compact control row, never a detached second line. */
