@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.64',date:'2026-11-05',title:'کوتاه‌سازی متن انتخاب با مرز واژه',changeKinds:['fix'],changes:[
+    'پیش‌نمایش انتخاب دیگر سقف تعداد واژه ندارد؛ تا بودجهٔ خوانای کاراکترها پیش می‌رود، واژهٔ آخر را کامل نگه می‌دارد و سپس سه‌نقطه می‌گذارد.',
+  ],
+},{
   version:'0.4.63',date:'2026-11-05',title:'پیش‌نمایش انتخاب و جست‌وجوی هم‌تراز',changeKinds:['fix'],changes:[
     'هدر پنل تحلیل فضای باقی‌مانده را به متن انتخاب‌شده می‌دهد تا واژه‌های بیشتری پیش از کوتاه‌شدن دیده شوند؛ مرجع همچنان بلافاصله پس از متن می‌آید.',
     'فلش بازگشت، کادر جست‌وجو و دکمه‌های نوار جست‌وجو در همهٔ حالت‌های بالای صفحه ارتفاع مشترک دارند.',
