@@ -65,6 +65,15 @@ add a second instance without discussing it first.
   wiring around it. See `src/lib/reading-route.test.ts` and
   `tests/e2e/reading-route.spec.cjs` for the pinned contract before changing
   either file.
+- `src/lib/root-comparison.ts`: the root-visibility rules for a range
+  comparison — which roots are muted and what tapping one does. Two overlapping
+  mechanisms live here (`hidden`, the set the reader tapped off one by one, and
+  `solo`, a single root shown on its own) and solo always wins. `page.tsx` keeps
+  the `useState` for both sets and the rest of the comparison state; the module
+  only decides the resulting display set and the next state after a tap. See
+  `src/lib/root-comparison.test.ts` and `tests/e2e/root-comparison.spec.cjs`
+  (which pins the tap/long-press/clear behavior through the real UI) before
+  changing it — the interaction is easy to break and was untested before this.
 - `src/app/study/`: the standalone study-notebook route (`/study/taha`, Surah 20
   — **Surah Taha, not Maryam** — see "Data facts" below).
 - `public/data/`: Quran text, translations, roots, fonts. Read-only from the

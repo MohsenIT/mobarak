@@ -24,6 +24,7 @@ import RootPanel from '@/components/quran/RootPanel'
 import StartupSplash from '@/components/quran/StartupSplash'
 import RecitationPlayer,{type RecitationTransportStatus} from '@/components/quran/RecitationPlayer'
 import { rootHue } from '@/lib/comparison-colors'
+import { mutedComparisonRoots as mutedComparisonRootsFor, toggleComparisonRoot } from '@/lib/root-comparison'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import {revealReadingTarget,revealReadingVerse} from '@/lib/reading-visibility'
 import CarStudySync from '@/components/quran/CarStudySync'
@@ -178,7 +179,8 @@ export default function Home() {
   const focusComparisonRoot = useCallback((root: string) => { setSoloComparisonRoot(root); setSel(null) }, [])
   useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
   useEffect(() => { setHiddenComparisonRoots(new Set()); setSoloComparisonRoot(null) }, [comparisonRange?.s, comparisonRange?.from, comparisonRange?.to])
-  const mutedComparisonRoots = useMemo(() => new Set(Object.keys(comparisonRoots).filter(root => soloComparisonRoot ? root !== soloComparisonRoot : hiddenComparisonRoots.has(root))), [comparisonRoots, hiddenComparisonRoots, soloComparisonRoot])
+  const comparisonVisibility = useMemo(() => ({ hidden: hiddenComparisonRoots, solo: soloComparisonRoot }), [hiddenComparisonRoots, soloComparisonRoot])
+  const mutedComparisonRoots = useMemo(() => mutedComparisonRootsFor(comparisonRoots, comparisonVisibility), [comparisonRoots, comparisonVisibility])
   const pinchRef = useRef<{ d: number; s: number } | null>(null)
 
   useEffect(() => { loadMeta().then(setMeta) }, [])
@@ -295,13 +297,9 @@ export default function Home() {
     setPlaybackTarget(null)
     if (!showComparison && !showIndex && comparisonRange?.s === word.s && word.root && comparisonRoots[word.root] !== undefined) {
       const root = word.root
-      setHiddenComparisonRoots(current => {
-        const next = new Set(current)
-        if (soloComparisonRoot && root !== soloComparisonRoot || next.has(root)) next.delete(root)
-        else next.add(root)
-        return next
-      })
-      setSoloComparisonRoot(null)
+      const next = toggleComparisonRoot(root, { hidden: hiddenComparisonRoots, solo: soloComparisonRoot })
+      setHiddenComparisonRoots(next.hidden)
+      setSoloComparisonRoot(next.solo)
       setSel(null)
       return
     }
@@ -309,7 +307,7 @@ export default function Home() {
     setFlash(null)
     setComparisonRoot(null)
     setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos && (current.part ?? 'stem') === (word.part ?? 'stem') ? null : word)
-  }, [comparisonRange, comparisonRoots, soloComparisonRoot, showComparison, showIndex])
+  }, [comparisonRange, comparisonRoots, hiddenComparisonRoots, soloComparisonRoot, showComparison, showIndex])
 
   const goSurah = useCallback((n: number) => {
     pullArrival.current = null
