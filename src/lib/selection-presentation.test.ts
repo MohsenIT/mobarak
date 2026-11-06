@@ -3,7 +3,7 @@ import {selectedContentText,selectionPreview} from './selection-presentation'
 import type {AnalysisSelection} from './analysis'
 import data from '../../public/data/surah/90.json'
 import type {SurahData} from './quran'
-const surah=data as SurahData
+const surah=data as unknown as SurahData
 const selection:AnalysisSelection={tab:'word',s:90,a:19,pos:1,root:null,text:'واژه'}
 test('short words stay complete while long selections keep their beginning and adapt at word boundaries',()=>{
  expect(selectionPreview('واژه',()=>false)).toBe('واژه')

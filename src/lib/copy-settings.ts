@@ -21,7 +21,7 @@ export function parseCopySettings(value: unknown): CopySettings {
   if (!value || typeof value !== 'object') return DEFAULT_COPY_SETTINGS
   const saved = value as Partial<CopySettings>
   const format: CopyFormat = saved.format === 'full' || saved.format === 'custom' ? saved.format : 'compact'
-  const custom = saved.custom && typeof saved.custom === 'object' ? saved.custom : {}
+  const custom: Partial<CopyCustomFormat> = saved.custom && typeof saved.custom === 'object' ? saved.custom : {}
   return {
     format,
     custom: {

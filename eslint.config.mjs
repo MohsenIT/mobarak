@@ -44,7 +44,26 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "no-useless-escape": "off",
   },
 }, {
-  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts", "examples/**", "skills"]
+  // .cjs files are CommonJS by definition (the extension is what forces that
+  // module format); require() there is correct usage, not a lint violation.
+  files: ["**/*.cjs"],
+  rules: {
+    "@typescript-eslint/no-require-imports": "off",
+  },
+}, {
+  ignores: [
+    "node_modules/**",
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "examples/**",
+    "skills",
+    // Standalone debug script from the original scaffold env (hardcoded
+    // /home/z/my-project paths); excluded from tsconfig.json for the same
+    // reason. Not part of the Next.js app bundle or any CI step.
+    "scripts/test-keyword-score.ts",
+  ]
 }];
 
 export default eslintConfig;
