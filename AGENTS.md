@@ -25,6 +25,15 @@ from `src/app` or `src/components` into `src/lib`. Never import from `src/app`
 into `src/components`. This boundary is what keeps one feature from silently
 breaking another; do not weaken it to make an import "easier".
 
+Verified (Phase 5 review): the only existing exception is test-only —
+`src/lib/translation-audio.test.ts` imports `GET` from
+`@/app/api/recitation/route` to exercise the audio-proxy endpoint alongside
+the pure `recitation.ts` helpers it already covers. No production file in
+`src/lib` or `src/components` imports from `src/app`. This is accepted as-is
+(moving the route's validation logic into `src/lib` to avoid it is a larger,
+unrelated restructuring, not a boundary violation in shipped code) — do not
+add a second instance without discussing it first.
+
 - `src/lib/*.ts`: framework-agnostic data loading, pure business logic, and thin
   platform bridges (`native-*.ts`). Prefer pure functions here — they are the
   cheapest code in the repo to test and the safest to refactor. Most files pair
@@ -55,21 +64,43 @@ breaking another; do not weaken it to make an import "easier".
   intentional (matches the `/study/taha` route), not a bug and not Maryam.
   If you introduce a named constant for it, name it for Taha.
 - Only `dialog` and `popover` under `src/components/ui/` are imported by the
-  app. Re-verify with `grep -rl "components/ui/<name>" src/components/quran src/app`
-  before assuming a ui/* primitive is live.
+  app — every other file that used to live in `src/components/ui/` (48 files:
+  accordion, alert-dialog, alert, aspect-ratio, avatar, badge, breadcrumb,
+  button, calendar, card, carousel, chart, checkbox, collapsible, command,
+  context-menu, drawer, dropdown-menu, form, hover-card, input-otp, input,
+  label, menubar, navigation-menu, pagination, progress, radio-group,
+  resizable, scroll-area, select, separator, sheet, sidebar, skeleton,
+  slider, sonner, switch, table, tabs, textarea, toaster, toast,
+  toggle-group, toggle, tooltip) was dead shadcn scaffolding with zero
+  imports anywhere in the app and was deleted (Phase 10), along with the two
+  hooks (`src/hooks/use-toast.ts`, `src/hooks/use-mobile.ts`) that only those
+  dead files referenced. Re-verify with
+  `grep -rl "components/ui/<name>" src/components/quran src/app` before
+  assuming a ui/* primitive is live if this ever needs re-checking.
 
 ## Dependency boundaries
 
 - Do not add a new npm dependency if an existing one already solves the problem
-  (check `package.json` first — this repo has accumulated unused dependencies
-  from earlier template scaffolding; don't repeat that pattern).
-- `prisma`, `@prisma/client`, `next-auth`, `zustand`, `@dnd-kit/*`,
-  `@tanstack/react-query`, `@tanstack/react-table`, `@mdxeditor/editor`,
-  `react-syntax-highlighter`, `@reactuses/core`, `uuid`, `date-fns`, `sharp`,
-  `zod`, `react-markdown`, `framer-motion` have zero imports anywhere in `src/`
-  or `scripts/` as of this writing. Do not resurrect them without checking the
-  app actually needs them; prefer removing newly-found dead dependencies over
-  leaving them.
+  (check `package.json` first).
+- Removed (Phase 10) as confirmed-dead scaffolding — zero imports anywhere in
+  `src/` or `scripts/`, verified by repo-wide grep excluding `.next/standalone`
+  build artifacts: `@dnd-kit/*`, `@hookform/resolvers`, `@mdxeditor/editor`,
+  `@prisma/client`, `prisma` (+ the generic unused `prisma/schema.prisma`
+  scaffold and its `db:*` package.json scripts — this app has no database),
+  all unused `@radix-ui/react-*` primitives (kept only `react-dialog` and
+  `react-popover`, the two actually imported by `dialog.tsx`/`popover.tsx`),
+  `@reactuses/core`, `@tanstack/react-query`, `@tanstack/react-table`,
+  `class-variance-authority`, `cmdk`, `date-fns`, `embla-carousel-react`,
+  `framer-motion`, `input-otp`, `next-auth`, `next-intl`, `next-themes`,
+  `react-day-picker`, `react-hook-form`, `react-markdown`,
+  `react-resizable-panels`, `react-syntax-highlighter`, `recharts`, `sharp`,
+  `sonner`, `uuid`, `vaul`, `z-ai-web-dev-sdk`, `zod`, `zustand`. Also removed
+  `tailwindcss-animate` and `tailwind.config.ts` itself — Tailwind v4's
+  CSS-first config (`@import "tailwindcss"` + `@theme inline` in
+  `src/app/globals.css`) made the JS config file fully redundant; confirmed
+  via byte-identical build output (`sha256sum` on the generated CSS chunk)
+  with and without the file before deleting it. The app uses `tw-animate-css`
+  (devDependency, `@import "tw-animate-css"` in `globals.css`) instead.
 - The app has no database and no server-side auth. Do not add either without
   an explicit product decision — persistence is local (`localStorage`,
   IndexedDB via `study-store.ts`) by design.
