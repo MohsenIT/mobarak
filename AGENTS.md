@@ -47,11 +47,24 @@ add a second instance without discussing it first.
   is dead scaffolding from the project template. Do not add new files here
   speculatively; add a primitive only when a real feature imports it.
 - `src/app/page.tsx`: the reading screen's orchestration root. It currently owns
-  a large amount of state (reading position, mode, search, selection, drawers).
-  This is a known architectural weak point (see "Known technical debt" below).
-  When adding a new reading-screen feature, prefer extracting a dedicated hook
-  under `src/components/quran/` (e.g. `useReadingRoute`, `useX`) over adding more
+  a large amount of state (presentation settings, search, selection, drawers,
+  audio, comparison). This is a known architectural weak point (see "Known
+  technical debt" below). When adding a new reading-screen feature, prefer
+  extracting a dedicated hook under `src/components/quran/` over adding more
   inline `useState`/`useEffect` to `page.tsx` directly.
+- `src/components/quran/useReadingRoute.ts` + `src/lib/reading-route.ts`: own
+  the reading position (`page`/`mode`/`surah`), its `mushaf.*` persistence, the
+  canonical reading URL, and browser back/forward restoration. `page.tsx` reads
+  a location change only through three callbacks it supplies to the hook
+  (`onSearch`/`onVerse`/`onReading`) — the hook decides *that* the location
+  changed and to what kind of route; `page.tsx` decides what that means for
+  selection, flash and the search panel. `src/lib/reading-route.ts` holds the
+  pure decision logic (which kind of route a location is, the first-render
+  position, the canonical URL, entering/leaving search) so it is unit-testable
+  without a DOM; the hook is the thin `useState`/`useEffect`/`window.history`
+  wiring around it. See `src/lib/reading-route.test.ts` and
+  `tests/e2e/reading-route.spec.cjs` for the pinned contract before changing
+  either file.
 - `src/app/study/`: the standalone study-notebook route (`/study/taha`, Surah 20
   — **Surah Taha, not Maryam** — see "Data facts" below).
 - `public/data/`: Quran text, translations, roots, fonts. Read-only from the
@@ -222,10 +235,12 @@ add a second instance without discussing it first.
 
 ## Known technical debt (tracked, not yet fixed)
 
-- `src/app/page.tsx` concentrates most reading-screen state (~40 `useState`)
-  and scattered URL/history-sync effects. Planned mitigation: incremental hook
-  extraction (e.g. `useReadingRoute`), each with a characterization test
-  landed first — not a single big rewrite.
+- `src/app/page.tsx` still concentrates most of the remaining reading-screen
+  state (~50 `useState`) — presentation settings, search panel, selection,
+  analysis, drawers, audio, and root/range comparison. The URL/history-sync
+  responsibility was extracted into `useReadingRoute` (see above); planned
+  mitigation for what remains: further incremental hook extraction, each with
+  a characterization test landed first — not a single big rewrite.
 - `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
   repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
   (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**

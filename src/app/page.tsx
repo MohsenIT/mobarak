@@ -4,8 +4,11 @@ import {useStudyWorkspace} from '@/lib/study-store'
 import {t,useUiLanguage} from '@/lib/i18n'
 import {isTranslator} from '@/lib/translations'
 import {LanguageOnboarding} from '@/components/quran/LanguageSettings'
-import { readVerseAddress, writeVerseAddress, readSurahNumber, readPageNumber, readingUrl } from '@/lib/verse-link'
-import { readSearchLink, searchLink, type SearchLinkState } from '@/lib/search-link'
+import { writeVerseAddress, readingUrl, readVerseAddress } from '@/lib/verse-link'
+import type { SearchLinkState } from '@/lib/search-link'
+import { readStored, writeStored } from '@/lib/reader-storage'
+import { useReadingRoute } from '@/components/quran/useReadingRoute'
+import type { VerseAddress } from '@/lib/verse-link'
 import type { Destination } from '@/lib/navigation'
 import { wordTarget } from '@/lib/word-parts'
 
@@ -41,45 +44,22 @@ import {
   IconTranslate,
 } from '@/components/quran/Ornaments'
 
-const LS = {
-  get: <T,>(k: string, d: T): T => {
-    try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d } catch { return d }
-  },
-  set: (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch {} },
-}
-
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 const round05 = (v: number) => Math.round(v * 20) / 20
 
 export default function Home() {
   useUiLanguage()
   useStudyWorkspace()
-  const [knownPersianReader]=useState(()=>LS.get('mushaf.safavi-default.v1',false)&&['s','f','a','m'].includes(LS.get('mushaf.tr','s')))
-  const [desktopPaneWidths] = useState(() => ({ navigation: clamp(LS.get('mushaf.desktop-navigation-width', 300), 240, 420), analysis: clamp(LS.get('mushaf.desktop-analysis-width', 360), 280, 520) }))
+  const [knownPersianReader]=useState(()=>readStored('mushaf.safavi-default.v1',false)&&['s','f','a','m'].includes(readStored('mushaf.tr','s')))
+  const [desktopPaneWidths] = useState(() => ({ navigation: clamp(readStored('mushaf.desktop-navigation-width', 300), 240, 420), analysis: clamp(readStored('mushaf.desktop-analysis-width', 360), 280, 520) }))
   const [meta, setMeta] = useState<Meta | null>(null)
-  const [page, setPage] = useState(() => {
-    if (typeof window === 'undefined') return LS.get('mushaf.page', 1)
-    const fromUrl = readPageNumber(window.location.search, window.location.pathname) ?? NaN
-    return clamp(Number.isFinite(fromUrl) ? fromUrl : LS.get('mushaf.page', 1), 1, 604)
-  })
-  const [mode, setMode] = useState<'mushaf' | 'flow'>(() => {
-    if (typeof window !== 'undefined') {
-      if (readSurahNumber(window.location.search, window.location.pathname)) return 'flow'
-      if (readPageNumber(window.location.search, window.location.pathname)) return 'mushaf'
-    }
-    return LS.get('mushaf.mode', 'flow')
-  })
-  const [surah, setSurah] = useState(() => {
-    const value = typeof window !== 'undefined' ? readSurahNumber(window.location.search, window.location.pathname) ?? NaN : NaN
-    return Number.isInteger(value) && value >= 1 && value <= 114 ? value : LS.get('mushaf.surah', 1)
-  })
-  const [showTrans, setShowTrans] = useState(() => LS.get('mushaf.showTrans', false))
-  const [theme, setTheme] = useState<'paper' | 'night'>(() => LS.get('mushaf.theme', 'paper'))
-  const [translator, setTranslator] = useState<Translator>(() => LS.get('mushaf.safavi-default.v1', false) && isTranslator(LS.get('mushaf.tr', 's')) ? LS.get('mushaf.tr', 's') : 's')
-  const [scale, setScale] = useState(() => LS.get('mushaf.scale', 1))
-  const [bookmarks, setBookmarks] = useState<number[]>(() => LS.get('mushaf.marks', []))
-  const [pinnedSurahs, setPinnedSurahs] = useState<number[]>(() => LS.get('mushaf.pinned-surahs', []))
-  const [recentSurahs, setRecentSurahs] = useState<number[]>(() => LS.get('mushaf.recent-surahs', []))
+  const [showTrans, setShowTrans] = useState(() => readStored('mushaf.showTrans', false))
+  const [theme, setTheme] = useState<'paper' | 'night'>(() => readStored('mushaf.theme', 'paper'))
+  const [translator, setTranslator] = useState<Translator>(() => readStored('mushaf.safavi-default.v1', false) && isTranslator(readStored('mushaf.tr', 's')) ? readStored('mushaf.tr', 's') : 's')
+  const [scale, setScale] = useState(() => readStored('mushaf.scale', 1))
+  const [bookmarks, setBookmarks] = useState<number[]>(() => readStored('mushaf.marks', []))
+  const [pinnedSurahs, setPinnedSurahs] = useState<number[]>(() => readStored('mushaf.pinned-surahs', []))
+  const [recentSurahs, setRecentSurahs] = useState<number[]>(() => readStored('mushaf.recent-surahs', []))
   const [drawerView, setDrawerView] = useState<'navigation' | 'tools'>('navigation')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -89,28 +69,41 @@ export default function Home() {
   const [quickHighlights,setQuickHighlights]=useState<ReaderSearchState|null>(null)
   const [searchStart, setSearchStart] = useState<SearchStart | null>(null)
   const [occurrenceSearch, setOccurrenceSearch] = useState<AnalysisSelection | null>(null)
-  const readingBeforeSearch = useRef<string | null>(null)
-  const lastSearchUrl = useRef<string | null>(null)
-  const writeSearchState = useCallback((state: SearchLinkState) => {
-    const current = window.location.href
-    const entering = !readSearchLink(current)
-    if (entering) readingBeforeSearch.current = current
-    const url = searchLink(current, state, process.env.NEXT_PUBLIC_DESKTOP === '1')
-    lastSearchUrl.current = url.href
-    if (url.href !== current) window.history[entering ? 'pushState' : 'replaceState'](entering ? { ...window.history.state, quranSearchEntry: true } : window.history.state, '', url)
-  }, [])
-  const changeSearchOpen = (open: boolean) => {
-    setSearchOpen(open)
-    if (!open && readSearchLink(window.location.href)) {
-      if (window.history.state?.quranSearchEntry) window.history.back()
-      else window.history.replaceState(window.history.state, '', readingBeforeSearch.current || readingUrl(new URL('/', window.location.href).href, mode, surah, page, process.env.NEXT_PUBLIC_DESKTOP === '1'))
-    }
-  }
   const [returnToSearch, setReturnToSearch] = useState(false)
   const [searchTarget, setSearchTarget] = useState<{ s: number; a: number; pos: number; align?: 'start'; wholeVerse?: boolean } | null>(null)
   const [sel, setSel] = useState<Selection | null>(null)
   const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
   const [flash, setFlash] = useState<{ s: number; a: number; pos: number } | null>(null)
+  /**
+   * The three ways a location can describe the reader. Only the route hook
+   * knows a navigation happened; only this screen knows what it means for the
+   * surrounding panels, so the two are joined here rather than inside the hook.
+   */
+  const applySearchEntry = useCallback((state: SearchLinkState, sameEntry: boolean) => {
+    if (sameEntry) { setTranslator(state.translator); setSearchOpen(true); return }
+    setSearchStart({ query: state.query, mode: state.mode, surahs: state.surahs, revision: Date.now(), state })
+    setOccurrenceSearch(state.occurrence); setTranslator(state.translator); setSearchOpen(true)
+  }, [])
+  /** A verse address in the location: drop selection and reveal it once loaded. */
+  const applyVerseEntry = useCallback((address: VerseAddress) => {
+    setSearchOpen(false)
+    setSel(null)
+    loadSurah(address.s).then(data => {
+      const verse = data.v[address.a - 1]
+      if (!verse) return
+      const pos = Math.min(address.pos, verse.w.length)
+      setFlash({ ...address, pos })
+      setSearchTarget({ ...address, pos, wholeVerse:pos===1 })
+    })
+  }, [])
+  /** A surah or page in the location: only transient selection state is dropped. */
+  const clearTransientSelection = useCallback(() => { setSearchOpen(false); setSel(null); setFlash(null) }, [])
+  const route = useReadingRoute({ onSearch: applySearchEntry, onVerse: applyVerseEntry, onReading: clearTransientSelection })
+  const { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch } = route
+  const changeSearchOpen = (open: boolean) => {
+    setSearchOpen(open)
+    if (!open) leaveSearch()
+  }
   const [pageData, setPageData] = useState<Map<number, SurahData>>(new Map())
   const pullArrival = useRef<{ s: number; end: boolean } | null>(null)
   const [flowSurah, setFlowSurah] = useState<SurahData | null>(null)
@@ -125,7 +118,6 @@ export default function Home() {
     const timer = setTimeout(() => setStartupMinimumElapsed(true), 1000)
     return () => clearTimeout(timer)
   }, [])
-  const [mushafNavigationRevision, setMushafNavigationRevision] = useState(0)
   const [mushafContentRevision, setMushafContentRevision] = useState(0)
   const onMushafContentReady = useCallback(() => setMushafContentRevision(n => n + 1), [])
   const [audioOpen, setAudioOpen] = useState(false)
@@ -194,33 +186,25 @@ export default function Home() {
     document.documentElement.dataset.theme = theme
     document.documentElement.style.colorScheme = theme==='night'?'dark':'light'
     void syncNativeAppearance(theme)
-    LS.set('mushaf.theme', theme)
+    writeStored('mushaf.theme', theme)
   }, [theme])
   useEffect(() => {
     const color = !startupComplete ? '#faf4df' : getComputedStyle(document.documentElement).getPropertyValue('--paper').trim()
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color)
   }, [theme, startupComplete])
+  useEffect(() => { writeStored('mushaf.showTrans', showTrans) }, [showTrans])
+  useEffect(() => { writeStored('mushaf.tr', translator); writeStored('mushaf.safavi-default.v1', true) }, [translator])
   useEffect(() => {
-    LS.set('mushaf.page', page)
-    if (readSearchLink(window.location.href)) return
-    const url = readingUrl(window.location.href, mode, surah, page, process.env.NEXT_PUBLIC_DESKTOP === '1')
-    window.history.replaceState(window.history.state, '', url.toString())
-  }, [page, mode, surah])
-  useEffect(() => { LS.set('mushaf.mode', mode) }, [mode])
-  useEffect(() => { LS.set('mushaf.surah', surah) }, [surah])
-  useEffect(() => { LS.set('mushaf.showTrans', showTrans) }, [showTrans])
-  useEffect(() => { LS.set('mushaf.tr', translator); LS.set('mushaf.safavi-default.v1', true) }, [translator])
-  useEffect(() => {
-    const timer = window.setTimeout(() => LS.set('mushaf.scale', scale), 200)
+    const timer = window.setTimeout(() => writeStored('mushaf.scale', scale), 200)
     return () => window.clearTimeout(timer)
   }, [scale])
-  useEffect(() => { LS.set('mushaf.marks', bookmarks) }, [bookmarks])
+  useEffect(() => { writeStored('mushaf.marks', bookmarks) }, [bookmarks])
 
   const segs = useMemo(() => (meta ? meta.pages[page - 1] || [] : []), [meta, page])
   const curSurahN = mode === 'mushaf' ? (desktopSurah&&segs.some(segment=>segment.s===desktopSurah)?desktopSurah:segs[0]?.s??1) : surah
   useEffect(() => {
     if (!meta || loadingPage) return
-    setRecentSurahs(previous => { const next = [curSurahN, ...previous.filter(n => n !== curSurahN && Number.isInteger(n) && n >= 1 && n <= 114)].slice(0, 12); LS.set('mushaf.recent-surahs', next); return next })
+    setRecentSurahs(previous => { const next = [curSurahN, ...previous.filter(n => n !== curSurahN && Number.isInteger(n) && n >= 1 && n <= 114)].slice(0, 12); writeStored('mushaf.recent-surahs', next); return next })
   }, [curSurahN, meta, loadingPage])
 
   // close panel-max when selection changes / panel closes
@@ -290,11 +274,6 @@ export default function Home() {
     el.addEventListener('wheel', h, { passive: false })
     return () => el.removeEventListener('wheel', h)
   }, [meta])
-
-  const requestMushafPage = useCallback((p: number) => {
-    setPage(clamp(p, 1, 604))
-    setMushafNavigationRevision(n => n + 1)
-  }, [])
 
   const goPage = useCallback((p: number) => {
     const destination = clamp(p, 1, 604)
@@ -379,40 +358,6 @@ export default function Home() {
     }
     else goVerse(destination.s,destination.kind==='surah'?1:destination.kind==='context'?destination.from:destination.a,1,'start')
   }
-
-  useEffect(() => {
-    const restore = () => {
-      const search = readSearchLink(window.location.href)
-      if (search) {
-        if (lastSearchUrl.current === window.location.href) { setTranslator(search.translator); setSearchOpen(true); return }
-        setSearchStart({ query: search.query, mode: search.mode, surahs: search.surahs, revision: Date.now(), state: search })
-        setOccurrenceSearch(search.occurrence); setTranslator(search.translator); setSearchOpen(true)
-        return
-      }
-      setSearchOpen(false)
-      const target = readVerseAddress(window.location.search, window.location.pathname)
-      if (target) {
-        setMode('flow')
-        setSurah(target.s)
-        setSel(null)
-        loadSurah(target.s).then(data => {
-          const verse = data.v[target.a - 1]
-          if (!verse) return
-          const pos = Math.min(target.pos, verse.w.length)
-          setFlash({ ...target, pos })
-          setSearchTarget({ ...target, pos, wholeVerse:pos===1 })
-        })
-      } else {
-        const s = readSurahNumber(window.location.search, window.location.pathname) ?? 0, p = readPageNumber(window.location.search, window.location.pathname) ?? 0
-        setSel(null); setFlash(null)
-        if (s >= 1 && s <= 114) { setMode('flow'); setSurah(s) }
-        else if (p >= 1 && p <= 604) { setMode('mushaf'); requestMushafPage(p) }
-      }
-    }
-    restore()
-    window.addEventListener('popstate', restore)
-    return () => window.removeEventListener('popstate', restore)
-  }, [requestMushafPage])
 
   useEffect(() => {
     if (!searchTarget || loadingPage || (mode === 'flow' && flowSurah?.n !== searchTarget.s)) return
@@ -691,8 +636,8 @@ export default function Home() {
           bookmarks={bookmarks}
           recentSurahs={recentSurahs}
           pinnedSurahs={pinnedSurahs}
-          onTogglePin={n => setPinnedSurahs(old => { const next = old.includes(n) ? old.filter(s => s !== n) : [...old, n]; LS.set('mushaf.pinned-surahs', next); return next })}
-          onClearRecent={() => { setRecentSurahs([]); LS.set('mushaf.recent-surahs', []) }}
+          onTogglePin={n => setPinnedSurahs(old => { const next = old.includes(n) ? old.filter(s => s !== n) : [...old, n]; writeStored('mushaf.pinned-surahs', next); return next })}
+          onClearRecent={() => { setRecentSurahs([]); writeStored('mushaf.recent-surahs', []) }}
           onAdvancedSearch={() => { setDrawerOpen(false); setOccurrenceSearch(null); setSel(null); setSearchStart({ query: '', mode: 'text', surahs: [], revision: Date.now() }); setSearchOpen(true) }}
           onOpenKeywords={() => { setDrawerOpen(false); setShowIndex(true) }}
           onOpenComparison={() => { setDrawerOpen(false); setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }}
