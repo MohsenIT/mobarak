@@ -195,11 +195,23 @@ breaking another; do not weaken it to make an import "easier".
   and scattered URL/history-sync effects. Planned mitigation: incremental hook
   extraction (e.g. `useReadingRoute`), each with a characterization test
   landed first — not a single big rewrite.
-- `react-hooks/exhaustive-deps` and the React Compiler lint rules are disabled
-  repo-wide in `eslint.config.mjs`. There are real diagnostics underneath this
-  (observed in `page.tsx`, `ContinuousMushaf.tsx`, `AnalysisSections.tsx`, and
-  others) — this is deferred debt, not evidence the code is effect-safe.
-  Re-enable incrementally after the related extraction work, not all at once.
+- `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
+  repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
+  (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**
+  disabled and currently surface 27 real diagnostics across 13 files
+  (`page.tsx`, `ContinuousMushaf.tsx`, `QuranSearch.tsx`, `RootPanel.tsx`,
+  `SurahPull.tsx`, `AnalysisSections.tsx`, `DictationInput.tsx`,
+  `IshtiqaqiMeaning.tsx`, `MaqayisMeaning.tsx`, `OccurrencePicker.tsx`,
+  `QuickSurahSearch.tsx`, `RangeComparison.tsx`, `ReleaseNotesDialog.tsx`,
+  `useRecitationMediaSession.ts`). These are two recurring, intentional
+  patterns — "latest ref" (`const r = useRef(x); r.current = x` during
+  render, so a callback/effect can read the newest value without
+  re-subscribing) and "reset state at the top of an effect that then loads
+  async data" — not accidental bugs. `bun run lint` is left non-zero on
+  purpose rather than suppressed: fixing each requires rewriting the
+  surrounding effect (e.g. moving the reset into an event handler, or
+  switching to a key-based remount) with a characterization test proving no
+  behavior change, file by file, not a rule-level `"off"`.
 - `src/lib/study-store.ts` (IndexedDB read/write for the study workspace) has
   no direct test coverage; only the pure logic in `src/lib/study.ts` is
   tested. Add characterization tests for `loadStudy`/`saveStudy` before
