@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
     ]
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   reactStrictMode: false,
   allowedDevOrigins: ["*.space-z.ai", "*.app.github.dev"],
