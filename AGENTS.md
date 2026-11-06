@@ -74,6 +74,15 @@ add a second instance without discussing it first.
   `src/lib/root-comparison.test.ts` and `tests/e2e/root-comparison.spec.cjs`
   (which pins the tap/long-press/clear behavior through the real UI) before
   changing it — the interaction is easy to break and was untested before this.
+- `src/lib/reader-settings.ts`: the pure update rules for reader presentation
+  settings — scale clamping/stepping, the recent-surah list (front-insert,
+  de-duplicate, capped at 12, invalid numbers filtered because this runs on
+  every page load), pinned surahs, bookmark removal, and resolving the initial
+  translator from `mushaf.tr` + the `mushaf.safavi-default.v1` opt-in marker.
+  `page.tsx` still owns the `useState` and the `mushaf.*` writes, so the values
+  keep their existing lifecycle and persistence timing; only the arithmetic
+  lives here. See `src/lib/reader-settings.test.ts` and
+  `tests/e2e/reader-settings.spec.cjs`.
 - `src/app/study/`: the standalone study-notebook route (`/study/taha`, Surah 20
   — **Surah Taha, not Maryam** — see "Data facts" below).
 - `public/data/`: Quran text, translations, roots, fonts. Read-only from the
@@ -245,11 +254,14 @@ add a second instance without discussing it first.
 ## Known technical debt (tracked, not yet fixed)
 
 - `src/app/page.tsx` still concentrates most of the remaining reading-screen
-  state (~50 `useState`) — presentation settings, search panel, selection,
-  analysis, drawers, audio, and root/range comparison. The URL/history-sync
-  responsibility was extracted into `useReadingRoute` (see above); planned
-  mitigation for what remains: further incremental hook extraction, each with
-  a characterization test landed first — not a single big rewrite.
+  state (~45 `useState`) — search panel, selection, analysis, drawers, audio,
+  startup, and the state *around* root/range comparison. Three responsibilities
+  have been extracted so far, each with its own characterization tests:
+  URL/history/reading-position into `useReadingRoute` (see above), the
+  comparison root-visibility rules into `src/lib/root-comparison.ts`, and the
+  presentation-setting update arithmetic into `src/lib/reader-settings.ts`.
+  Planned mitigation for what remains: further incremental extraction, each
+  with a characterization test landed first — not a single big rewrite.
 - `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
   repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
   (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**

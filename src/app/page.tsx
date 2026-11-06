@@ -2,11 +2,11 @@
 import {occurrenceScopeSurahs,type OccurrenceScope} from '@/lib/occurrence-scope'
 import {useStudyWorkspace} from '@/lib/study-store'
 import {t,useUiLanguage} from '@/lib/i18n'
-import {isTranslator} from '@/lib/translations'
 import {LanguageOnboarding} from '@/components/quran/LanguageSettings'
 import { writeVerseAddress, readingUrl, readVerseAddress } from '@/lib/verse-link'
 import type { SearchLinkState } from '@/lib/search-link'
 import { readStored, writeStored } from '@/lib/reader-storage'
+import { clampScale, rememberSurah, removeBookmark, resolveInitialTranslator, stepScale, togglePinnedSurah } from '@/lib/reader-settings'
 import { useReadingRoute } from '@/components/quran/useReadingRoute'
 import type { VerseAddress } from '@/lib/verse-link'
 import type { Destination } from '@/lib/navigation'
@@ -46,7 +46,6 @@ import {
 } from '@/components/quran/Ornaments'
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
-const round05 = (v: number) => Math.round(v * 20) / 20
 
 export default function Home() {
   useUiLanguage()
@@ -56,7 +55,7 @@ export default function Home() {
   const [meta, setMeta] = useState<Meta | null>(null)
   const [showTrans, setShowTrans] = useState(() => readStored('mushaf.showTrans', false))
   const [theme, setTheme] = useState<'paper' | 'night'>(() => readStored('mushaf.theme', 'paper'))
-  const [translator, setTranslator] = useState<Translator>(() => readStored('mushaf.safavi-default.v1', false) && isTranslator(readStored('mushaf.tr', 's')) ? readStored('mushaf.tr', 's') : 's')
+  const [translator, setTranslator] = useState<Translator>(() => resolveInitialTranslator(readStored('mushaf.tr', 's'), readStored('mushaf.safavi-default.v1', false)))
   const [scale, setScale] = useState(() => readStored('mushaf.scale', 1))
   const [bookmarks, setBookmarks] = useState<number[]>(() => readStored('mushaf.marks', []))
   const [pinnedSurahs, setPinnedSurahs] = useState<number[]>(() => readStored('mushaf.pinned-surahs', []))
@@ -206,7 +205,7 @@ export default function Home() {
   const curSurahN = mode === 'mushaf' ? (desktopSurah&&segs.some(segment=>segment.s===desktopSurah)?desktopSurah:segs[0]?.s??1) : surah
   useEffect(() => {
     if (!meta || loadingPage) return
-    setRecentSurahs(previous => { const next = [curSurahN, ...previous.filter(n => n !== curSurahN && Number.isInteger(n) && n >= 1 && n <= 114)].slice(0, 12); writeStored('mushaf.recent-surahs', next); return next })
+    setRecentSurahs(previous => { const next = rememberSurah(previous, curSurahN); writeStored('mushaf.recent-surahs', next); return next })
   }, [curSurahN, meta, loadingPage])
 
   // close panel-max when selection changes / panel closes
@@ -271,7 +270,7 @@ export default function Home() {
     const h = (e: WheelEvent) => {
       if (!e.ctrlKey && !e.metaKey) return
       e.preventDefault()
-      setScale(s => round05(clamp(s + (e.deltaY < 0 ? 0.1 : -0.1), 0.55, 1.9)))
+      setScale(s => stepScale(s, e.deltaY))
     }
     el.addEventListener('wheel', h, { passive: false })
     return () => el.removeEventListener('wheel', h)
@@ -440,7 +439,7 @@ export default function Home() {
     if (pinchRef.current && e.touches.length === 2) {
       const d = touchDist(e.touches)
       const ratio = d / pinchRef.current.d
-      setScale(round05(clamp(pinchRef.current.s * ratio, 0.55, 1.9)))
+      setScale(clampScale(pinchRef.current.s * ratio))
     }
   }
   const onTouchEnd = () => { pinchRef.current = null }
@@ -634,7 +633,7 @@ export default function Home() {
           bookmarks={bookmarks}
           recentSurahs={recentSurahs}
           pinnedSurahs={pinnedSurahs}
-          onTogglePin={n => setPinnedSurahs(old => { const next = old.includes(n) ? old.filter(s => s !== n) : [...old, n]; writeStored('mushaf.pinned-surahs', next); return next })}
+          onTogglePin={n => setPinnedSurahs(old => { const next = togglePinnedSurah(old, n); writeStored('mushaf.pinned-surahs', next); return next })}
           onClearRecent={() => { setRecentSurahs([]); writeStored('mushaf.recent-surahs', []) }}
           onAdvancedSearch={() => { setDrawerOpen(false); setOccurrenceSearch(null); setSel(null); setSearchStart({ query: '', mode: 'text', surahs: [], revision: Date.now() }); setSearchOpen(true) }}
           onOpenKeywords={() => { setDrawerOpen(false); setShowIndex(true) }}
@@ -649,7 +648,7 @@ export default function Home() {
           onGoPage={goPage}
           onGoSurah={n=>{setDesktopSurah(n);goSurah(n);writeVerseAddress({s:n,a:1,pos:1})}}
           onGoVerse={(s, a) => goVerse(s, a, 1, 'start')}
-          onRemoveBookmark={p => setBookmarks(b => b.filter(x => x !== p))}
+          onRemoveBookmark={p => setBookmarks(b => removeBookmark(b, p))}
           onTheme={setTheme}
           onTranslator={setTranslator}
           onScale={setScale}
