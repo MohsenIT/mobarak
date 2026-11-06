@@ -83,6 +83,15 @@ add a second instance without discussing it first.
   keep their existing lifecycle and persistence timing; only the arithmetic
   lives here. See `src/lib/reader-settings.test.ts` and
   `tests/e2e/reader-settings.spec.cjs`.
+- `src/lib/study-anchors.ts`: `anchorOptions(kind, surah, source, personal)` —
+  the single place that decides which entity a study note can be anchored to
+  (verse, root, lemma, form, or context). It was inline in `StudyNotebook.tsx`
+  and untested; the notebook now just renders what this returns.
+  `src/lib/study.ts` holds the workspace model and its invariants
+  (`validPartition`, `moveBoundary`, `splitContext`, `mergeContext`,
+  `validateStudy`, `upsertNote`) — keep new study logic there or in
+  `study-anchors.ts`, not back in the component. Coverage:
+  `src/lib/study-anchors.test.ts`, `tests/e2e/study-anchors.spec.cjs`.
 - `src/app/study/`: the standalone study-notebook route (`/study/taha`, Surah 20
   — **Surah Taha, not Maryam** — see "Data facts" below).
 - `public/data/`: Quran text, translations, roots, fonts. Read-only from the
@@ -265,12 +274,12 @@ add a second instance without discussing it first.
 - `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
   repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
   (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**
-  disabled and currently surface 27 real diagnostics across 13 files
+  disabled and currently surface 25 real diagnostics across 11 files
   (`page.tsx`, `ContinuousMushaf.tsx`, `QuranSearch.tsx`, `RootPanel.tsx`,
   `SurahPull.tsx`, `AnalysisSections.tsx`, `DictationInput.tsx`,
-  `IshtiqaqiMeaning.tsx`, `MaqayisMeaning.tsx`, `OccurrencePicker.tsx`,
-  `QuickSurahSearch.tsx`, `RangeComparison.tsx`, `ReleaseNotesDialog.tsx`,
-  `useRecitationMediaSession.ts`). These are two recurring, intentional
+  `OccurrencePicker.tsx`, `QuickSurahSearch.tsx`, `RangeComparison.tsx`,
+  `ReleaseNotesDialog.tsx`, `useRecitationMediaSession.ts`). These are two
+  recurring, intentional
   patterns — "latest ref" (`const r = useRef(x); r.current = x` during
   render, so a callback/effect can read the newest value without
   re-subscribing) and "reset state at the top of an effect that then loads
@@ -279,6 +288,17 @@ add a second instance without discussing it first.
   surrounding effect (e.g. moving the reset into an event handler, or
   switching to a key-based remount) with a characterization test proving no
   behavior change, file by file, not a rule-level `"off"`.
+  Two files have been fixed this way already: `MaqayisMeaning.tsx` and
+  `IshtiqaqiMeaning.tsx` scoped their disclosure state to the root it was
+  opened for (`expandedFor === root`) instead of resetting it in the loading
+  effect — and since `RootMeaning` already keys those components by
+  `${book.id}:${root}`, the reset was dead code. Their replacement coverage is
+  `tests/e2e/root-dictionaries.spec.cjs`.
+- `RangeComparison.tsx` sorts its memoized rows with `.slice().sort(...)` rather
+  than in place. The React Compiler still reports two
+  `preserve-manual-memoization` diagnostics there (it cannot prove `from`/`to`
+  are not mutated later); do not "fix" those by dropping the memoization —
+  the in-place mutation really was a bug and the copy is the point.
 - `src/lib/study-store.ts` (IndexedDB read/write for the study workspace) has
   no direct test coverage; only the pure logic in `src/lib/study.ts` is
   tested. Add characterization tests for `loadStudy`/`saveStudy` before

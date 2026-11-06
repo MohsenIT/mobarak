@@ -57,8 +57,9 @@ export default function RangeComparison({ surahN, meta, onClose, onPickRoot, onR
   const rows = useMemo(() => {
     if (!surah || !roots || !valid || whole) return []
     const result = compareRootRange(surah, roots, from, to)
-    if (sort === 'frequency') result.sort((a, b) => Math.min(b.inside, b.outside) - Math.min(a.inside, a.outside) || b.connection - a.connection)
-    if (sort === 'keyword') result.sort((a, b) => b.keyword - a.keyword || b.connection - a.connection)
+    // Sort a copy: the memoized value must never be mutated in place.
+    if (sort === 'frequency') return result.slice().sort((a, b) => Math.min(b.inside, b.outside) - Math.min(a.inside, a.outside) || b.connection - a.connection)
+    if (sort === 'keyword') return result.slice().sort((a, b) => b.keyword - a.keyword || b.connection - a.connection)
     return result
   }, [surah, roots, valid, whole, from, to, sort])
 
