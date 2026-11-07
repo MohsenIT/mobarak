@@ -114,7 +114,17 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   }
   const linkState: SearchLinkState = { query, mode, ...(isNavigationInput(query)?{contextSurah:restored?.contextSurah??currentSurah}:{}), surahs, lemmas, forms, includeRoots, includePartial, includeNear, showTranslation, translator, occurrence: occurrenceFilter ?? null }
   const linkStateKey = JSON.stringify(linkState)
-  useEffect(() => { if (open) { onStateChange?.(JSON.parse(linkStateKey)); setCopyStatus('') } }, [open, linkStateKey, onStateChange])
+  // The copy-link feedback is dropped whenever the search state changes while
+  // the page is open — adjusted here during render instead of inside the
+  // parent-sync effect below, so the stale "copied" chip never paints for a
+  // frame (and the effect keeps only the external synchronization).
+  const copyResetKey = `${open}:${linkStateKey}`
+  const [seenCopyResetKey, setSeenCopyResetKey] = useState(copyResetKey)
+  if (seenCopyResetKey !== copyResetKey) {
+    setSeenCopyResetKey(copyResetKey)
+    if (open) setCopyStatus('')
+  }
+  useEffect(() => { if (open) onStateChange?.(JSON.parse(linkStateKey)) }, [open, linkStateKey, onStateChange])
 
   const valid = !!occurrenceFilter || normalizeQuranSearch(query).replace(/\s/g, '').length >= 2
   const scopeKey = surahs.join(',')
