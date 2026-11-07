@@ -14,6 +14,7 @@ import OfflineSettings from './OfflineSettings'
 import DownloadsManager from './DownloadsManager'
 import { IconBook, IconMoon, IconSun } from './Ornaments'
 import { toFa } from '@/lib/quran'
+import type { ReadingMode } from '@/lib/reading-route'
 
 type Tab = 'appearance' | 'language' | 'downloads' | 'about'
 
@@ -21,6 +22,14 @@ interface Props {
   meta: Meta
   theme: 'paper' | 'night'
   onTheme: (theme: 'paper' | 'night') => void
+  /** The reader's current view. Owned by useReadingRoute, not by this screen. */
+  mode: ReadingMode
+  /**
+   * The one reading-mode action. Switching view carries the surah across,
+   * writes the URL and persists the choice; that all lives in the reader.
+   * This screen only renders the choice and reports it.
+   */
+  onMode: (mode: ReadingMode) => void
   translator: Translator
   onTranslator: (translator: Translator) => void
   scale: number
@@ -28,7 +37,7 @@ interface Props {
   onClose: () => void
 }
 
-export default function SettingsScreen({ meta, theme, onTheme, translator, onTranslator, scale, onScale, onClose }: Props) {
+export default function SettingsScreen({ meta, theme, onTheme, mode, onMode, translator, onTranslator, scale, onScale, onClose }: Props) {
   const [tab, setTab] = useState<Tab>('appearance')
   const tabs: { id: Tab; label: string }[] = [
     { id: 'appearance', label: t('appearance.title') },
@@ -50,6 +59,9 @@ export default function SettingsScreen({ meta, theme, onTheme, translator, onTra
           {(['paper', 'night'] as const).map(item => <button key={item} type="button" aria-pressed={theme === item} onClick={() => onTheme(item)}>{item === 'paper' ? t('ui.a97a005a42') : t('ui.95b1ddc4a1')}</button>)}
         </div></section>
         <AppearanceColors />
+        <section><h3><IconBook />{t('ui.88619bd189')}</h3><div className="settings-theme-choices" role="group" aria-label={t('ui.88619bd189')}>
+          {(['flow', 'mushaf'] as const).map(item => <button key={item} type="button" aria-pressed={mode === item} onClick={() => onMode(item)}>{item === 'mushaf' ? t('ui.f7c7ba28bb') : t('ui.8fef24ffc4')}</button>)}
+        </div></section>
         <section><h3><IconBook />{t('ui.1fe7007e7e')}</h3><div className="settings-scale"><button type="button" className="icon-btn" aria-label={t('ui.8b885c6faa')} disabled={scale >= 1.9} onClick={() => onScale(Math.round(Math.min(1.9, scale + .15) * 20) / 20)}>+</button><output>{toFa(Math.round(scale * 100))}٪</output><button type="button" className="icon-btn" aria-label={t('ui.2e81f56c3d')} disabled={scale <= .55} onClick={() => onScale(Math.round(Math.max(.55, scale - .15) * 20) / 20)}>−</button></div></section>
         <ReadingScreenSettings />
       </div>}

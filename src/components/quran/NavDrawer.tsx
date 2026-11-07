@@ -21,7 +21,6 @@ import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { destinationSuggestions, resolveDestination, normalizeSearch, NAVIGATION_HELP, searchSurahs, type Destination } from '@/lib/navigation'
-import type { ReadingMode } from '@/lib/reading-route'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate, IconSortIndex } from './Ornaments'
 import { ChevronLeft, GitCompareArrows } from 'lucide-react'
 
@@ -39,8 +38,6 @@ interface Props {
   onOpenKeywords: () => void
   onOpenComparison: () => void
   theme: 'paper' | 'night'
-  mode: ReadingMode
-  onMode: (mode: ReadingMode) => void
   translator: Translator
   scale: number
   /** current surah number — used to auto-scroll the surah list to the
@@ -334,26 +331,6 @@ export default function NavDrawer(props: Props) {
                   onChange={e => props.onScale(+e.target.value)} />
                 <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--ink-faint)' }}>
                   <span>{t("ui.ad78cda0dc")}</span><span>{toFa(Math.round(props.scale * 100))}٪</span><span>{t("ui.053b14047d")}</span>
-                </div>
-              </section>
-
-              <section>
-                <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
-                  <IconBook />{t("ui.88619bd189")}</h3>
-                <div className="grid grid-cols-2 gap-2" role="group" aria-label={t("ui.88619bd189")}>
-                  {(['flow', 'mushaf'] as const).map(mode => (
-                    <button key={mode}
-                      className="rounded-xl border py-3 text-sm font-medium transition-all"
-                      aria-pressed={props.mode === mode}
-                      style={{
-                        borderColor: props.mode === mode ? 'var(--sage)' : 'var(--line)',
-                        background: props.mode === mode ? 'var(--word-root)' : 'transparent',
-                        color: 'var(--ink)',
-                      }}
-                      onClick={() => props.onMode(mode)}>
-                      {mode === 'mushaf' ? t("ui.f7c7ba28bb") : t("ui.8fef24ffc4")}
-                    </button>
-                  ))}
                 </div>
               </section>
 
