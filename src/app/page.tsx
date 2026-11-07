@@ -8,6 +8,7 @@ import type { SearchLinkState } from '@/lib/search-link'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import { clampScale, rememberSurah, removeBookmark, resolveInitialTranslator, stepScale, togglePinnedSurah } from '@/lib/reader-settings'
 import { useReadingRoute } from '@/components/quran/useReadingRoute'
+import { useComparison } from '@/components/quran/useComparison'
 import type { ReadingMode } from '@/lib/reading-route'
 import type { VerseAddress } from '@/lib/verse-link'
 import type { Destination } from '@/lib/navigation'
@@ -16,7 +17,7 @@ import { wordTarget } from '@/lib/word-parts'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { Meta, SurahData, Translations } from '@/lib/quran'
-import { loadMeta, loadSurah, loadTrans, loadGlobalRoots, compareRootRange, toFa } from '@/lib/quran'
+import { loadMeta, loadSurah, loadTrans, toFa } from '@/lib/quran'
 import type { Selection } from '@/components/quran/MushafPage'
 import ContinuousMushaf from '@/components/quran/ContinuousMushaf'
 import FlowPage, { FlowSurface } from '@/components/quran/FlowPage'
@@ -24,8 +25,6 @@ import SurahPull from '@/components/quran/SurahPull'
 import RootPanel from '@/components/quran/RootPanel'
 import StartupSplash from '@/components/quran/StartupSplash'
 import RecitationPlayer,{type RecitationTransportStatus} from '@/components/quran/RecitationPlayer'
-import { rootHue } from '@/lib/comparison-colors'
-import { mutedComparisonRoots as mutedComparisonRootsFor, toggleComparisonRoot } from '@/lib/root-comparison'
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import {revealReadingTarget,revealReadingVerse} from '@/lib/reading-visibility'
 import CarStudySync from '@/components/quran/CarStudySync'
@@ -131,40 +130,20 @@ export default function Home() {
   const [panelMax, setPanelMax] = useState(false)
   const [sheetH, setSheetH] = useState(46)
   const [showIndex, setShowIndex] = useState(false)
-  const [showComparison, setShowComparison] = useState(false)
-  const [contextComparison, setContextComparison] = useState(false)
-  const [comparisonSurah, setComparisonSurah] = useState(1)
-  const [hiddenComparisonRoots, setHiddenComparisonRoots] = useState<Set<string>>(new Set())
-  const [soloComparisonRoot, setSoloComparisonRoot] = useState<string | null>(null)
-  const [comparisonRoots, setComparisonRoots] = useState<Record<string, number>>({})
-  const [comparisonRoot, setComparisonRoot] = useState<string | null>(null)
-  const [comparisonRange, setComparisonRange] = useState<{ s: number; from: number; to: number } | null>(null)
+  // Range comparison is one owned piece of state; see useComparison.ts.
+  const comparison = useComparison({ selected: !!sel, analysisSelection })
+  const {
+    show: showComparison, context: contextComparison, surah: comparisonSurah, range: comparisonRange,
+    roots: comparisonRoots, pickedRoot: comparisonRoot, muted: mutedComparisonRoots,
+    visibility: comparisonVisibility,
+  } = comparison
 
-  const compareContext = useCallback((s: number, from: number, to: number) => {
-    setComparisonSurah(s)
-    setComparisonRange({ s, from, to })
-    setComparisonRoot(null)
-    setShowComparison(false)
-    setContextComparison(true)
-  }, [])
-
-  useEffect(() => {
-    if (!contextComparison || !sel || analysisSelection?.tab !== 'context' || !analysisSelection.from || !analysisSelection.to) return
-    const { s, from, to } = analysisSelection
-    setComparisonSurah(s)
-    setComparisonRange(current => current?.s === s && current.from === from && current.to === to ? current : { s, from, to })
-  }, [contextComparison, sel, analysisSelection])
-
-  useEffect(() => {
-    if (!contextComparison || showComparison || !comparisonRange) return
-    let live = true
-    const { s, from, to } = comparisonRange
-    setComparisonRoots({})
-    Promise.all([loadSurah(s), loadGlobalRoots()]).then(([data, roots]) => {
-      if (live) setComparisonRoots(Object.fromEntries(compareRootRange(data, roots, from, to).map(row => [row.root, rootHue(row.root)])))
-    }).catch(() => { if (live) setComparisonRoots({}) })
-    return () => { live = false }
-  }, [contextComparison, showComparison, comparisonRange])
+  const compareContext = comparison.startContext
+  /** The analysis panel reports its selection here; a context comparison follows it. */
+  const onAnalysisSelection = useCallback((selection: AnalysisSelection) => {
+    setAnalysisSelection(selection)
+    comparison.followContext(selection)
+  }, [comparison.followContext])
 
   const mainRef = useRef<HTMLElement>(null)
   useEffect(()=>{
@@ -176,11 +155,8 @@ export default function Home() {
   },[!!meta])
   const followingVerse=!!(audioOpen&&audioVerse&&flash?.s===audioVerse.s&&flash?.a===audioVerse.a)
   useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, (!!sel||followingVerse) && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}:${mushafContentRevision}:${!!sel}:${audioOpen}:${audioControlsVisible}`, followingVerse||analysisSelection?.tab==='verse'||analysisSelection?.tab==='context')
-  const focusComparisonRoot = useCallback((root: string) => { setSoloComparisonRoot(root); setSel(null) }, [])
+  const focusComparisonRoot = useCallback((root: string) => { comparison.solo(root); setSel(null) }, [comparison.solo])
   useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
-  useEffect(() => { setHiddenComparisonRoots(new Set()); setSoloComparisonRoot(null) }, [comparisonRange?.s, comparisonRange?.from, comparisonRange?.to])
-  const comparisonVisibility = useMemo(() => ({ hidden: hiddenComparisonRoots, solo: soloComparisonRoot }), [hiddenComparisonRoots, soloComparisonRoot])
-  const mutedComparisonRoots = useMemo(() => mutedComparisonRootsFor(comparisonRoots, comparisonVisibility), [comparisonRoots, comparisonVisibility])
   const pinchRef = useRef<{ d: number; s: number } | null>(null)
 
   useEffect(() => { loadMeta().then(setMeta) }, [])
@@ -290,24 +266,21 @@ export default function Home() {
       setSearchTarget({ ...target, align: 'start', wholeVerse:true })
     } else requestMushafPage(destination)
     setSel(null)
-    setComparisonRoot(null)
-  }, [mode, meta, requestMushafPage])
+    comparison.setPickedRoot(null)
+  }, [mode, meta, requestMushafPage, comparison.setPickedRoot])
 
   const tapWord = useCallback((word: Selection) => {
     setPlaybackTarget(null)
     if (!showComparison && !showIndex && comparisonRange?.s === word.s && word.root && comparisonRoots[word.root] !== undefined) {
-      const root = word.root
-      const next = toggleComparisonRoot(root, { hidden: hiddenComparisonRoots, solo: soloComparisonRoot })
-      setHiddenComparisonRoots(next.hidden)
-      setSoloComparisonRoot(next.solo)
+      comparison.toggleRoot(word.root)
       setSel(null)
       return
     }
     writeVerseAddress(word)
     setFlash(null)
-    setComparisonRoot(null)
+    comparison.setPickedRoot(null)
     setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos && (current.part ?? 'stem') === (word.part ?? 'stem') ? null : word)
-  }, [comparisonRange, comparisonRoots, hiddenComparisonRoots, soloComparisonRoot, showComparison, showIndex])
+  }, [comparisonRange, comparisonRoots, showComparison, showIndex, comparison.toggleRoot, comparison.setPickedRoot])
 
   const goSurah = useCallback((n: number) => {
     pullArrival.current = null
@@ -480,7 +453,7 @@ export default function Home() {
       <PatternBG />
 
       <QuranSearch onNavigate={navigateDestination} key={searchStart?.revision ?? 0} onStateChange={writeSearchState} initialSearch={searchStart} occurrenceFilter={occurrenceSearch} onClearOccurrenceFilter={() => setOccurrenceSearch(null)} translator={translator} open={searchOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
-        setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); setComparisonRoot(null); goVerse(s, a, pos,undefined,false)
+        setReturnToSearch(true); setSearchOpen(false); setQuickSearchOpen(false); setSel(null); comparison.setPickedRoot(null); goVerse(s, a, pos,undefined,false)
       }} />
 
       {/* Desktop has explicit previous/next controls in the reading pane below. */}
@@ -532,11 +505,11 @@ export default function Home() {
       {!showComparison && comparisonRange?.s === curSurahN && (contextComparison || Object.keys(comparisonRoots).length > 0) && (
         <div className="relative z-10 flex flex-wrap items-center gap-2 px-3 py-2 text-xs" style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>
           <span className="comparison-range-band rounded px-2 py-1">{t("ui.6f0ffd5c13")}{' '}{toFa(comparisonRange.from)}–{toFa(comparisonRange.to)}</span>
-          {soloComparisonRoot ? <button className="chip" aria-label={t("ui.8ecef9ea93")} onClick={() => { setSoloComparisonRoot(null); setHiddenComparisonRoots(new Set()) }}>{t("ui.52a86c5c98")}{' '}{soloComparisonRoot.split('').join(' ')} ×</button>
-            : hiddenComparisonRoots.size > 0 ? <button className="chip" aria-label={t("ui.e0b2c3ffe6")} onClick={() => setHiddenComparisonRoots(new Set())}>{toFa(hiddenComparisonRoots.size)}{' '}{t("ui.5277283f26")}</button> : <span>{t("ui.fbd767126d")}</span>}
+          {comparisonVisibility.solo ? <button className="chip" aria-label={t("ui.8ecef9ea93")} onClick={comparison.revealAll}>{t("ui.52a86c5c98")}{' '}{comparisonVisibility.solo.split('').join(' ')} ×</button>
+            : comparisonVisibility.hidden.size > 0 ? <button className="chip" aria-label={t("ui.e0b2c3ffe6")} onClick={comparison.unhideAll}>{toFa(comparisonVisibility.hidden.size)}{' '}{t("ui.5277283f26")}</button> : <span>{t("ui.fbd767126d")}</span>}
           <span className="basis-full" style={{ color: 'var(--ink-soft)' }}>{t("ui.a8b5fe8641")}</span>
-          <button className="underline mr-auto" onClick={() => setShowComparison(true)}>{t("ui.e5d9ee962d")}</button>
-          <button aria-label={t("ui.36fdc8888e")} onClick={() => { setContextComparison(false); setComparisonRoot(null); setComparisonRoots({}); setComparisonRange(null); setSel(null) }}>×</button>
+          <button className="underline mr-auto" onClick={comparison.openSheet}>{t("ui.e5d9ee962d")}</button>
+          <button aria-label={t("ui.36fdc8888e")} onClick={() => { comparison.dismiss(); setSel(null) }}>×</button>
         </div>
       )}
       {/* ===== Main + side root panel ===== */}
@@ -595,7 +568,7 @@ export default function Home() {
               <RootPanel
             playbackTarget={playbackTarget}
             onOpenOccurrences={openOccurrenceSearch}
-            onSelectionChange={setAnalysisSelection}
+            onSelectionChange={onAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}
             meta={meta}
@@ -616,7 +589,7 @@ export default function Home() {
               <RootPanel
             playbackTarget={playbackTarget}
             onOpenOccurrences={openOccurrenceSearch}
-            onSelectionChange={setAnalysisSelection}
+            onSelectionChange={onAnalysisSelection}
             onCompareContext={compareContext}
             sel={sel}
             meta={meta}
@@ -646,7 +619,7 @@ export default function Home() {
           onClearRecent={() => { setRecentSurahs([]); writeStored('mushaf.recent-surahs', []) }}
           onAdvancedSearch={() => { setDrawerOpen(false); setOccurrenceSearch(null); setSel(null); setSearchStart({ query: '', mode: 'text', surahs: [], revision: Date.now() }); setSearchOpen(true) }}
           onOpenKeywords={() => { setDrawerOpen(false); setShowIndex(true) }}
-          onOpenComparison={() => { setDrawerOpen(false); setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }}
+          onOpenComparison={() => { setDrawerOpen(false); setSel(null); comparison.open(curSurahN) }}
           theme={theme}
           translator={translator}
           scale={scale}
@@ -669,11 +642,11 @@ export default function Home() {
           selected row in the list so the user knows where they are. */}
       {showComparison && (
         <RangeComparison key={comparisonSurah} surahN={comparisonSurah} meta={meta}
-          onRangeChange={setComparisonRange}
-          onRootsChange={setComparisonRoots}
+          onRangeChange={comparison.setRange}
+          onRootsChange={comparison.setRoots}
           initialRange={comparisonRange?.s === comparisonSurah ? comparisonRange : null}
-          onClose={() => { setShowComparison(false); setSel(null) }}
-          onPickRoot={root => { setComparisonRoot(root); setPanelMax(false); pickRootFromIndex(root, comparisonSurah) }} />
+          onClose={() => { comparison.closeSheet(); setSel(null) }}
+          onPickRoot={root => { comparison.setPickedRoot(root); setPanelMax(false); pickRootFromIndex(root, comparisonSurah) }} />
       )}
       {showIndex && (
         <SurahIndex
