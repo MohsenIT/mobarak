@@ -274,7 +274,7 @@ add a second instance without discussing it first.
 - `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
   repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
   (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**
-  disabled and currently surface 25 real diagnostics across 11 files
+  disabled and currently surface 25 real diagnostics across 12 files
   (`page.tsx`, `ContinuousMushaf.tsx`, `QuranSearch.tsx`, `RootPanel.tsx`,
   `SurahPull.tsx`, `AnalysisSections.tsx`, `DictationInput.tsx`,
   `OccurrencePicker.tsx`, `QuickSurahSearch.tsx`, `RangeComparison.tsx`,
@@ -300,9 +300,10 @@ add a second instance without discussing it first.
   are not mutated later); do not "fix" those by dropping the memoization —
   the in-place mutation really was a bug and the copy is the point.
 - `src/lib/study-store.ts` (IndexedDB read/write for the study workspace) has
-  no direct test coverage; only the pure logic in `src/lib/study.ts` is
-  tested. Add characterization tests for `loadStudy`/`saveStudy` before
-  refactoring this file.
+  direct characterization coverage in `src/lib/study-store.test.ts` (fake
+  IndexedDB via `fake-indexeddb`, one fresh module instance per test because
+  the module keeps top-level state). The pure logic in `src/lib/study.ts` has
+  its own, separate test file.
 
 ## Definition of Done
 
