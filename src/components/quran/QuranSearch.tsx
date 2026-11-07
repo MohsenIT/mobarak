@@ -120,11 +120,17 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const scopeKey = surahs.join(',')
   const canExpandRoots = occurrenceFilter ? !!occurrenceFilter.root && occurrenceFilter.part !== 'prefix' : !normalizeQuranSearch(query).includes(' ')
 
-  useEffect(() => {
-    if (occurrenceFilter && !restored) {
-      setIncludeNear(false); setIncludeRoots(occurrenceFilter.tab === 'root'); setQuery('')
-    }
-  }, [occurrenceFilter])
+  // A newly handed-over occurrence filter retunes the search options (it has
+  // its own criterion, so near-matches are off, root-expansion follows the
+  // filter's tab, and the query is emptied). Adjusted here during render
+  // instead of in an effect, so a mount with a filter never paints the untuned
+  // state; `undefined` as the initial "seen" value makes a mount WITH a filter
+  // act, exactly like the effect did, while a mount without one stays put.
+  const [seenOccurrence, setSeenOccurrence] = useState<AnalysisSelection | null | undefined>(occurrenceFilter === null ? null : undefined)
+  if (seenOccurrence !== occurrenceFilter) {
+    setSeenOccurrence(occurrenceFilter)
+    if (occurrenceFilter && !restored) { setIncludeNear(false); setIncludeRoots(occurrenceFilter.tab === 'root'); setQuery('') }
+  }
   useEffect(() => () => worker.current?.terminate(), [])
   useEffect(() => {
     if (!open) return
