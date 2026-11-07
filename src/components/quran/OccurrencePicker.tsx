@@ -1,6 +1,6 @@
 'use client'
 import {t} from '@/lib/i18n'
-import { useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
 import { Arrow as PopoverArrow } from '@radix-ui/react-popover'
 import { Search, X } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -23,8 +23,12 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
   operation?: PickerOperation; scopes?: readonly Extract<OccurrenceScope, 'surah' | 'quran'>[]
 }) {
   const list = useRef<HTMLDivElement>(null)
-  const memory = useRef<{ group: string; top: number | null }>({ group: groupKey, top: null })
-  if (memory.current.group !== groupKey) memory.current = { group: groupKey, top: null }
+  // The scroll offset to restore when this picker reopens. It belongs to the
+  // group it was scrolled in: a different group starts at the top, so the
+  // offset is dropped when the group changes. That reset lives in an effect
+  // rather than in render because a ref must not be mutated while rendering.
+  const offset = useRef<number | null>(null)
+  useEffect(() => { offset.current = null }, [groupKey])
   const tokens = useMemo(() => surah ? occurrenceTokens(surah) : [], [surah])
   const groups = useMemo(() => groupOccurrencesByAyah(items), [items])
   return <Popover open={open} onOpenChange={onOpenChange}>
@@ -35,7 +39,7 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
         requestAnimationFrame(() => {
           const selected = list.current?.querySelector<HTMLButtonElement>('[aria-current="true"]')
           selected?.focus({ preventScroll: true })
-          if (list.current && memory.current.top !== null) list.current.scrollTop = memory.current.top
+          if (list.current && offset.current !== null) list.current.scrollTop = offset.current
           else selected?.scrollIntoView({ block: 'nearest' })
         })
       }}>
@@ -49,12 +53,12 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
         </div>}
         <button type="button" className="occurrence-picker-close" aria-label={t("ui.510fc4baec")} onClick={() => onOpenChange(false)}><X size={18} /></button>
       </div>
-      <div ref={list} className="occurrence-picker-list nice-scroll" onScroll={event => { memory.current.top = event.currentTarget.scrollTop }}>
+      <div ref={list} className="occurrence-picker-list nice-scroll" onScroll={event => { offset.current = event.currentTarget.scrollTop }}>
         {groups.map(group => {
           const selected = group.indexes.includes(index)
           const location = selected ? items[index] : group.locations[0]
           return <OccurrenceRow key={group.a} tokens={tokens} a={group.a} pos={location[1]} part={location[2]} locations={group.locations} selected={selected}
-            onPick={() => { memory.current.top = list.current?.scrollTop ?? 0; onSelect(location); onOpenChange(false) }} />
+            onPick={() => { offset.current = list.current?.scrollTop ?? 0; onSelect(location); onOpenChange(false) }} />
         })}
       </div>
       <PopoverArrow width={18} height={9} className="occurrence-picker-arrow" />

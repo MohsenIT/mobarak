@@ -79,10 +79,13 @@ export default function Home() {
     onReveal: useCallback((s: number, a: number, pos: number) => setSearchTarget({ s, a, pos }), []),
     onTranslator: setTranslator,
   })
+  // Destructured so these callbacks depend on a specific function rather than
+  // on the whole hook result; the compiler cannot otherwise preserve them.
+  const { close: closeSearch, applyEntry: applySearchEntry, setAdvancedOpen: setAdvancedSearchOpen } = search
   // The route hook is created after the search hook because a search location
   // is applied to the search UI; the reveal it asks for is the reader's.
   const applyVerseEntry = useCallback((address: VerseAddress) => {
-    search.close()
+    closeSearch()
     setSel(null)
     loadSurah(address.s).then(data => {
       const verse = data.v[address.a - 1]
@@ -91,27 +94,33 @@ export default function Home() {
       setFlash({ ...address, pos })
       setSearchTarget({ ...address, pos, wholeVerse:pos===1 })
     })
-  }, [search.close])
+  }, [closeSearch])
   /** A surah or page in the location: only transient selection state is dropped. */
-  const clearTransientSelection = useCallback(() => { search.close(); setSel(null); setFlash(null) }, [search.close])
-  const route = useReadingRoute({ onSearch: search.applyEntry, onVerse: applyVerseEntry, onReading: clearTransientSelection })
+  const clearTransientSelection = useCallback(() => { closeSearch(); setSel(null); setFlash(null) }, [closeSearch])
+  const route = useReadingRoute({ onSearch: applySearchEntry, onVerse: applyVerseEntry, onReading: clearTransientSelection })
   const { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch } = route
   /**
    * QuranSearch's close control: the panel owns its own open flag, but only the
    * route hook knows how to unwind the search URL it wrote.
    */
   const changeSearchOpen = useCallback((open: boolean) => {
-    search.setAdvancedOpen(open)
+    setAdvancedSearchOpen(open)
     if (!open) leaveSearch()
-  }, [search.setAdvancedOpen, leaveSearch])
+  }, [setAdvancedSearchOpen, leaveSearch])
   const [pageData, setPageData] = useState<Map<number, SurahData>>(new Map())
-  const pullArrival = useRef<{ s: number; end: boolean } | null>(null)
+  /**
+   * How a surah was arrived at: pulling backwards lands at the end of the
+   * previous surah, pulling forwards at its start. It must be state, not a ref:
+   * the value is read while rendering SurahPull's `arriveAtEnd`.
+   */
+  const [pullArrival, setPullArrival] = useState<{ s: number; end: boolean } | null>(null)
   const [flowSurah, setFlowSurah] = useState<SurahData | null>(null)
-  const [flowTrans, setFlowTrans] = useState<Translations | null>(null)
+  /** Translations are stored with the key they were loaded for. */
+  const [flowTransState, setFlowTransState] = useState<{ key: string; data: Translations } | null>(null)
   const [loadingPage, setLoadingPage] = useState(true)
   const [startupComplete, setStartupComplete] = useState(false)
   const [startupMinimumElapsed, setStartupMinimumElapsed] = useState(false)
-  const [startupLeaving, setStartupLeaving] = useState(false)
+  /** Holding the splash pauses its departure; releasing lets it carry on. */
   const [startupHeld, setStartupHeld] = useState(false)
 
   useEffect(() => {
@@ -125,7 +134,6 @@ export default function Home() {
   const [audioStatus,setAudioStatus]=useState<RecitationTransportStatus>('idle')
   const [audioPlayRequest,setAudioPlayRequest]=useState(0)
   const [audioVerse, setAudioVerse] = useState<{s:number;a:number}|null>(null)
-  useEffect(()=>{if(!audioOpen)setAudioVerse(null)},[audioOpen])
   const [playbackTarget, setPlaybackTarget] = useState<{s:number;a:number}|null>(null)
   const [panelMax, setPanelMax] = useState(false)
   const [sheetH, setSheetH] = useState(46)
@@ -136,14 +144,18 @@ export default function Home() {
     show: showComparison, context: contextComparison, surah: comparisonSurah, range: comparisonRange,
     roots: comparisonRoots, pickedRoot: comparisonRoot, muted: mutedComparisonRoots,
     visibility: comparisonVisibility,
+    // Destructured for the same reason as the search callbacks: a callback
+    // depending on one function is preservable, one depending on the whole
+    // hook result is not.
+    startContext: compareContext, followContext: followComparisonContext, solo: soloComparisonRoot,
+    setPickedRoot: setComparisonRoot, toggleRoot: toggleComparisonRoot,
   } = comparison
 
-  const compareContext = comparison.startContext
   /** The analysis panel reports its selection here; a context comparison follows it. */
   const onAnalysisSelection = useCallback((selection: AnalysisSelection) => {
     setAnalysisSelection(selection)
-    comparison.followContext(selection)
-  }, [comparison.followContext])
+    followComparisonContext(selection)
+  }, [followComparisonContext])
 
   const mainRef = useRef<HTMLElement>(null)
   useEffect(()=>{
@@ -155,7 +167,7 @@ export default function Home() {
   },[!!meta])
   const followingVerse=!!(audioOpen&&audioVerse&&flash?.s===audioVerse.s&&flash?.a===audioVerse.a)
   useVisibleSelection(mainRef, flash ?? analysisSelection ?? sel, (!!sel||followingVerse) && !panelMax && !showIndex && !showComparison, `${mode}:${page}:${surah}:${showTrans}:${loadingPage}:${mushafContentRevision}:${!!sel}:${audioOpen}:${audioControlsVisible}`, followingVerse||analysisSelection?.tab==='verse'||analysisSelection?.tab==='context')
-  const focusComparisonRoot = useCallback((root: string) => { comparison.solo(root); setSel(null) }, [comparison.solo])
+  const focusComparisonRoot = useCallback((root: string) => { soloComparisonRoot(root); setSel(null) }, [soloComparisonRoot])
   useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
   const pinchRef = useRef<{ d: number; s: number } | null>(null)
 
@@ -214,17 +226,27 @@ export default function Home() {
     }).catch(()=>{if(live)setLoadingPage(false)})
     return()=>{live=false}
   },[mode,surah])
+  const flowTransKey = `${surah}:${translator}`
+  // A translation belongs to the surah and translator it was loaded for: until
+  // that one arrives, the reader shows none. Storing the key alongside the
+  // translations makes the "clear it first" step a derivation instead of a
+  // setState at the top of the loading effect.
+  const flowTrans = flowTransState?.key === flowTransKey ? flowTransState.data : null
   useEffect(()=>{
     if(mode!=='flow')return
     let live=true
-    setFlowTrans(null)
-    loadTrans(surah,translator).then(data=>{if(live)setFlowTrans(data)}).catch(()=>{if(live)setFlowTrans({})})
+    loadTrans(surah,translator)
+      .then(data=>{if(live)setFlowTransState({key:flowTransKey,data})})
+      .catch(()=>{if(live)setFlowTransState({key:flowTransKey,data:{}})})
     return()=>{live=false}
-  },[mode,surah,translator])
+  },[mode,surah,translator,flowTransKey])
 
-  useEffect(() => {
-    if (!startupHeld && !startupComplete && startupMinimumElapsed && meta && !loadingPage && (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))) setStartupLeaving(true)
-  }, [startupHeld, startupComplete, startupMinimumElapsed, meta, loadingPage, mode, flowSurah?.n, surah, segs, pageData])
+  // The splash starts leaving as soon as the first screen is really ready, and
+  // a reader holding it pauses that departure — both were effects that only
+  // mirrored state computed here.
+  const startupReady = !!meta && !loadingPage &&
+    (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))
+  const startupLeaving = !startupComplete && startupMinimumElapsed && startupReady && !startupHeld
 
   useEffect(() => {
     if (!startupLeaving || startupHeld) return
@@ -259,36 +281,36 @@ export default function Home() {
       const first = meta?.pages[destination - 1]?.[0]
       if (!first) return
       const target = { s: first.s, a: first.f, pos: 1 }
-      pullArrival.current = null
+      setPullArrival(null)
       writeVerseAddress(target)
       setSurah(first.s)
       setFlash(target)
       setSearchTarget({ ...target, align: 'start', wholeVerse:true })
     } else requestMushafPage(destination)
     setSel(null)
-    comparison.setPickedRoot(null)
-  }, [mode, meta, requestMushafPage, comparison.setPickedRoot])
+    setComparisonRoot(null)
+  }, [mode, meta, requestMushafPage, setComparisonRoot, setSurah])
 
   const tapWord = useCallback((word: Selection) => {
     setPlaybackTarget(null)
     if (!showComparison && !showIndex && comparisonRange?.s === word.s && word.root && comparisonRoots[word.root] !== undefined) {
-      comparison.toggleRoot(word.root)
+      toggleComparisonRoot(word.root)
       setSel(null)
       return
     }
     writeVerseAddress(word)
     setFlash(null)
-    comparison.setPickedRoot(null)
+    setComparisonRoot(null)
     setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos && (current.part ?? 'stem') === (word.part ?? 'stem') ? null : word)
-  }, [comparisonRange, comparisonRoots, showComparison, showIndex, comparison.toggleRoot, comparison.setPickedRoot])
+  }, [comparisonRange, comparisonRoots, showComparison, showIndex, toggleComparisonRoot, setComparisonRoot])
 
   const goSurah = useCallback((n: number) => {
-    pullArrival.current = null
+    setPullArrival(null)
     const nn = clamp(n, 1, 114)
     if (!meta) return
     if (mode === 'mushaf') goPage(meta.surahs[nn - 1].pg)
     else setSurah(nn)
-  }, [meta, mode, goPage])
+  }, [meta, mode, goPage, setSurah])
 
   const requestMushafVerse = useCallback((p:number,s:number,a:number,pos:number)=>{
     const mounted=mainRef.current?.querySelector(`[data-reading-scroll] [data-surah="${s}"][data-ayah="${a}"][data-pos="${pos}"]`)
@@ -302,10 +324,10 @@ export default function Home() {
   const revealVerse = useCallback((s: number, a: number, pos: number, p: number) => {
     if (mode === 'mushaf') requestMushafVerse(p, s, a, pos)
     else setSurah(s)
-  }, [mode, requestMushafVerse])
+  }, [mode, requestMushafVerse, setSurah])
 
   const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start', wholeVerse = true) => {
-    pullArrival.current = null
+    setPullArrival(null)
     loadSurah(s).then(d => {
       const v = d.v[a - 1]
       if (v) {
@@ -438,13 +460,13 @@ export default function Home() {
 
   return (
     <>
-    {!startupComplete && <StartupSplash leaving={startupLeaving} onHoldChange={held => { setStartupHeld(held); if (held) setStartupLeaving(false) }} />}
+    {!startupComplete && <StartupSplash leaving={startupLeaving} onHoldChange={setStartupHeld} />}
     {meta && <div className={`reader-app h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} data-side-navigation={drawerOpen||showIndex||showComparison?'open':undefined} data-portaled-analysis={sel&&(showIndex||showComparison)&&!panelMax?'open':undefined} style={{ background: 'var(--paper)', ['--desktop-navigation-width' as string]: `${desktopPaneWidths.navigation}px`, ['--desktop-analysis-width' as string]: `${desktopPaneWidths.analysis}px` }}>
       <CarStudySync reader={mainRef} revision={`${mode}:${surah}:${page}:${mushafContentRevision}:${showTrans}:${flowSurah?.n}:${loadingPage}`} />
       <PatternBG />
 
       <QuranSearch onNavigate={navigateDestination} key={search.start?.revision ?? 0} onStateChange={writeSearchState} initialSearch={search.start} occurrenceFilter={search.occurrence} onClearOccurrenceFilter={search.clearOccurrence} translator={translator} open={search.advancedOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
-        search.pick(s, a, pos); setSel(null); comparison.setPickedRoot(null); goVerse(s, a, pos,undefined,false)
+        search.pick(s, a, pos); setSel(null); setComparisonRoot(null); goVerse(s, a, pos,undefined,false)
       }} />
 
       {/* Desktop has explicit previous/next controls in the reading pane below. */}
@@ -483,7 +505,7 @@ export default function Home() {
       </header>
 
       <LanguageOnboarding knownPersianReader={knownPersianReader} onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
-      <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => setAudioOpen(false)} onFollow={(s,a) => goVerse(s,a)} />
+      <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => { setAudioOpen(false); setAudioVerse(null) }} onFollow={(s,a) => goVerse(s,a)} />
 
       {search.returnToSearch && !search.advancedOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
@@ -520,12 +542,12 @@ export default function Home() {
             <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs} fontSize={flowFont} showTrans={showTrans} translator={translator}
               ready={!loadingPage && flowSurah?.n === surah}
               enabled={!(sel && panelMax) && !drawerOpen && !search.advancedOpen && !showComparison && !showIndex}
-              arriveAtEnd={pullArrival.current?.s === surah && pullArrival.current.end}
+              arriveAtEnd={pullArrival?.s === surah && pullArrival.end}
               onNavigate={async (n, end) => {
                 // Keep the completed preview visible until all destination data is ready.
                 const [data, translations] = await Promise.all([loadSurah(n), loadTrans(n,translator), document.fonts.ready])
-                pullArrival.current = { s: n, end }
-                setFlowSurah(data); setFlowTrans(translations); setLoadingPage(false)
+                setPullArrival({ s: n, end })
+                setFlowSurah(data); setFlowTransState({ key: `${n}:${translator}`, data: translations }); setLoadingPage(false)
                 setPage(data.v[0].p); setFlash(null); setSel(null); setSurah(n)
               }}>
               <FlowSurface>
@@ -637,7 +659,7 @@ export default function Home() {
           onRootsChange={comparison.setRoots}
           initialRange={comparisonRange?.s === comparisonSurah ? comparisonRange : null}
           onClose={() => { comparison.closeSheet(); setSel(null) }}
-          onPickRoot={root => { comparison.setPickedRoot(root); setPanelMax(false); pickRootFromIndex(root, comparisonSurah) }} />
+          onPickRoot={root => { setComparisonRoot(root); setPanelMax(false); pickRootFromIndex(root, comparisonSurah) }} />
       )}
       {showIndex && (
         <SurahIndex
