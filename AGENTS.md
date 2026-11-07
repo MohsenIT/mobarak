@@ -303,22 +303,23 @@ add a second instance without discussing it first.
 - `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
   repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
   (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**
-  disabled and currently surface 22 real diagnostics across 11 files
+  disabled and currently surface 18 real diagnostics across 10 files
   (`page.tsx`, `ContinuousMushaf.tsx`, `QuranSearch.tsx`, `RootPanel.tsx`,
   `SurahPull.tsx`, `AnalysisSections.tsx`, `DictationInput.tsx`,
-  `QuickSurahSearch.tsx`, `RangeComparison.tsx`, `ReleaseNotesDialog.tsx`,
+  `QuickSurahSearch.tsx`, `RangeComparison.tsx`,
   `useRecitationMediaSession.ts`). Composition: 7
-  `refs`, 13 `set-state-in-effect`, 2 `preserve-manual-memoization`.
+  `refs`, 9 `set-state-in-effect`, 2 `preserve-manual-memoization`.
   These are two recurring, intentional
   patterns — "latest ref" (`const r = useRef(x); r.current = x` during
   render, so a callback/effect can read the newest value without
   re-subscribing) and "reset state at the top of an effect that then loads
-  async data" — not accidental bugs. `bun run lint` is left non-zero on
+  async data" or "read an external store / unsupported-API probe only after
+  mount" — not accidental bugs. `bun run lint` is left non-zero on
   purpose rather than suppressed: fixing each requires rewriting the
   surrounding effect (e.g. moving the reset into an event handler, or
   switching to a key-based remount) with a characterization test proving no
   behavior change, file by file, not a rule-level `"off"`.
-  Four files have been fixed this way already: `MaqayisMeaning.tsx` and
+  Files fixed this way so far: `MaqayisMeaning.tsx` and
   `IshtiqaqiMeaning.tsx` scoped their disclosure state to the root it was
   opened for (`expandedFor === root`) instead of resetting it in the loading
   effect — and since `RootMeaning` already keys those components by
@@ -326,13 +327,23 @@ add a second instance without discussing it first.
   `tests/e2e/root-dictionaries.spec.cjs`); `page.tsx` converted `pullArrival`
   from a render-read ref into state and derived `startupLeaving` instead of
   setting it in an effect (coverage: `tests/e2e/react-ref-defects.spec.cjs`);
-  and `OccurrencePicker.tsx` moved its scroll-memory reset from render into an
-  effect keyed on the group (same spec). Additionally, the panel-maximize
-  reset and the search facet reset now use the render-time adjust-state
-  pattern instead of effects (`tests/e2e/panel-max.spec.cjs`,
-  `tests/e2e/search-facets.spec.cjs`). Note the compiler aborts analysis for
-  a whole component on a single `refs` violation, so fixing one can unmask
-  further diagnostics in the same file — re-check counts after such fixes.
+  `OccurrencePicker.tsx` moved its scroll-memory reset from render into an
+  effect keyed on the group (same spec); and the remaining reset-on-identity
+  sites now use React's documented render-time adjust-state pattern instead
+  of effects, each pinned by a characterization spec landed first: the
+  panel-maximize reset (`tests/e2e/panel-max.spec.cjs`), the search facet
+  reset (`tests/e2e/search-facets.spec.cjs`), the release-notes pagination
+  reset (`tests/e2e/release-notes.spec.cjs`), the form-tab fallback
+  (`tests/e2e/analysis-form-tab.spec.cjs`), the occurrence-filter retune and
+  the copy-link feedback reset in QuranSearch (covered by
+  `tests/e2e/search-orchestration.spec.cjs` and the new
+  `tests/e2e/search-copy-link.spec.cjs`). Note the compiler aborts analysis
+  for a whole component on a single `refs` violation, so fixing one can
+  unmask further diagnostics in the same file — re-check counts after such
+  fixes. What remains was re-triaged: the SSR-safe mount reads
+  (`AnalysisSections` localStorage, `DictationInput` SpeechRecognition)
+  would need a `useSyncExternalStore`/lazy-init rewrite with real hydration
+  risk, and the rest are the two documented patterns above.
 - `RangeComparison.tsx` sorts its memoized rows with `.slice().sort(...)` rather
   than in place. The React Compiler still reports two
   `preserve-manual-memoization` diagnostics there (it cannot prove `from`/`to`
