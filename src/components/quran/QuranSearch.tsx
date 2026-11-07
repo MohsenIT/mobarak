@@ -102,10 +102,16 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const formLabels = searchFormLabels(rawResults)
   const results = filterSearchFacets(rawResults, facets)
   const facetIdentity = JSON.stringify([query, mode, includeRoots, occurrenceFilter, surahs])
-  const previousFacetIdentity = useRef(facetIdentity)
-  useEffect(() => {
-    if (previousFacetIdentity.current !== facetIdentity) { setLemmas([]); setForms([]); previousFacetIdentity.current = facetIdentity }
-  }, [facetIdentity])
+  // Changing the search identity (query, mode, filters, scope) drops the facet
+  // selections so stale filters never follow the reader into a new search.
+  // Adjusting state here during render — instead of in an effect — also means
+  // the old facets never filter the new results for a single frame.
+  const [seenFacetIdentity, setSeenFacetIdentity] = useState(facetIdentity)
+  if (seenFacetIdentity !== facetIdentity) {
+    setSeenFacetIdentity(facetIdentity)
+    setLemmas([])
+    setForms([])
+  }
   const linkState: SearchLinkState = { query, mode, ...(isNavigationInput(query)?{contextSurah:restored?.contextSurah??currentSurah}:{}), surahs, lemmas, forms, includeRoots, includePartial, includeNear, showTranslation, translator, occurrence: occurrenceFilter ?? null }
   const linkStateKey = JSON.stringify(linkState)
   useEffect(() => { if (open) { onStateChange?.(JSON.parse(linkStateKey)); setCopyStatus('') } }, [open, linkStateKey, onStateChange])

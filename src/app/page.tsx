@@ -197,8 +197,15 @@ export default function Home() {
     setRecentSurahs(previous => { const next = rememberSurah(previous, curSurahN); writeStored('mushaf.recent-surahs', next); return next })
   }, [curSurahN, meta, loadingPage])
 
-  // close panel-max when selection changes / panel closes
-  useEffect(() => { if (!sel) setPanelMax(false) }, [sel])
+  // The maximized flag follows the selection lifecycle without an effect:
+  // when the selection closes — however it closes (close button, word
+  // toggle, backdrop, navigation) — reset it here, during render. Retargeting
+  // while the panel stays open deliberately keeps it maximized.
+  const [selectionOpen, setSelectionOpen] = useState(false)
+  if (!!sel !== selectionOpen) {
+    setSelectionOpen(!!sel)
+    if (!sel) setPanelMax(false)
+  }
 
   // mushaf mode: load surahs of current page
   useEffect(() => {
