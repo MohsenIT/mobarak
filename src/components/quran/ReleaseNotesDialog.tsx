@@ -11,7 +11,16 @@ export default function ReleaseNotesDialog({open,onOpenChange,update,onUpdate,on
  const {formatDate}=useCalendar()
  const missed=missedReleases(update?.releases??[],CURRENT_RELEASE),entries=history?update?.releases??[]:missed.length?missed:update?.latest&&compareRelease(update.latest.version,CURRENT_RELEASE)===0?[update.latest]:[]
  const [visible,setVisible]=useState(5),list=useRef<HTMLDivElement>(null),[sentinel,setSentinel]=useState<HTMLDivElement|null>(null)
- useEffect(()=>{if(open)setVisible(5)},[open,history,update?.build])
+ // Reset the page when the dialog context changes (opening it, or switching
+ // to a different history/update view) adjusted here during render instead of
+ // in an effect, so the dialog never paints one frame of the previously
+ // expanded list.
+ const notesContext=`${open}:${history}:${update?.build}`
+ const [seenNotesContext,setSeenNotesContext]=useState(notesContext)
+ if(seenNotesContext!==notesContext){
+  setSeenNotesContext(notesContext)
+  if(open)setVisible(5)
+ }
  useEffect(()=>{
   if(!open||visible>=entries.length||!sentinel||!('IntersectionObserver' in window))return
   const observer=new IntersectionObserver(items=>{if(items.some(item=>item.isIntersecting))setVisible(value=>Math.min(value+5,entries.length))},{root:list.current,rootMargin:'80px'})
