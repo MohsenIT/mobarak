@@ -1,10 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { readPageNumber, readSurahNumber, readVerseAddress, readingUrl, type VerseAddress } from '@/lib/verse-link'
-import { readSearchLink, type SearchLinkState } from '@/lib/search-link'
+import { readingUrl, type VerseAddress } from '@/lib/verse-link'
+import type { SearchLinkState } from '@/lib/search-link'
 import { readStored, writeStored } from '@/lib/reader-storage'
-import { initialReading, readingLocation, searchEntry, searchExit, type ReadingMode } from '@/lib/reading-route'
+import { initialReading, readingLocation, readingRoute, searchEntry, searchExit, type ReadingMode } from '@/lib/reading-route'
 
 const clampPage = (value: number) => Math.min(604, Math.max(1, value))
 const NATIVE = process.env.NEXT_PUBLIC_DESKTOP === '1'
@@ -89,23 +89,20 @@ export function useReadingRoute(handlers: ReadingRouteHandlers) {
   useEffect(() => {
     const restore = () => {
       const current = window.location.href
-      const search = readSearchLink(current)
-      if (search) {
-        latest.current.onSearch(search, lastSearchUrl.current === current)
+      const route = readingRoute(current)
+      if (route?.kind === 'search') {
+        latest.current.onSearch(route.state, lastSearchUrl.current === current)
         return
       }
-      const address = readVerseAddress(window.location.search, window.location.pathname)
-      if (address) {
+      if (route?.kind === 'verse') {
         setMode('flow')
-        setSurah(address.s)
-        latest.current.onVerse(address)
+        setSurah(route.address.s)
+        latest.current.onVerse(route.address)
         return
       }
       latest.current.onReading()
-      const s = readSurahNumber(window.location.search, window.location.pathname)
-      const p = readPageNumber(window.location.search, window.location.pathname)
-      if (s) { setMode('flow'); setSurah(s) }
-      else if (p) { setMode('mushaf'); requestMushafPage(p) }
+      if (route?.kind === 'surah') { setMode('flow'); setSurah(route.s) }
+      else if (route?.kind === 'page') { setMode('mushaf'); requestMushafPage(route.p) }
     }
     restore()
     window.addEventListener('popstate', restore)
