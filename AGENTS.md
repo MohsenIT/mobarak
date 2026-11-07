@@ -303,13 +303,12 @@ add a second instance without discussing it first.
 - `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
   repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
   (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**
-  disabled and currently surface 24 real diagnostics across 12 files
+  disabled and currently surface 22 real diagnostics across 11 files
   (`page.tsx`, `ContinuousMushaf.tsx`, `QuranSearch.tsx`, `RootPanel.tsx`,
   `SurahPull.tsx`, `AnalysisSections.tsx`, `DictationInput.tsx`,
-  `QuickSurahSearch.tsx`, `RangeComparison.tsx`,
-  `ReleaseNotesDialog.tsx`, `useRecitationMediaSession.ts`;
-  `OccurrencePicker.tsx` was fixed and no longer appears). Composition: 7
-  `refs`, 15 `set-state-in-effect`, 2 `preserve-manual-memoization`.
+  `QuickSurahSearch.tsx`, `RangeComparison.tsx`, `ReleaseNotesDialog.tsx`,
+  `useRecitationMediaSession.ts`). Composition: 7
+  `refs`, 13 `set-state-in-effect`, 2 `preserve-manual-memoization`.
   These are two recurring, intentional
   patterns — "latest ref" (`const r = useRef(x); r.current = x` during
   render, so a callback/effect can read the newest value without
@@ -328,7 +327,10 @@ add a second instance without discussing it first.
   from a render-read ref into state and derived `startupLeaving` instead of
   setting it in an effect (coverage: `tests/e2e/react-ref-defects.spec.cjs`);
   and `OccurrencePicker.tsx` moved its scroll-memory reset from render into an
-  effect keyed on the group (same spec). Note the compiler aborts analysis for
+  effect keyed on the group (same spec). Additionally, the panel-maximize
+  reset and the search facet reset now use the render-time adjust-state
+  pattern instead of effects (`tests/e2e/panel-max.spec.cjs`,
+  `tests/e2e/search-facets.spec.cjs`). Note the compiler aborts analysis for
   a whole component on a single `refs` violation, so fixing one can unmask
   further diagnostics in the same file — re-check counts after such fixes.
 - `RangeComparison.tsx` sorts its memoized rows with `.slice().sort(...)` rather
