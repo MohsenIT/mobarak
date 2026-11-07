@@ -65,15 +65,44 @@ add a second instance without discussing it first.
   wiring around it. See `src/lib/reading-route.test.ts` and
   `tests/e2e/reading-route.spec.cjs` for the pinned contract before changing
   either file.
+- Reading mode ownership: the `ReadingMode` type (`'page' | 'flow' |
+  'mushaf'` — word-by-word, translation-flow, continuous) is declared **once**
+  in `src/lib/verse-link.ts` and re-exported by `src/lib/reading-route.ts`;
+  do not re-declare it elsewhere. There is exactly **one** mode switch path in
+  the UI: `SettingsScreen` (`mode`/`onMode` props) — do not add a second
+  toggle. (The old NavDrawer selector was dead UI since release 0.4.52 — the
+  drawer's appearance/settings/downloads/about tabs never rendered it; it was
+  removed rather than revived.) Pinned by
+  `tests/e2e/reading-mode-navigation.spec.cjs`.
 - `src/lib/root-comparison.ts`: the root-visibility rules for a range
   comparison — which roots are muted and what tapping one does. Two overlapping
   mechanisms live here (`hidden`, the set the reader tapped off one by one, and
   `solo`, a single root shown on its own) and solo always wins. `page.tsx` keeps
   the `useState` for both sets and the rest of the comparison state; the module
-  only decides the resulting display set and the next state after a tap. See
+  only decides the resulting display set and the next state after a tap. That
+  comparison state now lives in
+  `src/components/quran/useComparison.ts` (see below). See
   `src/lib/root-comparison.test.ts` and `tests/e2e/root-comparison.spec.cjs`
   (which pins the tap/long-press/clear behavior through the real UI) before
   changing it — the interaction is easy to break and was untested before this.
+- `src/components/quran/useComparison.ts`: owns the range-comparison UI state
+  (sheet visibility, the selected range, the root palette colors, and the
+  muted/solo visibility sets it drives through `src/lib/root-comparison.ts`).
+  `RangeComparison.tsx` renders from it via props (`onRangeChange`/
+  `onRootsChange`/`onPickRoot`); `changeRange()` is the one seam that resets
+  per-range visibility, and derivations are keyed so a range change cannot
+  leak stale state. Behavior is pinned by `tests/e2e/root-comparison.spec.cjs`
+  and `tests/e2e/context-comparison.spec.cjs` — run both before touching it.
+- `src/components/quran/useSearchNavigation.ts`: owns the search *panel*
+  orchestration state (advanced/quick panel open flags, quick-highlight list,
+  the `start` descriptor handed to `QuranSearch`, the occurrence-picker filter
+  and the leave-for-reading return flag). The URL remains owned by
+  `useReadingRoute` (`writeSearchState`/`leaveSearch`); this hook never writes
+  history itself. The pending-reveal target stays in `page.tsx` because verse
+  deep links set it too. Pinned by
+  `tests/e2e/search-orchestration.spec.cjs` (landed before the extraction) plus
+  the search-history/progress/menu-dismissal specs — re-run all four when
+  touching search behavior.
 - `src/lib/reader-settings.ts`: the pure update rules for reader presentation
   settings — scale clamping/stepping, the recent-surah list (front-insert,
   de-duplicate, capped at 12, invalid numbers filtered because this runs on
@@ -274,12 +303,14 @@ add a second instance without discussing it first.
 - `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
   repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
   (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**
-  disabled and currently surface 25 real diagnostics across 12 files
+  disabled and currently surface 24 real diagnostics across 12 files
   (`page.tsx`, `ContinuousMushaf.tsx`, `QuranSearch.tsx`, `RootPanel.tsx`,
   `SurahPull.tsx`, `AnalysisSections.tsx`, `DictationInput.tsx`,
-  `OccurrencePicker.tsx`, `QuickSurahSearch.tsx`, `RangeComparison.tsx`,
-  `ReleaseNotesDialog.tsx`, `useRecitationMediaSession.ts`). These are two
-  recurring, intentional
+  `QuickSurahSearch.tsx`, `RangeComparison.tsx`,
+  `ReleaseNotesDialog.tsx`, `useRecitationMediaSession.ts`;
+  `OccurrencePicker.tsx` was fixed and no longer appears). Composition: 7
+  `refs`, 15 `set-state-in-effect`, 2 `preserve-manual-memoization`.
+  These are two recurring, intentional
   patterns — "latest ref" (`const r = useRef(x); r.current = x` during
   render, so a callback/effect can read the newest value without
   re-subscribing) and "reset state at the top of an effect that then loads
@@ -288,12 +319,18 @@ add a second instance without discussing it first.
   surrounding effect (e.g. moving the reset into an event handler, or
   switching to a key-based remount) with a characterization test proving no
   behavior change, file by file, not a rule-level `"off"`.
-  Two files have been fixed this way already: `MaqayisMeaning.tsx` and
+  Four files have been fixed this way already: `MaqayisMeaning.tsx` and
   `IshtiqaqiMeaning.tsx` scoped their disclosure state to the root it was
   opened for (`expandedFor === root`) instead of resetting it in the loading
   effect — and since `RootMeaning` already keys those components by
-  `${book.id}:${root}`, the reset was dead code. Their replacement coverage is
-  `tests/e2e/root-dictionaries.spec.cjs`.
+  `${book.id}:${root}`, the reset was dead code (their replacement coverage is
+  `tests/e2e/root-dictionaries.spec.cjs`); `page.tsx` converted `pullArrival`
+  from a render-read ref into state and derived `startupLeaving` instead of
+  setting it in an effect (coverage: `tests/e2e/react-ref-defects.spec.cjs`);
+  and `OccurrencePicker.tsx` moved its scroll-memory reset from render into an
+  effect keyed on the group (same spec). Note the compiler aborts analysis for
+  a whole component on a single `refs` violation, so fixing one can unmask
+  further diagnostics in the same file — re-check counts after such fixes.
 - `RangeComparison.tsx` sorts its memoized rows with `.slice().sort(...)` rather
   than in place. The React Compiler still reports two
   `preserve-manual-memoization` diagnostics there (it cannot prove `from`/`to`
