@@ -322,19 +322,27 @@ export default function Home() {
     if(!mounted)requestMushafPage(p)
   },[requestMushafPage])
 
+  // Reveal a verse on whichever surface is active: mushaf scrolls to its page
+  // (unless already mounted), flow switches surah. Shared by goVerse,
+  // panelJump and jumpSurahRoot, which otherwise differ in what else they do
+  // (write the URL, set flash, retarget the analysis panel, ...).
+  const revealVerse = useCallback((s: number, a: number, pos: number, p: number) => {
+    if (mode === 'mushaf') requestMushafVerse(p, s, a, pos)
+    else setSurah(s)
+  }, [mode, requestMushafVerse])
+
   const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start', wholeVerse = true) => {
     pullArrival.current = null
     loadSurah(s).then(d => {
       const v = d.v[a - 1]
       if (v) {
-        if (mode === 'mushaf') requestMushafVerse(v.p,s,a,pos)
-        else setSurah(s)
+        revealVerse(s, a, pos, v.p)
         writeVerseAddress({ s, a, pos })
         setFlash({ s, a, pos })
         setSearchTarget({ s, a, pos, align, wholeVerse })
       }
     })
-  }, [mode, requestMushafVerse])
+  }, [revealVerse])
 
   const openOccurrenceSearch = (selection: AnalysisSelection, scope: OccurrenceScope) => {
     const surahs = occurrenceScopeSurahs(scope, selection.s)
@@ -375,10 +383,9 @@ export default function Home() {
   // panel jump: keep panel open, highlight target
   const panelJump = useCallback((s: number, a: number, pos: number, p: number) => {
     writeVerseAddress({ s, a, pos })
-    if (mode === 'mushaf') requestMushafVerse(p,s,a,pos)
-    else setSurah(s)
+    revealVerse(s, a, pos, p)
     setFlash({ s, a, pos })
-  }, [mode, requestMushafVerse])
+  }, [revealVerse])
 
   // jump to root occurrence in another surah; retarget panel selection
   const jumpSurahRoot = useCallback((surahN: number, root: string) => {
@@ -389,18 +396,19 @@ export default function Home() {
       const w = d.v[a - 1]?.w[pos - 1]
       if (!w) return
       setSel({ s: surahN, a, pos, ...wordTarget(w), root })
-      if (mode === 'mushaf') requestMushafVerse(d.v[a - 1].p,surahN,a,pos)
-      else setSurah(surahN)
+      revealVerse(surahN, a, pos, d.v[a - 1].p)
       setFlash({ s: surahN, a, pos })
     })
-  }, [mode, requestMushafVerse])
+  }, [revealVerse])
 
   // SurahIndex: pick a root from the index page → open RootPanel for first occurrence
   // NOTE: the index STAYS OPEN — user wants to return to the same scroll position
   // after closing the panel. The RootPanel renders at a higher z-index than the
   // drawer so it overlays the index.
   const pickRootFromIndex = useCallback((root: string, sourceSurah?: number) => {
-    const targetSurah = sourceSurah ?? (mode === 'mushaf' ? curSurahN : surah)
+    // curSurahN is already "the surah on screen" in both modes (page's first
+    // surah in mushaf, the reading surah in flow).
+    const targetSurah = sourceSurah ?? curSurahN
     loadSurah(targetSurah).then(d => {
       const occ = d.ri[root]
       if (!occ || occ.length === 0) return
@@ -411,7 +419,7 @@ export default function Home() {
       // deliberately NOT calling setShowIndex(false) — index stays open
       setFlash({ s: targetSurah, a, pos })
     })
-  }, [mode, curSurahN, surah])
+  }, [curSurahN])
 
   // The sheet handles its active tab's keyboard navigation.
   useEffect(() => {
@@ -640,8 +648,6 @@ export default function Home() {
           onOpenKeywords={() => { setDrawerOpen(false); setShowIndex(true) }}
           onOpenComparison={() => { setDrawerOpen(false); setContextComparison(false); setComparisonSurah(curSurahN); setShowComparison(true); setSel(null) }}
           theme={theme}
-          mode={mode}
-          onMode={switchMode}
           translator={translator}
           scale={scale}
           currentSurah={curSurahN}
@@ -655,7 +661,7 @@ export default function Home() {
           onScale={setScale}
         />
       )}
-      {settingsOpen && <SettingsScreen meta={meta} theme={theme} onTheme={setTheme} translator={translator} onTranslator={setTranslator} scale={scale} onScale={setScale} onClose={() => setSettingsOpen(false)} />}
+      {settingsOpen && <SettingsScreen meta={meta} theme={theme} onTheme={setTheme} mode={mode} onMode={switchMode} translator={translator} onTranslator={setTranslator} scale={scale} onScale={setScale} onClose={() => setSettingsOpen(false)} />}
 
       {/* ===== Sorted Surah Index drawer =====
           Rendered as a right-side drawer that stays open while the
