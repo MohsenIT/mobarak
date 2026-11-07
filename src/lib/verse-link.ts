@@ -1,5 +1,6 @@
 import {nativeCommand,nativeRecitationAvailable} from './native-recitation'
 export type VerseAddress = { s: number; a: number; pos: number }
+export type ReadingMode = 'mushaf' | 'flow'
 const integer = (value: string | null | undefined, max: number) => {
   const n = Number(value)
   return Number.isInteger(n) && n >= 1 && n <= max ? n : null
@@ -24,7 +25,7 @@ export function versePath({ s, a, pos }: VerseAddress): string {
   return `/s/${s}/a/${a}${pos > 1 ? `/w/${pos}` : ''}`
 }
 /** The refresh token is only for requesting a fresh document, never a reading address. */
-export function readingUrl(current: string, mode: 'flow' | 'mushaf', surah: number, page: number, native = false): URL {
+export function readingUrl(current: string, mode: ReadingMode, surah: number, page: number, native = false): URL {
   const url = new URL(current)
   if (/^\/(q|search)\/?$/.test(url.pathname) || url.searchParams.get('search') === '1') { url.search = ''; url.hash = '' }
   const target = readVerseAddress(url.search, url.pathname)

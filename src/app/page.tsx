@@ -8,6 +8,7 @@ import type { SearchLinkState } from '@/lib/search-link'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import { clampScale, rememberSurah, removeBookmark, resolveInitialTranslator, stepScale, togglePinnedSurah } from '@/lib/reader-settings'
 import { useReadingRoute } from '@/components/quran/useReadingRoute'
+import type { ReadingMode } from '@/lib/reading-route'
 import type { VerseAddress } from '@/lib/verse-link'
 import type { Destination } from '@/lib/navigation'
 import { wordTarget } from '@/lib/word-parts'
@@ -458,7 +459,7 @@ export default function Home() {
   }, [meta, segs, pageData, page])
 
   const flowFont = 22 * scale
-  const switchMode = (m: 'mushaf' | 'flow') => {
+  const switchMode = (m: ReadingMode) => {
     if (m === 'flow') setSurah(curSurahN)
     setMode(m)
   }

@@ -1,7 +1,7 @@
-import { readPageNumber, readSurahNumber, readVerseAddress, readingUrl, type VerseAddress } from './verse-link'
+import { readPageNumber, readSurahNumber, readVerseAddress, readingUrl, type ReadingMode, type VerseAddress } from './verse-link'
 import { readSearchLink, searchLink, type SearchLinkState } from './search-link'
 
-export type ReadingMode = 'mushaf' | 'flow'
+export type { ReadingMode } from './verse-link'
 
 /** Which reading view a browser location describes. */
 export type ReadingRoute =

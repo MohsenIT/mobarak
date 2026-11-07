@@ -21,6 +21,7 @@ import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { destinationSuggestions, resolveDestination, normalizeSearch, NAVIGATION_HELP, searchSurahs, type Destination } from '@/lib/navigation'
+import type { ReadingMode } from '@/lib/reading-route'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate, IconSortIndex } from './Ornaments'
 import { ChevronLeft, GitCompareArrows } from 'lucide-react'
 
@@ -38,8 +39,8 @@ interface Props {
   onOpenKeywords: () => void
   onOpenComparison: () => void
   theme: 'paper' | 'night'
-  mode: 'mushaf' | 'flow'
-  onMode: (mode: 'mushaf' | 'flow') => void
+  mode: ReadingMode
+  onMode: (mode: ReadingMode) => void
   translator: Translator
   scale: number
   /** current surah number — used to auto-scroll the surah list to the
