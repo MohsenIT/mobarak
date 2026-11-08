@@ -127,6 +127,11 @@ test('a selected search result can be revisited from the back-to-results band, a
  await expect(page.locator('.reader-toolbar')).toBeVisible({timeout:20000});
  const band=page.getByRole('button',{name:'بازگشت به نتایج جست‌وجو'});
  await expect(band).toBeVisible({timeout:20000});
+ // goVerse writes the hit's verse URL only after its surah has loaded, while
+ // the band appears synchronously with the pick. Wait for the location to
+ // settle on the verse address before capturing it, or the captured "reading"
+ // URL may still be the search URL the rewrite has not replaced yet.
+ await expect(page).toHaveURL(/\/s\/\d+\/a\/\d+(\/w\/\d+)?$/,{timeout:20000});
  const readingUrl=page.url();
 
  // Going back opens the search page again on the same query.
