@@ -36,7 +36,8 @@ import SettingsScreen from '@/components/quran/SettingsScreen'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, Search, Settings, ChevronDown, Play, LoaderCircle, AudioLines } from 'lucide-react'
+import { ArrowRight, Search, Settings, ChevronDown } from 'lucide-react'
+import AudioToolbarButton from '@/components/quran/AudioToolbarButton'
 import QuranSearch from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import ReaderSearchHighlights from '@/components/quran/ReaderSearchHighlights'
@@ -493,7 +494,14 @@ export default function Home() {
 
         <button className="icon-btn" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { setSel(null); search.openQuick() }}><Search size={20} /></button>
 
-        <button className="icon-btn" aria-label={!audioOpen?t("ui.facfd50c31"):audioControlsVisible?t("ui.feabb65c6a"):audioStatus==='playing'?t("ui.7851ddb1df"):t("ui.f432f383bf")} title={!audioOpen?t("ui.1f7cc9473a"):audioControlsVisible?t("ui.0b17cf0f81"):t("ui.0884ec3e62")} aria-expanded={audioOpen&&audioControlsVisible} aria-busy={audioStatus==='loading'} style={audioOpen?{color:'var(--sage)',background:'var(--word-root)'}:undefined} onClick={()=>{if(!audioOpen){setAudioControlsVisible(true);setAudioOpen(true)}else if(audioControlsVisible)setAudioControlsVisible(false);else{setAudioControlsVisible(true);if(audioStatus!=='loading')setAudioPlayRequest(value=>value+1)}}}>{audioStatus==='playing'&&audioOpen?<span className="recitation-activity" aria-hidden="true">{[0,1,2,3,4].map(i=><i key={i} style={{animationDelay:`${i*0.12}s`}}/>)}</span>:audioStatus==='loading'&&audioOpen?<LoaderCircle size={20} className="recitation-start-spinner animate-spin"/>:audioOpen&&audioControlsVisible?<AudioLines size={20}/>:<Play size={20} fill="currentColor"/>}</button>
+        <AudioToolbarButton
+          open={audioOpen}
+          controlsVisible={audioControlsVisible}
+          status={audioStatus}
+          onOpen={() => { setAudioControlsVisible(true); setAudioOpen(true) }}
+          onCollapse={() => setAudioControlsVisible(false)}
+          onExpandAndResume={() => { setAudioControlsVisible(true); if (audioStatus !== 'loading') setAudioPlayRequest(value => value + 1) }}
+        />
 
           <button className="icon-btn" aria-label={t("ui.2d6258b160")}
             title={t("ui.37e2fdb79c")}
