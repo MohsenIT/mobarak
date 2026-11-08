@@ -55,7 +55,10 @@ test('navigating between pages rewrites the URL in place rather than growing his
  await page.goto('/p/5',{waitUntil:'domcontentloaded'});
  await readerReady(page);
  const before=await page.evaluate(()=>history.length);
- await page.evaluate(()=>window.history.pushState(null,'','/p/6'));
+ // Carry the current history state, as the app's own pushes do: a state-less
+ // entry invites the Next dev client to re-assert its last-known URL on
+ // whatever entry is current, clobbering a back/forward target under load.
+ await page.evaluate(()=>window.history.pushState(window.history.state,'','/p/6'));
  await expect(page.locator('[data-mushaf-page="6"]')).toBeAttached({timeout:20000});
  // Browser back/forward restores the page from the location.
  await page.goBack();
@@ -64,15 +67,29 @@ test('navigating between pages rewrites the URL in place rather than growing his
  expect(await page.evaluate(()=>history.length)).toBeGreaterThanOrEqual(before);
 });
 
+/**
+ * Drive a same-document history traversal from inside the page and wait until
+ * its popstate has been dispatched to the app before resolving. Issuing a
+ * second traversal while the previous one's popstate is still queued can be
+ * dropped by the browser under main-thread load — the pointer then never
+ * moves, which is a browser-side race, not an app behavior under test.
+ */
+async function traverseHistory(page,dir){
+ await page.evaluate(d=>new Promise(resolve=>{
+  window.addEventListener('popstate',()=>requestAnimationFrame(resolve),{once:true});
+  if(d==='back')window.history.back();else window.history.forward();
+ }),dir);
+}
+
 test('forward navigation after back restores the newer reading position',async({page})=>{
  await setup(page);
  await page.goto('/s/2',{waitUntil:'domcontentloaded'});
  await readerReady(page);
- await page.evaluate(()=>window.history.pushState(null,'','/s/3'));
+ await page.evaluate(()=>window.history.pushState(window.history.state,'','/s/3'));
  await expect(page).toHaveURL(/\/s\/3$/);
- await page.goBack();
+ await traverseHistory(page,'back');
  await expect(page).toHaveURL(/\/s\/2$/);
- await page.goForward();
+ await traverseHistory(page,'forward');
  await expect(page).toHaveURL(/\/s\/3$/);
  await readerReady(page);
 });
