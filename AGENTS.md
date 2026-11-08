@@ -46,12 +46,36 @@ add a second instance without discussing it first.
   `popover` are currently used by the app — everything else in this directory
   is dead scaffolding from the project template. Do not add new files here
   speculatively; add a primitive only when a real feature imports it.
-- `src/app/page.tsx`: the reading screen's orchestration root. It currently owns
-  a large amount of state (presentation settings, search, selection, drawers,
-  audio, comparison). This is a known architectural weak point (see "Known
-  technical debt" below). When adding a new reading-screen feature, prefer
-  extracting a dedicated hook under `src/components/quran/` over adding more
-  inline `useState`/`useEffect` to `page.tsx` directly.
+- `src/app/page.tsx`: the reading screen's orchestration root — and only that.
+  It still owns the state that no single feature can own because several
+  features touch it: the reading selection (`sel`/`analysisSelection`/`flash`),
+  the reveal target, the data-loading lifecycle (`pageData`/`flowSurah`/
+  `loadingPage`), the recitation session cluster, the panel/drawer flags, and
+  the navigation seams (`goPage`/`goVerse`/`tapWord`/`panelJump`/...). Everything
+  else lives in the hooks below. When adding a new reading-screen feature,
+  extract a dedicated hook under `src/components/quran/` (with a
+  characterization spec landed first) rather than adding more inline
+  `useState`/`useEffect` to `page.tsx`.
+
+  Reading-screen module map (where a change should land):
+
+  | Concern | Module |
+  |---|---|
+  | Reading position, URL, history, `mushaf.page/mode/surah` | `useReadingRoute.ts` (+ pure logic in `src/lib/reading-route.ts`) |
+  | Search panel orchestration (quick/advanced open, occurrence filter, back band) | `useSearchNavigation.ts` |
+  | Range comparison state (sheet, range, roots, mute/solo) | `useComparison.ts` (+ rules in `src/lib/root-comparison.ts`) |
+  | Presentation settings + `mushaf.*` persistence (theme, translator, scale, bookmarks, pins) | `useReaderPresentation.ts` (+ update rules in `src/lib/reader-settings.ts`) |
+  | Startup splash lifecycle | `useStartupSplash.ts` |
+  | Toolbar recitation button | `AudioToolbarButton.tsx` |
+  | Analysis panel UI | `RootPanel.tsx` (+ `src/lib/analysis.ts`, `src/lib/analysis-view.ts`) |
+  | Advanced search page UI | `QuranSearch.tsx` (+ `src/lib/quran-search*.ts`) |
+  | Selection-visible highlighting, comparison hold | `useVisibleSelection.ts`, `useComparisonHold.ts` |
+
+  Pure decision logic is deliberately kept in `src/lib/` (framework-free,
+  unit-tested); the hooks under `src/components/quran/` are the React wiring
+  around it. An AI agent looking for where to change behavior should find the
+  decision in `src/lib/`, the state in a `use*.ts` hook, and the pixels in a
+  `*.tsx` component — in that order.
 - `src/components/quran/useReadingRoute.ts` + `src/lib/reading-route.ts`: own
   the reading position (`page`/`mode`/`surah`), its `mushaf.*` persistence, the
   canonical reading URL, and browser back/forward restoration. `page.tsx` reads
@@ -65,8 +89,8 @@ add a second instance without discussing it first.
   wiring around it. See `src/lib/reading-route.test.ts` and
   `tests/e2e/reading-route.spec.cjs` for the pinned contract before changing
   either file.
-- Reading mode ownership: the `ReadingMode` type (`'page' | 'flow' |
-  'mushaf'` — word-by-word, translation-flow, continuous) is declared **once**
+- Reading mode ownership: the `ReadingMode` type (`'mushaf' | 'flow'` —
+  continuous page view, translation flow) is declared **once**
   in `src/lib/verse-link.ts` and re-exported by `src/lib/reading-route.ts`;
   do not re-declare it elsewhere. There is exactly **one** mode switch path in
   the UI: `SettingsScreen` (`mode`/`onMode` props) — do not add a second
@@ -291,15 +315,18 @@ add a second instance without discussing it first.
 
 ## Known technical debt (tracked, not yet fixed)
 
-- `src/app/page.tsx` still concentrates most of the remaining reading-screen
-  state (~45 `useState`) — search panel, selection, analysis, drawers, audio,
-  startup, and the state *around* root/range comparison. Three responsibilities
-  have been extracted so far, each with its own characterization tests:
-  URL/history/reading-position into `useReadingRoute` (see above), the
-  comparison root-visibility rules into `src/lib/root-comparison.ts`, and the
-  presentation-setting update arithmetic into `src/lib/reader-settings.ts`.
-  Planned mitigation for what remains: further incremental extraction, each
-  with a characterization test landed first — not a single big rewrite.
+- `src/app/page.tsx` is down to ~648 lines and ~24 `useState` of genuine
+  orchestration state (selection, data loading, recitation session, drawers,
+  navigation seams) after five extractions, each landed with a
+  characterization spec first: URL/history/reading-position into
+  `useReadingRoute`, search orchestration into `useSearchNavigation`, range
+  comparison into `useComparison`, presentation settings into
+  `useReaderPresentation`, and the splash lifecycle into `useStartupSplash`
+  (plus `AudioToolbarButton` and the deduplicated `RootPanel` mount). What
+  remains is state several features legitimately share through the navigation
+  seams; splitting it further would add indirection without reducing the
+  screen's knowledge. Any future extraction should follow the same
+  test-first pattern — never a big rewrite.
 - `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
   repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
   (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**
