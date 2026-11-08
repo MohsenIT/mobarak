@@ -449,6 +449,32 @@ export default function Home() {
     setMode(m)
   }
 
+  // The analysis panel is defined once: when the index or comparison drawer
+  // is open underneath, it rises over them through a portal; otherwise it
+  // mounts inline. The props are identical either way.
+  const rootPanel = sel && meta ? (
+    <RootPanel
+      playbackTarget={playbackTarget}
+      onOpenOccurrences={search.startOccurrence}
+      onSelectionChange={onAnalysisSelection}
+      onCompareContext={compareContext}
+      sel={sel}
+      meta={meta}
+      translator={translator}
+      maximized={panelMax}
+      sheetH={sheetH}
+      onSheetHeightChange={setSheetH}
+      onToggleMax={() => setPanelMax(v => !v)}
+      onClose={() => setSel(null)}
+      onJump={panelJump}
+      onJumpSurah={jumpSurahRoot}
+      /* When the index drawer is also open, the panel needs to sit on top of
+         it — passed as a flag so the panel can bump its z-index. */
+      stackedOverIndex={showIndex || showComparison}
+      comparisonRange={comparisonRange}
+    />
+  ) : null
+
   return (
     <>
     {!startupComplete && <StartupSplash leaving={startupLeaving} onHoldChange={setStartupHeld} />}
@@ -568,49 +594,9 @@ export default function Home() {
         </main>
 
         {sel && (showIndex || showComparison
-          ? createPortal(
-              <RootPanel
-            playbackTarget={playbackTarget}
-            onOpenOccurrences={search.startOccurrence}
-            onSelectionChange={onAnalysisSelection}
-            onCompareContext={compareContext}
-            sel={sel}
-            meta={meta}
-            translator={translator}
-            maximized={panelMax}
-            sheetH={sheetH}
-            onSheetHeightChange={setSheetH}
-            onToggleMax={() => setPanelMax(v => !v)}
-            onClose={() => setSel(null)}
-            onJump={panelJump}
-            onJumpSurah={jumpSurahRoot}
-            /* When the index drawer is also open, the panel needs to sit
-               on top of it — pass a flag so the panel can bump its z-index. */
-            stackedOverIndex={showIndex || showComparison}
-            comparisonRange={comparisonRange}
-          />, document.body)
-          : (
-              <RootPanel
-            playbackTarget={playbackTarget}
-            onOpenOccurrences={search.startOccurrence}
-            onSelectionChange={onAnalysisSelection}
-            onCompareContext={compareContext}
-            sel={sel}
-            meta={meta}
-            translator={translator}
-            maximized={panelMax}
-            sheetH={sheetH}
-            onSheetHeightChange={setSheetH}
-            onToggleMax={() => setPanelMax(v => !v)}
-            onClose={() => setSel(null)}
-            onJump={panelJump}
-            onJumpSurah={jumpSurahRoot}
-            /* When the index drawer is also open, the panel needs to sit
-               on top of it — pass a flag so the panel can bump its z-index. */
-            stackedOverIndex={showIndex || showComparison}
-            comparisonRange={comparisonRange}
-          />
-            ))}      </div>
+          ? createPortal(rootPanel, document.body)
+          : rootPanel
+        )}      </div>
 
       {/* ===== Drawer ===== */}
       {drawerOpen && (
