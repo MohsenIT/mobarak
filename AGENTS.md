@@ -46,16 +46,156 @@ add a second instance without discussing it first.
   `popover` are currently used by the app — everything else in this directory
   is dead scaffolding from the project template. Do not add new files here
   speculatively; add a primitive only when a real feature imports it.
-- `src/app/page.tsx`: the reading screen's orchestration root. It currently owns
-  a large amount of state (reading position, mode, search, selection, drawers).
-  This is a known architectural weak point (see "Known technical debt" below).
-  When adding a new reading-screen feature, prefer extracting a dedicated hook
-  under `src/components/quran/` (e.g. `useReadingRoute`, `useX`) over adding more
-  inline `useState`/`useEffect` to `page.tsx` directly.
+- `src/app/page.tsx`: the reading screen's orchestration root — and only that.
+  It still owns the state that no single feature can own because several
+  features touch it: the reading selection (`sel`/`analysisSelection`/`flash`),
+  the reveal target, the data-loading lifecycle (`pageData`/`flowSurah`/
+  `loadingPage`), the recitation session cluster, the panel/drawer flags, and
+  the navigation seams (`goPage`/`goVerse`/`tapWord`/`panelJump`/...). Everything
+  else lives in the hooks below. When adding a new reading-screen feature,
+  extract a dedicated hook under `src/components/quran/` (with a
+  characterization spec landed first) rather than adding more inline
+  `useState`/`useEffect` to `page.tsx`.
+
+  Reading-screen module map (where a change should land):
+
+  | Concern | Module |
+  |---|---|
+  | Reading position, URL, history, `mushaf.page/mode/surah` | `useReadingRoute.ts` (+ pure logic in `src/lib/reading-route.ts`) |
+  | Search panel orchestration (quick/advanced open, occurrence filter, back band) | `useSearchNavigation.ts` |
+  | Range comparison state (sheet, range, roots, mute/solo) | `useComparison.ts` (+ rules in `src/lib/root-comparison.ts`) |
+  | Presentation settings + `mushaf.*` persistence (theme, translator, scale, bookmarks, pins) | `useReaderPresentation.ts` (+ update rules in `src/lib/reader-settings.ts`) |
+  | Startup splash lifecycle | `useStartupSplash.ts` |
+  | Toolbar recitation button | `AudioToolbarButton.tsx` |
+  | Analysis panel UI | `RootPanel.tsx` (+ `src/lib/analysis.ts`, `src/lib/analysis-view.ts`) |
+  | Advanced search page UI | `QuranSearch.tsx` (+ `src/lib/quran-search*.ts`) |
+  | Selection-visible highlighting, comparison hold | `useVisibleSelection.ts`, `useComparisonHold.ts` |
+
+  Pure decision logic is deliberately kept in `src/lib/` (framework-free,
+  unit-tested); the hooks under `src/components/quran/` are the React wiring
+  around it. An AI agent looking for where to change behavior should find the
+  decision in `src/lib/`, the state in a `use*.ts` hook, and the pixels in a
+  `*.tsx` component — in that order.
+- `src/components/quran/useReadingRoute.ts` + `src/lib/reading-route.ts`: own
+  the reading position (`page`/`mode`/`surah`), its `mushaf.*` persistence, the
+  canonical reading URL, and browser back/forward restoration. `page.tsx` reads
+  a location change only through three callbacks it supplies to the hook
+  (`onSearch`/`onVerse`/`onReading`) — the hook decides *that* the location
+  changed and to what kind of route; `page.tsx` decides what that means for
+  selection, flash and the search panel. `src/lib/reading-route.ts` holds the
+  pure decision logic (which kind of route a location is, the first-render
+  position, the canonical URL, entering/leaving search) so it is unit-testable
+  without a DOM; the hook is the thin `useState`/`useEffect`/`window.history`
+  wiring around it. See `src/lib/reading-route.test.ts` and
+  `tests/e2e/reading-route.spec.cjs` for the pinned contract before changing
+  either file.
+- Reading mode ownership: the `ReadingMode` type (`'mushaf' | 'flow'` —
+  continuous page view, translation flow) is declared **once**
+  in `src/lib/verse-link.ts` and re-exported by `src/lib/reading-route.ts`;
+  do not re-declare it elsewhere. There is exactly **one** mode switch path in
+  the UI: `SettingsScreen` (`mode`/`onMode` props) — do not add a second
+  toggle. (The old NavDrawer selector was dead UI since release 0.4.52 — the
+  drawer's appearance/settings/downloads/about tabs never rendered it; it was
+  removed rather than revived.) Pinned by
+  `tests/e2e/reading-mode-navigation.spec.cjs`.
+- `src/lib/root-comparison.ts`: the root-visibility rules for a range
+  comparison — which roots are muted and what tapping one does. Two overlapping
+  mechanisms live here (`hidden`, the set the reader tapped off one by one, and
+  `solo`, a single root shown on its own) and solo always wins. `page.tsx` keeps
+  the `useState` for both sets and the rest of the comparison state; the module
+  only decides the resulting display set and the next state after a tap. That
+  comparison state now lives in
+  `src/components/quran/useComparison.ts` (see below). See
+  `src/lib/root-comparison.test.ts` and `tests/e2e/root-comparison.spec.cjs`
+  (which pins the tap/long-press/clear behavior through the real UI) before
+  changing it — the interaction is easy to break and was untested before this.
+- `src/components/quran/useComparison.ts`: owns the range-comparison UI state
+  (sheet visibility, the selected range, the root palette colors, and the
+  muted/solo visibility sets it drives through `src/lib/root-comparison.ts`).
+  `RangeComparison.tsx` renders from it via props (`onRangeChange`/
+  `onRootsChange`/`onPickRoot`); `changeRange()` is the one seam that resets
+  per-range visibility, and derivations are keyed so a range change cannot
+  leak stale state. Behavior is pinned by `tests/e2e/root-comparison.spec.cjs`
+  and `tests/e2e/context-comparison.spec.cjs` — run both before touching it.
+- `src/components/quran/useSearchNavigation.ts`: owns the search *panel*
+  orchestration state (advanced/quick panel open flags, quick-highlight list,
+  the `start` descriptor handed to `QuranSearch`, the occurrence-picker filter
+  and the leave-for-reading return flag). The URL remains owned by
+  `useReadingRoute` (`writeSearchState`/`leaveSearch`); this hook never writes
+  history itself. The pending-reveal target stays in `page.tsx` because verse
+  deep links set it too. Pinned by
+  `tests/e2e/search-orchestration.spec.cjs` (landed before the extraction) plus
+  the search-history/progress/menu-dismissal specs — re-run all four when
+  touching search behavior.
+- `src/lib/reader-settings.ts`: the pure update rules for reader presentation
+  settings — scale clamping/stepping, the recent-surah list (front-insert,
+  de-duplicate, capped at 12, invalid numbers filtered because this runs on
+  every page load), pinned surahs, bookmark removal, and resolving the initial
+  translator from `mushaf.tr` + the `mushaf.safavi-default.v1` opt-in marker.
+  `page.tsx` still owns the `useState` and the `mushaf.*` writes, so the values
+  keep their existing lifecycle and persistence timing; only the arithmetic
+  lives here. See `src/lib/reader-settings.test.ts` and
+  `tests/e2e/reader-settings.spec.cjs`.
+- `src/lib/study-anchors.ts`: `anchorOptions(kind, surah, source, personal)` —
+  the single place that decides which entity a study note can be anchored to
+  (verse, root, lemma, form, or context). It was inline in `StudyNotebook.tsx`
+  and untested; the notebook now just renders what this returns.
+  `src/lib/study.ts` holds the workspace model and its invariants
+  (`validPartition`, `moveBoundary`, `splitContext`, `mergeContext`,
+  `validateStudy`, `upsertNote`) — keep new study logic there or in
+  `study-anchors.ts`, not back in the component. Coverage:
+  `src/lib/study-anchors.test.ts`, `tests/e2e/study-anchors.spec.cjs`.
 - `src/app/study/`: the standalone study-notebook route (`/study/taha`, Surah 20
   — **Surah Taha, not Maryam** — see "Data facts" below).
 - `public/data/`: Quran text, translations, roots, fonts. Read-only from the
   app's perspective; see "Quranic data integrity" below.
+
+### Feature-change workflow (required for every change)
+
+Every feature or behavior change starts by answering *where it lives*, in this
+order. A change that cannot name its owning module for each part is not ready
+to be written.
+
+1. **Name the owning module first.** Use the module map above. If no existing
+   module owns the concern, decide where it belongs (and say so in the
+   commit/PR) before writing code — do not let new logic drift into whatever
+   file you already have open.
+2. **Pure domain decisions go in `src/lib/`.** Rules, arithmetic, routing
+   decisions, validation — framework-free, with a co-located `*.test.ts`
+   (see "Required testing"). React state and DOM access do not belong here.
+3. **Stateful feature orchestration goes in a cohesive hook or component**
+   under `src/components/quran/`, sized to one concern (see `useComparison`,
+   `useReaderPresentation` for the shape). The hook is the wiring around the
+   `src/lib` decision — it should add state and effects, not new rules.
+4. **`src/app/page.tsx` coordinates; it must not accumulate feature logic.**
+   It composes hooks/components and owns only the state several features share
+   through the navigation seams. New reading-screen features land as a new
+   hook/component — characterization spec landed first — never as fresh inline
+   `useState`/`useEffect` in `page.tsx`.
+5. **Do not duplicate ownership.** Before adding state, persistence, routing
+   or a helper, check whether it already exists: state (which hook owns it),
+   persistence (`mushaf.*` writes live with their owning hook), routing
+   (URL/history is `useReadingRoute`'s alone), utilities (`grep` `src/lib`
+   first). Prefer wiring the existing owner over re-implementing it.
+6. **Before modifying a shared module, know its blast radius.** List its
+   consumers (`grep -rl "<module>" src`) and the specs that pin its behavior
+   (each module entry above names them). Run those specs before and after the
+   change; if you cannot explain the delta, revert.
+7. **Every new feature and behavior change ships with a test** — a
+   characterization test *first* when touching fragile orchestration (URL/
+   history, persistence, native bridges, offline). See "Required testing" for
+   the exact commands.
+8. **Do not create a hook or abstraction by default.** If ownership is already
+   clear and a simpler change inside the existing module suffices, do that.
+   Extract only when a cohesive cluster with one responsibility actually
+   exists (the recent-surahs memory staying in `page.tsx` — see
+   `useReaderPresentation`'s header — is the documented counter-example).
+9. **Protected surfaces are never renegotiated by a refactor:** Quran source
+   data (`public/data/**` — content changes are a separate review), offline
+   behavior (`public/sw.js` + the generated manifest, see
+   "Platform-specific constraints"), native integrations (`native-*.ts`
+   message shapes), and storage contracts (`localStorage` keys are append
+   only — new key, never rename or repurpose).
 
 ### Data facts (verified, do not re-derive from assumption)
 
@@ -222,31 +362,72 @@ add a second instance without discussing it first.
 
 ## Known technical debt (tracked, not yet fixed)
 
-- `src/app/page.tsx` concentrates most reading-screen state (~40 `useState`)
-  and scattered URL/history-sync effects. Planned mitigation: incremental hook
-  extraction (e.g. `useReadingRoute`), each with a characterization test
-  landed first — not a single big rewrite.
+- `src/app/page.tsx` is down to ~648 lines and ~24 `useState` of genuine
+  orchestration state (selection, data loading, recitation session, drawers,
+  navigation seams) after five extractions, each landed with a
+  characterization spec first: URL/history/reading-position into
+  `useReadingRoute`, search orchestration into `useSearchNavigation`, range
+  comparison into `useComparison`, presentation settings into
+  `useReaderPresentation`, and the splash lifecycle into `useStartupSplash`
+  (plus `AudioToolbarButton` and the deduplicated `RootPanel` mount). What
+  remains is state several features legitimately share through the navigation
+  seams; splitting it further would add indirection without reducing the
+  screen's knowledge. Any future extraction should follow the same
+  test-first pattern — never a big rewrite.
 - `react-hooks/exhaustive-deps` and `react-hooks/purity` are disabled
   repo-wide in `eslint.config.mjs`. Other React Compiler-aware hooks rules
   (`refs`, `set-state-in-effect`, `preserve-manual-memoization`) are **not**
-  disabled and currently surface 27 real diagnostics across 13 files
+  disabled and currently surface 18 real diagnostics across 10 files
   (`page.tsx`, `ContinuousMushaf.tsx`, `QuranSearch.tsx`, `RootPanel.tsx`,
   `SurahPull.tsx`, `AnalysisSections.tsx`, `DictationInput.tsx`,
-  `IshtiqaqiMeaning.tsx`, `MaqayisMeaning.tsx`, `OccurrencePicker.tsx`,
-  `QuickSurahSearch.tsx`, `RangeComparison.tsx`, `ReleaseNotesDialog.tsx`,
-  `useRecitationMediaSession.ts`). These are two recurring, intentional
+  `QuickSurahSearch.tsx`, `RangeComparison.tsx`,
+  `useRecitationMediaSession.ts`). Composition: 7
+  `refs`, 9 `set-state-in-effect`, 2 `preserve-manual-memoization`.
+  These are two recurring, intentional
   patterns — "latest ref" (`const r = useRef(x); r.current = x` during
   render, so a callback/effect can read the newest value without
   re-subscribing) and "reset state at the top of an effect that then loads
-  async data" — not accidental bugs. `bun run lint` is left non-zero on
+  async data" or "read an external store / unsupported-API probe only after
+  mount" — not accidental bugs. `bun run lint` is left non-zero on
   purpose rather than suppressed: fixing each requires rewriting the
   surrounding effect (e.g. moving the reset into an event handler, or
   switching to a key-based remount) with a characterization test proving no
   behavior change, file by file, not a rule-level `"off"`.
+  Files fixed this way so far: `MaqayisMeaning.tsx` and
+  `IshtiqaqiMeaning.tsx` scoped their disclosure state to the root it was
+  opened for (`expandedFor === root`) instead of resetting it in the loading
+  effect — and since `RootMeaning` already keys those components by
+  `${book.id}:${root}`, the reset was dead code (their replacement coverage is
+  `tests/e2e/root-dictionaries.spec.cjs`); `page.tsx` converted `pullArrival`
+  from a render-read ref into state and derived `startupLeaving` instead of
+  setting it in an effect (coverage: `tests/e2e/react-ref-defects.spec.cjs`);
+  `OccurrencePicker.tsx` moved its scroll-memory reset from render into an
+  effect keyed on the group (same spec); and the remaining reset-on-identity
+  sites now use React's documented render-time adjust-state pattern instead
+  of effects, each pinned by a characterization spec landed first: the
+  panel-maximize reset (`tests/e2e/panel-max.spec.cjs`), the search facet
+  reset (`tests/e2e/search-facets.spec.cjs`), the release-notes pagination
+  reset (`tests/e2e/release-notes.spec.cjs`), the form-tab fallback
+  (`tests/e2e/analysis-form-tab.spec.cjs`), the occurrence-filter retune and
+  the copy-link feedback reset in QuranSearch (covered by
+  `tests/e2e/search-orchestration.spec.cjs` and the new
+  `tests/e2e/search-copy-link.spec.cjs`). Note the compiler aborts analysis
+  for a whole component on a single `refs` violation, so fixing one can
+  unmask further diagnostics in the same file — re-check counts after such
+  fixes. What remains was re-triaged: the SSR-safe mount reads
+  (`AnalysisSections` localStorage, `DictationInput` SpeechRecognition)
+  would need a `useSyncExternalStore`/lazy-init rewrite with real hydration
+  risk, and the rest are the two documented patterns above.
+- `RangeComparison.tsx` sorts its memoized rows with `.slice().sort(...)` rather
+  than in place. The React Compiler still reports two
+  `preserve-manual-memoization` diagnostics there (it cannot prove `from`/`to`
+  are not mutated later); do not "fix" those by dropping the memoization —
+  the in-place mutation really was a bug and the copy is the point.
 - `src/lib/study-store.ts` (IndexedDB read/write for the study workspace) has
-  no direct test coverage; only the pure logic in `src/lib/study.ts` is
-  tested. Add characterization tests for `loadStudy`/`saveStudy` before
-  refactoring this file.
+  direct characterization coverage in `src/lib/study-store.test.ts` (fake
+  IndexedDB via `fake-indexeddb`, one fresh module instance per test because
+  the module keeps top-level state). The pure logic in `src/lib/study.ts` has
+  its own, separate test file.
 
 ## Definition of Done
 

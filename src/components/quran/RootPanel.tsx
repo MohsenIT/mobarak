@@ -167,7 +167,16 @@ function RootPanelContent({
     return () => { live = false }
   }, [formTarget])
 
-  useEffect(() => { if (tab === 'form' && formAvailable === false) setTab('word') }, [tab, formAvailable])
+  // A restored 'form' tab falls back to the word tab once the load proves the
+  // selected word has no form — adjusted here during render (React's
+  // adjust-state pattern) instead of in an effect, so the panel never shows an
+  // inactive strip for a frame. switchTab already refuses to enter 'form'
+  // while it is unavailable, so this only ever fires on the load transition.
+  const [seenFormAvailable, setSeenFormAvailable] = useState(formAvailable)
+  if (formAvailable !== seenFormAvailable) {
+    setSeenFormAvailable(formAvailable)
+    if (formAvailable === false && tab === 'form') setTab('word')
+  }
 
   const switchTab = (key: AnalysisTab) => {
     if (key === tab || (key === 'form' && !formAvailable) || (key === 'root' && !rootAvailable)) return

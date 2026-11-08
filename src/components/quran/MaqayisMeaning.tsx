@@ -33,11 +33,14 @@ export default function MaqayisMeaning({ root }: { root: string }) {
   const [state, setState] = useState<{ root: string; entry?: Entry | null; error?: boolean }>({ root })
   const [preview, setPreview] = useState<{root: string; text: string} | null>(null)
   useEffect(() => { let live = true; rootSummaries('maqayis', root).then(rows => { if (live) setPreview({root, text: rows.map(row => row.summary).filter(Boolean).join(' ')}) }).catch(() => {}); return () => { live = false } }, [root])
-  const [expanded, setExpanded] = useState(false)
-  const [arabic, setArabic] = useState(false)
+  // These two are scoped to the root they were opened for, so switching root
+  // closes them without needing a reset at the top of the loading effect.
+  const [expandedFor, setExpandedFor] = useState<string | null>(null)
+  const [arabicFor, setArabicFor] = useState<string | null>(null)
+  const expanded = expandedFor === root
+  const arabic = arabicFor === root
   useEffect(() => {
     let live = true
-    setExpanded(false); setArabic(false)
     load(root).then(entry => { if (live) setState({ root, entry }) }).catch(() => { if (live) setState({ root, error: true }) })
     return () => { live = false }
   }, [root])
@@ -66,16 +69,16 @@ export default function MaqayisMeaning({ root }: { root: string }) {
   return <section aria-label={t("ui.25622dd345")} className="rounded-xl border p-3 mb-4 text-sm leading-7" style={{ borderColor: 'var(--line)' }}>
     {entry ? <>
       <RootBookHeading book="maqayis" expanded={expanded} summary={entry.summary} source={source}
-        onToggle={() => { setExpanded(value => !value); setArabic(false) }} />
+        onToggle={() => { setExpandedFor(expanded ? null : root); setArabicFor(null) }} />
       {expanded && <div>
         {entry.provenance.translationScope === 'author-and-editorial' && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>{t("ui.a9f13320d9")}</p>}
         {entry.provenance.translationKind === 'partial-reference-entry' && <p className="text-xs mt-2" style={{ color: 'var(--ink-soft)' }}>{t("ui.8f62241adf")}</p>}
         <TahqiqText text={entry.fa} />
-        <button type="button" aria-expanded={arabic} className="inline-flex items-center gap-1 text-xs py-2 mt-2 cursor-pointer" onClick={() => setArabic(value => !value)}>
+        <button type="button" aria-expanded={arabic} className="inline-flex items-center gap-1 text-xs py-2 mt-2 cursor-pointer" onClick={() => setArabicFor(arabic ? null : root)}>
           {arabic ? t("ui.cc9729c600") : t("ui.4cf44c4f5c")}<ChevronDown aria-hidden="true" size={16} className={`transition-transform duration-200 ${arabic ? 'rotate-180' : ''}`} />
         </button>
         {arabic && <p dir="rtl" lang="ar" className="mt-2 whitespace-pre-wrap break-words text-justify">{entry.ar}</p>}
       </div>}
-    </> : state.error && preview?.root === root ? <><RootBookHeading book="maqayis" expanded={expanded} summary={preview.text} onToggle={() => setExpanded(value => !value)} />{expanded && <p className="text-xs">{t("ui.84557ada04")}</p>}</> : <p><strong>{t("ui.5ac12abae1")}{' '}</strong><span className="text-xs" style={{ color: 'var(--ink-soft)' }}>{state.error && state.root === root ? t("ui.921e6df6ca") : entry === null ? unavailable.has(root) ? t("ui.d8d0c75ad5") : t("ui.be62721bd3") : t("ui.0cfb741f7a")}</span></p>}
+    </> : state.error && preview?.root === root ? <><RootBookHeading book="maqayis" expanded={expanded} summary={preview.text} onToggle={() => setExpandedFor(expanded ? null : root)} />{expanded && <p className="text-xs">{t("ui.84557ada04")}</p>}</> : <p><strong>{t("ui.5ac12abae1")}{' '}</strong><span className="text-xs" style={{ color: 'var(--ink-soft)' }}>{state.error && state.root === root ? t("ui.921e6df6ca") : entry === null ? unavailable.has(root) ? t("ui.d8d0c75ad5") : t("ui.be62721bd3") : t("ui.0cfb741f7a")}</span></p>}
   </section>
 }

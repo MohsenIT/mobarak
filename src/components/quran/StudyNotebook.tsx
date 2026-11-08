@@ -23,8 +23,8 @@ import {
   type NoteAnchor,
   type StudyNote,
 } from "@/lib/study";
-import { loadSurah, toFa, morphologyLabel, type SurahData } from "@/lib/quran";
-import { lemmaDisplay } from "@/lib/lemma-display";
+import { loadSurah, toFa, type SurahData } from "@/lib/quran";
+import { anchorOptions } from "@/lib/study-anchors";
 const kinds = ["verse", "root", "lemma", "form", "context"] as const;
 const targetLabel = (kind: NoteKind) =>
   st(kind === "context" ? "noteContext" : kind);
@@ -67,44 +67,10 @@ export default function StudyNotebook() {
         document.documentElement.dataset.theme = theme;
     } catch {}
   }, []);
-  const options = useMemo(() => {
-    if (!surah || !work) return [];
-    if (noteKind === "verse")
-      return surah.v.map((v) => ({
-        key: String(v.n),
-        label: `${st("verse")} ${toFa(v.n)}`,
-      }));
-    if (noteKind === "context")
-      return [
-        ...source.ranges.map((c, i) => ({
-          key: `s20:${c.id}`,
-          label: `${st("source")} · ${st("context", { n: i + 1 })}`,
-        })),
-        ...work.contexts.map((c, i) => ({
-          key: c.id,
-          label: `${st("personal")} · ${c.title || st("context", { n: i + 1 })}`,
-        })),
-      ];
-    const rows = surah.v
-      .flatMap((v) => v.w)
-      .flatMap((w) =>
-        noteKind === "root" && w.r
-          ? [{ key: w.r, label: w.r }]
-          : noteKind === "lemma" && w.lemma
-            ? [{ key: w.lemma, label: lemmaDisplay(w.lemma) }]
-            : noteKind === "form" && w.r && w.form
-              ? [
-                  {
-                    key: `${w.r}:${w.form}`,
-                    label: `${w.r} · ${morphologyLabel(w.form)}`,
-                  },
-                ]
-              : [],
-      );
-    return [...new Map(rows.map((row) => [row.key, row])).values()].sort(
-      (a, b) => a.label.localeCompare(b.label, "ar"),
-    );
-  }, [surah, work, noteKind]);
+  const options = useMemo(
+    () => (surah && work ? anchorOptions(noteKind, surah, source.ranges, work.contexts) : []),
+    [surah, work, noteKind],
+  );
   useEffect(() => {
     if (options.length && !options.some((option) => option.key === noteKey))
       setNoteKey(options[0].key);

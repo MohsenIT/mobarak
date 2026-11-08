@@ -42,10 +42,12 @@ export default function IshtiqaqiMeaning({ root }: { root: string }) {
   const [state, setState] = useState<{ root: string; data?: Definition | null; error?: boolean }>({ root })
   const [preview, setPreview] = useState<{root: string; text: string} | null>(null)
   useEffect(() => { let live = true; fetch('/data/ishtiqaqi-summaries.json').then(r => r.json()).then(rows => { if (live) setPreview({root, text: rows[root]?.summary || ''}) }).catch(() => {}); return () => { live = false } }, [root])
-  const [expanded, setExpanded] = useState(false)
+  // Scoped to the root it was opened for, so a root change closes it without a
+  // reset at the top of the loading effect.
+  const [expandedFor, setExpandedFor] = useState<string | null>(null)
+  const expanded = expandedFor === root
   useEffect(() => {
     let live = true
-    setExpanded(false)
     load(root).then(data => { if (live) setState({ root, data }) }).catch(() => { if (live) setState({ root, error: true }) })
     return () => { live = false }
   }, [root])
@@ -53,7 +55,7 @@ export default function IshtiqaqiMeaning({ root }: { root: string }) {
   const summary = data?.entries.find(entry => entry.translation?.summary)?.translation?.summary
   return <section aria-label={t("ui.761913287f")} className="rounded-xl border p-3 mb-4 text-sm leading-7" style={{ borderColor: 'var(--line)' }}>
     <RootBookHeading book="ishtiqaqi" expanded={expanded} summary={summary || (preview?.root === root ? preview.text : '') || (data ? t("ui.62d9d3f5e8") : undefined)}
-      source={data?.entries[0] ? ishtiqaqiSource(data.entries[0]) : undefined} onToggle={() => setExpanded(value => !value)} />
+      source={data?.entries[0] ? ishtiqaqiSource(data.entries[0]) : undefined} onToggle={() => setExpandedFor(expanded ? null : root)} />
     {state.error && state.root === root ? expanded && <p className="text-xs">{t("ui.84557ada04")}</p>
       : data === undefined ? <p role="status" className="text-xs">{t("ui.0cfb741f7a")}</p>
         : data === null ? <p className="text-xs" style={{ color: 'var(--ink-soft)' }}>{t("ui.bf6915cea1")}</p>

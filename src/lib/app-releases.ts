@@ -3,6 +3,13 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.68',date:'2026-11-08',title:'بازآفرینی صفحهٔ قرائت',changeKinds:['improvement','improvement','improvement','improvement'],changes:[
+    'معماری صفحهٔ قرائت از پایه بازآرایی شد: جایگاه مطالعه، جست‌وجو، مقایسهٔ ریشه‌ای و تنظیمات هر یک در ماژول خودِ خود هستند؛ نتیجه، جابه‌جایی روان‌تر، بدون پرش و چشمک است.',
+    'بازگشت به عقب و جلو دقیقاً به همان جایگاه مطالعه برمی‌گردد؛ پیوند عمیق آیه و تازه‌سازی صفحه نیز جای شما را نگه می‌دارند.',
+    'کلید تغییر حالت نمایش (مصحف/سیاری) به صفحهٔ تنظیمات منتقل شد تا همهٔ ترجیح‌های نمایش در یک جا باشند.',
+    'پنل تحلیل پس از هر بستن به اندازهٔ نیم‌صفحه باز می‌گردد، فیلترهای جست‌وجو با پرس‌وجوی تازه پاک می‌شوند و فهرست تکرارها جای پیمایشِ هر آیه را به یاد می‌سپارد.',
+  ],
+},{
   version:'0.4.67',date:'2026-11-05',title:'مرجع چسبیده به متن انتخاب',changeKinds:['fix'],changes:[
     'چیپ مرجع بلافاصله پس از متن انتخاب‌شده می‌آید؛ پیش‌نمایش فضای خالی میان متن و مرجع ایجاد نمی‌کند و اندازه‌گیری متن از فضای واقعی هدر انجام می‌شود.',
   ],

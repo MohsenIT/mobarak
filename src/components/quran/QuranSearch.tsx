@@ -102,23 +102,45 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const formLabels = searchFormLabels(rawResults)
   const results = filterSearchFacets(rawResults, facets)
   const facetIdentity = JSON.stringify([query, mode, includeRoots, occurrenceFilter, surahs])
-  const previousFacetIdentity = useRef(facetIdentity)
-  useEffect(() => {
-    if (previousFacetIdentity.current !== facetIdentity) { setLemmas([]); setForms([]); previousFacetIdentity.current = facetIdentity }
-  }, [facetIdentity])
+  // Changing the search identity (query, mode, filters, scope) drops the facet
+  // selections so stale filters never follow the reader into a new search.
+  // Adjusting state here during render — instead of in an effect — also means
+  // the old facets never filter the new results for a single frame.
+  const [seenFacetIdentity, setSeenFacetIdentity] = useState(facetIdentity)
+  if (seenFacetIdentity !== facetIdentity) {
+    setSeenFacetIdentity(facetIdentity)
+    setLemmas([])
+    setForms([])
+  }
   const linkState: SearchLinkState = { query, mode, ...(isNavigationInput(query)?{contextSurah:restored?.contextSurah??currentSurah}:{}), surahs, lemmas, forms, includeRoots, includePartial, includeNear, showTranslation, translator, occurrence: occurrenceFilter ?? null }
   const linkStateKey = JSON.stringify(linkState)
-  useEffect(() => { if (open) { onStateChange?.(JSON.parse(linkStateKey)); setCopyStatus('') } }, [open, linkStateKey, onStateChange])
+  // The copy-link feedback is dropped whenever the search state changes while
+  // the page is open — adjusted here during render instead of inside the
+  // parent-sync effect below, so the stale "copied" chip never paints for a
+  // frame (and the effect keeps only the external synchronization).
+  const copyResetKey = `${open}:${linkStateKey}`
+  const [seenCopyResetKey, setSeenCopyResetKey] = useState(copyResetKey)
+  if (seenCopyResetKey !== copyResetKey) {
+    setSeenCopyResetKey(copyResetKey)
+    if (open) setCopyStatus('')
+  }
+  useEffect(() => { if (open) onStateChange?.(JSON.parse(linkStateKey)) }, [open, linkStateKey, onStateChange])
 
   const valid = !!occurrenceFilter || normalizeQuranSearch(query).replace(/\s/g, '').length >= 2
   const scopeKey = surahs.join(',')
   const canExpandRoots = occurrenceFilter ? !!occurrenceFilter.root && occurrenceFilter.part !== 'prefix' : !normalizeQuranSearch(query).includes(' ')
 
-  useEffect(() => {
-    if (occurrenceFilter && !restored) {
-      setIncludeNear(false); setIncludeRoots(occurrenceFilter.tab === 'root'); setQuery('')
-    }
-  }, [occurrenceFilter])
+  // A newly handed-over occurrence filter retunes the search options (it has
+  // its own criterion, so near-matches are off, root-expansion follows the
+  // filter's tab, and the query is emptied). Adjusted here during render
+  // instead of in an effect, so a mount with a filter never paints the untuned
+  // state; `undefined` as the initial "seen" value makes a mount WITH a filter
+  // act, exactly like the effect did, while a mount without one stays put.
+  const [seenOccurrence, setSeenOccurrence] = useState<AnalysisSelection | null | undefined>(occurrenceFilter === null ? null : undefined)
+  if (seenOccurrence !== occurrenceFilter) {
+    setSeenOccurrence(occurrenceFilter)
+    if (occurrenceFilter && !restored) { setIncludeNear(false); setIncludeRoots(occurrenceFilter.tab === 'root'); setQuery('') }
+  }
   useEffect(() => () => worker.current?.terminate(), [])
   useEffect(() => {
     if (!open) return
