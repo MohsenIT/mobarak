@@ -6,6 +6,7 @@ import { writeVerseAddress, readingUrl, readVerseAddress } from '@/lib/verse-lin
 import { readStored, writeStored } from '@/lib/reader-storage'
 import { clampScale, rememberSurah, removeBookmark, resolveInitialTranslator, stepScale, togglePinnedSurah } from '@/lib/reader-settings'
 import { useReadingRoute } from '@/components/quran/useReadingRoute'
+import { useStartupSplash } from '@/components/quran/useStartupSplash'
 import { useComparison } from '@/components/quran/useComparison'
 import { useSearchNavigation } from '@/components/quran/useSearchNavigation'
 import type { ReadingMode } from '@/lib/reading-route'
@@ -118,15 +119,13 @@ export default function Home() {
   /** Translations are stored with the key they were loaded for. */
   const [flowTransState, setFlowTransState] = useState<{ key: string; data: Translations } | null>(null)
   const [loadingPage, setLoadingPage] = useState(true)
-  const [startupComplete, setStartupComplete] = useState(false)
-  const [startupMinimumElapsed, setStartupMinimumElapsed] = useState(false)
-  /** Holding the splash pauses its departure; releasing lets it carry on. */
-  const [startupHeld, setStartupHeld] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setStartupMinimumElapsed(true), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+  const segs = useMemo(() => (meta ? meta.pages[page - 1] || [] : []), [meta, page])
+  // The splash starts leaving as soon as the first screen is really ready; a
+  // reader holding it pauses that departure. Both live in useStartupSplash.
+  const startupReady = !!meta && !loadingPage &&
+    (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))
+  const splash = useStartupSplash(startupReady)
+  const { complete: startupComplete, leaving: startupLeaving, setHeld: setStartupHeld } = splash
   const [mushafContentRevision, setMushafContentRevision] = useState(0)
   const onMushafContentReady = useCallback(() => setMushafContentRevision(n => n + 1), [])
   const [audioOpen, setAudioOpen] = useState(false)
@@ -190,7 +189,6 @@ export default function Home() {
   }, [scale])
   useEffect(() => { writeStored('mushaf.marks', bookmarks) }, [bookmarks])
 
-  const segs = useMemo(() => (meta ? meta.pages[page - 1] || [] : []), [meta, page])
   const curSurahN = mode === 'mushaf' ? (desktopSurah&&segs.some(segment=>segment.s===desktopSurah)?desktopSurah:segs[0]?.s??1) : surah
   useEffect(() => {
     if (!meta || loadingPage) return
@@ -247,20 +245,6 @@ export default function Home() {
       .catch(()=>{if(live)setFlowTransState({key:flowTransKey,data:{}})})
     return()=>{live=false}
   },[mode,surah,translator,flowTransKey])
-
-  // The splash starts leaving as soon as the first screen is really ready, and
-  // a reader holding it pauses that departure — both were effects that only
-  // mirrored state computed here.
-  const startupReady = !!meta && !loadingPage &&
-    (mode === 'flow' ? flowSurah?.n === surah : segs.every(seg => pageData.has(seg.s)))
-  const startupLeaving = !startupComplete && startupMinimumElapsed && startupReady && !startupHeld
-
-  useEffect(() => {
-    if (!startupLeaving || startupHeld) return
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const timer = setTimeout(() => setStartupComplete(true), reduced ? 0 : 180)
-    return () => clearTimeout(timer)
-  }, [startupLeaving, startupHeld])
 
   // flash cleanup
   useEffect(() => {
