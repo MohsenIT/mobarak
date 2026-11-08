@@ -4,9 +4,10 @@ import {t,useUiLanguage} from '@/lib/i18n'
 import {LanguageOnboarding} from '@/components/quran/LanguageSettings'
 import { writeVerseAddress, readingUrl, readVerseAddress } from '@/lib/verse-link'
 import { readStored, writeStored } from '@/lib/reader-storage'
-import { clampScale, rememberSurah, removeBookmark, resolveInitialTranslator, stepScale, togglePinnedSurah } from '@/lib/reader-settings'
+import { clampScale, rememberSurah, removeBookmark, stepScale, togglePinnedSurah } from '@/lib/reader-settings'
 import { useReadingRoute } from '@/components/quran/useReadingRoute'
 import { useStartupSplash } from '@/components/quran/useStartupSplash'
+import { useReaderPresentation } from '@/components/quran/useReaderPresentation'
 import { useComparison } from '@/components/quran/useComparison'
 import { useSearchNavigation } from '@/components/quran/useSearchNavigation'
 import type { ReadingMode } from '@/lib/reading-route'
@@ -28,7 +29,6 @@ import RecitationPlayer,{type RecitationTransportStatus} from '@/components/qura
 import { useComparisonHold } from '@/components/quran/useComparisonHold'
 import {revealReadingTarget,revealReadingVerse} from '@/lib/reading-visibility'
 import CarStudySync from '@/components/quran/CarStudySync'
-import {syncNativeAppearance} from '@/lib/native-appearance'
 import { useVisibleSelection } from '@/components/quran/useVisibleSelection'
 import QuranClipboard from '@/components/quran/QuranClipboard'
 import NavDrawer, { type Translator } from '@/components/quran/NavDrawer'
@@ -53,12 +53,10 @@ export default function Home() {
   const [knownPersianReader]=useState(()=>readStored('mushaf.safavi-default.v1',false)&&['s','f','a','m'].includes(readStored('mushaf.tr','s')))
   const [desktopPaneWidths] = useState(() => ({ navigation: clamp(readStored('mushaf.desktop-navigation-width', 300), 240, 420), analysis: clamp(readStored('mushaf.desktop-analysis-width', 360), 280, 520) }))
   const [meta, setMeta] = useState<Meta | null>(null)
-  const [showTrans, setShowTrans] = useState(() => readStored('mushaf.showTrans', false))
-  const [theme, setTheme] = useState<'paper' | 'night'>(() => readStored('mushaf.theme', 'paper'))
-  const [translator, setTranslator] = useState<Translator>(() => resolveInitialTranslator(readStored('mushaf.tr', 's'), readStored('mushaf.safavi-default.v1', false)))
-  const [scale, setScale] = useState(() => readStored('mushaf.scale', 1))
-  const [bookmarks, setBookmarks] = useState<number[]>(() => readStored('mushaf.marks', []))
-  const [pinnedSurahs, setPinnedSurahs] = useState<number[]>(() => readStored('mushaf.pinned-surahs', []))
+  // Presentation preferences (theme, translation, scale, bookmarks, pins) and
+  // their mushaf.* persistence live in useReaderPresentation.
+  const presentation = useReaderPresentation()
+  const { showTrans, setShowTrans, theme, setTheme, translator, setTranslator, scale, setScale, bookmarks, setBookmarks, pinnedSurahs, setPinnedSurahs } = presentation
   const [recentSurahs, setRecentSurahs] = useState<number[]>(() => readStored('mushaf.recent-surahs', []))
   const [drawerView, setDrawerView] = useState<'navigation' | 'tools'>('navigation')
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -171,23 +169,12 @@ export default function Home() {
   const pinchRef = useRef<{ d: number; s: number } | null>(null)
 
   useEffect(() => { loadMeta().then(setMeta) }, [])
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    document.documentElement.style.colorScheme = theme==='night'?'dark':'light'
-    void syncNativeAppearance(theme)
-    writeStored('mushaf.theme', theme)
-  }, [theme])
+  // The splash and the theme share the theme-color meta tag: the splash's
+  // paper tone while it is up, the reading theme's paper once it is gone.
   useEffect(() => {
     const color = !startupComplete ? '#faf4df' : getComputedStyle(document.documentElement).getPropertyValue('--paper').trim()
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color)
   }, [theme, startupComplete])
-  useEffect(() => { writeStored('mushaf.showTrans', showTrans) }, [showTrans])
-  useEffect(() => { writeStored('mushaf.tr', translator); writeStored('mushaf.safavi-default.v1', true) }, [translator])
-  useEffect(() => {
-    const timer = window.setTimeout(() => writeStored('mushaf.scale', scale), 200)
-    return () => window.clearTimeout(timer)
-  }, [scale])
-  useEffect(() => { writeStored('mushaf.marks', bookmarks) }, [bookmarks])
 
   const curSurahN = mode === 'mushaf' ? (desktopSurah&&segs.some(segment=>segment.s===desktopSurah)?desktopSurah:segs[0]?.s??1) : surah
   useEffect(() => {
