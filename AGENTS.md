@@ -150,6 +150,53 @@ add a second instance without discussing it first.
 - `public/data/`: Quran text, translations, roots, fonts. Read-only from the
   app's perspective; see "Quranic data integrity" below.
 
+### Feature-change workflow (required for every change)
+
+Every feature or behavior change starts by answering *where it lives*, in this
+order. A change that cannot name its owning module for each part is not ready
+to be written.
+
+1. **Name the owning module first.** Use the module map above. If no existing
+   module owns the concern, decide where it belongs (and say so in the
+   commit/PR) before writing code — do not let new logic drift into whatever
+   file you already have open.
+2. **Pure domain decisions go in `src/lib/`.** Rules, arithmetic, routing
+   decisions, validation — framework-free, with a co-located `*.test.ts`
+   (see "Required testing"). React state and DOM access do not belong here.
+3. **Stateful feature orchestration goes in a cohesive hook or component**
+   under `src/components/quran/`, sized to one concern (see `useComparison`,
+   `useReaderPresentation` for the shape). The hook is the wiring around the
+   `src/lib` decision — it should add state and effects, not new rules.
+4. **`src/app/page.tsx` coordinates; it must not accumulate feature logic.**
+   It composes hooks/components and owns only the state several features share
+   through the navigation seams. New reading-screen features land as a new
+   hook/component — characterization spec landed first — never as fresh inline
+   `useState`/`useEffect` in `page.tsx`.
+5. **Do not duplicate ownership.** Before adding state, persistence, routing
+   or a helper, check whether it already exists: state (which hook owns it),
+   persistence (`mushaf.*` writes live with their owning hook), routing
+   (URL/history is `useReadingRoute`'s alone), utilities (`grep` `src/lib`
+   first). Prefer wiring the existing owner over re-implementing it.
+6. **Before modifying a shared module, know its blast radius.** List its
+   consumers (`grep -rl "<module>" src`) and the specs that pin its behavior
+   (each module entry above names them). Run those specs before and after the
+   change; if you cannot explain the delta, revert.
+7. **Every new feature and behavior change ships with a test** — a
+   characterization test *first* when touching fragile orchestration (URL/
+   history, persistence, native bridges, offline). See "Required testing" for
+   the exact commands.
+8. **Do not create a hook or abstraction by default.** If ownership is already
+   clear and a simpler change inside the existing module suffices, do that.
+   Extract only when a cohesive cluster with one responsibility actually
+   exists (the recent-surahs memory staying in `page.tsx` — see
+   `useReaderPresentation`'s header — is the documented counter-example).
+9. **Protected surfaces are never renegotiated by a refactor:** Quran source
+   data (`public/data/**` — content changes are a separate review), offline
+   behavior (`public/sw.js` + the generated manifest, see
+   "Platform-specific constraints"), native integrations (`native-*.ts`
+   message shapes), and storage contracts (`localStorage` keys are append
+   only — new key, never rename or repurpose).
+
 ### Data facts (verified, do not re-derive from assumption)
 
 - Surah 19 = مریم (Maryam). Surah 20 = طه (Taha). The study workspace
