@@ -24,6 +24,18 @@ test('shared occurrence picker preserves the selected lemma and its scope contra
  const highlight=picker.locator('[data-highlight-state="selected"]').first();await expect(highlight).toHaveCSS('text-decoration-line','none');await expect(highlight).toHaveCSS('box-shadow','none');
  await expect(trigger).toHaveCSS('outline-style','none');
 });
+test('only the current occurrence row has a faint background',async({page})=>{
+ const trigger=await open(page,20,20,1);await trigger.click();
+ const picker=page.locator('[data-analysis-picker]');
+ const selected=picker.locator('.analysis-position-option[aria-current="true"]');
+ const other=picker.locator('.analysis-position-option:not([aria-current])').first();
+ await expect(selected).toHaveCSS('border-radius','0px');
+ const list=picker.locator('.occurrence-picker-list');
+ await expect(list).toHaveCSS('padding-left','0px');
+ await expect(list).toHaveCSS('padding-right','0px');
+ await expect(selected).not.toHaveCSS('background-color',await other.evaluate(el=>getComputedStyle(el).backgroundColor));
+ await expect(selected.locator('.analysis-occurrence-reference')).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
+});
 for(const [scope,s] of [['surah','20'],['quran',null]])test(`${scope} scope preserves the lemma criterion and searches the requested surahs`,async({page})=>{
  const trigger=await open(page);await trigger.click();await page.locator(`[data-occurrence-scope="${scope}"]`).click();
  await expect(page.locator('[data-search-page]')).toBeVisible();

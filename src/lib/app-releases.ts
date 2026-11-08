@@ -4,7 +4,7 @@ export interface AppRelease { version:string; date:string; title:string; changes
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
   version:'0.4.69',date:'2026-11-08',title:'چیپ‌های محدوده و آدرس انتخاب فعلی',changeKinds:['improvement'],changes:[
-    'چیپ‌های جمع‌وجور محدوده از آیکن‌های کتاب تأییدشده استفاده می‌کنند و آدرس آیهٔ انتخاب‌شده در فهرست موارد برجسته‌تر نمایش داده می‌شود.',
+    'چیپ‌های جمع‌وجور محدوده از آیکن‌های کتاب تأییدشده استفاده می‌کنند و ردیف انتخاب‌شده با هایلایت کم‌رنگ، مستطیلی و سرتاسری مشخص می‌شود.',
   ],
 },{
   version:'0.4.68',date:'2026-11-08',title:'بازآفرینی صفحهٔ قرائت',changeKinds:['improvement','improvement','improvement','improvement'],changes:[
