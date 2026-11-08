@@ -12,6 +12,7 @@ import { AyahMarker } from './Ornaments'
 import QuranText from './QuranText'
 import QuranHighlight from './QuranHighlight'
 import type {OccurrenceScope} from '@/lib/occurrence-scope'
+import SearchScopeIcon from './SearchScopeIcon'
 
 export type PickerOperation = 'exact' | 'similarity'
 
@@ -48,7 +49,7 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
           <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.searchIn')}</span>
           <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.searchIn')}>
             {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).filter(([scope]) => scopes.includes(scope)).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
-              disabled={!surah} onClick={() => { onOpenChange(false); onFull(scope) }}>{t(key)}</button>)}
+              disabled={!surah} onClick={() => { onOpenChange(false); onFull(scope) }}><SearchScopeIcon scope={scope} /><span>{t(key)}</span></button>)}
           </div>
         </div>}
         <button type="button" className="occurrence-picker-close" aria-label={t("ui.510fc4baec")} onClick={() => onOpenChange(false)}><X size={18} /></button>

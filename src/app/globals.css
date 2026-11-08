@@ -1151,6 +1151,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 
 .analysis-position-option.has-excerpt { display: grid; grid-template-columns: 76px minmax(0, 1fr); overflow: hidden; }
 .analysis-occurrence-reference { font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
+.analysis-position-option[aria-current="true"] .analysis-occurrence-reference { color:var(--ink); background:var(--word-selected); border:1px solid var(--line-strong); border-radius:8px; padding:4px 6px; font-weight:700; }
 .analysis-position-option[aria-current="true"] { background: transparent; box-shadow: none; }
 @media (max-width: 380px) { .analysis-unit-button svg { display: none; } .analysis-navigation { gap: 2px; padding-inline: 5px; } .analysis-repeat-button { font-size: 11px; } }
 
@@ -1519,11 +1520,16 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 @media (max-width:380px){.analysis-unit-title{max-width:100%;}.analysis-navigation .analysis-repeat-button{font-size:10px;padding-inline:1px;}.panel-selection{min-width:5ch;}}
 
 /* Scope choices are a compact control row, never a detached second line. */
-.occurrence-picker-heading{display:flex;align-items:center;gap:6px;}
+.occurrence-picker-heading{display:flex;align-items:center;gap:6px;padding:4px 8px;}
 .occurrence-picker-heading>.occurrence-search-scopes{display:flex;align-items:center;gap:6px;min-width:0;flex:1;}
 .occurrence-search-label{display:inline-flex;flex:none;white-space:nowrap;}
-.occurrence-search-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;min-width:0;flex:1;}
-.occurrence-picker-heading .occurrence-search-shortcut{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.occurrence-search-chips{display:flex;gap:4px;min-width:0;flex:0 0 auto;}
+.occurrence-picker-heading .occurrence-search-shortcut{display:inline-flex;direction:rtl;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:32px;border-radius:9px;padding:3px 5px;margin:0;white-space:nowrap;color:var(--ink);}
+.occurrence-search-shortcut>svg{width:20px;height:20px;flex:none;}
+.occurrence-search-shortcut>span{white-space:nowrap;}
+[data-theme='night'] .occurrence-search-shortcut{color:#fff;}
+.occurrence-search-shortcut:focus-visible{outline:2px solid var(--sage);outline-offset:2px;}
+@media(min-width:1024px){.occurrence-picker-heading .occurrence-search-shortcut{font-size:12px;}}
 .occurrence-picker-close{flex:none;}
 
 
