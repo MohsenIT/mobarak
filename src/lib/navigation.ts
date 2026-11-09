@@ -30,6 +30,21 @@ function findSurah(meta: Meta, query: string) {
   const matches = searchSurahs(meta, query)
   return matches.length === 1 ? matches[0] : undefined
 }
+/** A named surah plus an ayah number, in either order. Exact names/aliases
+ * avoid turning arbitrary text ending in a number into a reading command. */
+function namedAyah(meta:Meta,input:string):Destination|null {
+  const value=commandText(input)
+  const forward=value.match(/^([^\d،,]+?)\s*[،,]?\s*(\d+)$/)
+  const reverse=value.match(/^(\d+)\s*[،,]?\s*([^\d،,]+)$/)
+  if(!forward&&!reverse)return null
+  const name=forward?forward[1]:reverse![2]
+  const number=forward?forward[2]:reverse![1]
+  const key=nameKey(name.trim())
+  const candidates=meta.surahs.filter(s=>surahKeys(s).includes(key))
+  if(candidates.length!==1)return null
+  const s=candidates[0],a=Number(number)
+  return Number.isInteger(a)&&a>=1&&a<=s.vc?{kind:'verse',s:s.n,a}:null
+}
 const longPrefixes: Record<string,JumpKind> = { سوره:'surah', صفحه:'page', جزء:'juz', جز:'juz', آیه:'verse', ایه:'verse', سیاق:'context' }
 const shortPrefixes: Record<string,JumpKind> = { س:'surah', ص:'page', ج:'juz', آ:'verse', ا:'verse', ق:'context' }
 const commandText = (value:string) => normalizeDigits(value).normalize('NFC').replace(/[\u200c\u200d]/g,' ').replace(/[۰-۹]/g,d=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[\u064B-\u065F\u0670]/g,'').replace(/ة/g,'ه').replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[أإٱ]/g,'ا').trim()
@@ -60,6 +75,10 @@ export function resolveDestination(meta: Meta, kind: JumpKind, input: string, cu
   let value=command?.value??input.trim()
   kind=command?.kind??kind
   if (!value) return null
+  if(!command&&kind==='surah'){
+    const named=namedAyah(meta,value)
+    if(named)return named
+  }
   if(kind==='surah'&&/[:：/]/.test(value))kind='verse'
   if (kind === 'surah') {
     const edge=command||/^\d+$/.test(normalizeSearch(value))?indexNumber(value,114):NaN
@@ -94,6 +113,10 @@ export function destinationSuggestions(meta: Meta, input: string, currentSurah: 
   if (!value) return []
   const label = (d: Destination) => d.kind==='context'?t('ui.6aa4f95889',{p0:(d.index),p1:(meta.surahs[d.s-1]?.fa),p2:(d.from),p3:(d.to)}):d.kind==='surah'?t('ui.0eb0a3f03f',{p0:(meta.surahs[d.s-1]?.fa)}):d.kind==='page'?t('ui.f9119fddb7',{p0:(d.p)}):t('ui.fde7db4d85',{p0:(meta.surahs[d.s-1]?.fa),p1:(d.a)})
   const command=jumpCommand(value)
+  if(!command){
+    const named=namedAyah(meta,value)
+    if(named)return [{destination:named,label:label(named)}]
+  }
   if (command || /[:：/]/.test(value)) {
     const destination = resolveDestination(meta, /[:：/]/.test(value) ? 'verse' : 'surah', value, currentSurah)
     const juz=command?.kind==='juz'?indexNumber(command.value,30):undefined
@@ -112,7 +135,7 @@ export function destinationSuggestions(meta: Meta, input: string, currentSurah: 
 }
 /** Search bars expose explicit jump commands without stealing ordinary word searches. */
 export function searchDestinations(meta:Meta,input:string,currentSurah:number) {
-  return isNavigationInput(input)?destinationSuggestions(meta,input,currentSurah):[]
+  return isNavigationInput(input)||namedAyah(meta,input)?destinationSuggestions(meta,input,currentSurah):[]
 }
 
 export const NAVIGATION_HELP = [

@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.70',date:'2026-11-09',title:'رفتن به آیه با نام سوره',changeKinds:['feature'],changes:[
+    'نوشتن نام سوره و شمارهٔ آیه با فاصله، بدون فاصله یا ویرگول و با هر ترتیب، مقصد آیه را در کادر برو پیشنهاد می‌کند؛ مانند انعام۳۷ یا ۳۷ انعام.',
+  ],
+},{
   version:'0.4.69',date:'2026-11-08',title:'چیپ‌های محدوده و آدرس انتخاب فعلی',changeKinds:['improvement'],changes:[
     'چیپ‌های جمع‌وجور محدوده از آیکن‌های کتاب تأییدشده استفاده می‌کنند و ردیف انتخاب‌شده با هایلایت کم‌رنگ، مستطیلی و سرتاسری مشخص می‌شود.',
   ],
