@@ -1,0 +1,21 @@
+const {test,expect}=require('@playwright/test');
+test('history opens above settings and update checking still works after closing it',async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem('mubarak.ui-language.v1','fa'));
+ const version=await(await page.request.get('/api/version')).json();
+ await page.route('**/api/version',r=>r.fulfill({json:version}));
+ await page.goto('/s/1');
+ await page.locator('.reader-toolbar button[aria-label="تنظیمات"]').click();
+ const screen=page.locator('.settings-screen');
+ await screen.locator('.settings-screen-tabs button',{hasText:'درباره ما'}).click();
+ await screen.getByRole('button',{name:'تاریخچهٔ نسخه‌ها'}).click();
+ const dialog=page.locator('.release-notes-dialog');
+ await expect(dialog).toBeVisible();
+ expect(await dialog.evaluate(e=>{const r=e.getBoundingClientRect();return e.contains(document.elementFromPoint(r.x+r.width/2,r.y+30))})).toBe(true);
+ await dialog.locator('.release-action-secondary').click();
+ await expect(dialog).not.toBeVisible();
+ await screen.getByRole('button',{name:'بررسی به‌روزرسانی'}).click();
+ await expect(screen.locator('[role="status"]')).toHaveText('برنامه به‌روز است.');
+ await screen.getByRole('button',{name:'تاریخچهٔ نسخه‌ها'}).click();
+ await expect(dialog).toBeVisible();
+ await dialog.locator('.release-action-secondary').click();
+});

@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.72',date:'2026-11-10',title:'رفع مسدودشدن تنظیمات با تاریخچهٔ نسخه‌ها',changeKinds:['fix'],changes:[
+    'پنجره‌های مشترک بالاتر از صفحهٔ تنظیمات باز می‌شوند تا تاریخچهٔ نسخه‌ها قابل استفاده باشد و کنترل بررسی به‌روزرسانی پشت پنجرهٔ مخفی مسدود نشود.',
+  ],
+},{
   version:'0.4.71',date:'2026-11-10',title:'بسم‌الله و مکث هنگام بارگذاری صوت',changeKinds:['fix'],changes:[
     'بسم‌الله پیش از آیهٔ اول سوره‌ها پخش می‌شود؛ فاتحه دوباره‌خوانی ندارد و توبه بدون بسم‌الله آغاز می‌شود.',
     'دکمهٔ بالای صفحه هنگام بارگذاری، مکث قابل‌کلیک در حلقهٔ چرخان نشان می‌دهد؛ مکث بارگذاری را لغو می‌کند و نوار پخش باز می‌ماند.',
