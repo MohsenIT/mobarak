@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { nextRecitation, recitationUrl, recitationSourceUrl, RECITERS } from './recitation'
+import { nextRecitation, recitationUrl, recitationSourceUrl, RECITERS, needsOpeningBasmalah } from './recitation'
+test('opening basmalah belongs only before verse one outside Fatiha and Tawbah',()=>{
+ for(let s=1;s<=114;s++){
+  expect(needsOpeningBasmalah(s,1)).toBe(s!==1&&s!==9)
+  expect(needsOpeningBasmalah(s,2)).toBe(false)
+ }
+})
 describe('recitation playback',()=>{
   test('uses Minshawi verse URLs supplied by provider',()=>{
     expect(recitationUrl(20,72)).toBe('https://verses.quran.com/Minshawi/Murattal/mp3/020072.mp3')

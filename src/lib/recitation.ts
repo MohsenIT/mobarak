@@ -7,6 +7,8 @@ export const AUDIO_TRANSLATIONS=translationAudio as (Reciter&{language:string})[
 export const AUDIO_SOURCES=[...RECITERS,...AUDIO_TRANSLATIONS]
 export const RECITER: Reciter = RECITERS[0]
 export const AUDIO_ORIGIN = 'https://verses.quran.com'
+/** Fatiha already contains it as ayah 1; Tawbah has no opening basmalah. */
+export function needsOpeningBasmalah(surah:number,ayah:number){return ayah===1&&surah!==1&&surah!==9}
 export function recitationSourceUrl(surah:number,ayah:number,reciter:Reciter=RECITER) {
   if(!Number.isInteger(surah)||surah<1||surah>114||!Number.isInteger(ayah)||ayah<1||ayah>286)throw new Error('invalid-location')
   const file=`${String(surah).padStart(3,'0')}${String(ayah).padStart(3,'0')}.mp3`

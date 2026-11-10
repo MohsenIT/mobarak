@@ -131,6 +131,7 @@ export default function Home() {
   const [audioControlsVisible,setAudioControlsVisible]=useState(true)
   const [audioStatus,setAudioStatus]=useState<RecitationTransportStatus>('idle')
   const [audioPlayRequest,setAudioPlayRequest]=useState(0)
+  const [audioPauseRequest,setAudioPauseRequest]=useState(0)
   const [audioVerse, setAudioVerse] = useState<{s:number;a:number}|null>(null)
   const [playbackTarget, setPlaybackTarget] = useState<{s:number;a:number}|null>(null)
   const [panelMax, setPanelMax] = useState(false)
@@ -500,6 +501,7 @@ export default function Home() {
           status={audioStatus}
           onOpen={() => { setAudioControlsVisible(true); setAudioOpen(true) }}
           onCollapse={() => setAudioControlsVisible(false)}
+          onCancelLoading={() => setAudioPauseRequest(value=>value+1)}
           onExpandAndResume={() => { setAudioControlsVisible(true); if (audioStatus !== 'loading') setAudioPlayRequest(value => value + 1) }}
         />
 
@@ -517,7 +519,7 @@ export default function Home() {
       </header>
 
       <LanguageOnboarding knownPersianReader={knownPersianReader} onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
-      <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => { setAudioOpen(false); setAudioVerse(null) }} onFollow={(s,a) => goVerse(s,a)} />
+      <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} pauseRequest={audioPauseRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => { setAudioOpen(false); setAudioVerse(null) }} onFollow={(s,a) => goVerse(s,a)} />
 
       {search.returnToSearch && !search.advancedOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>

@@ -12,7 +12,7 @@ async function setup(page){
   localStorage.setItem('mubarak.ui-language.v1','fa');
   localStorage.setItem('mushaf.safavi-default.v1','true');
   // Stub media playback so opening the player needs no real audio.
-  HTMLMediaElement.prototype.play=function(){this.dispatchEvent(new Event('canplay'));return Promise.resolve()};
+  HTMLMediaElement.prototype.play=function(){this.dispatchEvent(new Event('canplay'));this.dispatchEvent(new Event('play'));return Promise.resolve()};
  });
  await page.route('**/api/version',r=>r.fulfill({json:{version:'fixture',releases:[]}}));
  await page.route('**/offline-manifest.json',r=>r.fulfill({json:{groups:{core:[]}}}));

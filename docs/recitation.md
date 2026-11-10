@@ -97,3 +97,15 @@ recording. All 135 ayahs of Taha were downloaded (9,116,544 bytes), then Taha73 
 played with networking disabled. Cached Taha72 was reused during download and
 switching reciters showed independent download status. This validates the local
 production server, not the live Vercel deployment or an Android device.
+
+## Opening basmalah and loading cancellation
+
+Web playback inserts the selected reciter's Fatiha 1 audio before ayah 1 of
+surahs other than 1 and 9. This is a separate opening phase: its completion
+loads the requested ayah without advancing the verse counter or translation.
+The Android media-source factory prepends the same recording inside the first
+ayah's concatenated source, preserving queue indices and the ayah media ID.
+
+During loading, both transport buttons remain actionable and show a pause icon
+inside the loading ring. Pause clears autoplay intent, aborts the pending
+request and leaves the controls open. Explicit play starts a fresh request.

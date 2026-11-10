@@ -181,6 +181,11 @@ public class QuranCarNavigationTest {
     androidx.media3.exoplayer.source.MediaSource paired=new QuranVerseMediaSourceFactory(base,item->translation).createMediaSource(verse);
     assertEquals(Arrays.asList("https://verses.quran.com/Minshawi/Murattal/mp3/020072.mp3",translation),requested);assertEquals(verse.mediaId,paired.getMediaItem().mediaId);
     requested.clear();new QuranVerseMediaSourceFactory(base,item->null).createMediaSource(verse);assertEquals(1,requested.size());
+    requested.clear();MediaItem first=children("s/minshawi-murattal/20").get(0);
+    androidx.media3.exoplayer.source.MediaSource opening=new QuranVerseMediaSourceFactory(base,item->null).createMediaSource(first);
+    assertEquals(Arrays.asList("https://verses.quran.com/Minshawi/Murattal/mp3/001001.mp3","https://verses.quran.com/Minshawi/Murattal/mp3/020001.mp3"),requested);
+    assertEquals(first.mediaId,opening.getMediaItem().mediaId);
+    for(int s:new int[]{1,9}){requested.clear();new QuranVerseMediaSourceFactory(base,item->null).createMediaSource(children("s/minshawi-murattal/"+s).get(0));assertEquals(1,requested.size());}
     option("translation","translation-fa-fooladvand");assertEquals("translation-fa-fooladvand",field("translationAudioId"));
     try{option("translation","https://example.com/audio.mp3");fail();}catch(InvocationTargetException expected){}assertEquals("translation-fa-fooladvand",field("translationAudioId"));
     option("translation","off");assertEquals("",field("translationAudioId"));

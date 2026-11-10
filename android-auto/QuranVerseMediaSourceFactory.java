@@ -20,8 +20,20 @@ final class QuranVerseMediaSourceFactory implements MediaSource.Factory {
   @Override public MediaSource.Factory setLoadErrorHandlingPolicy(LoadErrorHandlingPolicy p){base.setLoadErrorHandlingPolicy(p);return this;}
   @Override public int[] getSupportedTypes(){return base.getSupportedTypes();}
   @Override public MediaSource createMediaSource(MediaItem item){
-    String uri=translation.apply(item);if(uri==null)return base.createMediaSource(item);
+    String uri=translation.apply(item);
+    String[] parts=item.mediaId.split("/");
+    boolean opening=parts.length==4&&parts[0].equals("v")&&parts[3].equals("1")&&!parts[2].equals("1")&&!parts[2].equals("9")&&item.localConfiguration!=null;
+    if(uri==null&&!opening)return base.createMediaSource(item);
+    ConcatenatingMediaSource2.Builder sequence=new ConcatenatingMediaSource2.Builder().setMediaItem(item).setMediaSourceFactory(base);
+    if(opening){
+      String source=item.localConfiguration.uri.toString();
+      int slash=source.lastIndexOf('/');
+      MediaItem basmalah=item.buildUpon().setMediaId("v/"+parts[1]+"/1/1").setUri(source.substring(0,slash+1)+"001001.mp3").build();
+      sequence.add(basmalah,6000);
+    }
+    sequence.add(item,Math.max(1,quranDuration.applyAsLong(item)));
+    if(uri==null)return sequence.build();
     MediaItem translated=item.buildUpon().setMediaId(item.mediaId+"#translation").setUri(uri).build();
-    return new ConcatenatingMediaSource2.Builder().setMediaItem(item).setMediaSourceFactory(base).add(item,Math.max(1,quranDuration.applyAsLong(item))).add(translated,Math.max(1,translationDuration.applyAsLong(item))).build();
+    return sequence.add(translated,Math.max(1,translationDuration.applyAsLong(item))).build();
   }
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { AudioLines, LoaderCircle, Play } from 'lucide-react'
+import { AudioLines, LoaderCircle, Pause, Play } from 'lucide-react'
 import { t } from '@/lib/i18n'
 import type { RecitationTransportStatus } from './RecitationPlayer'
 
@@ -24,6 +24,7 @@ export default function AudioToolbarButton({
   onOpen,
   onCollapse,
   onExpandAndResume,
+  onCancelLoading,
 }: {
   open: boolean
   controlsVisible: boolean
@@ -34,17 +35,20 @@ export default function AudioToolbarButton({
   onCollapse: () => void
   /** Show the controls again and resume if the transport is not loading. */
   onExpandAndResume: () => void
+  onCancelLoading: () => void
 }) {
   const handleClick = () => {
     if (!open) onOpen()
+    else if (status === 'loading') onCancelLoading()
+    else if (status === 'paused') onExpandAndResume()
     else if (controlsVisible) onCollapse()
     else onExpandAndResume()
   }
   return (
     <button
       className="icon-btn"
-      aria-label={!open ? t('ui.facfd50c31') : controlsVisible ? t('ui.feabb65c6a') : status === 'playing' ? t('ui.7851ddb1df') : t('ui.f432f383bf')}
-      title={!open ? t('ui.1f7cc9473a') : controlsVisible ? t('ui.0b17cf0f81') : t('ui.0884ec3e62')}
+      aria-label={open && status === 'loading' ? t('ui.fe2e1906b8') : open && status === 'paused' ? t('ui.1f7cc9473a') : !open ? t('ui.facfd50c31') : controlsVisible ? t('ui.feabb65c6a') : status === 'playing' ? t('ui.7851ddb1df') : t('ui.f432f383bf')}
+      title={open && status === 'loading' ? t('ui.fe2e1906b8') : !open || status === 'paused' ? t('ui.1f7cc9473a') : controlsVisible ? t('ui.0b17cf0f81') : t('ui.0884ec3e62')}
       aria-expanded={open && controlsVisible}
       aria-busy={status === 'loading'}
       style={open ? { color: 'var(--sage)', background: 'var(--word-root)' } : undefined}
@@ -55,8 +59,8 @@ export default function AudioToolbarButton({
           {[0, 1, 2, 3, 4].map(i => <i key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
         </span>
       ) : status === 'loading' && open ? (
-        <LoaderCircle size={20} className="recitation-start-spinner animate-spin" />
-      ) : open && controlsVisible ? (
+        <span className="relative inline-flex items-center justify-center" aria-hidden="true"><LoaderCircle size={24} className="recitation-start-spinner animate-spin" /><Pause size={10} className="absolute" fill="currentColor" /></span>
+      ) : open && controlsVisible && status !== 'paused' ? (
         <AudioLines size={20} />
       ) : (
         <Play size={20} fill="currentColor" />
