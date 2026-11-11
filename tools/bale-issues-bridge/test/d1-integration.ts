@@ -4,12 +4,12 @@ import { readFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const secret = 'local-integration-secret-'.repeat(3);
 const mf = new Miniflare(convertV4MiniflareOptions({
-  modules: true, scriptPath: 'dist/worker.js', compatibilityDate: '2026-11-09',
+  modules: true, scriptPath: 'dist/bridge-worker.js', compatibilityDate: '2026-11-09',
   d1Databases: { DB: 'probe' }, bindings: { BALE_WEBHOOK_SECRET: secret, ADMIN_SECRET: secret }
 }));
 try {
   const db = await mf.getD1Database('DB');
-  for (const file of ['0001_phase_zero.sql','0002_bridge.sql']) await db.exec((await readFile('migrations/'+file, 'utf8')).replaceAll('\n', ' '));
+  for (const file of ['0001_phase_zero.sql','0002_bridge.sql','0003_transport.sql']) await db.exec((await readFile('migrations/'+file, 'utf8')).replaceAll('\n', ' '));
   const post = () => mf.dispatchFetch(`https://probe.test/webhooks/bale/${secret}`, {
     method: 'POST', body: JSON.stringify({ update_id: 99, message: {
       message_id: 10, chat: { type: 'group', id: 5 }, text: 'PRIVATE', from: { id: 111 },
