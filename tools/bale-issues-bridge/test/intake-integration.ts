@@ -28,9 +28,9 @@ try{
   throw Error('Unexpected synthetic route '+url.pathname);
  };
  const bridge=new Bridge(env),intake=new Intake(bridge);let event=0;
- async function message(text:string,user=1,extra:Record<string,unknown>={}){const u={update_id:++event,message:{message_id:event,from:{id:user},chat:{id:user,type:'private'},text,...extra}};queries=0;await bridge.onBale(u);assert.ok(queries<=45,'private message D1 query budget: '+queries);return u;}
+ async function message(text:string,user=1,extra:Record<string,unknown>={}){const u={update_id:++event,message:{message_id:event,from:{id:user},chat:{id:user,type:'private'},text,...extra}};queries=0;await bridge.onBale(u);assert.ok(queries<=40,'private message D1 query budget: '+queries);return u;}
  async function current(user=1){return await db.prepare('SELECT * FROM conversations WHERE user_id=? ORDER BY updated_at DESC,rowid DESC LIMIT 1').bind(user).first<Conversation>();}
- async function click(action:string,user=1,arg?:string,c?:Conversation){c??=await current(user);const u:IntakeUpdate={update_id:++event,callback_query:{id:'q'+event,from:{id:user},message:{message_id:1,chat:{id:user,type:'private'}},data:`i:${action}:${c!.id}:${c!.revision}${arg?':'+arg:''}`}};queries=0;await intake.handle(u);assert.ok(queries<=45,'callback D1 query budget: '+queries);return u;}
+ async function click(action:string,user=1,arg?:string,c?:Conversation){c??=await current(user);const u:IntakeUpdate={update_id:++event,callback_query:{id:'q'+event,from:{id:user},message:{message_id:1,chat:{id:user,type:'private'}},data:`i:${action}:${c!.id}:${c!.revision}${arg?':'+arg:''}`}};queries=0;await intake.handle(u);assert.ok(queries<=40,'callback D1 query budget: '+queries);return u;}
  const first=await message('وقتی توی موبایل روی واژه می‌زنم و پنل تحلیل رو می‌بندم، جای مطالعه‌ام گم می‌شه.');
  let c=(await current())!;assert.equal(c.state,'preview');assert.equal(c.questions,0);assert.equal(issues,0);
  await bridge.onBale(first);assert.equal((await current())!.context.split('وقتی').length,2,'replayed user input must not append twice');

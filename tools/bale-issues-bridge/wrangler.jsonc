@@ -29,7 +29,8 @@
     "AI_REPORT_BUDGET_TOMAN": "0",
     "AI_MODEL": "gemini-3.1-flash-lite",
     "AI_INPUT_TOMAN_PER_MILLION": "800",
-    "AI_OUTPUT_TOMAN_PER_MILLION": "4600"
+    "AI_OUTPUT_TOMAN_PER_MILLION": "4600",
+    "BALE_TRANSPORT": "polling"
   },
   "triggers": {
     "crons": [

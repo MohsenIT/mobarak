@@ -78,7 +78,8 @@ export default {
  async scheduled(_event:unknown,env:BridgeEnv,ctx:Context):Promise<void>{
   ctx.waitUntil((async()=>{
    await pollBale(env);
-   await drain(env,2);
+   if(new Date().getUTCMinutes()!==0){await drain(env,2);return;}
+   // Cleanup runs hourly in a separate invocation budget from report processing.
    const cutoff=Math.floor(Date.now()/1000)-7*86400;
    await execute(env.DB,'DELETE FROM drafts WHERE expires_at<?',cutoff);
    if(env.INTAKE_ENABLED==='true'){
