@@ -11,7 +11,7 @@
     {
       "binding": "DB",
       "database_name": "bridge-db",
-      "database_id": "47b1bc8b-ec61-4fbe-ac87-e0a4b0309a85",
+      "database_id": "9acc5aa2-62ca-4b6a-b0b8-00c12c961bbb",
       "migrations_dir": "migrations"
     }
   ],
@@ -21,11 +21,20 @@
     "BALE_GROUP_ID": "4961157767",
     "BALE_CHANNEL_USERNAME": "mobarak_issues",
     "BALE_BOT_ID": "1025805170",
-    "BRIDGE_ENABLED": "true"
+    "BRIDGE_ENABLED": "true",
+    "INTAKE_ENABLED": "true",
+    "PUBLIC_BASE_URL": "https://mobarak-issues-bridge.mobarak-issues-cbf441aa.workers.dev",
+    "GITHUB_GOVERNANCE_READY": "true",
+    "AI_ENABLED": "false",
+    "AI_REPORT_BUDGET_TOMAN": "0",
+    "AI_MODEL": "gemini-3.1-flash-lite",
+    "AI_INPUT_TOMAN_PER_MILLION": "800",
+    "AI_OUTPUT_TOMAN_PER_MILLION": "4600"
   },
   "triggers": {
     "crons": [
       "* * * * *"
     ]
-  }
+  },
+  "preview_urls": false
 }

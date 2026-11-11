@@ -21,7 +21,7 @@ input_data = None
 # Use an allowlist to avoid exposing secrets through command arguments.
 if len(args) == 3 and args[:2] == ['secret','put']:
     files = {'BALE_WEBHOOK_SECRET':'bale-webhook-secret','ADMIN_SECRET':'admin-secret',
-             'GITHUB_WEBHOOK_SECRET':'github-webhook-secret','BALE_TOKEN':'bale-token','GITHUB_TOKEN':'github-token'}
+             'GITHUB_WEBHOOK_SECRET':'github-webhook-secret','BALE_TOKEN':'bale-token','GITHUB_TOKEN':'github-token','AI_API_TOKEN':'ai-api-token'}
     if args[2] not in files: sys.exit('Unknown project secret')
     input_data = (root / '.secrets' / files[args[2]]).read_text().strip().encode()
 result = subprocess.run([str(node), str(root / 'node_modules/wrangler/bin/wrangler.js'), *args],

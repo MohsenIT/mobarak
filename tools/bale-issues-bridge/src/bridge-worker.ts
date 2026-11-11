@@ -1,3 +1,4 @@
+import {mediaResponse} from './attachments.ts';
 import {Bridge,drain,type BridgeEnv} from './bridge.ts';
 import {execute,rows,one} from './db.ts';
 import {secretMatches,verifyGitHubSignature} from './security.ts';
@@ -16,6 +17,7 @@ async function admin(request:Request,env:BridgeEnv,ctx:Context,path:string):Prom
  if(!await secretMatches(request.headers.get('Authorization')?.replace(/^Bearer /,'')??'',env.ADMIN_SECRET))return json({error:'not_found'},404);
  if(path==='/admin/status'&&request.method==='GET'){
   return json({events:await rows(env.DB,'SELECT id,source,kind,state,attempts,error_code FROM events ORDER BY created_at DESC LIMIT 50'),
+   intake_metrics:env.INTAKE_ENABLED==='true'?await rows(env.DB,"SELECT state,COUNT(*) AS count,SUM(input_tokens) AS input_tokens,SUM(output_tokens) AS output_tokens,SUM(estimated_cost) AS estimated_cost FROM ai_usage GROUP BY state"):[],
    uncertain_effects:await rows(env.DB,"SELECT id,state,updated_at FROM effects WHERE state='uncertain' ORDER BY updated_at DESC LIMIT 50"),
    abuse_reports:await rows(env.DB,"SELECT id,issue_number,reason,state FROM abuse_reports WHERE state='open' ORDER BY created_at DESC LIMIT 50")});
  }
@@ -44,7 +46,8 @@ async function admin(request:Request,env:BridgeEnv,ctx:Context,path:string):Prom
 export default {
  async fetch(request:Request,env:BridgeEnv,ctx:Context):Promise<Response>{
   const path=new URL(request.url).pathname;
-  if(path==='/health'&&request.method==='GET')return json({service:'bale-github-bridge',stage:'bridge',bridge_enabled:env.BRIDGE_ENABLED==='true',bale_transport:env.BALE_TRANSPORT??'webhook'});
+  if(env.INTAKE_ENABLED==='true'&&path.startsWith('/media/')&&request.method==='GET')return mediaResponse(env.DB,path.slice(7));
+  if(path==='/health'&&request.method==='GET')return json({service:'bale-github-bridge',stage:'bridge',bridge_enabled:env.BRIDGE_ENABLED==='true',bale_transport:env.BALE_TRANSPORT??'webhook',intake_enabled:env.INTAKE_ENABLED==='true',ai_enabled:env.AI_ENABLED==='true'&&!!env.AI_API_TOKEN&&!!env.AI_ENDPOINT&&Number(env.AI_REPORT_BUDGET_TOMAN)>0});
   try{
    if(path.startsWith('/admin/'))return await admin(request,env,ctx,path);
    if(request.method!=='POST')return json({error:'not_found'},404);
@@ -78,6 +81,13 @@ export default {
    await drain(env,2);
    const cutoff=Math.floor(Date.now()/1000)-7*86400;
    await execute(env.DB,'DELETE FROM drafts WHERE expires_at<?',cutoff);
+   if(env.INTAKE_ENABLED==='true'){
+    await execute(env.DB,'DELETE FROM intake_inputs WHERE conversation_id IN (SELECT id FROM conversations WHERE expires_at<?)',cutoff);
+    await execute(env.DB,'DELETE FROM intake_attachments WHERE published=0 AND conversation_id IN (SELECT id FROM conversations WHERE expires_at<?)',cutoff);
+    await execute(env.DB,"UPDATE conversations SET context='',report_json='{}',question=NULL,options_json='[]',state=CASE WHEN state='published' THEN state ELSE 'cancelled' END WHERE expires_at<? AND context!=''",cutoff);
+    await execute(env.DB,'UPDATE ai_usage SET result_json=NULL WHERE result_json IS NOT NULL AND conversation_id IN (SELECT id FROM conversations WHERE expires_at<?)',cutoff);
+    await execute(env.DB,'DELETE FROM ai_usage WHERE created_at<?',cutoff-23*86400);
+   }
    await execute(env.DB,"UPDATE events SET payload_json='{}' WHERE created_at<? AND payload_json!='{}'",cutoff);
    await execute(env.DB,"DELETE FROM events WHERE state='done' AND created_at<?",cutoff-23*86400);
    await execute(env.DB,"DELETE FROM probe_events WHERE received_at<datetime('now','-7 days')");

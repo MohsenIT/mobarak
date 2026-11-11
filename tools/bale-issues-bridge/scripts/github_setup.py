@@ -20,7 +20,10 @@ parser=argparse.ArgumentParser();parser.add_argument('action',choices=['labels',
 try:
  if args.action=='labels':
   existing={l['name'].lower() for l in call('/labels?per_page=100')}
-  for name,color,description in [('bug','d73a4a','گزارش خطا'),('suggestion','a2eeef','پیشنهاد قابلیت'),('enhancement','84b6eb','بهبود قابلیت موجود'),('question','d876e3','پرسش')]:
+  required=[('bug','d73a4a','گزارش خطا'),('suggestion','a2eeef','پیشنهاد قابلیت'),('enhancement','84b6eb','بهبود قابلیت موجود'),('question','d876e3','پرسش')]
+  required.extend(('area:'+name,'c5def5','حوزه محصول') for name in ['reader','search','analysis','translation','tafsir','recitation','settings','other'])
+  required.extend([('needs-info','fbca04','نیازمند اطلاعات بیشتر'),('needs-content-review','b60205','نیازمند بررسی متخصص محتوا'),('blocked','cccccc','متوقف')])
+  for name,color,description in required:
    if name not in existing:call('/labels','POST',{'name':name,'color':color,'description':description});print('Created label:',name)
   print('Required labels ready')
  elif args.action=='webhook':

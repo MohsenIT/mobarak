@@ -3,7 +3,9 @@ export const defaultCategories: Category[] = [
  {key:'bug',label:'bug',hashtag:'باگ'},
  {key:'suggestion',label:'suggestion',hashtag:'پیشنهاد'},
  {key:'enhancement',label:'enhancement',hashtag:'بهبود'},
- {key:'question',label:'question',hashtag:'سؤال'}
+ {key:'question',label:'question',hashtag:'سؤال'},
+ {key:'content',label:'needs-content-review',hashtag:'اصلاح_محتوا'},
+ {key:'documentation',label:'documentation',hashtag:'راهنما'}
 ];
 export function categories(value?: string): Category[] {
  if(!value)return defaultCategories;
@@ -46,8 +48,13 @@ export function categoryForIssue(issue:PublicIssue,available:Category[]):Categor
  return available.find(c=>labels.includes(c.label))??classify(issue.title+' '+(issue.body??''),available);
 }
 export function statusText(issue:PublicIssue):string {
+ if(issue.state==='closed'&&issue.state_reason==='duplicate')return '⚪ بسته‌شده — گزارش تکراری';
  if(issue.state==='closed')return issue.state_reason==='not_planned'?'⚪ بسته‌شده — برنامه‌ریزی نشده':'🟢 بسته‌شده — انجام‌شده';
  const labels=issue.labels.map(l=>typeof l==='string'?l:l.name);
+ if(labels.includes('needs-info'))return '🟡 نیاز به اطلاعات بیشتر';
+ if(labels.includes('blocked'))return '⚪ متوقف';
+ if(labels.includes('status:in-review'))return '🟣 در حال بازبینی';
+ if(labels.includes('status:planned'))return '🔵 برنامه‌ریزی‌شده';
  return labels.some(l=>['in progress','in-progress','status:in-progress'].includes(l.toLowerCase()))?'🟠 در حال انجام':'🔵 در حال بررسی';
 }
 export function publicBody(body:string|null):string {
@@ -55,7 +62,9 @@ export function publicBody(body:string|null):string {
 }
 export function channelPost(issue:PublicIssue,available:Category[]):string {
  const category=categoryForIssue(issue,available);
- const description=publicBody(issue.body).replace(/\s+/g,' ').slice(0,1600);
+ const body=publicBody(issue.body);
+ const summary=body.match(/### Summary\s*\n([\s\S]*?)(?=\n### |$)/)?.[1];
+ const description=(summary??body).replace(/\s+/g,' ').slice(0,1000);
  return `#${issue.number} — ${issue.title.slice(0,180)}\n\nدسته: #${category.hashtag}\nوضعیت: ${statusText(issue)}\n\nتوضیح: ${description||'توضیحی ثبت نشده است.'}\n\nGitHub Issue: ${issue.html_url}\n\nگفت‌وگو و مشارکت: بخش «افزودن دیدگاه» همین پست`;
 }
 export function githubComment(text:string,alias:string,marker:string):string {

@@ -1,19 +1,22 @@
+import {Intake} from './intake.ts';
+import type {AIEnv} from './ai-intake.ts';
+import {redact,usefulComment,ui} from './intake-domain.ts';
 import {APIs,Retryable,Rejected,Uncertain} from './api.ts';
 import {execute,one,rows,type Database} from './db.ts';
 import {effect} from './effects.ts';
 import {categories,categoryForIssue,classify,reportTitle,similarity,channelPost,githubComment,toBaleComment,statusText,publicBody,type Category,type PublicIssue} from './domain.ts';
 import {digest,aliasFor} from './security.ts';
 
-export interface BridgeEnv {
+export interface BridgeEnv extends AIEnv {
  DB:Database; BALE_TOKEN:string; GITHUB_TOKEN:string; GITHUB_REPO:string;
  BALE_CHANNEL_ID:string; BALE_GROUP_ID:string; BALE_CHANNEL_USERNAME:string; BALE_BOT_ID:string;
  BALE_WEBHOOK_SECRET:string; GITHUB_WEBHOOK_SECRET:string; ADMIN_SECRET:string;
- CATEGORIES_JSON?:string; BRIDGE_ENABLED?:string; BALE_TRANSPORT?:'webhook'|'polling';
+ INTAKE_ENABLED?:string;PUBLIC_BASE_URL?:string;GITHUB_GOVERNANCE_READY?:string; CATEGORIES_JSON?:string; BRIDGE_ENABLED?:string; BALE_TRANSPORT?:'webhook'|'polling';
 }
 export interface EventRow {id:string;source:string;kind:string;payload_json:string;attempts:number;}
 interface IssueRow {number:number;github_id:number;title:string;body:string|null;labels_json:string;state:string;state_reason:string|null;url:string;channel_post_id:number|null;group_root_id:number|null;canonical_text:string|null;reporter_chat_id:number|null;updated_at:string;}
 interface GitIssue extends PublicIssue {updated_at:string;}
-interface Draft {id:string;user_id:number;chat_id:number;body:string;title:string;category:string;mode:string;target_issue:number|null;candidates_json:string;state:string;issue_number:number|null;expires_at:number;}
+interface Draft {id:string;user_id:number;chat_id:number;body:string;title:string;category:string;mode:string;target_issue:number|null;candidates_json:string;state:string;issue_number:number|null;expires_at:number;report_json?:string|null;}
 interface User {id:number;is_bot?:boolean;username?:string;}
 interface Message {message_id:number;message_thread_id?:number;date?:number;text?:string;from?:User;chat:{id:number;type:string};reply_to_message?:Message;}
 interface BaleUpdate {update_id:number;message?:Message;edited_message?:Message;callback_query?:{id:string;from:User;data?:string;message?:Message};}
@@ -41,7 +44,8 @@ export class Bridge {
  async syncIssue(issue:GitIssue,eventKey:string,reporter?:number):Promise<IssueRow>{
   const old=await one<IssueRow>(this.env.DB,'SELECT * FROM issues WHERE number=?',issue.number);
   if(old&&old.updated_at>issue.updated_at)return old;
-  if(old&&(old.state!==issue.state||old.state_reason!==(issue.state_reason??null)||old.labels_json!==JSON.stringify(issue.labels))){
+  const previous=old?{id:old.github_id,number:old.number,title:old.title,body:old.body,state:old.state,state_reason:old.state_reason,html_url:old.url,labels:JSON.parse(old.labels_json)}:undefined;
+  if(old&&previous&&(statusText(previous)!==statusText(issue)||categoryForIssue(previous,this.available).key!==categoryForIssue(issue,this.available).key)){
    const text=`وضعیت #${issue.number}: ${statusText(issue)}\nدسته: #${categoryForIssue(issue,this.available).hashtag}\n${issue.html_url}`;
    await this.queue('status:'+issue.number+':'+issue.updated_at+':'+(await digest(text)).slice(0,12),'internal','status',{number:issue.number,text});
   }
@@ -132,15 +136,16 @@ export class Bridge {
    await this.say('supplement-result:'+id,draft.chat_id,`توضیح برای #${issue.number} ثبت شد.\n${issue.url}`);return;
   }
   const cat=this.available.find(c=>c.key===draft.category)??this.available[0];
+  const structured=draft.report_json?JSON.parse(draft.report_json) as {type?:string;labels:string[]}:undefined;
   const issue=await effect<GitIssue>(this.env.DB,'github-create:'+id,()=>this.api.github(this.api.repo('/issues'),'POST',{
-   title:draft.title,body:draft.body+`\n\n<!-- mobarak-bridge:report:${id} -->`,labels:[cat.label]
+   title:draft.title,body:draft.body+`\n\n<!-- mobarak-bridge:report:${id} -->`,labels:[cat.label,...(structured&&this.env.GITHUB_GOVERNANCE_READY==='true'?structured.labels:[])],...(structured?.type?{type:structured.type}:{})
   }));
   const saved=await this.syncIssue(issue,'report:'+id,draft.chat_id);
   await execute(this.env.DB,"UPDATE drafts SET state='created',issue_number=? WHERE id=?",issue.number,id);
-  await this.say('report-result:'+id,draft.chat_id,`گزارش #${issue.number} ثبت شد.\n${issue.html_url}\n${this.postLink(saved.channel_post_id!)}\nنتیجه و تغییر وضعیت را همین‌جا دریافت می‌کنید.`);
+  await this.say('report-result:'+id,draft.chat_id,this.env.INTAKE_ENABLED==='true'?`${ui.success}\nشماره گزارش: #${issue.number}\n${this.postLink(saved.channel_post_id!)}`:`گزارش #${issue.number} ثبت شد.\n${issue.html_url}\n${this.postLink(saved.channel_post_id!)}\nنتیجه و تغییر وضعیت را همین‌جا دریافت می‌کنید.`,this.env.INTAKE_ENABLED==='true'?[[{text:ui.view,url:this.postLink(saved.channel_post_id!)},{text:ui.mine,callback_data:'menu:mine'}],[{text:ui.new_short,callback_data:'menu:new'}]]:undefined);
  }
  async createBaleComment(key:string,issue:IssueRow,text:string,userId:number,sourceMessage?:number):Promise<void>{
-  const marker='bale:'+key;const alias=await aliasFor(userId,this.env.ADMIN_SECRET);
+  const marker='bale:'+key;if(this.env.INTAKE_ENABLED==='true')text=redact(text).text;const alias=await aliasFor(userId,this.env.ADMIN_SECRET);
   const comment=await effect<GHComment>(this.env.DB,'github-comment:'+key,()=>this.api.github(this.api.repo(`/issues/${issue.number}/comments`),'POST',{body:githubComment(text,alias,marker)}));
   await execute(this.env.DB,'INSERT OR IGNORE INTO comment_links(source,source_id,issue_number,github_comment_id,bale_message_id) VALUES (?,?,?,?,?)','bale',key,issue.number,comment.id,sourceMessage??null);
   if(!sourceMessage){
@@ -149,6 +154,7 @@ export class Bridge {
   }
  }
  async onBale(update:BaleUpdate):Promise<void>{
+  if(this.env.INTAKE_ENABLED==='true'&&await new Intake(this).handle(update))return;
   if(update.callback_query){await this.callback(update);return;}
   const message=update.message??update.edited_message;
   if(!message)return;
@@ -169,6 +175,10 @@ export class Bridge {
    if(!thread)throw new Retryable('unknown_thread_waiting_for_mirror',60);
    const issue=(await one<IssueRow>(this.env.DB,'SELECT * FROM issues WHERE number=?',thread.issue_number))!;
    const key=`group:${message.chat.id}:${message.message_id}`;
+   if(this.env.INTAKE_ENABLED==='true'){
+    await execute(this.env.DB,'INSERT OR IGNORE INTO participants(user_id,issue_number) VALUES (?,?)',from.id,issue.number);
+    if(!usefulComment(message.text))return;
+   }
    if(update.edited_message){
     const link=await one<{github_comment_id:number}>(this.env.DB,"SELECT github_comment_id FROM comment_links WHERE source='bale' AND source_id=?",key);
     if(!link)return;
@@ -208,7 +218,7 @@ export class Bridge {
   const given=payload.issue as PublicIssue|undefined;
   if(!given||given.pull_request||!safeNumber(given.number))return;
   const issue=await this.issue(given.number);
-  const reportMatch=issue.body?.match(/<!-- mobarak-bridge:report:(d\d+) -->/);
+  const reportMatch=issue.body?.match(/<!-- mobarak-bridge:report:(d[a-z0-9]+) -->/);
   const draft=reportMatch?await one<Draft>(this.env.DB,'SELECT * FROM drafts WHERE id=?',reportMatch[1]):undefined;
   const saved=await this.syncIssue(issue,key,draft?.chat_id);
   if(kind!=='issue_comment')return;
@@ -233,18 +243,24 @@ export class Bridge {
   const payload=JSON.parse(event.payload_json);
   if(event.source==='bale')return this.onBale(payload as BaleUpdate);
   if(event.source==='github')return this.onGitHub(payload as Record<string,unknown>,event.kind,event.id);
+  if(event.kind==='notice'){await this.say('notice:'+event.id,Number(payload.chat_id),payload.text,payload.closed?[[{text:ui.fixed,callback_data:'feedback:fixed:'+payload.number},{text:ui.persists,callback_data:'feedback:persists:'+payload.number}]]:undefined);return;}
   if(event.kind==='sync') {await this.syncIssue(await this.issue(Number(payload.number)),event.id);return;}
   if(event.kind==='status'){
    const issue=await one<IssueRow>(this.env.DB,'SELECT * FROM issues WHERE number=?',payload.number);
    if(!issue?.group_root_id)throw new Retryable('await_group_root',15);
    await effect(this.env.DB,'status-group:'+event.id,()=>this.api.bale('sendMessage',{chat_id:Number(this.env.BALE_GROUP_ID),reply_to_message_id:issue.group_root_id,text:payload.text}));
-   if(issue.reporter_chat_id)await this.say('status-reporter:'+event.id,issue.reporter_chat_id,payload.text);
+   if(this.env.INTAKE_ENABLED==='true'){
+    const subscribers=await rows<{chat_id:number}>(this.env.DB,'SELECT DISTINCT chat_id FROM subscriptions WHERE issue_number=? LIMIT 50',issue.number);
+    const recipients=new Set(subscribers.map(s=>s.chat_id));if(issue.reporter_chat_id)recipients.add(issue.reporter_chat_id);
+    await execute(this.env.DB,`INSERT OR IGNORE INTO events(id,source,kind,payload_json) SELECT 'notice:'||?||':'||value,'internal','notice',json_object('chat_id',value,'number',?,'closed',?,'text',?) FROM json_each(?)`,event.id,issue.number,issue.state==='closed'?1:0,payload.text,JSON.stringify([...recipients]));
+   }else if(issue.reporter_chat_id)await this.say('status-reporter:'+event.id,issue.reporter_chat_id,payload.text);
   }
  }
 }
 
 export async function drain(env:BridgeEnv,limit=2):Promise<void>{
  if(env.BRIDGE_ENABLED!=='true')return;
+ limit=env.INTAKE_ENABLED==='true'?1:limit;
  const bridge=new Bridge(env);
  const ready=await rows<EventRow>(env.DB,"SELECT * FROM events WHERE (state='pending' AND available_at<=?) OR (state='processing' AND lease_until<?) ORDER BY created_at,id LIMIT ?",now(),now(),limit);
  for(const event of ready){
