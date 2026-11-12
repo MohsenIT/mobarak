@@ -1310,13 +1310,15 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .quick-search-status > span:first-child { flex: 1; }
 .quick-search-status button { min-width: 34px; min-height: 32px; display: grid; place-items: center; }
 .quick-search-status button:disabled { opacity: .3; }
-.quick-search-actions { display: flex; align-items: center; gap: 8px; font-size: 11px; padding-bottom: 3px; }
-.quick-search-actions > div { display: flex; gap: 2px; }
+.quick-search-actions { display: flex; align-items: center; gap: 6px; font-size: 11px; padding-bottom: 3px; }
 .quick-search-actions button, .search-mode-tabs button { padding: 6px 9px; border-radius: 8px; }
 .quick-search-actions button[aria-pressed='true'], .search-mode-tabs button[aria-pressed='true'] { background: var(--word-selected); color: var(--ink); }
-.quick-search-actions { gap: 3px; }
-.quick-search-actions > .quick-search-scope { margin-inline-start: auto; flex-shrink: 0; border: 1px solid var(--line); border-radius: 6px; gap: 0; overflow: hidden; }
-.quick-search-scope button { border-radius: 0; padding: 6px; white-space: nowrap; }
+.quick-search-segment { display: inline-flex; align-items: stretch; flex-shrink: 1; min-width: 0; height: 30px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.quick-search-actions .quick-search-segment button { display: inline-flex; align-items: center; justify-content: center; flex: 1 1 auto; min-width: 0; border-radius: 0; padding: 0 6px; white-space: nowrap; }
+.quick-search-segment button > span { overflow: hidden; text-overflow: ellipsis; }
+.quick-search-segment button + button { border-inline-start: 1px solid var(--line); }
+.quick-search-scope { margin-inline-start: auto; }
+.quick-search-actions .quick-search-advanced { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; gap: 4px; height: 30px; padding: 0 6px; border: 1px solid var(--sage); border-radius: 6px; background: var(--word-root); white-space: nowrap; }
 .quick-search-return { padding: 4px 12px; border-bottom: 1px solid var(--line); background: var(--paper); }
 .quick-search-return .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; }
 .search-mode-tabs, .search-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; font-size: 13px; }

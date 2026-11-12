@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.77',date:'2026-11-12',title:'یکدست‌شدن کنترل‌های جست‌وجوی سریع',changeKinds:['improvement'],changes:[
+    'انتخاب متن، ریشه و بُن‌واژه به شکل سگمنت یکپارچه نمایش داده می‌شود؛ پیشرفته با آیکن جست‌وجو در سمت چپ ردیف قرار دارد و همهٔ کنترل‌ها هم‌ارتفاع و هم‌تراز هستند.',
+  ],
+},{
   version:'0.4.76',date:'2026-11-12',title:'محدودهٔ جست‌وجوی سریع و بازگشت به مطالعه',changeKinds:['feature','improvement'],changes:[
     'محدودهٔ این سوره یا کل قرآن در جست‌وجوی سریع ماندگار است؛ چیپ بازگشت و Back مرورگر، محل آغاز مطالعه را پس از پیمایش نتایج بازیابی می‌کنند.',
     'فیلترهای بُن‌واژه و باب تا جایی که در یک ردیف جا دارند نمایش داده می‌شوند؛ دکمهٔ بیشتر فقط هنگام کمبود فضا ظاهر می‌شود.',

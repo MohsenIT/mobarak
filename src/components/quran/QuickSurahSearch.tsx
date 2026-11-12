@@ -3,7 +3,7 @@ import {DictationInput} from './DictationInput'
 import {normalizeDigits} from '@/lib/locale-numbers'
 import {t} from '@/lib/i18n'
 import { useEffect, useRef, useState } from 'react'
-import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight, Search, X } from 'lucide-react'
 import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
 import type { SurahMeta, Meta } from '@/lib/quran'
 import { loadSurah, toFa } from '@/lib/quran'
@@ -110,11 +110,11 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
       <button type="button" disabled={!results.length || busy} aria-label={t(scope === 'quran' ? 'quickSearch.nextResult' : 'ui.3c9bb58eee')} onClick={() => jump(results, (index + 1) % results.length)}><ChevronLeft size={18} /></button>
     </div>
     <div className="quick-search-actions">
-      <div role="group" aria-label={t("ui.5e4040c150")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, title]) => <button type="button" key={key} aria-pressed={key === mode} onClick={() => setMode(key)}>{title}</button>)}</div>
-      <button type="button" onClick={() => expand(scope === 'quran')}>{t("ui.9617b95709")}</button>
-      <div className="quick-search-scope" role="group" aria-label={t('occurrence.searchIn')}>
-        {(['surah','quran'] as const).map(value => <button type="button" key={value} aria-pressed={scope === value} onClick={() => { if (value === 'surah' && scope !== value) setSurah(currentSurah); onScopeChange(value) }}>{t(value === 'surah' ? 'occurrence.thisSurah' : 'occurrence.wholeQuran')}</button>)}
+      <div className="quick-search-mode quick-search-segment" role="group" aria-label={t("ui.5e4040c150")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, title]) => <button type="button" key={key} aria-pressed={key === mode} onClick={() => setMode(key)}><span>{title}</span></button>)}</div>
+      <div className="quick-search-scope quick-search-segment" role="group" aria-label={t('occurrence.searchIn')}>
+        {(['surah','quran'] as const).map(value => <button type="button" key={value} aria-pressed={scope === value} onClick={() => { if (value === 'surah' && scope !== value) setSurah(currentSurah); onScopeChange(value) }}><span>{t(value === 'surah' ? 'occurrence.thisSurah' : 'occurrence.wholeQuran')}</span></button>)}
       </div>
+      <button type="button" className="quick-search-advanced" onClick={() => expand(scope === 'quran')}><Search size={14} aria-hidden="true" />{t("ui.9617b95709")}</button>
     </div>
   </div>
 }
