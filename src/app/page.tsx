@@ -2,7 +2,7 @@
 import {useStudyWorkspace} from '@/lib/study-store'
 import {t,useUiLanguage} from '@/lib/i18n'
 import {LanguageOnboarding} from '@/components/quran/LanguageSettings'
-import { writeVerseAddress, readingUrl, readVerseAddress } from '@/lib/verse-link'
+import { writeVerseAddress, readVerseAddress } from '@/lib/verse-link'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import { clampScale, rememberSurah, removeBookmark, stepScale, togglePinnedSurah } from '@/lib/reader-settings'
 import { useReadingRoute } from '@/components/quran/useReadingRoute'
@@ -68,6 +68,7 @@ export default function Home() {
   const [sel, setSel] = useState<Selection | null>(null)
   const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
   const [flash, setFlash] = useState<{ s: number; a: number; pos: number } | null>(null)
+  const mainRef = useRef<HTMLElement>(null)
   /**
    * The three ways a location can describe the reader. Only the route hook
    * knows a navigation happened; only this screen knows what it means for the
@@ -97,8 +98,10 @@ export default function Home() {
   }, [closeSearch])
   /** A surah or page in the location: only transient selection state is dropped. */
   const clearTransientSelection = useCallback(() => { closeSearch(); setSel(null); setFlash(null) }, [closeSearch])
-  const route = useReadingRoute({ onSearch: applySearchEntry, onVerse: applyVerseEntry, onReading: clearTransientSelection })
-  const { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch } = route
+  const route = useReadingRoute({ onSearch: applySearchEntry, onVerse: applyVerseEntry, onReading: clearTransientSelection,
+    onQuickReturn: () => { clearTransientSelection(); search.setQuickOpen(false); setSearchTarget(null) },
+  }, mainRef)
+  const { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, writeReadingVerse, prepareQuickVisit } = route
   /**
    * QuranSearch's close control: the panel owns its own open flag, but only the
    * route hook knows how to unwind the search URL it wrote.
@@ -156,7 +159,6 @@ export default function Home() {
     followComparisonContext(selection)
   }, [followComparisonContext])
 
-  const mainRef = useRef<HTMLElement>(null)
   useEffect(()=>{
     const app=mainRef.current?.closest<HTMLElement>('.reader-app'),header=app?.querySelector<HTMLElement>('.reader-toolbar')
     if(!app||!header)return
@@ -306,29 +308,28 @@ export default function Home() {
     else setSurah(s)
   }, [mode, requestMushafVerse, setSurah])
 
-  const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start', wholeVerse = true) => {
+  const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start', wholeVerse = true, quick = false) => {
     setPullArrival(null)
+    const isCurrent = quick ? prepareQuickVisit() : () => true
     loadSurah(s).then(d => {
+      if (!isCurrent()) return
       const v = d.v[a - 1]
       if (v) {
         revealVerse(s, a, pos, v.p)
-        writeVerseAddress({ s, a, pos })
+        writeReadingVerse({ s, a, pos }, quick)
         setFlash({ s, a, pos })
         setSearchTarget({ s, a, pos, align, wholeVerse })
       }
     })
-  }, [revealVerse])
+  }, [revealVerse, writeReadingVerse, prepareQuickVisit])
 
-  const navigateDestination = (destination: Destination) => {
+  const navigateDestination = (destination: Destination, quick = false) => {
     search.leaveForReading();setSel(null)
     if(destination.kind==='page') {
-      if(mode==='mushaf') {
-        const url=readingUrl(window.location.href,'mushaf',surah,destination.p,process.env.NEXT_PUBLIC_DESKTOP==='1')
-        if(url.href!==window.location.href)window.history.pushState(window.history.state,'',url)
-      }
+      route.writePageDestination(destination.p, quick)
       goPage(destination.p)
     }
-    else goVerse(destination.s,destination.kind==='surah'?1:destination.kind==='context'?destination.from:destination.a,1,'start')
+    else goVerse(destination.s,destination.kind==='surah'?1:destination.kind==='context'?destination.from:destination.a,1,'start',true,quick)
   }
 
   useEffect(() => {
@@ -481,9 +482,10 @@ export default function Home() {
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
           backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
         }}>
-        {search.quickOpen ? <QuickSurahSearch meta={meta} onNavigate={navigateDestination} surah={meta.surahs[curSurahN - 1]} onClose={() => search.setQuickOpen(false)}
+        {search.quickOpen ? <QuickSurahSearch meta={meta} onNavigate={destination => navigateDestination(destination, true)} surah={meta.surahs[curSurahN - 1]} onClose={() => search.setQuickOpen(false)}
+          scope={search.quickScope} onScopeChange={search.changeQuickScope}
           onHighlights={search.setQuickHighlights}
-          onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false) }}
+          onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false,true) }}
           onAdvanced={search.advance} /> : <>
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><IconMenu /></button>
 
@@ -493,7 +495,7 @@ export default function Home() {
           </span><ChevronDown size={16} aria-hidden="true" />
         </button>
 
-        <button className="icon-btn" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { setSel(null); search.openQuick() }}><Search size={20} /></button>
+        <button className="icon-btn" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { route.captureQuickOrigin(); setSel(null); search.openQuick() }}><Search size={20} /></button>
 
         <AudioToolbarButton
           open={audioOpen}
@@ -521,6 +523,7 @@ export default function Home() {
       <LanguageOnboarding knownPersianReader={knownPersianReader} onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
       <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} pauseRequest={audioPauseRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => { setAudioOpen(false); setAudioVerse(null) }} onFollow={(s,a) => goVerse(s,a)} />
 
+      {route.quickOrigin && !search.advancedOpen && <div className="quick-search-return"><button type="button" className="chip" data-quick-search-return onClick={route.returnFromQuick}><ArrowRight size={14} aria-hidden="true" />{t('quickSearch.returnTo', { p0: meta.surahs[route.quickOrigin.address.s - 1].fa, p1: toFa(route.quickOrigin.address.a) })}</button></div>}
       {search.returnToSearch && !search.advancedOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
           <button type="button" className="chip gap-1.5 py-1.5" onClick={() => { setSel(null); search.setAdvancedOpen(true) }}>

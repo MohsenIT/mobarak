@@ -2,7 +2,7 @@
 
 Two complementary views share the same search engine:
 
-- The toolbar magnifier opens quick search within the current surah: text/substring/phrase, direct root or lemma, verse number, previous/next result, advanced search in the same scope, or expansion to the whole Quran.
+- The toolbar magnifier opens quick search with an inline current-surah / whole-Quran scope segment. It defaults to the current surah and persists the explicit choice under `mushaf.quick-search-scope`. Text/substring/phrase, direct root or lemma, verse numbers and previous/next results remain available; advanced search inherits the chosen scope.
 - Advanced search occupies the entire screen. It supports selecting multiple surahs, direct text/root/lemma queries, root/lemma suggestions, independently removable form/lemma facets with occurrence counts, and optional translations. Result selection opens the verse in the reader; the return action retains the query, scope, filters, translation setting, loaded results and scroll.
 
 Morphology keeps original corpus lemma identifiers internally. Buckwalter IDs are decoded to Arabic for input matching and display. Text normalization never changes the displayed Quran text. Facet counts represent matching word occurrences, not a sum of whole verses. Multiple values within a group are OR; different groups apply AND to the same matched word. Alternatives in the same group remain available when selecting a facet.
@@ -25,6 +25,10 @@ Surah pairing shortcuts are intentionally deferred until the user provides their
 ## Quick-search scroll regression
 
 Quick search builds its index from the already loaded current-surah data, without waiting for the global corpus. Results follow reading order. Focus uses preventScroll; result navigation scrolls only the reader container and is instant in quick mode. The previous FlowPage scrollIntoView path was removed to avoid competing scroll animations and movement of the outer document/header.
+
+Whole-Quran quick search uses the existing search worker/corpus. Revealing a hit does not change the source surah of an ongoing scoped search. Explicitly switching back to “this surah” starts from the currently displayed surah. `useSearchNavigation` owns the scope preference; `useReadingRoute` owns the return journey. Opening quick search captures the visible word and its offset. The first jump creates one history entry; subsequent hits replace it. The return chip or browser Back restores the original URL, reading mode and visual offset; Forward can revisit the last hit. Closing the bar preserves the return chip.
+
+All inline filter rows use `SearchFilterRow`, a shared component receiving labels, options, optional counts, selection and a toggle callback. It has no knowledge of lemma/form types; current form and lemma filters and future inline filters use the same layout contract. It measures actual chip and overflow-action widths using ResizeObserver, including font and viewport changes. All fitting chips appear on one line; “more” is reserved only when needed. Its hidden measurement copy is inert and excluded from accessibility. Expansion still reveals every option and retains the existing filtering semantics. Browser coverage includes root نصر with four form options, not just lemma overflow.
 
 Browser regression checks verify that the toolbar stays at the top, window.scrollY remains zero, the first and next matches are visible promptly, repeated verse-number jumps work, a shorter viewport retains the toolbar, and local search works with the global corpus request blocked. The complete advanced-search/result-return scenario also passes.
 

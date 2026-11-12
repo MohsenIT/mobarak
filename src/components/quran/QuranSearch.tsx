@@ -20,6 +20,7 @@ import { searchFormLabels } from '@/lib/search-form-labels'
 import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
 import { searchLink, type SearchLinkState } from '@/lib/search-link'
 import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
+import SearchFilterRow from './SearchFilterRow'
 import { useDismissiblePanel } from './useDismissiblePanel'
 export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number; state?: SearchLinkState }
 
@@ -271,7 +272,15 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       </div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label={t("ui.57f03a82b0")} aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
         {!busy && rawResults.length > 0 && <div className="search-facets-inline" aria-label={t("ui.07093a152e")}>
-          {(['forms', 'lemmas'] as const).map(kind => <SearchFacetGroup key={`${mode}:${query}:${kind}`} kind={kind} formLabels={formLabels} counts={searchFacetCounts(rawResults, facets, kind)} selected={facets[kind]} onToggle={value => toggleFacet(kind, value)} />)}
+          {(['forms', 'lemmas'] as const).map(kind => <SearchFilterRow key={`${mode}:${query}:${kind}`}
+            label={t(kind === 'forms' ? 'ui.12706fd406' : 'ui.8d5e58ddd8')}
+            ariaLabel={t(kind === 'forms' ? 'ui.314d58e669' : 'ui.1dc4cae4ed')}
+            options={searchFacetCounts(rawResults, facets, kind).map(({value,count}) => ({
+              value, count,
+              label: kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : <QuranText text={lemmaDisplay(value)} />,
+              title: kind === 'forms' ? formLabels.get(value)?.description ?? morphologyLabel(value) : undefined,
+            }))}
+            selected={facets[kind]} onToggle={value => toggleFacet(kind, value)} />)}
           {(lemmas.length > 0 || forms.length > 0) && <div className="search-active-facets">{(['forms', 'lemmas'] as const).flatMap(kind => facets[kind].map(value => <button type="button" key={`${kind}:${value}`} aria-label={t("ui.96ba59563f",{p0:(kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value))})} onClick={() => toggleFacet(kind, value)}>{kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value)}<X size={12} /></button>))}<button type="button" onClick={() => { setLemmas([]); setForms([]) }}>{t("ui.1c36b0e132")}</button></div>}
         </div>}
         {!valid && <div className="search-empty"><BookOpen size={34} /><h2>{t("ui.2c2cdb504e")}</h2><p>{t("ui.9535464700")}</p><div>{[t("ui.cfd7c4bd1f"), t("ui.72dbd6c944"), t("ui.e7e17d45e9")].map(text => <button type="button" key={text} onClick={() => setQuery(text)}>{text}</button>)}</div></div>}
@@ -289,16 +298,4 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       </div>
     </div>
   </main>, document.body)
-}
-
-
-function SearchFacetGroup({ kind, counts, selected, onToggle, formLabels }: {
-  formLabels: Map<string, { label: string; description: string }>; kind: 'forms' | 'lemmas'; counts: { value: string; count: number }[]; selected: string[]; onToggle: (value: string) => void
-}) {
-  const [expanded, setExpanded] = useState(false)
-  if (!counts.length) return null
-  return <div className="search-facet-row" role="group" aria-label={kind === 'forms' ? t("ui.314d58e669") : t("ui.1dc4cae4ed")}>
-    <span>{kind === 'forms' ? t("ui.12706fd406") : t("ui.8d5e58ddd8")}</span><div>{(expanded ? counts : counts.slice(0, 3)).map(({ value, count }) => <button type="button" key={value} aria-pressed={selected.includes(value)} title={kind === 'forms' ? formLabels.get(value)?.description ?? morphologyLabel(value) : undefined} onClick={() => onToggle(value)}><span>{kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : <QuranText text={lemmaDisplay(value)} />}</span><small>{toFa(count)}</small></button>)}
-    {counts.length > 3 && <button type="button" className="search-facet-more" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? t("ui.a023ed0970") : t("ui.9b083d9135",{p0:(toFa(counts.length - 3))})}</button>}</div>
-  </div>
 }

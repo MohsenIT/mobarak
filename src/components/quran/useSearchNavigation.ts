@@ -7,6 +7,7 @@ import type { SearchLinkState } from '@/lib/search-link'
 import type { Translator } from '@/lib/quran'
 import type { SearchStart } from './QuranSearch'
 import type { ReaderSearchState } from './ReaderSearchHighlights'
+import { readStored, writeStored } from '@/lib/reader-storage'
 
 /**
  * Search, as one owned piece of state instead of six loose ones in page.tsx.
@@ -38,6 +39,11 @@ export function useSearchNavigation({
 }) {
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const [quickOpen, setQuickOpen] = useState(false)
+  const [quickScope, setQuickScope] = useState<'surah' | 'quran'>(() => readStored<unknown>('mushaf.quick-search-scope', 'surah') === 'quran' ? 'quran' : 'surah')
+  const changeQuickScope = useCallback((scope: 'surah' | 'quran') => {
+    setQuickScope(scope)
+    writeStored('mushaf.quick-search-scope', scope)
+  }, [])
   const [quickHighlights, setQuickHighlights] = useState<ReaderSearchState | null>(null)
   /** What a freshly mounted advanced search starts from, keyed by revision. */
   const [start, setStart] = useState<SearchStart | null>(null)
@@ -117,7 +123,7 @@ export function useSearchNavigation({
 
   return {
     advancedOpen, setAdvancedOpen, close,
-    quickOpen, openQuick, setQuickOpen,
+    quickOpen, openQuick, setQuickOpen, quickScope, changeQuickScope,
     quickHighlights, setQuickHighlights,
     start, occurrence, clearOccurrence: () => setOccurrence(null),
     returnToSearch, dismissReturn: () => setReturnToSearch(false),

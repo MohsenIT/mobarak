@@ -431,6 +431,17 @@ to be written.
 
 ## Definition of Done
 
+Quick-search scope is owned by `useSearchNavigation` and persisted under the
+append-only `mushaf.quick-search-scope` key. Its reading-origin snapshot and
+single-entry result journey belong to `useReadingRoute`; do not add separate
+history writes for quick results. The captured visible word/offset restores
+flow or mushaf on the return chip and browser Back. Coverage:
+`tests/e2e/quick-search-journey.spec.cjs`. Responsive morphology facet sizing
+uses the reusable `SearchFilterRow` component (labels/options/counts/selection,
+without lemma/form-specific rules), backed by `src/lib/search-facet-layout.ts`,
+and is covered by its unit test and
+`tests/e2e/search-facet-layout.spec.cjs`; do not restore a fixed chip count.
+
 A change is done when:
 
 - The specific problem it targets is fixed, with no unrelated files touched.

@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.76',date:'2026-11-12',title:'محدودهٔ جست‌وجوی سریع و بازگشت به مطالعه',changeKinds:['feature','improvement'],changes:[
+    'محدودهٔ این سوره یا کل قرآن در جست‌وجوی سریع ماندگار است؛ چیپ بازگشت و Back مرورگر، محل آغاز مطالعه را پس از پیمایش نتایج بازیابی می‌کنند.',
+    'فیلترهای بُن‌واژه و باب تا جایی که در یک ردیف جا دارند نمایش داده می‌شوند؛ دکمهٔ بیشتر فقط هنگام کمبود فضا ظاهر می‌شود.',
+  ],
+},{
   version:'0.4.75',date:'2026-11-12',title:'قاعدهٔ مشترک پیمایش قرآن',changeKinds:['improvement'],changes:[
     'حرکت به سوره‌های مجاور روی بخش قابل‌دسترسی قرآن همیشه فعال است و به بازبودن پنل‌ها یا اندازهٔ دستگاه وابسته نیست.',
   ],

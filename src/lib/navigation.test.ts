@@ -7,7 +7,7 @@ const meta: Meta = { ...rawMeta, juz: Object.fromEntries(Object.entries(rawMeta.
 test('named ayah references accept either order, commas, spaces and native digits',async()=>{
  const {destinationSuggestions,searchDestinations}=await import('./navigation')
  for(const input of ['انعام، 37','انعام37','انعام 37','37انعام','37 انعام','انعام,37','انعام۳۷','٣٧ الأنعام']){
-  const destination={kind:'verse',s:6,a:37}
+  const destination={kind:'verse' as const,s:6,a:37}
   expect(resolveDestination(meta,'surah',input,20)).toEqual(destination)
   expect(destinationSuggestions(meta,input,20).map(x=>x.destination)).toEqual([destination])
   expect(searchDestinations(meta,input,20).map(x=>x.destination)).toEqual([destination])

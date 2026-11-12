@@ -1,4 +1,7 @@
 {
+  "quickSearch.previousResult": "نتیجهٔ قبلی",
+  "quickSearch.nextResult": "نتیجهٔ بعدی",
+  "quickSearch.returnTo": "بازگشت به {p0} · {p1}",
   "ui.2e49f1d53a": "مطالعه",
   "ui.3906317c3a": "یافتن",
   "ui.5edb2177af": "تحلیل سوره",
