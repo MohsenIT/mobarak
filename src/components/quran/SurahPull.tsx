@@ -1,7 +1,7 @@
 'use client'
 import {t} from '@/lib/i18n'
 
-import { memo, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { memo, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { loadSurah, loadTrans, type SurahData, type SurahMeta, type Translations, type Translator } from '@/lib/quran'
 import FlowPage, { FlowSurface } from './FlowPage'
 
@@ -9,13 +9,20 @@ const THRESHOLD = 210
 const ignoreWordTap = () => {}
 // Keep full adjacent pages mounted without rerendering their words on every touch move.
 const AdjacentFlowPage = memo(FlowPage)
+const desktopQuery='(min-width:1024px)'
+const subscribeDesktop=(notify:()=>void)=>{const media=window.matchMedia(desktopQuery);media.addEventListener('change',notify);return()=>media.removeEventListener('change',notify)}
+const isDesktop=()=>window.matchMedia(desktopQuery).matches
 
 /** Edge-only, deliberate pull: releasing before the threshold always cancels. */
-export default function SurahPull({ surah, meta, ready, enabled, arriveAtEnd, onNavigate, children, fontSize, showTrans, translator }: {
+export default function SurahPull({ surah, meta, ready, enabled:allowNavigation, sideNavigationOpen=false, arriveAtEnd, onNavigate, children, fontSize, showTrans, translator }: {
   fontSize: number; showTrans: boolean; translator: Translator
   surah: number; meta: SurahMeta[]; ready: boolean; enabled: boolean; arriveAtEnd: boolean
+  sideNavigationOpen?:boolean
   onNavigate: (surah: number, atEnd: boolean) => Promise<void>; children: ReactNode
 }) {
+  const desktop=useSyncExternalStore(subscribeDesktop,isDesktop,()=>false)
+  // Desktop menus are docked beside the reader; mobile menus cover it.
+  const enabled=allowNavigation&&(!sideNavigationOpen||desktop)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [pull, setPull] = useState(0)
   const [wheelPull, setWheelPull] = useState(false)

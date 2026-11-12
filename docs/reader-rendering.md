@@ -18,3 +18,11 @@ Navigation to a word/root occurrence or ayah now leaves a fully exposed target u
 ## Whole-ayah navigation (0.4.19)
 
 Ayah navigation and recitation following measure the complete ayah, rather than only word one. Flow bounds include its marker and displayed translation fragments. Mushaf bounds combine all rendered word boxes and the closing ayah marker. A fully exposed ayah stays still. A partially hidden ayah that fits moves only enough to reveal the obscured edge, with margins reduced when necessary to fit. A completely offscreen ayah starts at the exposed top. An ayah taller than the available area starts at the top without changing font size; simultaneous full visibility is impossible in that case. Root/word-occurrence navigation retains its word-based visibility rule. Overlay geometry, reader-only scrolling and end-of-document spacer handling are shared.
+
+## Docked menu and surah-edge scrolling
+
+`SurahPull` treats an open navigation drawer as blocking only below the
+1024px desktop breakpoint. On desktop the drawer is docked beside the reading
+surface, so wheel/touch edge navigation on the Quran remains enabled. The
+viewport subscription also updates this rule when the window is resized.
+Fullscreen analysis, advanced search and comparison overlays remain blockers.

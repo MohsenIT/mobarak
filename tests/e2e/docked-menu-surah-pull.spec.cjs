@@ -1,0 +1,31 @@
+const{test,expect}=require('@playwright/test');
+test('mobile overlay keeps reader-edge navigation disabled',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.addInitScript(()=>{localStorage.setItem('mubarak.ui-language.v1','fa');localStorage.setItem('mushaf.mode','flow')});
+ await page.route('**/api/version',r=>r.fulfill({json:{version:'fixture',releases:[]}}));
+ await page.goto('/s/20');const scroll=page.locator('[data-reading-scroll]');
+ await expect(scroll.locator('[data-surah="20"]').first()).toBeAttached();
+ await page.locator('.reader-toolbar button').first().click();
+ await scroll.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new WheelEvent('wheel',{deltaY:120,bubbles:true,cancelable:true}))});
+ await page.waitForTimeout(350);
+ for(let i=0;i<4;i++)await scroll.dispatchEvent('wheel',{deltaY:120,bubbles:true,cancelable:true});
+ await page.waitForTimeout(500);
+ await expect(scroll.locator('[data-surah="20"]').first()).toBeAttached();
+ await expect(page.locator('[data-surah-wheel-progress]')).toHaveCount(0);
+});
+for(const sign of [-1,1])test(`desktop reader navigates ${sign<0?'previous':'next'} with hamburger open`,async({page})=>{
+ await page.setViewportSize({width:1280,height:900});
+ await page.addInitScript(()=>{localStorage.setItem('mubarak.ui-language.v1','fa');localStorage.setItem('mushaf.mode','flow')});
+ await page.route('**/api/version',r=>r.fulfill({json:{version:'fixture',releases:[]}}));
+ await page.goto('/s/20');const scroll=page.locator('[data-reading-scroll]');
+ await expect(scroll.locator('[data-surah="20"]').first()).toBeAttached();
+ await page.locator('.reader-toolbar button').first().click();
+ await expect(page.locator('.drawer')).toBeVisible();
+ await page.evaluate(()=>document.fonts.ready);
+ await scroll.evaluate((el,sign)=>el.scrollTop=sign>0?el.scrollHeight:0,sign);
+ const box=await scroll.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
+ await page.mouse.wheel(0,sign*120);await page.waitForTimeout(350);
+ for(let i=0;i<4;i++)await page.mouse.wheel(0,sign*120);
+ await expect(scroll.locator(`[data-surah="${20+sign}"]`).first()).toBeAttached();
+ await expect(page.locator('.drawer')).toBeVisible();
+});

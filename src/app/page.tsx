@@ -555,7 +555,8 @@ export default function Home() {
           ) : (
             <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs} fontSize={flowFont} showTrans={showTrans} translator={translator}
               ready={!loadingPage && flowSurah?.n === surah}
-              enabled={!(sel && panelMax) && !drawerOpen && !search.advancedOpen && !showComparison && !showIndex}
+              enabled={!(sel && panelMax) && !search.advancedOpen && !showComparison && !showIndex}
+              sideNavigationOpen={drawerOpen}
               arriveAtEnd={pullArrival?.s === surah && pullArrival.end}
               onNavigate={async (n, end) => {
                 // Keep the completed preview visible until all destination data is ready.
