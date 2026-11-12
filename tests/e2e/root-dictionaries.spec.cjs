@@ -29,6 +29,16 @@ async function pickWord(page,surah,ayah,pos){
 /** The dictionary heading for a book, inside the open root analysis panel. */
 const heading=(page,book)=>page.locator(`[data-root-book-heading="${book}"]`).first();
 
+test('an Arabic-only etymological entry does not render an empty explanation card',async({page})=>{
+ await setup(page);await page.goto('/s/1/a/6',{waitUntil:'domcontentloaded'});
+ await pickWord(page,1,6,1);await page.locator('#analysis-tab-root').click();
+ await expect(heading(page,'tahqiq')).toBeVisible();
+ await expect(heading(page,'maqayis')).toBeVisible();
+ await expect(heading(page,'ishtiqaqi')).toHaveCount(0);
+ await pickWord(page,1,1,1);await page.locator('#analysis-tab-root').click();
+ await expect(heading(page,'ishtiqaqi')).toBeVisible();
+});
+
 test('the dictionary panel opens on toggle and closes on a second toggle',async({page})=>{
  await setup(page);
  await page.goto('/s/1',{waitUntil:'domcontentloaded'});

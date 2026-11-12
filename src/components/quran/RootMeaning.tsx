@@ -41,7 +41,12 @@ function loadAvailability() {
     const response = await fetch(book.index)
     if (!response.ok) throw new Error('book index')
     const data = await response.json()
-    return [book.id, data[book.field] ?? []] as const
+    // An Arabic source match alone is not a readable Persian explanation.
+    // Hide the etymological card until a summary or translation is available.
+    const roots=book.id==='ishtiqaqi'
+      ? [...new Set<string>([...(data.translatedRoots??[]),...(data.summarizedRoots??[])])]
+      : data[book.field]??[]
+    return [book.id, roots] as const
   })).then(entries => Object.fromEntries(entries)).catch(error => { availability = undefined; throw error })
   return availability
 }

@@ -92,6 +92,9 @@ for (const [direction,landing] of [['previous','end'],['next','start']]) {
   await page.evaluate(() => document.fonts.ready);
 
   const sign = direction==='previous' ? -1 : 1;
+  // Keeping the analysis sidebar open must not block reader-edge navigation.
+  await scroller.locator('[data-surah="20"] .quran-word').first().click();
+  await expect(page.locator('.root-panel')).toBeVisible();
   const target = direction==='previous' ? 19 : 21;
   // Wheel gestures are the deterministic way to pull: the same state
   // (`pullArrival`) drives touch and wheel landings.
