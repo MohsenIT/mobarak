@@ -17,6 +17,7 @@ import OfflineSettings from './OfflineSettings'
 import DownloadsManager from './DownloadsManager'
 import SurahShortcuts from './SurahShortcuts'
 import DesktopPaneResizeHandle from './DesktopPaneResizeHandle'
+import { useDismissiblePanel } from './useDismissiblePanel'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
@@ -67,6 +68,7 @@ const TABS = [
 
 export default function NavDrawer(props: Props) {
   const { meta, onClose, onGoPage, onGoSurah, onGoVerse, currentSurah } = props
+  const drawerRef=useDismissiblePanel<HTMLElement>(true,onClose)
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('surah')
   const [pageInput, setPageInput] = useState('')
   const q = pageInput
@@ -117,8 +119,8 @@ export default function NavDrawer(props: Props) {
 
   return (
     <>
-      <div className="sheet-backdrop" onClick={onClose} />
-      <aside className="drawer" role="dialog" aria-label={props.view === 'tools' ? t("ui.b563f0690c") : t("ui.38a1e75271")}>
+      <div className="sheet-backdrop pointer-events-none" aria-hidden="true" />
+      <aside ref={drawerRef} className="drawer" role="dialog" aria-label={props.view === 'tools' ? t("ui.b563f0690c") : t("ui.38a1e75271")}>
         <DesktopPaneResizeHandle pane="navigation" edge="start" min={240} max={420} />
         <div className="drawer-header flex items-center justify-between px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">

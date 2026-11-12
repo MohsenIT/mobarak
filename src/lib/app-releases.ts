@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.75',date:'2026-11-12',title:'قاعدهٔ مشترک پیمایش قرآن',changeKinds:['improvement'],changes:[
+    'حرکت به سوره‌های مجاور روی بخش قابل‌دسترسی قرآن همیشه فعال است و به بازبودن پنل‌ها یا اندازهٔ دستگاه وابسته نیست.',
+  ],
+},{
   version:'0.4.74',date:'2026-11-12',title:'پیمایش سوره با منوی دسکتاپ باز',changeKinds:['fix'],changes:[
     'بازبودن منوی کناری دسکتاپ دیگر رفتن به سورهٔ قبل و بعد با اسکرول روی متن قرآن را غیرفعال نمی‌کند؛ منوی موبایل همچنان حرکت پشت خود را مسدود می‌کند.',
   ],

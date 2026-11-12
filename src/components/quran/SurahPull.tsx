@@ -1,7 +1,7 @@
 'use client'
 import {t} from '@/lib/i18n'
 
-import { memo, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { memo, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { loadSurah, loadTrans, type SurahData, type SurahMeta, type Translations, type Translator } from '@/lib/quran'
 import FlowPage, { FlowSurface } from './FlowPage'
 
@@ -9,20 +9,13 @@ const THRESHOLD = 210
 const ignoreWordTap = () => {}
 // Keep full adjacent pages mounted without rerendering their words on every touch move.
 const AdjacentFlowPage = memo(FlowPage)
-const desktopQuery='(min-width:1024px)'
-const subscribeDesktop=(notify:()=>void)=>{const media=window.matchMedia(desktopQuery);media.addEventListener('change',notify);return()=>media.removeEventListener('change',notify)}
-const isDesktop=()=>window.matchMedia(desktopQuery).matches
 
 /** Edge-only, deliberate pull: releasing before the threshold always cancels. */
-export default function SurahPull({ surah, meta, ready, enabled:allowNavigation, sideNavigationOpen=false, arriveAtEnd, onNavigate, children, fontSize, showTrans, translator }: {
+export default function SurahPull({ surah, meta, ready, arriveAtEnd, onNavigate, children, fontSize, showTrans, translator }: {
   fontSize: number; showTrans: boolean; translator: Translator
-  surah: number; meta: SurahMeta[]; ready: boolean; enabled: boolean; arriveAtEnd: boolean
-  sideNavigationOpen?:boolean
+  surah: number; meta: SurahMeta[]; ready: boolean; arriveAtEnd: boolean
   onNavigate: (surah: number, atEnd: boolean) => Promise<void>; children: ReactNode
 }) {
-  const desktop=useSyncExternalStore(subscribeDesktop,isDesktop,()=>false)
-  // Desktop menus are docked beside the reader; mobile menus cover it.
-  const enabled=allowNavigation&&(!sideNavigationOpen||desktop)
   const scrollRef = useRef<HTMLDivElement>(null)
   const [pull, setPull] = useState(0)
   const [wheelPull, setWheelPull] = useState(false)
@@ -74,7 +67,9 @@ export default function SurahPull({ surah, meta, ready, enabled:allowNavigation,
   }, [surah, showTrans, translator])
   useEffect(() => {
     const element = scrollRef.current
-    if (!element || !enabled || !ready) return
+    // Gestures belong to the reader surface itself. Covering overlays receive
+    // their own input; visible reader areas stay navigable regardless of panels.
+    if (!element || !ready) return
     let start: { x: number; y: number; edge: number } | null = null
     let distance = 0
     let claimed = false
@@ -181,7 +176,7 @@ export default function SurahPull({ surah, meta, ready, enabled:allowNavigation,
       element.removeEventListener('touchend', end); element.removeEventListener('touchcancel', cancel)
       element.removeEventListener('click', click, true)
     }
-  }, [enabled, ready, surah])
+  }, [ready, surah])
   const target = surah + (previous ? -1 : 1)
   const progress = Math.min(1, Math.abs(pull) / THRESHOLD)
   const offset = wheelPull ? 0 : committing ? pull : Math.sign(pull) * Math.min(180, Math.abs(pull) * 0.65)

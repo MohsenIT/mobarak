@@ -21,8 +21,10 @@ Ayah navigation and recitation following measure the complete ayah, rather than 
 
 ## Docked menu and surah-edge scrolling
 
-`SurahPull` treats an open navigation drawer as blocking only below the
-1024px desktop breakpoint. On desktop the drawer is docked beside the reading
-surface, so wheel/touch edge navigation on the Quran remains enabled. The
-viewport subscription also updates this rule when the window is resized.
-Fullscreen analysis, advanced search and comparison overlays remain blockers.
+`SurahPull` handles wheel/touch gestures on its own reader surface whenever
+its content is ready. Panel visibility and viewport size do not disable it.
+Any visible, accessible Quran area stays navigable; covering overlays receive
+their own pointer events and do not forward them to the covered reader.
+The drawer's visual backdrop does not intercept input on exposed Quran.
+Outside-pointer dismissal uses `useDismissiblePanel`; wheel events stay on
+the surface under the pointer, so scrolling inside a menu does not turn surahs.
