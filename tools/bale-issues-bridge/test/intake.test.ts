@@ -66,3 +66,20 @@ test('vision uses bounded inline private bytes and keeps image facts separate fr
  const r=validateReport({...rules('قسمت پایین صفحه زیر پنل مخفی می‌شود.'),evidence_notes:['متن پایین زیر پنل دیده نمی‌شود.'],follow_up_question:'روی موبایل است یا دسکتاپ؟'});
  const draft=githubDraft(r,'id','شرح');assert.ok(draft.body.includes('Image Observations (AI, unverified)'));assert.throws(()=>validateReport({...r,evidence_notes:['x'.repeat(401)]}));
 });
+
+test('short buttons pair in order while long labels remain full width',async()=>{
+ const {layoutButtons}=await import('../src/button-layout.ts');
+ const buttons=[{text:'✅ ثبت',callback_data:'publish'},{text:'✏️ اصلاح',callback_data:'edit'},{text:'این گزینه توضیح بسیار بلندی دارد',callback_data:'long'},{text:'بازگشت',callback_data:'back'}];
+ const result=layoutButtons(buttons.map(button=>[button]));
+ assert.deepEqual(result.map(row=>row.length),[2,1,1]);
+ assert.deepEqual(result.flat(),buttons);
+});
+test('vision instructions preserve literal faulty text instead of silently normalizing it',()=>{
+ const request=intakeRequest({AI_MODEL:'glm-5-3-flash'} as AIEnv,'ه به انبیا چسبیده: هانبیا');
+ const messages=request.messages as {content:string}[];
+ assert.match(messages[0].content,/never silently correct spelling, joined letters, spacing/);
+ assert.match(messages[0].content,/mark the transcription uncertain/);
+ assert.match(messages[1].content,/هانبیا/);
+ const report=validateReport({...rules('عنوان مشکل دارد'),evidence_notes:['متن معیوب: «هانبیا»؛ ه به انبیا چسبیده است.']});
+ assert.match(githubDraft(report,'literal-test','شرح').body,/«هانبیا»/);
+});

@@ -36,7 +36,7 @@ try{
  await bridge.onBale(first);assert.equal((await current())!.context.split('وقتی').length,2,'replayed user input must not append twice');
  await click('publish',2,undefined,c);assert.equal(issues,0,'another user cannot approve');
  const approve=await click('publish');await intake.handle(approve);assert.equal(issues,1);assert.equal((await current())!.state,'published');
- assert.ok(sent.filter(s=>s.method==='sendMessage'&&s.data.chat_id===1&&s.data.reply_markup).every(s=>((s.data.reply_markup as {inline_keyboard:unknown[][]}).inline_keyboard).every(row=>row.length===1)),'private buttons must occupy a full row');
+ assert.ok(sent.filter(s=>s.method==='sendMessage'&&s.data.chat_id===1&&s.data.reply_markup).every(s=>((s.data.reply_markup as {inline_keyboard:unknown[][]}).inline_keyboard).every(row=>row.length<=2)),'buttons must have at most two columns');
  assert.equal(sent.filter(s=>s.method==='sendMessage'&&s.data.chat_id===100).length,1,'one channel post');
  await message(first.message.text,3);await click('duplicate',3,'42');assert.equal(issues,1);assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM subscriptions WHERE user_id=3 AND issue_number=42').first<{n:number}>())!.n,1);
  const post=sent.find(s=>s.data.chat_id===100)!;

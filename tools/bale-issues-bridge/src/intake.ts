@@ -86,8 +86,8 @@ export class Intake {
    buttons=[[this.button(c,ui.same,'duplicate',String(match.number)),this.button(c,ui.different,'different')],[{text:ui.view,url}],[this.button(c,ui.cancel,'cancel')]];
    await this.say(key+':confirm',c.chat_id,summary+'\n\n'+ui.similar+`\n#${match.number} — ${match.title}\n\n`+ui.preview_notice,buttons);return;
   }
-  buttons=[[this.button(c,ui.approve,'publish')],[this.button(c,ui.edit,'edit')],[this.button(c,'گزینه‌های بیشتر','options')],[this.button(c,ui.cancel,'cancel')]];
-  if(report.follow_up_question&&c.questions<c.question_limit)buttons.splice(1,0,[this.button(c,'💬 تکمیل اختیاری','enrich')]);
+  buttons=[[this.button(c,ui.approve,'publish')],[this.button(c,ui.edit,'edit')],[this.button(c,'بیشتر','options')],[this.button(c,ui.cancel,'cancel')]];
+  if(report.follow_up_question&&c.questions<c.question_limit)buttons.splice(1,0,[this.button(c,'💬 تکمیل','enrich')]);
   if(links.length)buttons.push([this.button(c,ui.remove_media,'remove_media')]);
   if(report.needs_clarification&&c.questions>=2&&c.question_limit===2)buttons.push([this.button(c,ui.more,'more')]);
   await this.say(key+':confirm',c.chat_id,summary+'\n\n'+ui.preview_notice+(report.privacy_flags.length?'\n'+ui.redacted:''),buttons);

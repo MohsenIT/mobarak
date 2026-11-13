@@ -1,3 +1,4 @@
+import {layoutButtons} from './button-layout.ts';
 import {Intake} from './intake.ts';
 import type {AIEnv} from './ai-intake.ts';
 import {redact,usefulComment,ui} from './intake-domain.ts';
@@ -29,7 +30,7 @@ export class Bridge {
  env:BridgeEnv;api:APIs;available:Category[];
  constructor(env:BridgeEnv){this.env=env;this.api=new APIs(env);this.available=categories(env.CATEGORIES_JSON);}
  async say(key:string,chat:number,text:string,buttons?:{text:string;callback_data?:string;url?:string}[][]):Promise<{message_id:number}>{
-  return effect(this.env.DB,key,()=>this.api.bale('sendMessage',{chat_id:chat,text,...(buttons?{reply_markup:{inline_keyboard:buttons.flatMap(row=>row.map(button=>[button]))}}:{})}));
+  return effect(this.env.DB,key,()=>this.api.bale('sendMessage',{chat_id:chat,text,...(buttons?{reply_markup:{inline_keyboard:layoutButtons(buttons)}}:{})}));
  }
  async issue(number:number):Promise<GitIssue>{return this.api.github(this.api.repo('/issues/'+number));}
  postLink(_message:number):string{return `https://ble.ir/${this.env.BALE_CHANNEL_USERNAME.replace(/^@/,'')}`;}
