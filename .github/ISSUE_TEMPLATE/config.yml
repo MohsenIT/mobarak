@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: مشارکت از طریق بات بله
+    url: https://ble.ir/mobarak_bot
+    about: بدون نیاز به دانستن GitHub، موضوعت را برای همراه مبارک بنویس.

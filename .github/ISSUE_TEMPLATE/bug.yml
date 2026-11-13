@@ -1,0 +1,30 @@
+name: گزارش مشکل
+description: مشکل عملکردی یا ظاهری قرآن مبارک
+title: "[Bug] "
+type: Bug
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "اطلاعات خصوصی منتشر نکنید. اگر کار با GitHub راحت نیست، گزارش را در بات بله ثبت کنید."
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: چه اتفاقی افتاد؟
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: فقط اگر می‌دانید.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Environment and Evidence
+      description: محیط، تصویر یا لینک اختیاری؛ اطلاعات خصوصی را حذف کنید.
