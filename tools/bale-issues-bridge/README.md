@@ -58,3 +58,17 @@ python3 -m unittest discover -s tests -v
 در دیدگاه‌ها تشکر و پیام کوتاه بی‌اطلاعات به GitHub کپی نمی‌شوند. مشارکت گروه به‌تنهایی مجوز پیام خصوصی نیست؛ اشتراک از مسیر خصوصی بات انجام می‌شود. اعلان‌های فنی جزئی ارسال نمی‌شوند و اعلان‌های چندکاربره جداگانه صف‌بندی می‌شوند تا سقف D1 Free رعایت شود.
 
 دریافت بله برای رفع تأخیر مشاهده‌شدهٔ وب‌هوک از polling رسمی دقیقه‌ای استفاده می‌کند؛ این تأخیر در صف سبک حدود یک دقیقه است. تغییر مسیر با `scripts/switch_bale_polling.py` و حفظ پیام‌های صف و rollback انجام می‌شود. GitHub webhook باقی می‌ماند.
+
+### Current AI and image intake
+
+The deployed configuration uses GLM through the owner's Coarena endpoint, with no paid fallback. `AI_FREE_ONLY=true` and `AI_VISION_ENABLED=true` enable the verified free route and at most two latest images per analysis (`detail: low`). The provider's allowance still applies; there is no application-wide daily request cap. No credentials are committed.
+
+Send photos normally, optionally in several messages, then choose **پایان توضیحات**. Images up to 1.5 MiB each are accepted; the bot prefers the available medium-sized Bale photo variant. Core ambiguity gets one useful question; engineering details can be added through **تکمیل اختیاری**, or skipped. Buttons use one full row each. Images remain private until explicit publication consent; AI observations are marked unverified in GitHub. No automatic visual privacy redaction is claimed.
+
+The optional live test uses a synthetic fixture and is never run by CI. To test the configured free model explicitly:
+
+```sh
+RUN_AI_LIVE=approved-1000-toman AI_LIVE_MODEL=glm-5-3-flash AI_LIVE_CASE=image RUN_AI_VISION=1 node --experimental-strip-types test/ai-live.ts
+```
+
+Reception runs independently of analysis through the authenticated self service binding; cron polls on a bounded three-second cadence. This is a scheduling target, not a promise of instant replies.

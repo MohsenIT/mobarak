@@ -25,17 +25,28 @@
     "INTAKE_ENABLED": "true",
     "PUBLIC_BASE_URL": "https://mobarak-issues-bridge.mobarak-issues-cbf441aa.workers.dev",
     "GITHUB_GOVERNANCE_READY": "true",
-    "AI_ENABLED": "false",
+    "AI_ENABLED": "true",
     "AI_REPORT_BUDGET_TOMAN": "0",
-    "AI_MODEL": "gemini-3.1-flash-lite",
-    "AI_INPUT_TOMAN_PER_MILLION": "800",
-    "AI_OUTPUT_TOMAN_PER_MILLION": "4600",
-    "BALE_TRANSPORT": "polling"
+    "AI_MODEL": "glm-5-3-flash",
+    "AI_INPUT_TOMAN_PER_MILLION": "0",
+    "AI_OUTPUT_TOMAN_PER_MILLION": "0",
+    "BALE_TRANSPORT": "polling",
+    "AI_ENDPOINT": "https://coarena.ai/api/v1/chat/completions",
+    "AI_REASONING_EFFORT": "low",
+    "AI_TIMEOUT_MS": "45000",
+    "AI_FREE_ONLY": "true",
+    "AI_VISION_ENABLED": "true"
   },
   "triggers": {
     "crons": [
       "* * * * *"
     ]
   },
-  "preview_urls": false
+  "preview_urls": false,
+  "services": [
+    {
+      "binding": "PUMP",
+      "service": "mobarak-issues-bridge"
+    }
+  ]
 }

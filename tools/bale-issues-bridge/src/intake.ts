@@ -2,7 +2,7 @@ import {Retryable} from './api.ts';
 import type {Bridge} from './bridge.ts';
 import {execute,one,rows} from './db.ts';
 import {analyze} from './ai-intake.ts';
-import {ui,rules,redact,githubDraft,areaNames,type Report} from './intake-domain.ts';
+import {ui,rules,redact,githubDraft,areaNames,compactPreview,type Report} from './intake-domain.ts';
 import {faq} from './knowledge.ts';
 import {attachImage,attachmentLinks,type Photo} from './attachments.ts';
 interface Button {text:string;callback_data?:string;url?:string;}
@@ -52,7 +52,11 @@ export class Intake {
  async evaluate(c:Conversation,key:string,force=false):Promise<void>{
     const answer=faq(c.context);
   if((answer||rules(c.context).intent==='question')&&!force&&c.questions===0){c=await this.update(c,'help');await execute(this.db,'UPDATE conversations SET question=? WHERE id=?',answer??ui.no_help,c.id);await this.show(await this.load(c.id),key);return;}
+  if(this.bridge.env.AI_ENABLED==='true')await this.bridge.api.bale('sendChatAction',{chat_id:c.chat_id,action:'typing'},false).catch(()=>undefined);
   const report=await analyze(this.bridge.env,c.id,key,c.context);
+  if(!report.follow_up_question&&report.intent==='bug'&&report.area==='reader'&&!report.environment.platform&&/درگ|پیمایش|اسکرول/.test(c.context))report.follow_up_question='این مشکل روی موبایل پیش میاد یا دسکتاپ؟';
+  if(!report.summary.trim()){report.summary='تصویر ارسال شده؛ شرح مشکل هنوز مشخص نشده است.';report.needs_human_review=true;report.missing_critical_info=['شرح مشکل در تصویر'];if(c.questions<c.question_limit){force=false;report.needs_clarification=true;report.next_question='عکس رسید؛ کدوم قسمت تصویر مشکل داره یا انتظار داشتی چه اتفاقی بیفته؟';}}
+  if(force)report.follow_up_question=null;
   if(!force&&report.needs_clarification&&report.next_question&&c.questions<c.question_limit){
    c=await this.update(c,'clarifying',c.context,report);
    await execute(this.db,'UPDATE conversations SET questions=questions+1,question=?,options_json=? WHERE id=?',report.next_question,JSON.stringify(report.suggested_buttons.slice(0,4)),c.id);
@@ -75,15 +79,15 @@ export class Intake {
   if(!draft){await this.say(key,c.chat_id,ui.expired,this.menu());return;}
   const links=await attachmentLinks(this.db,c.id,this.bridge.env.PUBLIC_BASE_URL??'');
   const match=(JSON.parse(c.candidates_json) as Match[])[0];
-  const summary=`${report.intent==='feature'?'💡 پیشنهاد':report.intent==='content'?'📖 اشکال محتوایی':'📝 گزارش'}\n\n${report.title}\n${report.summary}\n\n📍 بخش: ${areaNames[report.area]}${report.environment.platform?'\nمحیط: '+report.environment.platform:''}\nپیوست: ${links.length} تصویر${report.needs_human_review?'\n'+ui.content_review:''}`;
+  const summary=compactPreview(report,links.length);
   let buttons:Button[][];
   if(match&&!c.ignore_duplicate){
-   const url=match.post?this.bridge.postLink(match.post):match.url;
+   const url=match.url;
    buttons=[[this.button(c,ui.same,'duplicate',String(match.number)),this.button(c,ui.different,'different')],[{text:ui.view,url}],[this.button(c,ui.cancel,'cancel')]];
    await this.say(key+':confirm',c.chat_id,summary+'\n\n'+ui.similar+`\n#${match.number} — ${match.title}\n\n`+ui.preview_notice,buttons);return;
   }
-  buttons=[[this.button(c,ui.approve,'publish'),this.button(c,ui.edit,'edit')],[this.button(c,ui.attach,'attach'),this.button(c,ui.cancel,'cancel')]];
-  buttons.push([this.button(c,ui.details,'details')]);
+  buttons=[[this.button(c,ui.approve,'publish')],[this.button(c,ui.edit,'edit')],[this.button(c,'گزینه‌های بیشتر','options')],[this.button(c,ui.cancel,'cancel')]];
+  if(report.follow_up_question&&c.questions<c.question_limit)buttons.splice(1,0,[this.button(c,'💬 تکمیل اختیاری','enrich')]);
   if(links.length)buttons.push([this.button(c,ui.remove_media,'remove_media')]);
   if(report.needs_clarification&&c.questions>=2&&c.question_limit===2)buttons.push([this.button(c,ui.more,'more')]);
   await this.say(key+':confirm',c.chat_id,summary+'\n\n'+ui.preview_notice+(report.privacy_flags.length?'\n'+ui.redacted:''),buttons);
@@ -130,12 +134,14 @@ export class Intake {
    }
    const [,action,id,revision,arg]=q.data.split(':');let c=await one<Conversation>(this.db,'SELECT * FROM conversations WHERE id=? AND user_id=? AND chat_id=?',id,user,chat.id);
    if(!c||c.expires_at<time()){await this.say(key,chat.id,ui.expired,this.menu());return true;}
-   if(c.state==='published'){await this.say(key,chat.id,`گزارش #${c.issue_number} قبلاً ثبت شده است.`,this.menu());return true;}
+   if(c.state==='published')return true;
    if(c.state==='publishing'&&action==='publish'){await this.publish(c,update.update_id);return true;}
    if(c.revision!==Number(revision)||['cancelled','resolved','publishing'].includes(c.state)){await this.say(key,chat.id,ui.stale);return true;}
    if(action==='cancel'){await this.update(c,'cancelled');await this.say(key,chat.id,ui.cancelled,this.menu());return true;}
    if(action==='resume'){await this.show(c,key);return true;}
    if(action==='publish'&&c.state==='preview'){await this.publish(c,update.update_id);return true;}
+   if(action==='options'&&c.state==='preview'){await this.say(key,chat.id,'می‌تونی عکس یا جزئیات اضافه کنی؛ ثبت با همین اطلاعات هم ممکنه.',[[this.button(c,ui.attach,'attach')],[this.button(c,ui.details,'details')],[this.button(c,ui.back,'back')]]);return true;}
+   if(action==='enrich'&&c.state==='preview'){const report=JSON.parse(c.report_json) as Report;if(!report.follow_up_question||c.questions>=c.question_limit)return true;c=await this.update(c,'clarifying');const options=/موبایل|دسکتاپ/.test(report.follow_up_question)?['موبایل','دسکتاپ','مطمئن نیستم']:[];await execute(this.db,'UPDATE conversations SET question=?,questions=questions+1,options_json=? WHERE id=?',report.follow_up_question,JSON.stringify(options),c.id);await this.show(await this.load(c.id),key);return true;}
    if(action==='details'&&c.state==='preview'){
     const draft=await one<{title:string;body:string}>(this.db,'SELECT title,body FROM drafts WHERE id=?',c.draft_id);
     if(draft){const text=draft.title+'\n\n'+draft.body;for(let i=0;i<text.length;i+=2800)await this.say(key+':'+i,c.chat_id,text.slice(i,i+2800));}
@@ -151,7 +157,7 @@ export class Intake {
     if(option===ui.free){await this.say(key,chat.id,ui.free_prompt,[[this.button(c,ui.without,'ready')]]);return true;}
     c=await this.update(c,'collecting',c.context+'\n'+option);await this.evaluate(c,key,true);return true;
    }
-   if(action==='ready'&&['collecting','clarifying'].includes(c.state)){if(!c.context.trim()){await this.say(key,chat.id,ui.generic_question);return true;}await this.evaluate(c,key,true);return true;}
+   if(action==='ready'&&['collecting','clarifying'].includes(c.state)){if(!c.context.trim()&&!await one(this.db,'SELECT id FROM intake_attachments WHERE conversation_id=? LIMIT 1',c.id)){await this.say(key,chat.id,ui.generic_question);return true;}await this.evaluate(c,key,c.state==='clarifying');return true;}
    if(action==='more'&&c.state==='preview'&&c.question_limit===2){await execute(this.db,'UPDATE conversations SET question_limit=3 WHERE id=?',c.id);await this.evaluate(await this.load(c.id),key);return true;}
    if(action==='attach'&&['preview','collecting'].includes(c.state)){c=await this.update(c,'collecting');await this.say(key,chat.id,ui.media_prompt,[[this.button(c,ui.done,'ready')]]);return true;}
    if(action==='remove_media'&&['preview','collecting'].includes(c.state)){await execute(this.db,'DELETE FROM intake_attachments WHERE conversation_id=? AND published=0',c.id);c=await this.update(c,'preview');await this.prepare(c,key);return true;}
@@ -181,7 +187,7 @@ export class Intake {
    }
    if(command==='/cancel'){if(c)await this.update(c,'cancelled');return false;}
    if(command==='/continue'){if(c)await this.show(c,key);else await this.say(key,chat.id,ui.send,this.menu());return true;}
-   if(command==='/done'){if(c)await this.evaluate(c,key,true);else await this.say(key,chat.id,ui.send);return true;}
+   if(command==='/done'){if(c)await this.evaluate(c,key,c.state==='clarifying');else await this.say(key,chat.id,ui.send);return true;}
    if(command==='/new'){c=await this.start(user,chat.id,update.update_id);if(c)await this.show(c,key);return true;}
    const returning=!!await one(this.db,'SELECT user_id FROM intake_users WHERE user_id=?',user);
    await execute(this.db,'INSERT OR IGNORE INTO intake_users(user_id) VALUES (?)',user);
@@ -199,7 +205,8 @@ export class Intake {
   if(m.photo?.length||m.document){
    const photos=m.photo??(m.document?[m.document]:[]);const result=await attachImage(this.db,this.bridge.api,c.id,key,photos);
    if(result==='saved')await execute(this.db,"INSERT OR IGNORE INTO intake_inputs(event_id,conversation_id,text,kind) VALUES (?,?,?,'photo')",key,c.id,redact(text).text);
-   c=await this.load(c.id);await this.say(key,chat.id,result==='saved'?ui.media_saved:result==='limit'?ui.media_limit:ui.media_error,[[this.button(c,ui.done,'ready')]]);return true;
+   if(result!=='saved'&&text.trim())await execute(this.db,"INSERT OR IGNORE INTO intake_inputs(event_id,conversation_id,text,kind) VALUES (?,?,?,'append')",key,c.id,redact(text).text);
+   c=await this.load(c.id);await this.say(key,chat.id,result==='saved'?ui.media_saved:result==='limit'?ui.media_limit:result==='too_large'?ui.media_large:ui.media_error,[[this.button(c,ui.done,'ready')],[this.button(c,ui.cancel,'cancel')]]);return true;
   }
   if(!text.trim()){await this.say(key,chat.id,ui.unsupported);return true;}
   const clean=redact(text);

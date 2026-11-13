@@ -1,7 +1,9 @@
+import {analyze} from './ai-intake.ts';
 import {mediaResponse} from './attachments.ts';
 import {Bridge,drain,type BridgeEnv} from './bridge.ts';
 import {execute,rows,one} from './db.ts';
 import {secretMatches,verifyGitHubSignature} from './security.ts';
+import {pollingLoop} from './polling-loop.ts';
 import {pollBale} from './bale-polling.ts';
 import {routingUpdate} from './worker.ts';
 interface Context {waitUntil(promise:Promise<unknown>):void;}
@@ -15,6 +17,15 @@ async function body(request:Request):Promise<Uint8Array<ArrayBuffer>>{
 const parse=(bytes:Uint8Array)=>JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes)) as Record<string,unknown>;
 async function admin(request:Request,env:BridgeEnv,ctx:Context,path:string):Promise<Response>{
  if(!await secretMatches(request.headers.get('Authorization')?.replace(/^Bearer /,'')??'',env.ADMIN_SECRET))return json({error:'not_found'},404);
+ if(path==='/admin/ai-check'&&request.method==='POST'){
+  const id='probe-'+crypto.randomUUID();
+  await execute(env.DB,'INSERT INTO conversations(id,user_id,chat_id,expires_at) VALUES (?,0,0,unixepoch()+3600)',id);
+  await analyze(env,id,id,'وقتی در موبایل پنل تحلیل را می‌بندم جای مطالعه قبلی از دست می‌رود.');
+  return json(await one(env.DB,'SELECT state,input_tokens,output_tokens,latency_ms FROM ai_usage WHERE conversation_id=?',id)??{state:'disabled_or_budget_blocked'});
+ }
+ if(path==='/admin/poll'&&request.method==='POST'){await pollBale(env);return json({ok:true});}
+ if(path==='/admin/drain'&&request.method==='POST'){await drain(env);return json({ok:true});}
+ if(path==='/admin/pump'&&request.method==='POST'){await pollBale(env);await drain(env);return json({ok:true});}
  if(path==='/admin/status'&&request.method==='GET'){
   return json({events:await rows(env.DB,'SELECT id,source,kind,state,attempts,error_code FROM events ORDER BY created_at DESC LIMIT 50'),
    intake_metrics:env.INTAKE_ENABLED==='true'?await rows(env.DB,"SELECT state,COUNT(*) AS count,SUM(input_tokens) AS input_tokens,SUM(output_tokens) AS output_tokens,SUM(estimated_cost) AS estimated_cost FROM ai_usage GROUP BY state"):[],
@@ -47,7 +58,7 @@ export default {
  async fetch(request:Request,env:BridgeEnv,ctx:Context):Promise<Response>{
   const path=new URL(request.url).pathname;
   if(env.INTAKE_ENABLED==='true'&&path.startsWith('/media/')&&request.method==='GET')return mediaResponse(env.DB,path.slice(7));
-  if(path==='/health'&&request.method==='GET')return json({service:'bale-github-bridge',stage:'bridge',bridge_enabled:env.BRIDGE_ENABLED==='true',bale_transport:env.BALE_TRANSPORT??'webhook',intake_enabled:env.INTAKE_ENABLED==='true',ai_enabled:env.AI_ENABLED==='true'&&!!env.AI_API_TOKEN&&!!env.AI_ENDPOINT&&Number(env.AI_REPORT_BUDGET_TOMAN)>0});
+  if(path==='/health'&&request.method==='GET')return json({service:'bale-github-bridge',stage:'bridge',bridge_enabled:env.BRIDGE_ENABLED==='true',bale_transport:env.BALE_TRANSPORT??'webhook',intake_enabled:env.INTAKE_ENABLED==='true',ai_enabled:env.AI_ENABLED==='true'&&!!env.AI_API_TOKEN&&!!env.AI_ENDPOINT&&(Number(env.AI_REPORT_BUDGET_TOMAN)>0||env.AI_FREE_ONLY==='true')});
   try{
    if(path.startsWith('/admin/'))return await admin(request,env,ctx,path);
    if(request.method!=='POST')return json({error:'not_found'},404);
@@ -77,8 +88,13 @@ export default {
  },
  async scheduled(_event:unknown,env:BridgeEnv,ctx:Context):Promise<void>{
   ctx.waitUntil((async()=>{
-   await pollBale(env);
-   if(new Date().getUTCMinutes()!==0){await drain(env,2);return;}
+   if(env.PUMP&&env.BALE_TRANSPORT==='polling'){
+    ctx.waitUntil(pollingLoop(env));
+    if(new Date().getUTCMinutes()!==0)return;
+   }else{
+    await pollBale(env);
+    if(new Date().getUTCMinutes()!==0){await drain(env,2);return;}
+   }
    // Cleanup runs hourly in a separate invocation budget from report processing.
    const cutoff=Math.floor(Date.now()/1000)-7*86400;
    await execute(env.DB,'DELETE FROM drafts WHERE expires_at<?',cutoff);

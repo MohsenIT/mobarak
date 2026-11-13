@@ -8,6 +8,7 @@ import {categories,categoryForIssue,classify,reportTitle,similarity,channelPost,
 import {digest,aliasFor} from './security.ts';
 
 export interface BridgeEnv extends AIEnv {
+ PUMP?:{fetch(input:string,init?:RequestInit):Promise<Response>};
  DB:Database; BALE_TOKEN:string; GITHUB_TOKEN:string; GITHUB_REPO:string;
  BALE_CHANNEL_ID:string; BALE_GROUP_ID:string; BALE_CHANNEL_USERNAME:string; BALE_BOT_ID:string;
  BALE_WEBHOOK_SECRET:string; GITHUB_WEBHOOK_SECRET:string; ADMIN_SECRET:string;
@@ -28,10 +29,10 @@ export class Bridge {
  env:BridgeEnv;api:APIs;available:Category[];
  constructor(env:BridgeEnv){this.env=env;this.api=new APIs(env);this.available=categories(env.CATEGORIES_JSON);}
  async say(key:string,chat:number,text:string,buttons?:{text:string;callback_data?:string;url?:string}[][]):Promise<{message_id:number}>{
-  return effect(this.env.DB,key,()=>this.api.bale('sendMessage',{chat_id:chat,text,...(buttons?{reply_markup:{inline_keyboard:buttons}}:{})}));
+  return effect(this.env.DB,key,()=>this.api.bale('sendMessage',{chat_id:chat,text,...(buttons?{reply_markup:{inline_keyboard:buttons.flatMap(row=>row.map(button=>[button]))}}:{})}));
  }
  async issue(number:number):Promise<GitIssue>{return this.api.github(this.api.repo('/issues/'+number));}
- postLink(message:number):string{return `https://ble.ir/${this.env.BALE_CHANNEL_USERNAME.replace(/^@/,'')}/${message}`;}
+ postLink(_message:number):string{return `https://ble.ir/${this.env.BALE_CHANNEL_USERNAME.replace(/^@/,'')}`;}
  async saveIssue(issue:GitIssue,reporter?:number):Promise<IssueRow>{
   if(issue.pull_request)throw new Rejected('pull_request_not_issue');
   await execute(this.env.DB,`INSERT INTO issues(number,github_id,title,body,labels_json,state,state_reason,url,updated_at,reporter_chat_id)
@@ -142,7 +143,7 @@ export class Bridge {
   }));
   const saved=await this.syncIssue(issue,'report:'+id,draft.chat_id);
   await execute(this.env.DB,"UPDATE drafts SET state='created',issue_number=? WHERE id=?",issue.number,id);
-  await this.say('report-result:'+id,draft.chat_id,this.env.INTAKE_ENABLED==='true'?`${ui.success}\nشماره گزارش: #${issue.number}\n${this.postLink(saved.channel_post_id!)}`:`گزارش #${issue.number} ثبت شد.\n${issue.html_url}\n${this.postLink(saved.channel_post_id!)}\nنتیجه و تغییر وضعیت را همین‌جا دریافت می‌کنید.`,this.env.INTAKE_ENABLED==='true'?[[{text:ui.view,url:this.postLink(saved.channel_post_id!)},{text:ui.mine,callback_data:'menu:mine'}],[{text:ui.new_short,callback_data:'menu:new'}]]:undefined);
+  await this.say('report-result:'+id,draft.chat_id,this.env.INTAKE_ENABLED==='true'?`${ui.success}\nشماره گزارش: #${issue.number}\n${issue.html_url}`:`گزارش #${issue.number} ثبت شد.\n${issue.html_url}\n${this.postLink(saved.channel_post_id!)}\nنتیجه و تغییر وضعیت را همین‌جا دریافت می‌کنید.`,this.env.INTAKE_ENABLED==='true'?[[{text:ui.view,url:issue.html_url},{text:'کانال گزارش‌ها',url:this.postLink(saved.channel_post_id!)},{text:ui.mine,callback_data:'menu:mine'}],[{text:ui.new_short,callback_data:'menu:new'}]]:undefined);
  }
  async createBaleComment(key:string,issue:IssueRow,text:string,userId:number,sourceMessage?:number):Promise<void>{
   const marker='bale:'+key;if(this.env.INTAKE_ENABLED==='true')text=redact(text).text;const alias=await aliasFor(userId,this.env.ADMIN_SECRET);
