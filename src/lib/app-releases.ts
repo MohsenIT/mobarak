@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.80',date:'2026-11-12',title:'صفحهٔ معرفی قرآن مبارک',changeKinds:['feature'],changes:[
+    'ارائهٔ ده‌اسلایدی معرفی قرآن مبارک در مسیر about منتشر شد؛ با تصاویر و فونت‌های محلی، کنترل لمسی و کیبورد و نمایش سازگار با موبایل و دسکتاپ.',
+  ],
+},{
   version:'0.4.79',date:'2026-11-12',title:'فهرست یکپارچه و تراز نشانگر جزء',changeKinds:['improvement'],changes:[
     'تب‌های فهرست حذف شدند؛ نوار جزءها با فاصلهٔ کوتاه از دو سر فهرست قرار می‌گیرد تا نشانگر شناور حتی در جزءهای ۱ و ۳۰ دقیقاً روبه‌روی جایگاه بماند.',
   ],

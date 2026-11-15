@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      { source: '/about', destination: '/about/index.html' },
       { source: '/q', destination: '/' },
       { source: '/search', destination: '/' },
       { source: '/s/:s(\\d+)/a/:a(\\d+)/w/:w(\\d+)', destination: '/' },

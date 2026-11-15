@@ -3,7 +3,7 @@
 const CACHE = 'quran-startup-v1'
 const PACKS = 'quran-offline-packs-v1'
 const SHELL = '/__last-successful-document'
-const shellFor=url=>url.pathname.startsWith('/study/taha')?'/__study-taha-document':SHELL
+const shellFor=url=>url.pathname.startsWith('/study/taha')?'/__study-taha-document':/^\/about(?:\/|$)/.test(url.pathname)?'/__about-document':SHELL
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim()))
 
@@ -14,7 +14,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(request.url)
   if (request.method !== 'GET' || url.origin !== self.location.origin) return
   const navigation = request.mode === 'navigate'
-  const asset = url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/data/') || url.pathname.startsWith('/fonts/') || url.pathname.startsWith('/icons/') || url.pathname.startsWith('/images/')
+  const asset = url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/data/') || url.pathname.startsWith('/fonts/') || url.pathname.startsWith('/icons/') || url.pathname.startsWith('/images/') || url.pathname.startsWith('/about/')
   if (!navigation && !asset) return
   event.respondWith((async () => {
     let cache

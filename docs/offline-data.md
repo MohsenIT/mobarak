@@ -9,3 +9,9 @@ Web/PWA downloads defaults after service worker readiness, and resumes on a late
 The native static build bundles defaults and excludes the two optional full-book directories. Native data fetches prefer downloaded cache entries, then bundled files, then the public web data endpoint. Opening an undownloaded entry online caches it. Settings downloads complete optional books. Updates compare bundled/cached hashes before requesting changed files. Public data and manifest responses allow cross-origin native reads. App-code updates still require a new application package.
 
 Validation: browser service-worker download, repeat with zero data requests, offline Quran/translation/search/Tahqiq/summary reads and offline document reload; production web and native static builds. Device-specific Android storage and signing remain separate from browser validation.
+
+The reader, study notebook and `/about` introduction have independent last-
+successful-document fallbacks. Introduction scripts, styles and visited images
+are cached under `/about/`; opening the presentation must not overwrite the
+reader's offline document. See `docs/about-presentation.md` and
+`src/lib/document-shells.test.ts`.

@@ -1,0 +1,20 @@
+/* Technical fixes for the supplied presentation; its editorial styling stays in presentation.css. */
+@font-face { font-family: Vazirmatn; src: url('/data/fonts/vazirmatn-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: Vazirmatn; src: url('/data/fonts/vazirmatn-500.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: Vazirmatn; src: url('/data/fonts/vazirmatn-700.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+:root { --intro-nav-height: 75px; }
+[hidden] { display: none !important; }
+body { padding-top: env(safe-area-inset-top, 0px); padding-bottom: calc(var(--intro-nav-height) + env(safe-area-inset-bottom, 0px)); }
+.slide { min-height: calc(100vh - var(--intro-nav-height)); min-height: calc(100dvh - var(--intro-nav-height) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
+.content, .visual { min-width: 0; }
+.slide { touch-action: pan-y pinch-zoom; }
+nav { position: fixed; inset-inline: 0; bottom: 0; height: calc(var(--intro-nav-height) + env(safe-area-inset-bottom, 0px)); padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+button:focus-visible, a:focus-visible { outline: 3px solid #ddc486; outline-offset: 3px; }
+h1:focus { outline: none; }
+@media (max-width: 800px) {
+  :root { --intro-nav-height: 69px; }
+  nav { padding-bottom: calc(9px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (max-height: 650px) and (min-width: 801px) {
+  :root { --intro-nav-height: 65px; }
+}
