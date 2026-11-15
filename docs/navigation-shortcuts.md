@@ -31,3 +31,10 @@ the reading location until a surah is chosen. Existing drawer navigation and
 mode behavior remain owned by their existing handlers. Unit coverage checks
 every verse against the original juz data; browser coverage pins slot counts,
 range metadata, drag/touch/keyboard navigation and preservation of reading mode.
+
+The drawer has one surah list, without the surah/juz/recent tab strip. Existing
+recent shortcuts and Go commands remain available. The index reserves a small
+inset at both ends of the list for the floating preview: its center stays
+exactly aligned with the selected slot, including juz 1 and 30, without
+clamping the preview upward. The rail uses the available inset height even on
+tall displays and still ends immediately after its final slot.

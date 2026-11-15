@@ -45,7 +45,7 @@ export default function JuzRail({ numbers, active, onSelect }: { numbers: number
       {layout.slots.map(slot=><span className="juz-rail-slot" style={{top:slot.center,height:layout.labelHeight}} data-juz-slot={slot.juz} data-labelled={slot.labelled||undefined} key={slot.juz} aria-hidden="true">
         {slot.labelled?t('ui.6668c797a2',{p0:toFa(slot.juz)}):<span className="juz-rail-dot" />}
       </span>)}
-      {preview&&<output className="juz-rail-preview" aria-hidden="true" style={{top:Math.max(24,Math.min(layout.height-24,center))}}>{t('ui.6668c797a2',{p0:toFa(active)})}</output>}
+      {preview&&<output className="juz-rail-preview" aria-hidden="true" style={{top:center}}>{t('ui.6668c797a2',{p0:toFa(active)})}</output>}
     </div>
   </div>
 }

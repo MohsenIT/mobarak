@@ -14,7 +14,7 @@ export function juzRailLayout(numbers: number[], availableHeight: number) {
   const padding = 8
   const labelHeight = 12
   const intervals = Math.max(1,numbers.length-1)
-  const step = Math.max(1, Math.min(26, (availableHeight - padding * 2 - labelHeight) / intervals))
+  const step = Math.max(1, (availableHeight - padding * 2 - labelHeight) / intervals)
   const labelEvery = step >= 24 ? 1 : step >= 20 ? 2 : 5
   return {
     padding, step, labelHeight, height: (numbers.length-1) * step + labelHeight + padding * 2,

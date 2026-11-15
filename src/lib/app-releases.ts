@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.79',date:'2026-11-12',title:'فهرست یکپارچه و تراز نشانگر جزء',changeKinds:['improvement'],changes:[
+    'تب‌های فهرست حذف شدند؛ نوار جزءها با فاصلهٔ کوتاه از دو سر فهرست قرار می‌گیرد تا نشانگر شناور حتی در جزءهای ۱ و ۳۰ دقیقاً روبه‌روی جایگاه بماند.',
+  ],
+},{
   version:'0.4.78',date:'2026-11-12',title:'نمایهٔ جزءها در فهرست سوره‌ها',changeKinds:['feature','improvement'],changes:[
     'فهرست سوره‌ها نمایهٔ عمودی جزءهای ۱ تا ۳۰ دارد؛ لمس، کشیدن و کلیدهای جهت، فهرست را به محل جزء می‌برند و برچسب کامل جزء در نشانگر شناور دیده می‌شود.',
     'بازهٔ کامل جزءهای هر سوره نمایش داده می‌شود و نمایشگرهای بلندتر برچسب‌های بیشتری در نمایه دارند؛ نگاشت جایگاه‌ها و نقطه‌ها از داده محاسبه می‌شود.',

@@ -22,6 +22,7 @@ test('indexing the list leaves mushaf mode and its reading location intact',asyn
  await page.addInitScript(()=>localStorage.setItem('mushaf.mode','"mushaf"'));
  const drawer=await open(page,'/p/293');
  const rail=drawer.getByRole('slider',{name:'جزء',exact:true});
+ await expect(drawer.locator('.tab-btn')).toHaveCount(0);
  await rail.focus();await rail.press('End');
  await expect(rail).toHaveAttribute('aria-valuenow','30');
  await expect(page).toHaveURL(/\/p\/293$/);
@@ -44,6 +45,9 @@ test('rail has exact compact anchors, all thirty slots and a tight final edge',a
  await page.setViewportSize({width:390,height:1400});
  await expect.poll(()=>rail.locator('[data-labelled]').count()).toBeGreaterThan(7);
  await expect(rail.locator('[data-juz-slot]')).toHaveCount(30);
+ const tallRail=await rail.boundingBox(),tallList=await drawer.locator('.drawer-content-shell').boundingBox();
+ expect(tallRail.height/tallList.height).toBeGreaterThan(0.9);
+ expect(tallRail.height).toBeLessThan(tallList.height);
 });
 
 test('drag, touch and keyboard use the same juz slots and show the complete floating label',async({page})=>{
@@ -72,4 +76,19 @@ test('drag, touch and keyboard use the same juz slots and show the complete floa
  await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
  await expect(rail).toHaveAttribute('aria-valuenow','16');
  await touch.detach();
+});
+
+test('floating preview stays opposite the first and last juz within the list bounds',async({page})=>{
+ const drawer=await open(page);
+ const rail=drawer.getByRole('slider',{name:'جزء',exact:true});
+ await rail.focus();
+ for(const [key,juz]of [['Home',1],['End',30]]){
+  await rail.press(key);
+  const slot=await rail.locator(`[data-juz-slot="${juz}"]`).boundingBox();
+  const preview=await rail.locator('.juz-rail-preview').boundingBox();
+  const list=await drawer.locator('.drawer-content-shell').boundingBox();
+  expect(Math.abs(slot.y+slot.height/2-preview.y-preview.height/2)).toBeLessThan(1);
+  expect(preview.y).toBeGreaterThanOrEqual(list.y);
+  expect(preview.y+preview.height).toBeLessThanOrEqual(list.y+list.height);
+ }
 });

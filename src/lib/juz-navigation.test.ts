@@ -21,7 +21,8 @@ test('taller displays reveal more labels while all pointer coordinates retain th
   const layouts = [480,660,1000].map(height => juzRailLayout(numbers,height))
   expect(layouts[1].slots.filter(s=>s.labelled).length).toBeGreaterThan(layouts[0].slots.filter(s=>s.labelled).length)
   expect(layouts[2].slots.filter(s=>s.labelled)).toHaveLength(30)
-  for (const layout of layouts) {
+  for (const [index,layout] of layouts.entries()) {
+    expect(layout.height).toBeCloseTo([480,660,1000][index])
     for (const slot of layout.slots) expect(juzAtRailY(slot.center,layout)).toBe(slot.juz)
     expect(juzAtRailY(-100,layout)).toBe(1)
     expect(juzAtRailY(layout.height+100,layout)).toBe(30)

@@ -1,7 +1,7 @@
 'use client'
 import {StudyEntry} from './StudyLinks'
 import {DictationInput} from './DictationInput'
-import {t,t as tText} from '@/lib/i18n'
+import {t} from '@/lib/i18n'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import LanguageSettings from './LanguageSettings'
@@ -195,17 +195,6 @@ export default function NavDrawer(props: Props) {
         </div>}
         <details className="px-4 pb-3 text-xs leading-7"><summary>{t("ui.f4bf9b146f")}</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl><p>{t("ui.a8175202e6")}</p></details>
         </>}
-        {props.view !== 'tools' && <div className="flex border-b px-2" style={{ borderColor: 'var(--line)' }}>
-          {TABS.filter(t => props.view === 'tools'
-            ? t.id === 'appearance' || t.id === 'settings' || t.id === 'downloads' || t.id === 'about'
-            : t.id === 'surah' || t.id === 'juz' || t.id === 'recent'
-          ).map(t => (
-            <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
-              {tText(t.label)}
-            </button>
-          ))}
-        </div>}
-
         {props.view !== 'tools' && <div className="drawer-content-shell">
         <div ref={contentRef} className="h-full overflow-y-auto nice-scroll" onScroll={event=>{
           if(tab!=='surah'||q.trim())return
