@@ -68,6 +68,7 @@ add a second instance without discussing it first.
   | Startup splash lifecycle | `useStartupSplash.ts` |
   | Toolbar recitation button | `AudioToolbarButton.tsx` |
   | Analysis panel UI | `RootPanel.tsx` (+ `src/lib/analysis.ts`, `src/lib/analysis-view.ts`) |
+  | Surah drawer juz index and full juz ranges | `NavDrawer.tsx`, `JuzRail.tsx` (+ pure geometry/boundaries in `src/lib/juz-navigation.ts`) |
   | Advanced search page UI | `QuranSearch.tsx` (+ `src/lib/quran-search*.ts`) |
   | Selection-visible highlighting, comparison hold | `useVisibleSelection.ts`, `useComparisonHold.ts` |
 

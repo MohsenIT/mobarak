@@ -721,6 +721,15 @@ body {
 /* NavDrawer surah row — base layout + active (current surah) state.
    Active row gets a sage-tinted background and a stronger border so
    the user can spot where they are in the 114-row list. */
+.drawer-content-shell { position: relative; flex: 1; min-height: 0; }
+.drawer-surahs-with-index { padding-right: 78px; }
+.nav-surah-juz-range { white-space: nowrap; }
+.drawer-juz-index { position: absolute; right: 8px; top: 8px; bottom: 8px; width: 58px; z-index: 2; }
+.juz-rail { position: relative; width: 100%; border-radius: 14px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-soft); touch-action: none; user-select: none; cursor: ns-resize; }
+.juz-rail-slot { position: absolute; left: 8px; right: 8px; transform: translateY(-50%); display: flex; align-items: center; justify-content: center; font-size: 11px; line-height: 1; white-space: nowrap; pointer-events: none; }
+.juz-rail-dot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+.juz-rail-active { position: absolute; left: 5px; right: 5px; height: 16px; transform: translateY(-50%); border-radius: 999px; background: var(--word-selected); pointer-events: none; }
+.juz-rail-preview { position: absolute; right: calc(100% + 8px); transform: translateY(-50%); display: flex; align-items: center; justify-content: center; min-width: 72px; height: 44px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--sheet); box-shadow: 0 3px 14px #0002; color: var(--ink); font-size: 16px; font-weight: 600; white-space: nowrap; pointer-events: none; }
 .nav-surah-row {
   display: flex;
   align-items: center;

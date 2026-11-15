@@ -19,3 +19,15 @@ For every explicit destination prefix, `ا` / `اول` means first; `آ` / `آخ
 Persian, Arabic and Latin digits are accepted. Bare numbers in Go offer explicit alternatives; they do not silently pick a page or a surah. Bare numbers in quick search keep their existing meaning of an ayah number in the current surah. Shortcuts never change continuous reading into mushaf mode. Page, juz, ayah and context jumps align the target at the top rather than the bottom-sheet centering position.
 
 For shared advanced-search links containing relative commands, `at` retains the source surah. This is separate from `s`, the search-results scope.
+
+The unfiltered surah drawer also has a vertical juz index. `juz-navigation.ts`
+owns its thirty equal slots, adaptive label density, coordinate mapping and
+surah juz ranges, all derived from the existing juz boundary metadata. Compact
+labels are 1, 5, 10, 15, 20, 25, 30; every intervening juz has its own dot.
+Taller panes show additional labels without changing the slots or their mapping.
+`JuzRail` owns pointer capture, touch, keyboard and the full-label floating
+preview. Selecting an index position scrolls the surah list; it does not change
+the reading location until a surah is chosen. Existing drawer navigation and
+mode behavior remain owned by their existing handlers. Unit coverage checks
+every verse against the original juz data; browser coverage pins slot counts,
+range metadata, drag/touch/keyboard navigation and preservation of reading mode.

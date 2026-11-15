@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.78',date:'2026-11-12',title:'نمایهٔ جزءها در فهرست سوره‌ها',changeKinds:['feature','improvement'],changes:[
+    'فهرست سوره‌ها نمایهٔ عمودی جزءهای ۱ تا ۳۰ دارد؛ لمس، کشیدن و کلیدهای جهت، فهرست را به محل جزء می‌برند و برچسب کامل جزء در نشانگر شناور دیده می‌شود.',
+    'بازهٔ کامل جزءهای هر سوره نمایش داده می‌شود و نمایشگرهای بلندتر برچسب‌های بیشتری در نمایه دارند؛ نگاشت جایگاه‌ها و نقطه‌ها از داده محاسبه می‌شود.',
+  ],
+},{
   version:'0.4.77',date:'2026-11-12',title:'یکدست‌شدن کنترل‌های جست‌وجوی سریع',changeKinds:['improvement'],changes:[
     'انتخاب متن، ریشه و بُن‌واژه به شکل سگمنت یکپارچه نمایش داده می‌شود؛ پیشرفته با آیکن جست‌وجو در سمت چپ ردیف قرار دارد و همهٔ کنترل‌ها هم‌ارتفاع و هم‌تراز هستند.',
   ],

@@ -16,6 +16,8 @@ import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
 import DownloadsManager from './DownloadsManager'
 import SurahShortcuts from './SurahShortcuts'
+import JuzRail from './JuzRail'
+import { juzAtVerse, surahJuzRange } from '@/lib/juz-navigation'
 import DesktopPaneResizeHandle from './DesktopPaneResizeHandle'
 import { useDismissiblePanel } from './useDismissiblePanel'
 import { APP_NAME } from '@/lib/branding'
@@ -78,6 +80,21 @@ export default function NavDrawer(props: Props) {
   // when the drawer opens.
   const surahListRef = useRef<HTMLDivElement>(null)
   const activeSurahRef = useRef<HTMLButtonElement>(null)
+  const initialScrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [indexedJuz, setIndexedJuz] = useState(() => juzAtVerse(meta,currentSurah,1))
+  const railScroll = useRef<number | null>(null)
+  const juzNumbers = useMemo(()=>Object.keys(meta.juz).map(Number).sort((a,b)=>a-b),[meta])
+  const juzRanges = useMemo(()=>new Map(meta.surahs.map(s=>[s.n,surahJuzRange(meta,s)])),[meta])
+  const indexJuz = (juz: number) => {
+    if(initialScrollTimer.current)clearTimeout(initialScrollTimer.current)
+    const pane=contentRef.current, start=meta.juz[String(juz)]
+    const row=start&&pane?.querySelector<HTMLElement>(`[data-surah-row="${start[0]}"]`)
+    if(!pane||!row)return
+    setIndexedJuz(juz)
+    const top=Math.max(0,Math.min(pane.scrollHeight-pane.clientHeight,pane.scrollTop+row.getBoundingClientRect().top-pane.getBoundingClientRect().top-12))
+    railScroll.current=top
+    pane.scrollTo({top,behavior:'instant'})
+  }
 
   // When the drawer mounts (opens), auto-scroll the surah list so the
   // current surah is visible. Skip when there's a search query (user is
@@ -91,6 +108,7 @@ export default function NavDrawer(props: Props) {
       const pane = contentRef.current, row = activeSurahRef.current
       if (pane && row) pane.scrollTop = Math.max(0, pane.scrollTop + row.getBoundingClientRect().top - pane.getBoundingClientRect().top - (pane.clientHeight - row.clientHeight) / 2)
     }, 50)
+    initialScrollTimer.current=t
     return () => clearTimeout(t)
   }, [tab, q])
 
@@ -188,9 +206,17 @@ export default function NavDrawer(props: Props) {
           ))}
         </div>}
 
-        {props.view !== 'tools' && <div ref={contentRef} className="flex-1 overflow-y-auto nice-scroll">
+        {props.view !== 'tools' && <div className="drawer-content-shell">
+        <div ref={contentRef} className="h-full overflow-y-auto nice-scroll" onScroll={event=>{
+          if(tab!=='surah'||q.trim())return
+          const pane=event.currentTarget,top=pane.getBoundingClientRect().top
+          if(railScroll.current!==null&&Math.abs(pane.scrollTop-railScroll.current)<1)return
+          railScroll.current=null
+          const row=Array.from(pane.querySelectorAll<HTMLElement>('[data-surah-row]')).find(row=>row.getBoundingClientRect().bottom>top+8)
+          if(row)setIndexedJuz(juzAtVerse(meta,Number(row.dataset.surahRow),1))
+        }}>
           {tab === 'surah' && (
-            <div className="p-3">
+            <div className={`p-3${!q.trim()?' drawer-surahs-with-index':''}`}>
               {surahs.length === 0 && !suggestions.length && <p role="status" className="text-center py-4 text-sm">{t("ui.68f830ec5c")}</p>}
               <div ref={surahListRef} className="flex flex-col">
                 {surahs.map(s => {
@@ -200,6 +226,7 @@ export default function NavDrawer(props: Props) {
                       key={s.n}
                       ref={isActive ? activeSurahRef : null}
                       className="nav-surah-row"
+                      data-surah-row={s.n}
                       data-active={isActive || undefined}
                       style={isActive ? {
                         background: 'var(--word-root)',
@@ -222,7 +249,8 @@ export default function NavDrawer(props: Props) {
                       <span className="flex-1">
                         <span className="block font-bold text-[15px] font-quran" style={{ color: 'var(--ink)' }}>{s.ar}</span>
                         <span className="block text-xs mt-0.5" style={{ color: 'var(--ink-faint)' }}>
-                          {s.fa} · {toFa(s.vc)}{' '}{t("ui.d9959426df")}{' '}{s.rev === 'makkah' ? t("ui.039e791597") : t("ui.40f14b2806")}
+                          {toFa(s.vc)}{' '}{t("ui.d9959426df")}{' · '}{s.rev === 'makkah' ? t("ui.039e791597") : t("ui.40f14b2806")}{' · '}
+                          <span className="nav-surah-juz-range">{t('ui.f74f9b04c7')}{' '}<bdi dir="ltr">{toFa(juzRanges.get(s.n)!.from)}{juzRanges.get(s.n)!.to!==juzRanges.get(s.n)!.from&&<>–{toFa(juzRanges.get(s.n)!.to)}</>}</bdi></span>
                         </span>
                       </span>
                     </button>
@@ -359,6 +387,8 @@ export default function NavDrawer(props: Props) {
               <p className="text-xs leading-6 pt-2 border-t" style={{ color: 'var(--ink-faint)', borderColor: 'var(--line)' }}>{t("ui.9f4b86895b")}</p>
             </div>
           )}
+        </div>
+        {tab==='surah'&&!q.trim()&&<JuzRail numbers={juzNumbers} active={indexedJuz} onSelect={indexJuz}/>}
         </div>}
       </aside>
     </>
