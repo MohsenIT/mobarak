@@ -4,7 +4,7 @@ import {t,useUiLanguage} from '@/lib/i18n'
 import {LanguageOnboarding} from '@/components/quran/LanguageSettings'
 import { writeVerseAddress, readVerseAddress } from '@/lib/verse-link'
 import { readStored, writeStored } from '@/lib/reader-storage'
-import { clampScale, rememberSurah, removeBookmark, stepScale, togglePinnedSurah } from '@/lib/reader-settings'
+import { clampScale, readerFontSize, rememberSurah, removeBookmark, stepScale, togglePinnedSurah } from '@/lib/reader-settings'
 import { useReadingRoute } from '@/components/quran/useReadingRoute'
 import { useStartupSplash } from '@/components/quran/useStartupSplash'
 import { useReaderPresentation } from '@/components/quran/useReaderPresentation'
@@ -57,7 +57,7 @@ export default function Home() {
   // Presentation preferences (theme, translation, scale, bookmarks, pins) and
   // their mushaf.* persistence live in useReaderPresentation.
   const presentation = useReaderPresentation()
-  const { showTrans, setShowTrans, theme, setTheme, translator, setTranslator, scale, setScale, bookmarks, setBookmarks, pinnedSurahs, setPinnedSurahs } = presentation
+  const { showTrans, setShowTrans, theme, setTheme, translator, setTranslator, bookmarks, setBookmarks, pinnedSurahs, setPinnedSurahs } = presentation
   const [recentSurahs, setRecentSurahs] = useState<number[]>(() => readStored('mushaf.recent-surahs', []))
   const [drawerView, setDrawerView] = useState<'navigation' | 'tools'>('navigation')
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -102,6 +102,9 @@ export default function Home() {
     onQuickReturn: () => { clearTransientSelection(); search.setQuickOpen(false); setSearchTarget(null) },
   }, mainRef)
   const { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, writeReadingVerse, prepareQuickVisit } = route
+  const scale = presentation.scaleFor(mode)
+  const { setScaleFor } = presentation
+  const setScale = useCallback((value: React.SetStateAction<number>) => setScaleFor(mode, value), [mode, setScaleFor])
   /**
    * QuranSearch's close control: the panel owns its own open flag, but only the
    * route hook knows how to unwind the search URL it wrote.
@@ -255,7 +258,7 @@ export default function Home() {
     }
     el.addEventListener('wheel', h, { passive: false })
     return () => el.removeEventListener('wheel', h)
-  }, [meta])
+  }, [meta, setScale])
 
   const goPage = useCallback((p: number) => {
     const destination = clamp(p, 1, 604)
@@ -271,7 +274,7 @@ export default function Home() {
     } else requestMushafPage(destination)
     setSel(null)
     setComparisonRoot(null)
-  }, [mode, meta, requestMushafPage, setComparisonRoot, setSurah])
+  }, [mode, meta, requestMushafPage, setComparisonRoot, setSurah, setPullArrival, setFlash, setSearchTarget, setSel])
 
   const tapWord = useCallback((word: Selection) => {
     setPlaybackTarget(null)
@@ -284,7 +287,7 @@ export default function Home() {
     setFlash(null)
     setComparisonRoot(null)
     setSel(current => current?.s === word.s && current.a === word.a && current.pos === word.pos && (current.part ?? 'stem') === (word.part ?? 'stem') ? null : word)
-  }, [comparisonRange, comparisonRoots, showComparison, showIndex, toggleComparisonRoot, setComparisonRoot])
+  }, [comparisonRange, comparisonRoots, showComparison, showIndex, toggleComparisonRoot, setComparisonRoot, setPlaybackTarget, setSel, setFlash])
 
   const goSurah = useCallback((n: number) => {
     setPullArrival(null)
@@ -292,7 +295,7 @@ export default function Home() {
     if (!meta) return
     if (mode === 'mushaf') goPage(meta.surahs[nn - 1].pg)
     else setSurah(nn)
-  }, [meta, mode, goPage, setSurah])
+  }, [meta, mode, goPage, setSurah, setPullArrival])
 
   const requestMushafVerse = useCallback((p:number,s:number,a:number,pos:number)=>{
     const mounted=mainRef.current?.querySelector(`[data-reading-scroll] [data-surah="${s}"][data-ayah="${a}"][data-pos="${pos}"]`)
@@ -321,7 +324,7 @@ export default function Home() {
         setSearchTarget({ s, a, pos, align, wholeVerse })
       }
     })
-  }, [revealVerse, writeReadingVerse, prepareQuickVisit])
+  }, [revealVerse, writeReadingVerse, prepareQuickVisit, setPullArrival, setFlash, setSearchTarget])
 
   const navigateDestination = (destination: Destination, quick = false) => {
     search.leaveForReading();setSel(null)
@@ -433,7 +436,7 @@ export default function Home() {
     return { names, juz }
   }, [meta, segs, pageData, page])
 
-  const flowFont = 22 * scale
+  const flowFont = readerFontSize(scale)
   const switchMode = (m: ReadingMode) => {
     if (m === 'flow') setSurah(curSurahN)
     setMode(m)

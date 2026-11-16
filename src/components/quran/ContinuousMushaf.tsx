@@ -5,6 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type Compone
 import { loadSurah, loadTrans, toFa, type Meta, type SurahData, type Translations, type Translator } from '@/lib/quran'
 import MushafPage from './MushafPage'
 import FlowPage from './FlowPage'
+import { readerFontSize } from '@/lib/reader-settings'
 
 type ReadingProps = Pick<ComponentProps<typeof MushafPage>, 'selection' | 'highlightRoot' | 'analysisSelection' | 'comparisonRange' | 'comparisonRoots' | 'mutedComparisonRoots' | 'flash' | 'onWordTap' | 'onOpenSurahs'>
 type Bundle = { data: Map<number, SurahData>; translations: Map<number, Translations> }
@@ -54,7 +55,7 @@ function PageContent({ meta, page, showTrans, translator, fontSize, flowFont, pa
           surah={{ ...data, v: data.v.filter(v => v.n >= seg.f && v.n <= seg.t) }} trans={bundle.translations.get(seg.s) ?? null}
           showTrans translator={translator} fontSize={flowFont} {...reading} />
       })}
-    </div> : <div style={{ height: pageHeight }}>
+    </div> : <div className="mushaf-page-pan nice-scroll" dir="rtl" style={{ minHeight: pageHeight }}>
       <MushafPage meta={meta} page={page} pageData={bundle.data} fontSize={fontSize} {...reading} />
     </div>}
     <div className="mushaf-page-divider" aria-label={t("ui.562b3acae1",{p0:(toFa(page))})}>
@@ -79,7 +80,7 @@ export default function ContinuousMushaf({ meta, page, navigationRevision, onPag
   const frame = useRef(0)
   const report = useRef(onPageChange)
   report.current = onPageChange
-  const fontSize = Math.max(11, Math.min(size.h / 29, Math.min(640, size.w - 16) / 14, 48)) * scale
+  const fontSize = readerFontSize(scale)
   const pageHeight = Math.ceil(Math.max(size.h - 44, fontSize * 29))
   const rowHeight = pageHeight + 44 + PAGE_GAP
   const findPage = useCallback((y: number) => {
@@ -134,7 +135,7 @@ export default function ContinuousMushaf({ meta, page, navigationRevision, onPag
         data-mushaf-page={p} aria-label={t("ui.f9119fddb7",{p0:(toFa(p))})} className="relative w-full max-w-[640px] mx-auto"
         style={{ minHeight: visible ? rowHeight : heights.current.get(p) ?? rowHeight, paddingBottom: PAGE_GAP }}>
         {visible && <PageContent key={`${p}:${showTrans}`} meta={meta} page={p} showTrans={showTrans} translator={translator}
-          fontSize={fontSize} flowFont={22 * scale} pageHeight={pageHeight} onReady={onContentReady} onMeasure={measure} {...reading} />}
+          fontSize={fontSize} flowFont={fontSize} pageHeight={pageHeight} onReady={onContentReady} onMeasure={measure} {...reading} />}
       </section>
     })}
   </div>

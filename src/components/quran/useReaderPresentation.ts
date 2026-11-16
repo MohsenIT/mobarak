@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type SetStateAction } from 'react'
 import { readStored, writeStored } from '@/lib/reader-storage'
-import { resolveInitialTranslator } from '@/lib/reader-settings'
+import { clampScale, initialReaderScales, resolveInitialTranslator } from '@/lib/reader-settings'
+import type { ReadingMode } from '@/lib/verse-link'
 import { syncNativeAppearance } from '@/lib/native-appearance'
 import type { Translator } from '@/lib/quran'
 
@@ -25,7 +26,17 @@ export function useReaderPresentation() {
   const [showTrans, setShowTrans] = useState(() => readStored('mushaf.showTrans', false))
   const [theme, setTheme] = useState<'paper' | 'night'>(() => readStored('mushaf.theme', 'paper'))
   const [translator, setTranslator] = useState<Translator>(() => resolveInitialTranslator(readStored('mushaf.tr', 's'), readStored('mushaf.safavi-default.v1', false)))
-  const [scale, setScale] = useState(() => readStored('mushaf.scale', 1))
+  const [scaleState, setScaleState] = useState(() => ({
+    values: initialReaderScales(readStored('mushaf.scale', 1), readStored('mushaf.scales.v1', null)),
+    lastEdited: null as ReadingMode | null,
+  }))
+  const scaleFor = (mode: ReadingMode) => scaleState.values[mode]
+  const setScaleFor = useCallback((mode: ReadingMode, value: SetStateAction<number>) => {
+    setScaleState(current => ({
+      values: { ...current.values, [mode]: clampScale(typeof value === 'function' ? value(current.values[mode]) : value) },
+      lastEdited: mode,
+    }))
+  }, [])
   const [bookmarks, setBookmarks] = useState<number[]>(() => readStored('mushaf.marks', []))
   const [pinnedSurahs, setPinnedSurahs] = useState<number[]>(() => readStored('mushaf.pinned-surahs', []))
 
@@ -38,16 +49,17 @@ export function useReaderPresentation() {
   useEffect(() => { writeStored('mushaf.showTrans', showTrans) }, [showTrans])
   useEffect(() => { writeStored('mushaf.tr', translator); writeStored('mushaf.safavi-default.v1', true) }, [translator])
   useEffect(() => {
-    const timer = window.setTimeout(() => writeStored('mushaf.scale', scale), 200)
-    return () => window.clearTimeout(timer)
-  }, [scale])
+    writeStored('mushaf.scales.v1', scaleState.values)
+    // Preserve the legacy last-edited preference; mode memory is append-only.
+    if (scaleState.lastEdited) writeStored('mushaf.scale', scaleState.values[scaleState.lastEdited])
+  }, [scaleState])
   useEffect(() => { writeStored('mushaf.marks', bookmarks) }, [bookmarks])
 
   return {
     showTrans, setShowTrans,
     theme, setTheme,
     translator, setTranslator,
-    scale, setScale,
+    scaleFor, setScaleFor,
     bookmarks, setBookmarks,
     pinnedSurahs, setPinnedSurahs,
   }

@@ -9,6 +9,18 @@
  */
 
 import { isTranslator, type Translator } from './translations'
+import type { ReadingMode } from './verse-link'
+
+/** Shared physical font calibration; mode controls wrapping, not glyph size. */
+export const READER_BASE_FONT_SIZE = 22
+export const readerFontSize = (scale: number) => READER_BASE_FONT_SIZE * scale
+export type ReaderScales = Record<ReadingMode, number>
+export function initialReaderScales(legacy: unknown, stored: unknown): ReaderScales {
+  const valid = (value: unknown, fallback: number) => typeof value === 'number' && Number.isFinite(value) ? clampScale(value) : fallback
+  const fallback = valid(legacy, 1)
+  const values = stored && typeof stored === 'object' ? stored as Partial<ReaderScales> : {}
+  return { mushaf: valid(values.mushaf, fallback), flow: valid(values.flow, fallback) }
+}
 
 /** Smallest and largest reader scale the UI offers. */
 export const MIN_SCALE = 0.55

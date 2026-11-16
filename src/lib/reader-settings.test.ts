@@ -10,7 +10,20 @@ import {
   resolveInitialTranslator,
   stepScale,
   togglePinnedSurah,
+  initialReaderScales,
+  readerFontSize,
 } from './reader-settings'
+
+test('mode scales migrate the old preference without overwriting independent choices', () => {
+  expect(initialReaderScales(1.2, null)).toEqual({ mushaf: 1.2, flow: 1.2 })
+  expect(initialReaderScales(1.2, { mushaf: 1.5, flow: .8 })).toEqual({ mushaf: 1.5, flow: .8 })
+  expect(initialReaderScales('bad', { mushaf: NaN, flow: 9 })).toEqual({ mushaf: 1, flow: MAX_SCALE })
+})
+
+test('both modes use the same physical font calibration', () => {
+  expect(readerFontSize(1)).toBe(22)
+  expect(readerFontSize(1.5)).toBe(33)
+})
 
 test('scale clamps to the range the UI exposes', () => {
   expect(clampScale(0.1)).toBe(MIN_SCALE)

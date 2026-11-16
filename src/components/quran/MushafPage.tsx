@@ -98,23 +98,20 @@ export default function MushafPage({ meta, page, pageData, fontSize, selection, 
     let live = true
     const measure = () => {
       if (!live) return
-      // Fit the whole page uniformly to its available width. A narrow phone
-      // must never lose words beyond the left edge of a fixed mushaf line.
+      // Keep the chosen font size. Fixed mushaf lines may widen the page;
+      // its RTL scroll container exposes every word without shrinking glyphs.
       frame.style.fontSize = `${fontSize}px`
+      frame.style.minWidth = '0px'
       const pageLines = [...frame.querySelectorAll<HTMLElement>('.mushaf-line')]
-      // Fixed borders and minimum glyph widths do not scale with font size.
-      // Re-measure after fitting rather than assuming a single ratio is exact.
-      for (let pass = 0; pass < 5; pass++) {
-        let fit = 1
-        for (const line of pageLines) {
-          const children = [...line.children] as HTMLElement[]
-          const gap = parseFloat(getComputedStyle(line).columnGap) || 0
-          const needed = children.reduce((sum, child) => sum + child.getBoundingClientRect().width, 0) + gap * Math.max(0, children.length - 1)
-          if (needed > line.clientWidth && needed > 0) fit = Math.min(fit, line.clientWidth / needed)
-        }
-        if (fit >= 1) break
-        frame.style.fontSize = `${Math.floor(parseFloat(frame.style.fontSize) * fit * 0.995 * 100) / 100}px`
+      const padding = getComputedStyle(frame)
+      let neededWidth = 0
+      for (const line of pageLines) {
+        const children = [...line.children] as HTMLElement[]
+        const gap = parseFloat(getComputedStyle(line).columnGap) || 0
+        const needed = children.reduce((sum, child) => sum + child.getBoundingClientRect().width, 0) + gap * Math.max(0, children.length - 1)
+        neededWidth = Math.max(neededWidth, needed)
       }
+      frame.style.minWidth = `${Math.ceil(neededWidth + parseFloat(padding.paddingLeft) + parseFloat(padding.paddingRight) + 2)}px`
       for (const line of pageLines) {
         line.removeAttribute('data-comparison-band')
         const comparisonWords = [...line.querySelectorAll<HTMLElement>('[data-comparison-range="true"]')]

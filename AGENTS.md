@@ -140,6 +140,11 @@ add a second instance without discussing it first.
   keep their existing lifecycle and persistence timing; only the arithmetic
   lives here. See `src/lib/reader-settings.test.ts` and
   `tests/e2e/reader-settings.spec.cjs`.
+- Font calibration is shared through `readerFontSize` in `reader-settings.ts`.
+  `useReaderPresentation` owns per-mode scales in `mushaf.scales.v1`, seeded from
+  the legacy `mushaf.scale` without renaming it. Fixed mushaf lines pan inside
+  their page when needed rather than shrinking the selected font silently.
+  See `docs/reader-display.md` and `tests/e2e/reader-font-memory.spec.cjs`.
 - `src/lib/study-anchors.ts`: `anchorOptions(kind, surah, source, personal)` —
   the single place that decides which entity a study note can be anchored to
   (verse, root, lemma, form, or context). It was inline in `StudyNotebook.tsx`

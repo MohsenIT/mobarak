@@ -1,0 +1,35 @@
+const {test,expect}=require('@playwright/test');
+
+test('font calibration is equal and each mode remembers its last scale after switching and reload',async({page})=>{
+ await page.addInitScript(()=>{localStorage.setItem('mubarak.ui-language.v1','fa');localStorage.setItem('mushaf.safavi-default.v1','true')});
+ await page.route('**/offline-manifest.json',r=>r.fulfill({json:{groups:{core:[]}}}));
+ await page.goto('/s/19');
+ const trigger=page.locator('.reader-toolbar').getByRole('button',{name:'تنظیمات نمایش',exact:true});
+ const menu=page.locator('.reader-display-menu'),slider=menu.getByRole('slider');
+ const font=async locator=>locator.evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+ const flowWord=page.locator('.surah-pull-content .quran-word').first();
+ await expect(flowWord).toBeVisible({timeout:20000});
+ const initialFont=await font(flowWord);expect(initialFont).toBe(22);
+ await trigger.click();await menu.getByRole('button',{name:'مصحف',exact:true}).click();
+ const mushafWord=page.locator('[data-continuous-mushaf] .quran-word').first();
+ await expect(mushafWord).toBeAttached({timeout:20000});await page.evaluate(()=>document.fonts.ready);
+ await expect.poll(()=>font(mushafWord)).toBe(initialFont);
+ await slider.focus();await page.keyboard.press('End');await expect(slider).toHaveValue('1.9');
+ await expect.poll(()=>font(mushafWord)).toBeCloseTo(41.8,1);
+ const bounds=await mushafWord.evaluate(word=>{const el=word.closest('.mushaf-page-pan');return {client:el.clientWidth,scroll:el.scrollWidth}});
+ if(page.viewportSize().width<500)expect(bounds.scroll).toBeGreaterThan(bounds.client);
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await menu.getByRole('button',{name:'پیوسته',exact:true}).click();await expect(slider).toHaveValue('1');
+ await menu.getByRole('button',{name:'بزرگ‌نمایی',exact:true}).click();await expect(slider).toHaveValue('1.15');
+ await expect.poll(()=>font(flowWord)).toBeCloseTo(25.3,1);
+ await menu.getByRole('button',{name:'مصحف',exact:true}).click();await expect(slider).toHaveValue('1.9');
+ await menu.getByRole('button',{name:'پیوسته',exact:true}).click();await expect(slider).toHaveValue('1.15');
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mushaf.scales.v1')))).toEqual({mushaf:1.9,flow:1.15});
+ await page.reload();await trigger.click();await expect(slider).toHaveValue('1.15');
+ await menu.getByRole('button',{name:'مصحف',exact:true}).click();await expect(slider).toHaveValue('1.9');
+ await expect.poll(()=>font(mushafWord)).toBeCloseTo(41.8,1);
+ await page.keyboard.press('Escape');
+ await page.mouse.move(150,Math.min(600,page.viewportSize().height-80));
+ await page.keyboard.down('Control');await page.mouse.wheel(0,100);await page.keyboard.up('Control');
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mushaf.scales.v1')))).toEqual({mushaf:1.8,flow:1.15});
+});

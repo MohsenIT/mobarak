@@ -1,6 +1,6 @@
 'use client'
 
-import { BookOpen, Type } from 'lucide-react'
+import { BookOpen, ScrollText, Type } from 'lucide-react'
 import { t } from '@/lib/i18n'
 import { toFa } from '@/lib/quran'
 import { clampScale, MIN_SCALE, MAX_SCALE } from '@/lib/reader-settings'
@@ -22,7 +22,10 @@ export default function ReaderDisplayControls({ mode, onMode, scale, onScale, tr
     <section>
       <h3><BookOpen size={20} aria-hidden="true" />{t('ui.88619bd189')}</h3>
       <div className="reader-display-modes" role="group" aria-label={t('ui.88619bd189')}>
-        {(['mushaf', 'flow'] as const).map(item => <button key={item} type="button" aria-pressed={mode === item} onClick={() => onMode(item)}>{item === 'mushaf' ? t('ui.f7c7ba28bb') : t('ui.8fef24ffc4')}</button>)}
+        {(['mushaf', 'flow'] as const).map(item => <button key={item} type="button" aria-pressed={mode === item} onClick={() => onMode(item)}>
+          {item === 'mushaf' ? <BookOpen size={19} aria-hidden="true" /> : <ScrollText size={19} aria-hidden="true" />}
+          <span>{item === 'mushaf' ? t('ui.f7c7ba28bb') : t('ui.8fef24ffc4')}</span>
+        </button>)}
       </div>
     </section>
     {translation && <section className="reader-display-translation">

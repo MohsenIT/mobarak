@@ -15,3 +15,20 @@ The native range input supports keyboard and touch and uses the existing
 viewport bounds, preferences after reload, shared settings, route preservation,
 and Escape/focus behavior. Existing reading-mode and scale tests cover the
 settings placement.
+
+## Font calibration and mode memory
+
+Both surfaces use `readerFontSize` (22px at 100%). Mushaf never silently fits
+the font downward: fixed source lines expand their page's width and the local
+RTL horizontal scroll container exposes the full line. Vertical virtualization
+and source line grouping remain unchanged; the application itself does not
+overflow horizontally.
+
+`useReaderPresentation` owns independent scales under the append-only
+`mushaf.scales.v1` key (`{mushaf, flow}`). Missing values migrate from the existing
+`mushaf.scale`; that legacy key retains the last edited value for compatibility.
+Changing mode selects its remembered value without overwriting the other one.
+Slider, settings buttons, pinch and Ctrl/wheel all update the active mode.
+Persistence happens after the edit, without a delayed write that could outlive
+a quick mode change. `reader-font-memory.spec.cjs` checks rendered pixel sizes,
+mode round trips, reload, and local horizontal overflow at large font sizes.
