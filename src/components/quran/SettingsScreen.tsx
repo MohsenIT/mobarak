@@ -12,8 +12,8 @@ import ReadingScreenSettings from './ReadingScreen'
 import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
 import DownloadsManager from './DownloadsManager'
-import { IconBook, IconMoon, IconSun } from './Ornaments'
-import { toFa } from '@/lib/quran'
+import { IconMoon, IconSun } from './Ornaments'
+import ReaderDisplayControls from './ReaderDisplayControls'
 import type { ReadingMode } from '@/lib/reading-route'
 
 type Tab = 'appearance' | 'language' | 'downloads' | 'about'
@@ -59,10 +59,7 @@ export default function SettingsScreen({ meta, theme, onTheme, mode, onMode, tra
           {(['paper', 'night'] as const).map(item => <button key={item} type="button" aria-pressed={theme === item} onClick={() => onTheme(item)}>{item === 'paper' ? t('ui.a97a005a42') : t('ui.95b1ddc4a1')}</button>)}
         </div></section>
         <AppearanceColors />
-        <section><h3><IconBook />{t('ui.88619bd189')}</h3><div className="settings-theme-choices" role="group" aria-label={t('ui.88619bd189')}>
-          {(['flow', 'mushaf'] as const).map(item => <button key={item} type="button" aria-pressed={mode === item} onClick={() => onMode(item)}>{item === 'mushaf' ? t('ui.f7c7ba28bb') : t('ui.8fef24ffc4')}</button>)}
-        </div></section>
-        <section><h3><IconBook />{t('ui.1fe7007e7e')}</h3><div className="settings-scale"><button type="button" className="icon-btn" aria-label={t('ui.8b885c6faa')} disabled={scale >= 1.9} onClick={() => onScale(Math.round(Math.min(1.9, scale + .15) * 20) / 20)}>+</button><output>{toFa(Math.round(scale * 100))}٪</output><button type="button" className="icon-btn" aria-label={t('ui.2e81f56c3d')} disabled={scale <= .55} onClick={() => onScale(Math.round(Math.max(.55, scale - .15) * 20) / 20)}>−</button></div></section>
+        <ReaderDisplayControls mode={mode} onMode={onMode} scale={scale} onScale={onScale} />
         <ReadingScreenSettings />
       </div>}
       {tab === 'language' && <div className="settings-stack"><LanguageSettings translator={translator} onTranslation={onTranslator} /><CalendarSettings /><CopyFormatSettings /></div>}

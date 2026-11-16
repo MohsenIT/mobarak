@@ -1,0 +1,25 @@
+const {test,expect}=require('@playwright/test');
+test('eye menu shares persistent display settings and preserves the reading route',async({page})=>{
+ await page.addInitScript(()=>{localStorage.setItem('mubarak.ui-language.v1','fa');localStorage.setItem('mushaf.safavi-default.v1','true')});
+ await page.route('**/offline-manifest.json',r=>r.fulfill({json:{groups:{core:[]}}}));
+ await page.goto('/s/19');
+ const trigger=page.locator('.reader-toolbar').getByRole('button',{name:'تنظیمات نمایش',exact:true});
+ await expect(trigger).toBeVisible({timeout:20000});await trigger.click();
+ const menu=page.locator('.reader-display-menu');await expect(menu).toBeVisible();
+ const box=await menu.boundingBox(),viewport=page.viewportSize();
+ expect(box.x).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(viewport.width);expect(box.y+box.height).toBeLessThanOrEqual(viewport.height);
+ const translation=menu.getByRole('switch');await translation.click();await expect(translation).toHaveAttribute('aria-checked','true');
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mushaf.showTrans')))).toBe(true);
+ await menu.getByRole('slider').focus();await page.keyboard.press('ArrowRight');
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mushaf.scale')))).toBe(1.05);
+ await menu.getByRole('button',{name:'مصحف',exact:true}).click();
+ await expect(menu.getByRole('button',{name:'مصحف',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('mushaf.mode')))).toBe('mushaf');
+ await menu.getByRole('button',{name:'پیوسته',exact:true}).click();await expect(page).toHaveURL(/\/s\/19(?:\/|$)/);
+ await page.keyboard.press('Escape');await expect(menu).toBeHidden();await expect(trigger).toBeFocused();
+ await page.reload();await trigger.click();
+ await expect(menu.getByRole('switch')).toHaveAttribute('aria-checked','true');await expect(menu.getByRole('slider')).toHaveValue('1.05');
+ await expect(menu.getByRole('button',{name:'پیوسته',exact:true})).toHaveAttribute('aria-pressed','true');
+ await page.keyboard.press('Escape');await page.locator('.reader-toolbar').getByRole('button',{name:'تنظیمات',exact:true}).click();
+ await expect(page.locator('.settings-screen .settings-scale output')).toHaveText('۱۰۵٪');
+});

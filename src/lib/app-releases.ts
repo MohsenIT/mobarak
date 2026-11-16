@@ -3,6 +3,10 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.81',date:'2026-11-16',title:'دسترسی سریع به تنظیمات نمایش',changeKinds:['feature'],changes:[
+    'آیکن چشم در نوار مطالعه، تنظیمات نمایش را باز می‌کند: انتخاب مصحف یا پیوسته، نمایش ترجمه و اندازهٔ قلم؛ هماهنگ با تنظیمات اصلی و تم برنامه.',
+  ],
+},{
   version:'0.4.80',date:'2026-11-12',title:'صفحهٔ معرفی قرآن مبارک',changeKinds:['feature'],changes:[
     'ارائهٔ ده‌اسلایدی معرفی قرآن مبارک در مسیر about منتشر شد؛ با تصاویر و فونت‌های محلی، کنترل لمسی و کیبورد و نمایش سازگار با موبایل و دسکتاپ.',
   ],

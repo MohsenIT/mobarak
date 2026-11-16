@@ -4,8 +4,8 @@ const {test,expect}=require('@playwright/test');
 // There is exactly one switch path: page.tsx's `switchMode` -> useReadingRoute's
 // `setMode`, which owns the surah carry-over, the URL rewrite and the
 // `mushaf.mode` persistence. The selector is a pure control rendered in
-// SettingsScreen (the only reachable placement); NavDrawer carries no second
-// copy. These tests pin that through the real UI, so a hypothetical third
+// SettingsScreen and the toolbar eye's shared ReaderDisplayControls; NavDrawer
+// carries no copy. These tests pin that through the real UI, so a hypothetical third
 // reading mode cannot quietly fork the switch logic.
 //
 // Also pins the mode-aware verse reveal that goVerse / panelJump /
@@ -37,7 +37,7 @@ async function openSettings(page){
 }
 const modeGroup=screen=>screen.getByRole('group',{name:'حالت نمایش'});
 
-test('the mode selector exists exactly once, inside settings, and not on the reader',async({page})=>{
+test('the mode selector in settings uses shared controls while quick access is closed',async({page})=>{
  await setup(page);
  await page.goto('/s/19',{waitUntil:'domcontentloaded'});
  await readerReady(page);

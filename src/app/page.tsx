@@ -38,12 +38,12 @@ import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
 import { ArrowRight, Search, Settings, ChevronDown } from 'lucide-react'
 import AudioToolbarButton from '@/components/quran/AudioToolbarButton'
+import ReaderDisplayMenu from '@/components/quran/ReaderDisplayMenu'
 import QuranSearch from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import ReaderSearchHighlights from '@/components/quran/ReaderSearchHighlights'
 import {
   PatternBG, IconMenu,
-  IconTranslate,
 } from '@/components/quran/Ornaments'
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
@@ -507,13 +507,7 @@ export default function Home() {
           onExpandAndResume={() => { setAudioControlsVisible(true); if (audioStatus !== 'loading') setAudioPlayRequest(value => value + 1) }}
         />
 
-          <button className="icon-btn" aria-label={t("ui.2d6258b160")}
-            title={t("ui.37e2fdb79c")}
-            aria-pressed={showTrans}
-            style={{ color: showTrans ? 'var(--sage)' : undefined, background: showTrans ? 'var(--word-root)' : undefined }}
-            onClick={() => setShowTrans(v => !v)}>
-            <IconTranslate />
-          </button>
+          <ReaderDisplayMenu mode={mode} onMode={switchMode} scale={scale} onScale={setScale} showTranslation={showTrans} onTranslation={setShowTrans} />
           <button className="icon-btn" onClick={() => setSettingsOpen(true)} aria-label={t("ui.6badcac8c1")} title={t("ui.6badcac8c1")}><Settings size={20} /></button>
 
 

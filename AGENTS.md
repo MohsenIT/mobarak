@@ -94,8 +94,11 @@ add a second instance without discussing it first.
   continuous page view, translation flow) is declared **once**
   in `src/lib/verse-link.ts` and re-exported by `src/lib/reading-route.ts`;
   do not re-declare it elsewhere. There is exactly **one** mode switch path in
-  the UI: `SettingsScreen` (`mode`/`onMode` props) — do not add a second
-  toggle. (The old NavDrawer selector was dead UI since release 0.4.52 — the
+  the UI: `switchMode` (`mode`/`onMode` props). The shared
+  `ReaderDisplayControls` renders in `SettingsScreen` and the toolbar eye
+  popover (`ReaderDisplayMenu`), explicitly requested as quick access.
+  Both use the same route/presentation owners; never fork that state.
+  (The old NavDrawer selector was dead UI since release 0.4.52 — the
   drawer's appearance/settings/downloads/about tabs never rendered it; it was
   removed rather than revived.) Pinned by
   `tests/e2e/reading-mode-navigation.spec.cjs`.

@@ -1187,6 +1187,23 @@ input[type='range'].page-slider::-moz-range-thumb {
 .analysis-examples { order: 2; min-width: 0; }
 .analysis-settings-popover { z-index: 150; background: var(--sheet); color: var(--ink); border-color: var(--line-strong); width: min(280px, calc(100vw - 24px)); max-height: min(480px, 70dvh); overflow-y: auto; }
 .analysis-settings-popover input { accent-color: var(--sage); }
+
+.reader-display-menu { z-index: 150; width: min(340px, calc(100vw - 24px)); max-height: min(520px, calc(100dvh - 100px)); overflow-y: auto; background: var(--sheet); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 16px; padding: 18px; }
+.reader-display-controls { display: grid; gap: 18px; }
+.reader-display-controls section + section { border-top: 1px solid var(--line); padding-top: 18px; }
+.reader-display-controls h3, .reader-display-translation > span { display: flex; align-items: center; gap: 10px; font-weight: 700; margin: 0 0 14px; }
+.reader-display-modes { display: flex; padding: 3px; border: 1px solid var(--line-strong); border-radius: 10px; gap: 3px; }
+.reader-display-modes button { flex: 1; min-height: 40px; border-radius: 7px; }
+.reader-display-modes button[aria-pressed="true"] { background: var(--word-root); color: var(--ink); box-shadow: inset 0 0 0 1px var(--sage); }
+.reader-display-translation { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.reader-display-translation > span { margin: 0; }
+.reader-display-switch { flex-shrink: 0; width: 46px; height: 28px; padding: 3px; border-radius: 999px; background: var(--line-strong); direction: ltr; }
+.reader-display-switch span { display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--paper); transition: transform .15s; }
+.reader-display-switch[aria-checked="true"] { background: var(--sage); }
+.reader-display-switch[aria-checked="true"] span { transform: translateX(18px); }
+.reader-display-scale { display: flex; align-items: center; gap: 8px; }
+.reader-display-scale input { min-width: 0; flex: 1; accent-color: var(--sage); height: 32px; }
+.reader-display-scale .icon-btn { flex-shrink: 0; font-family: inherit; }
 .analysis-order-select { background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 6px; min-width: 0; }
 .analysis-settings-button:focus-visible, .analysis-section-toggle:focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }
 
