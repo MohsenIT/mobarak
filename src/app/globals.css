@@ -43,6 +43,7 @@
 
 /* Default shadcn tokens — kept for any shadcn/ui component that still references them */
 :root {
+  --reader-control-font-size: 13px;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -808,7 +809,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 .tab-btn {
   flex: 1;
   padding: 10px 4px;
-  font-size: 13px;
+  font-size: var(--reader-control-font-size);
   font-weight: 500;
   color: var(--ink-soft);
   border-bottom: 2px solid transparent;
@@ -1190,6 +1191,7 @@ input[type='range'].page-slider::-moz-range-thumb {
 .analysis-settings-popover input { accent-color: var(--sage); }
 
 .reader-display-menu { z-index: 150; width: min(340px, calc(100vw - 24px)); max-height: min(520px, calc(100dvh - 100px)); overflow-y: auto; background: var(--sheet); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 16px; padding: 18px; }
+.reader-display-menu { font-size: var(--reader-control-font-size); }
 .reader-display-controls { display: grid; gap: 18px; }
 .reader-display-controls section + section { border-top: 1px solid var(--line); padding-top: 18px; }
 .reader-display-controls h3, .reader-display-translation > span { display: flex; align-items: center; gap: 10px; font-weight: 700; margin: 0 0 14px; }
@@ -1206,6 +1208,10 @@ input[type='range'].page-slider::-moz-range-thumb {
 .reader-display-scale { display: flex; align-items: center; gap: 8px; }
 .reader-display-scale input { min-width: 0; flex: 1; accent-color: var(--sage); height: 32px; }
 .reader-display-scale .icon-btn { flex-shrink: 0; font-family: inherit; }
+.reader-display-menu .reader-display-controls h3,
+.reader-display-menu .reader-display-translation > span,
+.reader-display-menu .reader-display-modes button { font-family: inherit; font-size: var(--reader-control-font-size); font-weight: 500; line-height: 1.5; }
+.reader-display-menu .reader-display-modes button[aria-pressed="true"] { font-weight: 700; }
 .analysis-order-select { background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 6px; min-width: 0; }
 .analysis-settings-button:focus-visible, .analysis-section-toggle:focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }
 

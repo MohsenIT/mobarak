@@ -7,14 +7,37 @@ import { juzAtRailY, juzAtVerse, juzRailLayout, surahJuzRange } from './juz-navi
 const meta = rawMeta as unknown as Meta
 const numbers = Object.keys(meta.juz).map(Number).sort((a,b) => a-b)
 
-test('compact rail has every juz with the specified anchors and exact dot counts', () => {
+test('compact rail retains endpoints and one slot per juz with a tight final edge', () => {
   const layout = juzRailLayout(numbers, 480)
   expect(layout.slots.map(slot => slot.juz)).toEqual(numbers)
-  expect(layout.slots.filter(slot => slot.labelled).map(slot => slot.juz)).toEqual([1,5,10,15,20,25,30])
-  expect(layout.slots.filter(slot => slot.juz > 1 && slot.juz < 5 && !slot.labelled)).toHaveLength(3)
-  for (const start of [5,10,15,20,25]) expect(layout.slots.filter(slot => slot.juz > start && slot.juz < start + 5 && !slot.labelled)).toHaveLength(4)
+  expect(layout.slots[0].labelled).toBe(true)
+  expect(layout.slots.at(-1)!.labelled).toBe(true)
   const last = layout.slots.at(-1)!
   expect(layout.height - last.center - layout.labelHeight / 2).toBeCloseTo(layout.padding)
+})
+
+test('every label and dot fits without collisions from short landscape to tall screens', () => {
+  let previousCount = 0
+  for (let height = 80; height <= 1500; height++) {
+    const layout = juzRailLayout(numbers,height)
+    expect(layout.height).toBeCloseTo(height)
+    expect(layout.slots[0].labelled).toBe(true)
+    expect(layout.slots.at(-1)!.labelled).toBe(true)
+    const labels = layout.slots.filter(slot=>slot.labelled).length
+    expect(labels).toBeGreaterThanOrEqual(previousCount)
+    previousCount = labels
+    for (let i = 0; i < layout.slots.length; i++) {
+      const slot = layout.slots[i]
+      expect(juzAtRailY(slot.center,layout)).toBe(slot.juz)
+      if (i) {
+        const previous = layout.slots[i-1]
+        expect(slot.center - slot.height/2).toBeGreaterThanOrEqual(previous.center + previous.height/2 - .000001)
+      }
+    }
+    const last = layout.slots.at(-1)!
+    expect(layout.height - last.center - last.height/2).toBeCloseTo(layout.padding)
+  }
+  expect(juzRailLayout(numbers,170).slots.filter(s=>s.labelled)).toHaveLength(2)
 })
 
 test('taller displays reveal more labels while all pointer coordinates retain the same juz mapping', () => {

@@ -31,23 +31,37 @@ test('indexing the list leaves mushaf mode and its reading location intact',asyn
  await expect(page.locator('[data-continuous-mushaf]')).toBeVisible();
 });
 
-test('rail has exact compact anchors, all thirty slots and a tight final edge',async({page})=>{
+test('rail adapts label density, keeps all thirty slots and a tight final edge',async({page})=>{
  await page.setViewportSize({width:390,height:780});
  const drawer=await open(page);
  const rail=drawer.getByRole('slider',{name:'جزء',exact:true});
  await expect(rail.locator('[data-juz-slot]')).toHaveCount(30);
- await expect.poll(()=>rail.locator('[data-labelled]').evaluateAll(es=>es.map(e=>Number(e.dataset.juzSlot)))).toEqual([1,5,10,15,20,25,30]);
+ await expect(rail.locator('[data-juz-slot="1"]')).toHaveAttribute('data-labelled','true');
+ await expect(rail.locator('[data-juz-slot="30"]')).toHaveAttribute('data-labelled','true');
+ const compactCount=await rail.locator('[data-labelled]').count();
  await expect(rail.locator('[data-juz-slot="1"]')).toBeVisible();
  const gap=await rail.evaluate(el=>el.getBoundingClientRect().bottom-el.lastElementChild.getBoundingClientRect().bottom);
  expect(gap).toBeLessThanOrEqual(9);
  const range=drawer.locator('[data-surah-row="18"] .nav-surah-juz-range');
  await expect(range).toHaveText('جزء ۱۵–۱۶');
  await page.setViewportSize({width:390,height:1400});
- await expect.poll(()=>rail.locator('[data-labelled]').count()).toBeGreaterThan(7);
+ await expect.poll(()=>rail.locator('[data-labelled]').count()).toBeGreaterThan(compactCount);
  await expect(rail.locator('[data-juz-slot]')).toHaveCount(30);
  const tallRail=await rail.boundingBox(),tallList=await drawer.locator('.drawer-content-shell').boundingBox();
  expect(tallRail.height/tallList.height).toBeGreaterThan(0.9);
  expect(tallRail.height).toBeLessThan(tallList.height);
+ const tallCount=await rail.locator('[data-labelled]').count();
+ for(const viewport of [{width:1280,height:591},{width:740,height:390},{width:390,height:780}]){
+  await page.setViewportSize(viewport);
+  await expect.poll(async()=>{
+   const sizes=await rail.evaluate(el=>({rail:el.clientHeight,host:el.parentElement.clientHeight}));return Math.abs(sizes.rail-sizes.host);
+  }).toBeLessThan(1);
+  await expect(rail.locator('[data-juz-slot="1"]')).toHaveAttribute('data-labelled','true');
+  await expect(rail.locator('[data-juz-slot="30"]')).toHaveAttribute('data-labelled','true');
+  expect(await rail.locator('[data-labelled]').count()).toBeLessThan(tallCount);
+  const overlap=await rail.locator('[data-juz-slot]').evaluateAll(es=>es.slice(1).some((el,i)=>el.getBoundingClientRect().top<es[i].getBoundingClientRect().bottom-.1));
+  expect(overlap).toBe(false);
+ }
 });
 
 test('drag, touch and keyboard use the same juz slots and show the complete floating label',async({page})=>{

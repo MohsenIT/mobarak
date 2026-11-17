@@ -10,23 +10,41 @@ export function surahJuzRange(meta: Meta, surah: SurahMeta): { from: number; to:
 }
 
 export function juzRailLayout(numbers: number[], availableHeight: number) {
-  if (!numbers.length) return { height: 0, padding: 0, step: 0, labelHeight: 0, slots: [] as { juz: number; labelled: boolean; center: number }[] }
+  if (!numbers.length) return { height: 0, padding: 0, labelHeight: 0, dotHeight: 0, slots: [] as { juz: number; labelled: boolean; center: number; height: number }[] }
   const padding = 8
-  const labelHeight = 12
-  const intervals = Math.max(1,numbers.length-1)
-  const step = Math.max(1, (availableHeight - padding * 2 - labelHeight) / intervals)
-  const labelEvery = step >= 24 ? 1 : step >= 20 ? 2 : 5
+  const labelHeight = 14
+  const count = numbers.length
+  const height = Math.max(padding * 2 + Math.min(count, 2) * labelHeight + Math.max(0, count - 2) * .5, availableHeight)
+  const dotHeight = Math.min(3, Math.max(.5, (height - padding * 2 - Math.min(count, 2) * labelHeight - (count - 1)) / Math.max(1, count - 2)))
+  const anchors = (labels: number) => new Set(Array.from({ length: labels }, (_, i) => labels === 1 ? 0 : Math.round(i * (count - 1) / (labels - 1))))
+  const geometry = (labelled: Set<number>) => {
+    const sizes = numbers.map((_, i) => labelled.has(i) ? labelHeight : dotHeight)
+    const gaps = numbers.slice(1).map((_, i) => labelled.has(i) || labelled.has(i + 1) ? 12 : 6)
+    return { sizes, gaps, required: padding * 2 + sizes.reduce((a,b) => a+b,0) + gaps.reduce((a,b) => a+b,0) }
+  }
+  // Pick the densest evenly distributed labels that fit their real boxes.
+  // Endpoints always remain; in short landscapes only the dot gaps compress.
+  let labelled = anchors(Math.min(2, count))
+  for (let labels = count; labels > 2; labels--) {
+    const candidate = anchors(labels)
+    if (geometry(candidate).required <= height) { labelled = candidate; break }
+  }
+  const { sizes, gaps } = geometry(labelled)
+  const gapBudget = height - padding * 2 - sizes.reduce((a,b) => a+b,0)
+  const preferredGaps = gaps.reduce((a,b) => a+b,0)
+  let cursor = padding
+  const slots = numbers.map((juz, index) => {
+    const size = sizes[index]
+    const slot = { juz, labelled: labelled.has(index), center: cursor + size / 2, height: size }
+    cursor += size + (preferredGaps ? (gaps[index] ?? 0) * gapBudget / preferredGaps : 0)
+    return slot
+  })
   return {
-    padding, step, labelHeight, height: (numbers.length-1) * step + labelHeight + padding * 2,
-    slots: numbers.map((juz, index) => ({
-      juz, center: padding + labelHeight / 2 + index * step,
-      labelled: index === 0 || index === numbers.length - 1 || juz % 5 === 0 || juz % labelEvery === 0,
-    })),
+    padding, labelHeight, dotHeight, height: count === 1 ? padding * 2 + labelHeight : height, slots,
   }
 }
 
 export function juzAtRailY(y: number, layout: ReturnType<typeof juzRailLayout>): number | null {
   if (!layout.slots.length) return null
-  const index = Math.max(0, Math.min(layout.slots.length - 1, Math.round((y - layout.padding - layout.labelHeight / 2) / layout.step)))
-  return layout.slots[index].juz
+  return layout.slots.reduce((nearest, slot) => Math.abs(slot.center - y) < Math.abs(nearest.center - y) ? slot : nearest).juz
 }

@@ -21,10 +21,14 @@ Persian, Arabic and Latin digits are accepted. Bare numbers in Go offer explicit
 For shared advanced-search links containing relative commands, `at` retains the source surah. This is separate from `s`, the search-results scope.
 
 The unfiltered surah drawer also has a vertical juz index. `juz-navigation.ts`
-owns its thirty equal slots, adaptive label density, coordinate mapping and
-surah juz ranges, all derived from the existing juz boundary metadata. Compact
-labels are 1, 5, 10, 15, 20, 25, 30; every intervening juz has its own dot.
-Taller panes show additional labels without changing the slots or their mapping.
+owns its thirty slots, adaptive label density, coordinate mapping and
+surah juz ranges, all derived from the existing juz boundary metadata. Labels
+1 and 30 always remain; intermediate labels are distributed evenly at the
+densest count that fits the available pane height. Label and dot rectangles
+have separate measured-size budgets and nonnegative spacing. Short landscape
+panes compress dot gaps instead of overlapping text. Pointer mapping uses the
+nearest actual slot center, the same geometry as rendering and the preview.
+Taller panes show additional labels; every intervening juz retains its dot.
 `JuzRail` owns pointer capture, touch, keyboard and the full-label floating
 preview. Selecting an index position scrolls the surah list; it does not change
 the reading location until a surah is chosen. Existing drawer navigation and

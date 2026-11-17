@@ -3,6 +3,11 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.83',date:'2026-11-17',title:'نوار جزءهای واکنش‌گرا و فونت یکدست',changeKinds:['fix','improvement'],changes:[
+    'تعداد برچسب‌های نوار جزءها از فضای واقعی محاسبه می‌شود؛ جزء ۱ و ۳۰ همیشه دیده می‌شوند و برچسب‌ها در حالت افقی روی هم نمی‌افتند.',
+    'فونت متن‌های منوی نمایش با تب‌های باتم‌شیت یکسان شد.',
+  ],
+},{
   version:'0.4.82',date:'2026-11-16',title:'اندازهٔ قلم و حافظهٔ حالت نمایش',changeKinds:['fix','improvement'],changes:[
     'اندازهٔ قلم مصحف و پیوسته مبنای یکسان دارد؛ آخرین اندازهٔ هر حالت جداگانه ذخیره و با برگشت یا بارگذاری مجدد بازیابی می‌شود. سطرهای عریض مصحف به‌جای کوچک‌شدن خودکار، قابل جابه‌جایی افقی‌اند.',
     'آیکن کتاب باز و طومار متن به انتخاب مصحف و پیوسته اضافه شد.',
