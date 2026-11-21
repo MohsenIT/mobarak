@@ -18,8 +18,8 @@ export interface BridgeEnv extends AIEnv {
 export interface EventRow {id:string;source:string;kind:string;payload_json:string;attempts:number;}
 interface IssueRow {number:number;github_id:number;title:string;body:string|null;labels_json:string;state:string;state_reason:string|null;url:string;channel_post_id:number|null;group_root_id:number|null;canonical_text:string|null;reporter_chat_id:number|null;updated_at:string;}
 interface GitIssue extends PublicIssue {updated_at:string;}
-interface Draft {id:string;user_id:number;chat_id:number;body:string;title:string;category:string;mode:string;target_issue:number|null;candidates_json:string;state:string;issue_number:number|null;expires_at:number;report_json?:string|null;}
-interface User {id:number;is_bot?:boolean;username?:string;}
+interface Draft {id:string;user_id:number;chat_id:number;body:string;title:string;category:string;mode:string;target_issue:number|null;candidates_json:string;state:string;issue_number:number|null;expires_at:number;report_json?:string|null;reply_group_message_id?:number|null;}
+interface User {id:number;is_bot?:boolean;username?:string;first_name?:string;last_name?:string;}
 interface Message {message_id:number;message_thread_id?:number;date?:number;text?:string;from?:User;chat:{id:number;type:string};reply_to_message?:Message;}
 interface BaleUpdate {update_id:number;message?:Message;edited_message?:Message;callback_query?:{id:string;from:User;data?:string;message?:Message};}
 interface Candidate {number:number;title:string;url:string;post:number|null;score:number;}
@@ -84,14 +84,20 @@ export class Bridge {
   }
   return {items:[...map.values()].filter(i=>i.score>=0.15).sort((a,b)=>b.score-a.score).slice(0,3),degraded};
  }
- async newDraft(update:BaleUpdate,message:Message,mode='report',target?:number):Promise<void>{
-  const user=message.from!;const text=message.text!.trim();const id='d'+update.update_id;
+ async newDraft(update:BaleUpdate,message:Message,mode='report',target?:number,replyTo?:number):Promise<void>{
+  const user=message.from!;const text=replyTo?redact(message.text!.trim()).text:message.text!.trim();const id='d'+update.update_id;
   if(text.length>2800){await this.say('long:'+update.update_id,message.chat.id,'لطفاً متن را به حداکثر ۲۸۰۰ نویسه کوتاه کنید تا پیش از انتشار، تمام آن قابل بررسی باشد.');return;}
   const count=await one<{n:number}>(this.env.DB,'SELECT COUNT(*) AS n FROM drafts WHERE user_id=? AND created_at>?',user.id,now()-86400);
   if((count?.n??0)>=20){await this.say('limit:'+update.update_id,message.chat.id,'سقف روزانهٔ ثبت گزارش پر شده است؛ فردا دوباره تلاش کنید.');return;}
   const category=classify(text,this.available);const title=mode==='comment'?`توضیح تکمیلی #${target}`:reportTitle(text);
   const similar=mode==='report'?await this.candidates(text):{items:[],degraded:false};
-  await execute(this.env.DB,`INSERT OR IGNORE INTO drafts(id,user_id,chat_id,body,title,category,mode,target_issue,candidates_json,expires_at) VALUES (?,?,?,?,?,?,?,?,?,?)`,id,user.id,message.chat.id,text,title,category.key,mode,target??null,JSON.stringify(similar.items),now()+86400);
+  await execute(this.env.DB,`INSERT OR IGNORE INTO drafts(id,user_id,chat_id,body,title,category,mode,target_issue,candidates_json,expires_at,reply_group_message_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,id,user.id,message.chat.id,text,title,category.key,mode,target??null,JSON.stringify(similar.items),now()+86400,replyTo??null);
+  if(replyTo){
+   await this.say('draft-preview:'+id,message.chat.id,
+    `پاسخ به دیدگاه گزارش #${target}\n\n${text}\n\nبا تأیید، این پاسخ زیر همان دیدگاه در بله و در GitHub عمومی می‌شود.`,
+    [[{text:'انتشار پاسخ',callback_data:`approve:${id}`},{text:'لغو',callback_data:`cancel:${id}`}]]);
+   return;
+  }
   const buttons:{text:string;callback_data?:string;url?:string}[][]=[];
   const matches=similar.items.map(i=>`#${i.number} — ${i.title}`).join('\n');
   for(const item of similar.items)buttons.push([{text:`همین موضوع است: #${item.number}`,callback_data:`use:${id}:${item.number}`}]);
@@ -111,6 +117,7 @@ export class Bridge {
    await this.say('stale:'+update.update_id,q.message.chat.id,'این درخواست منقضی یا لغو شده است. گزارش را دوباره بفرستید.');return;
   }
   if(draft.state==='created'){
+   if(draft.reply_group_message_id)return;
    await this.say('already:'+update.update_id,draft.chat_id,`این درخواست قبلاً برای #${draft.issue_number} ثبت شده است.`);return;
   }
   if((action==='cancel'||action==='edit'||action==='category')&&draft.state!=='draft'){await this.say('busy:'+update.update_id,draft.chat_id,'درخواست در حال ثبت است؛ لطفاً منتظر نتیجه بمانید.');return;}
@@ -132,8 +139,11 @@ export class Bridge {
   if(action!=='approve')return;
   await execute(this.env.DB,"UPDATE drafts SET state='publishing' WHERE id=? AND state='draft'",id);
   if(draft.mode==='comment'){
-   const issue=await this.syncIssue(await this.issue(draft.target_issue!),'supplement:'+id);
-   await this.createBaleComment('private:'+id,issue,draft.body,q.from.id);
+   const issue=draft.reply_group_message_id
+    ? await one<IssueRow>(this.env.DB,'SELECT * FROM issues WHERE number=? AND reporter_chat_id=?',draft.target_issue,draft.chat_id)
+    : await this.syncIssue(await this.issue(draft.target_issue!),'supplement:'+id);
+   if(!issue)return;
+   await this.createBaleComment('private:'+id,issue,draft.body,q.from.id,undefined,draft.reply_group_message_id??undefined);
    await execute(this.env.DB,"UPDATE drafts SET state='created',issue_number=? WHERE id=?",issue.number,id);
    await this.say('supplement-result:'+id,draft.chat_id,`توضیح برای #${issue.number} ثبت شد.\n${issue.url}`);return;
   }
@@ -146,16 +156,34 @@ export class Bridge {
   await execute(this.env.DB,"UPDATE drafts SET state='created',issue_number=? WHERE id=?",issue.number,id);
   await this.say('report-result:'+id,draft.chat_id,this.env.INTAKE_ENABLED==='true'?`${ui.success}\nشماره گزارش: #${issue.number}\n${issue.html_url}`:`گزارش #${issue.number} ثبت شد.\n${issue.html_url}\n${this.postLink(saved.channel_post_id!)}\nنتیجه و تغییر وضعیت را همین‌جا دریافت می‌کنید.`,this.env.INTAKE_ENABLED==='true'?[[{text:ui.view,url:issue.html_url},{text:'کانال گزارش‌ها',url:this.postLink(saved.channel_post_id!)},{text:ui.mine,callback_data:'menu:mine'}],[{text:ui.new_short,callback_data:'menu:new'}]]:undefined);
  }
- async createBaleComment(key:string,issue:IssueRow,text:string,userId:number,sourceMessage?:number):Promise<void>{
-  const marker='bale:'+key;if(this.env.INTAKE_ENABLED==='true')text=redact(text).text;const alias=await aliasFor(userId,this.env.ADMIN_SECRET);
+ async createBaleComment(key:string,issue:IssueRow,text:string,userId:number,sourceMessage?:number,replyTo?:number):Promise<void>{
+  const marker='bale:'+key;if(replyTo||this.env.INTAKE_ENABLED==='true')text=redact(text).text;const alias=await aliasFor(userId,this.env.ADMIN_SECRET);
   const comment=await effect<GHComment>(this.env.DB,'github-comment:'+key,()=>this.api.github(this.api.repo(`/issues/${issue.number}/comments`),'POST',{body:githubComment(text,alias,marker)}));
   await execute(this.env.DB,'INSERT OR IGNORE INTO comment_links(source,source_id,issue_number,github_comment_id,bale_message_id) VALUES (?,?,?,?,?)','bale',key,issue.number,comment.id,sourceMessage??null);
   if(!sourceMessage){
    if(!issue.group_root_id)throw new Retryable('await_group_root',15);
-   await effect(this.env.DB,'private-comment-mirror:'+key,()=>this.api.bale('sendMessage',{chat_id:Number(this.env.BALE_GROUP_ID),reply_to_message_id:issue.group_root_id,text:`از بله — ${alias}\n\n${text}`}));
+   await effect(this.env.DB,'private-comment-mirror:'+key,()=>this.api.bale('sendMessage',{chat_id:Number(this.env.BALE_GROUP_ID),reply_to_message_id:replyTo??issue.group_root_id,...(replyTo?{message_thread_id:issue.group_root_id}:{}),text:`از بله — ${alias}\n\n${text}`}));
   }
  }
  async onBale(update:BaleUpdate):Promise<void>{
+  const privateReply=update.message;
+  if(privateReply?.chat.type==='private'&&privateReply.from&&!privateReply.from.is_bot&&
+    safeNumber(privateReply.reply_to_message?.message_id)&&!privateReply.text?.startsWith('/')){
+   const notice=await one<{issue_number:number;group_message_id:number}>(this.env.DB,
+    'SELECT issue_number,group_message_id FROM comment_notices WHERE chat_id=? AND message_id=?',
+    privateReply.chat.id,privateReply.reply_to_message.message_id);
+   if(notice){
+    if(await one(this.env.DB,'SELECT user_id FROM blocked_users WHERE user_id=?',privateReply.from.id))return;
+    const ownsReport=await one(this.env.DB,'SELECT number FROM issues WHERE number=? AND reporter_chat_id=?',notice.issue_number,privateReply.chat.id);
+    if(!ownsReport)return;
+    if(!privateReply.text?.trim()){
+     await this.say('reply-text:'+update.update_id,privateReply.chat.id,'لطفاً پاسخ را به‌صورت متن و با Reply به همان اعلان بفرست.');
+     return;
+    }
+    await this.newDraft(update,privateReply,'comment',notice.issue_number,notice.group_message_id);
+    return;
+   }
+  }
   if(this.env.INTAKE_ENABLED==='true'&&await new Intake(this).handle(update))return;
   if(update.callback_query){await this.callback(update);return;}
   const message=update.message??update.edited_message;
@@ -177,6 +205,15 @@ export class Bridge {
    if(!thread)throw new Retryable('unknown_thread_waiting_for_mirror',60);
    const issue=(await one<IssueRow>(this.env.DB,'SELECT * FROM issues WHERE number=?',thread.issue_number))!;
    const key=`group:${message.chat.id}:${message.message_id}`;
+   if(!update.edited_message&&issue.reporter_chat_id&&issue.reporter_chat_id!==from.id){
+    const name=redact([from.first_name,from.last_name].filter(v=>typeof v==='string').join(' ').slice(0,120)).text.replace(/[\r\n]/g,' ').trim();
+    const handle=typeof from.username==='string'&&/^[a-zA-Z0-9_]{1,64}$/.test(from.username)?'@'+from.username:'';
+    const author=[name,handle&&name?`(${handle})`:handle].filter(Boolean).join(' ')||'کاربر بله';
+    await this.queue('comment-notice:'+key,'internal','comment-notice',{
+     number:issue.number,chat_id:issue.reporter_chat_id,group_message_id:message.message_id,
+     text:`دیدگاه تازه برای گزارش #${issue.number} — ${author}\n\n${redact(message.text).text.slice(0,3000)}\n\nبرای پاسخ، روی همین پیام Reply بزن. پیش از انتشار عمومی، متن را برای تأیید نشان می‌دهم.`
+    });
+   }
    if(this.env.INTAKE_ENABLED==='true'){
     await execute(this.env.DB,'INSERT OR IGNORE INTO participants(user_id,issue_number) VALUES (?,?)',from.id,issue.number);
     if(!usefulComment(message.text))return;
@@ -203,6 +240,7 @@ export class Bridge {
   if(text==='/forget'){
    await execute(this.env.DB,'DELETE FROM drafts WHERE user_id=?',message.from.id);
    await execute(this.env.DB,'UPDATE issues SET reporter_chat_id=NULL WHERE reporter_chat_id=?',message.chat.id);
+   await execute(this.env.DB,'DELETE FROM comment_notices WHERE chat_id=?',message.chat.id);
    await this.say('forget:'+update.update_id,message.chat.id,'پیش‌نویس‌ها و ارتباط پیگیری خصوصی شما حذف شد. محتوایی که قبلاً با تأیید شما عمومی شده، همچنان در GitHub و کانال باقی می‌ماند.');return;
   }
   const status=text.match(/^\/(?:status|follow)\s+#?(\d+)$/);
@@ -245,6 +283,14 @@ export class Bridge {
   const payload=JSON.parse(event.payload_json);
   if(event.source==='bale')return this.onBale(payload as BaleUpdate);
   if(event.source==='github')return this.onGitHub(payload as Record<string,unknown>,event.kind,event.id);
+  if(event.kind==='comment-notice'){
+   const reporter=await one(this.env.DB,'SELECT number FROM issues WHERE number=? AND reporter_chat_id=?',payload.number,payload.chat_id);
+   if(!reporter)return;
+   const notice=await this.say(event.id,payload.chat_id,payload.text);
+   await execute(this.env.DB,'INSERT OR IGNORE INTO comment_notices(chat_id,message_id,issue_number,group_message_id) VALUES (?,?,?,?)',
+    payload.chat_id,notice.message_id,payload.number,payload.group_message_id);
+   return;
+  }
   if(event.kind==='notice'){await this.say('notice:'+event.id,Number(payload.chat_id),payload.text,payload.closed?[[{text:ui.fixed,callback_data:'feedback:fixed:'+payload.number},{text:ui.persists,callback_data:'feedback:persists:'+payload.number}]]:undefined);return;}
   if(event.kind==='sync') {await this.syncIssue(await this.issue(Number(payload.number)),event.id);return;}
   if(event.kind==='status'){

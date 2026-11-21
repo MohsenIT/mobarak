@@ -12,7 +12,7 @@ const mf=new Miniflare(convertV4MiniflareOptions({modules:true,script:'export de
 const originalFetch=globalThis.fetch;
 try{
  const db=await mf.getD1Database('DB');
- for(const file of ['0001_phase_zero.sql','0002_bridge.sql','0003_transport.sql'])await db.exec((await readFile('migrations/'+file,'utf8')).replaceAll('\n',' '));
+ for(const file of ['0001_phase_zero.sql','0002_bridge.sql','0003_transport.sql','0004_intake.sql','0005_comment_replies.sql'])await db.exec((await readFile('migrations/'+file,'utf8')).replaceAll('\n',' '));
  const env:BridgeEnv={DB:db as unknown as Database,BALE_TOKEN:'test-bot',GITHUB_TOKEN:'test-gh',GITHUB_REPO:'example/project',BALE_CHANNEL_ID:'100',BALE_GROUP_ID:'200',BALE_CHANNEL_USERNAME:'test_channel',BALE_BOT_ID:'99',BALE_WEBHOOK_SECRET:'b'.repeat(40),GITHUB_WEBHOOK_SECRET:'g'.repeat(40),ADMIN_SECRET:'a'.repeat(40),BRIDGE_ENABLED:'true'};
  const issue={id:1234,number:42,title:'',body:'',state:'open',state_reason:null as string|null,html_url:'https://github.com/example/project/issues/42',labels:[{name:'bug'}],updated_at:'2026-11-09T12:00:00Z'};
  let pollOffset=-1;let polled=false;
@@ -56,13 +56,26 @@ try{
  await send({update_id:3,message:{message_id:500,chat:{id:200,type:'group'},from:{is_bot:true,id:999,username:'test_channel'},text:post.data.text}});
  const mapped=await db.prepare('SELECT group_root_id FROM issues WHERE number=42').first<{group_root_id:number}>();
  assert.equal(mapped?.group_root_id,500);
- await send({update_id:4,message:{message_id:501,message_thread_id:500,chat:{id:200,type:'group'},from:{is_bot:false,id:888},text:'من هم همین مشکل را دارم',reply_to_message:{message_id:0}}});
+ await send({update_id:4,message:{message_id:501,message_thread_id:500,chat:{id:200,type:'group'},from:{is_bot:false,id:888,first_name:'نویسنده نمونه',username:'sample_writer'},text:'من هم همین مشکل را دارم',reply_to_message:{message_id:0}}});
  assert.equal(commentCreates,1);
  const before=sent.filter(v=>v.method==='sendMessage'&&v.data.chat_id===200).length;
  await send({repository:{full_name:'example/project'},action:'created',issue,comment:{id:801,body:'<!-- mobarak-bridge:bale:group:200:501 -->',user:{login:'bridge-user'},html_url:'https://github.com/example/project/issues/42#issuecomment-801'}},'github','issue_comment');
  assert.equal(sent.filter(v=>v.method==='sendMessage'&&v.data.chat_id===200).length,before,'must suppress comment loops');
  await send({repository:{full_name:'example/project'},action:'created',issue,comment:{id:900,body:'اصلاح شد؛ لطفاً بررسی کنید.',user:{login:'maintainer'},html_url:'https://github.com/example/project/issues/42#issuecomment-900'}},'github','issue_comment');
  assert.ok(sent.some(v=>v.method==='sendMessage'&&v.data.chat_id===200&&v.data.reply_to_message_id===500&&String(v.data.text).includes('از GitHub — maintainer')));
+ assert.ok(sent.some(v=>v.data.chat_id===777&&String(v.data.text).includes('نویسنده نمونه (@sample_writer)')),'comment author must appear in the reporter’s private notice');
+ const notice=await db.prepare('SELECT message_id FROM comment_notices WHERE chat_id=777 AND group_message_id=501').first<{message_id:number}>();
+ assert.ok(notice);
+ env.INTAKE_ENABLED='true';
+ const reply={...privateMessage(41,'ممکن است نسخه مرورگر را بگویید؟'),message:{...privateMessage(41,'ممکن است نسخه مرورگر را بگویید؟').message,reply_to_message:{message_id:notice.message_id}}};
+ await send(reply);
+ assert.equal(commentCreates,1,'reply requires consent');
+ const approveReply={update_id:42,callback_query:{...approved.callback_query,id:'reply-approval',data:'approve:d41'}};
+ await send(approveReply);await send({...approveReply,update_id:43});
+ assert.equal(commentCreates,2,'one confirmed reply');
+ assert.equal(sent.filter(v=>v.method==='sendMessage'&&v.data.chat_id===200&&v.data.reply_to_message_id===501&&v.data.message_thread_id===500).length,1,'reply targets the original comment');
+ assert.equal(issueCreates,1,'reply cannot create an issue');
+ env.INTAKE_ENABLED='false';
  issue.state='closed';issue.state_reason='completed';issue.updated_at='2026-11-09T13:00:00Z';
  await send({repository:{full_name:'example/project'},action:'closed',issue},'github');
  assert.equal(sent.filter(v=>v.method==='sendMessage'&&v.data.chat_id===100).length,1,'status must edit one original post');

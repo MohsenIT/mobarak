@@ -11,7 +11,7 @@ import {mediaResponse,attachImage,visionImages} from '../src/attachments.ts';
 const mf=new Miniflare(convertV4MiniflareOptions({modules:true,script:'export default {fetch(){return new Response("ready")}}',d1Databases:{DB:'intake-test'}}));
 const originalFetch=globalThis.fetch;
 try{
- const db=await mf.getD1Database('DB');for(const file of ['0001_phase_zero.sql','0002_bridge.sql','0003_transport.sql','0004_intake.sql'])await db.exec((await readFile('migrations/'+file,'utf8')).replaceAll('\n',' '));
+ const db=await mf.getD1Database('DB');for(const file of ['0001_phase_zero.sql','0002_bridge.sql','0003_transport.sql','0004_intake.sql','0005_comment_replies.sql'])await db.exec((await readFile('migrations/'+file,'utf8')).replaceAll('\n',' '));
  let queries=0;const realDB=db as unknown as Database;const countedDB:Database={prepare(sql:string){queries++;return realDB.prepare(sql);}};
  const env:BridgeEnv={DB:countedDB,BALE_TOKEN:'test',GITHUB_TOKEN:'test',GITHUB_REPO:'example/project',BALE_CHANNEL_ID:'100',BALE_GROUP_ID:'200',BALE_CHANNEL_USERNAME:'channel',BALE_BOT_ID:'99',BALE_WEBHOOK_SECRET:'b',GITHUB_WEBHOOK_SECRET:'g',ADMIN_SECRET:'a',BRIDGE_ENABLED:'true',INTAKE_ENABLED:'true',PUBLIC_BASE_URL:'https://bridge.test',GITHUB_GOVERNANCE_READY:'true'};
  const sent:{method:string;data:Record<string,unknown>}[]=[];let sequence=100,issues=0,paid=0;let aiBad=false;let aiBalance=false;let aiVagueImage=false;let comments=0;let photoBytes=new Uint8Array([255,216,255,1,2,3]);let photoPath='photos/test.jpg';
@@ -46,7 +46,7 @@ try{
  Object.assign(issue,{labels:['bug','area:reader'],updated_at:'2026-11-11T12:01:00Z'});await bridge.onGitHub({repository:{full_name:'example/project'},issue},'issues','minor-label');
  assert.equal((await db.prepare("SELECT COUNT(*) AS n FROM events WHERE kind='status'").first<{n:number}>())!.n,0,'minor technical labels do not notify');
  Object.assign(issue,{state:'closed',state_reason:'completed',updated_at:'2026-11-11T12:02:00Z'});await bridge.onGitHub({repository:{full_name:'example/project'},issue},'issues','closed');
- for(let n=0;n<4;n++)await drain(env);
+ for(let n=0;n<6;n++)await drain(env);
  assert.ok(sent.some(s=>s.data.chat_id===3&&String(s.data.text).includes('بسته‌شده')));assert.equal(sent.some(s=>s.data.chat_id===4),false,'group participation alone cannot trigger private messages');
  await message('/new');await message('جستجو خرابه.');c=(await current())!;assert.equal(c.state,'clarifying');assert.equal(c.questions,1);
  await click('answer',1,'1');c=(await current())!;assert.equal(c.state,'preview');assert.equal(c.questions,1);
