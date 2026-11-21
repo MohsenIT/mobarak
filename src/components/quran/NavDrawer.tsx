@@ -25,7 +25,7 @@ import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { destinationSuggestions, resolveDestination, normalizeSearch, NAVIGATION_HELP, searchSurahs, type Destination } from '@/lib/navigation'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate, IconSortIndex } from './Ornaments'
-import { ChevronLeft, GitCompareArrows } from 'lucide-react'
+import { ChevronLeft, GitCompareArrows, Settings } from 'lucide-react'
 
 export type { Translator } from '@/lib/quran'
 
@@ -47,6 +47,7 @@ interface Props {
       active row when the drawer opens, so the user doesn't have to scroll
       from the top of the 114-row list. */
   currentSurah: number
+  onOpenSettings: () => void
   onClose: () => void
   onGoPage: (p: number) => void
   onGoSurah: (n: number) => void   // NEW — fixes flow-mode surah navigation
@@ -169,6 +170,11 @@ export default function NavDrawer(props: Props) {
                 <GitCompareArrows size={20} /><span>{t("ui.1f253d9ad1")}</span><ChevronLeft size={17} aria-hidden="true" />
               </button>
             </div>
+          </section>
+          <section className="drawer-tool-section" aria-label={t('ui.6badcac8c1')}>
+            <button type="button" className="drawer-tool-row" onClick={props.onOpenSettings}>
+              <Settings size={20} aria-hidden="true" /><span>{t('ui.6badcac8c1')}</span><ChevronLeft size={17} aria-hidden="true" />
+            </button>
           </section>
         </div>}
         {props.view !== 'tools' && <>

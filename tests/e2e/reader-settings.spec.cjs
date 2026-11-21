@@ -28,7 +28,8 @@ async function openSurahDrawer(page){
  return drawer;
 }
 async function openSettings(page){
- await page.locator('button[aria-label="تنظیمات"]').first().click();
+ await page.getByRole('button',{name:'منوی برنامه',exact:true}).click();
+ await page.locator('.drawer-tools').getByRole('button',{name:'تنظیمات',exact:true}).click();
  const screen=page.locator('.settings-screen');
  await expect(screen).toBeVisible();
  return screen;

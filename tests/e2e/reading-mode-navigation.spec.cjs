@@ -29,7 +29,8 @@ async function readerReady(page){
  await expect(page.locator('.reader-toolbar')).toBeVisible({timeout:20000});
 }
 async function openSettings(page){
- await page.locator('.reader-toolbar button[aria-label="تنظیمات"]').click();
+ await page.getByRole('button',{name:'منوی برنامه',exact:true}).click();
+ await page.locator('.drawer-tools').getByRole('button',{name:'تنظیمات',exact:true}).click();
  const screen=page.locator('.settings-screen');
  await expect(screen).toBeVisible({timeout:20000});
  await expect(screen).toHaveAttribute('aria-modal','true');

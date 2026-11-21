@@ -20,6 +20,7 @@ test('eye menu shares persistent display settings and preserves the reading rout
  await page.reload();await trigger.click();
  await expect(menu.getByRole('switch')).toHaveAttribute('aria-checked','true');await expect(menu.getByRole('slider')).toHaveValue('1.05');
  await expect(menu.getByRole('button',{name:'پیوسته',exact:true})).toHaveAttribute('aria-pressed','true');
- await page.keyboard.press('Escape');await page.locator('.reader-toolbar').getByRole('button',{name:'تنظیمات',exact:true}).click();
+ await page.keyboard.press('Escape');await page.getByRole('button',{name:'منوی برنامه',exact:true}).click();
+ await page.locator('.drawer-tools').getByRole('button',{name:'تنظیمات',exact:true}).click();
  await expect(page.locator('.settings-screen .settings-scale output')).toHaveText('۱۰۵٪');
 });

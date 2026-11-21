@@ -4,7 +4,8 @@ test('history opens above settings and update checking still works after closing
  const version=await(await page.request.get('/api/version')).json();
  await page.route('**/api/version',r=>r.fulfill({json:version}));
  await page.goto('/s/1');
- await page.locator('.reader-toolbar button[aria-label="تنظیمات"]').click();
+ await page.getByRole('button',{name:'منوی برنامه',exact:true}).click();
+ await page.locator('.drawer-tools').getByRole('button',{name:'تنظیمات',exact:true}).click();
  const screen=page.locator('.settings-screen');
  await screen.locator('.settings-screen-tabs button',{hasText:'درباره ما'}).click();
  await screen.getByRole('button',{name:'تاریخچهٔ نسخه‌ها'}).click();

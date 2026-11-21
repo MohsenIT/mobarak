@@ -24,7 +24,8 @@ test('release history paginates and restarts from the top when reopened',async({
  await setup(page);
  await page.goto('/s/19',{waitUntil:'domcontentloaded'});
  await expect(page.locator('.reader-toolbar')).toBeVisible({timeout:20000});
- await page.locator('.reader-toolbar button[aria-label="تنظیمات"]').click();
+ await page.getByRole('button',{name:'منوی برنامه',exact:true}).click();
+ await page.locator('.drawer-tools').getByRole('button',{name:'تنظیمات',exact:true}).click();
  const screen=page.locator('.settings-screen');
  await expect(screen).toBeVisible({timeout:20000});
  await screen.locator('.settings-screen-tabs button',{hasText:'درباره ما'}).click();

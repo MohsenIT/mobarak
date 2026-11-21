@@ -36,7 +36,7 @@ import SettingsScreen from '@/components/quran/SettingsScreen'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, Settings, ChevronDown } from 'lucide-react'
+import { ArrowRight, ChevronDown } from 'lucide-react'
 import AudioToolbarButton from '@/components/quran/AudioToolbarButton'
 import ReaderDisplayMenu from '@/components/quran/ReaderDisplayMenu'
 import ReaderSearchIcon from '@/components/quran/ReaderSearchIcon'
@@ -44,7 +44,7 @@ import QuranSearch from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import ReaderSearchHighlights from '@/components/quran/ReaderSearchHighlights'
 import {
-  PatternBG, IconMenu,
+  PatternBG,
 } from '@/components/quran/Ornaments'
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
@@ -491,7 +491,6 @@ export default function Home() {
           onHighlights={search.setQuickHighlights}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false,true) }}
           onAdvanced={search.advance} /> : <>
-        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><IconMenu /></button>
 
         <button className="reader-surah-link" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
           <ChevronDown size={16} aria-hidden="true" />
@@ -517,7 +516,7 @@ export default function Home() {
         />
 
           <ReaderDisplayMenu mode={mode} onMode={switchMode} scale={scale} onScale={setScale} showTranslation={showTrans} onTranslation={setShowTrans} />
-          <button className="icon-btn" onClick={() => setSettingsOpen(true)} aria-label={t("ui.6badcac8c1")} title={t("ui.6badcac8c1")}><Settings size={20} /></button>
+        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
 
 
         </>}
@@ -610,6 +609,7 @@ export default function Home() {
           onTogglePin={n => setPinnedSurahs(old => { const next = togglePinnedSurah(old, n); writeStored('mushaf.pinned-surahs', next); return next })}
           onClearRecent={() => { setRecentSurahs([]); writeStored('mushaf.recent-surahs', []) }}
           onAdvancedSearch={() => { setDrawerOpen(false); setSel(null); search.openAdvanced() }}
+          onOpenSettings={() => { setDrawerOpen(false); setSettingsOpen(true) }}
           onOpenKeywords={() => { setDrawerOpen(false); setShowIndex(true) }}
           onOpenComparison={() => { setDrawerOpen(false); setSel(null); comparison.open(curSurahN) }}
           theme={theme}
