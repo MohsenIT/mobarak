@@ -9,6 +9,6 @@ test('desktop surah menu opens from the toolbar and navigates to a different sur
  const drawer=page.locator('.drawer');await expect(drawer).toBeVisible();
  await expect(drawer.getByRole('slider',{name:'جزء',exact:true})).toBeVisible();
  await expect(drawer.locator('.drawer-navigation-form .dictation-field')).toHaveCSS('margin-bottom','0px');
- await drawer.locator('.nav-surah-row').filter({hasText:'بقره'}).click();
+ await drawer.locator('[data-surah-row="2"]').click();
  await expect(page.locator('.reader-surah-link')).toContainText('البقرة');
 });
