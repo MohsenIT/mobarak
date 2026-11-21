@@ -27,9 +27,9 @@ export default function ReleaseNotesDialog({open,onOpenChange,update,onUpdate,on
   observer.observe(sentinel);return()=>observer.disconnect()
  },[open,visible,entries.length,sentinel])
  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent className="release-notes-dialog" dir={uiDirection()}>
-  <DialogHeader><DialogTitle>{history?t('ui.3a0967fbbe'):t('ui.20245d9e19')}</DialogTitle><DialogDescription>{t('ui.457dafcc7b')}{' '}{toFa(CURRENT_RELEASE)}{!history&&missed.length>1?t('ui.449d089d40',{p0:toFa(missed.length)}):''}</DialogDescription></DialogHeader>
+  <DialogHeader><DialogTitle>{history?t('ui.3a0967fbbe'):t('ui.20245d9e19')}</DialogTitle><DialogDescription>{update?.channel==='beta'?'Beta':t('ui.457dafcc7b')}{' '}{update?.channel==='beta'?'':toFa(CURRENT_RELEASE)}{!history&&missed.length>1?t('ui.449d089d40',{p0:toFa(missed.length)}):''}</DialogDescription></DialogHeader>
   <div className="release-notes-list" ref={list}>
-   {!entries.length&&<p className="text-sm leading-7">{t('ui.177aa250df')}</p>}
+   {!entries.length&&<p className="text-sm leading-7">{update?.betaNote||t('ui.177aa250df')}</p>}
    {entries.slice(0,visible).map(release=><section key={release.version} aria-label={t('ui.bb810c0981',{p0:release.version})}><h3>{t('ui.953819a315')}{' '}{toFa(release.version)} <small><time dateTime={release.date}>{formatDate(release.date)}</time></small></h3><p>{toFa(release.title)}</p><ul>{release.changes.map((change,i)=>{const kind:ReleaseChangeKind=release.changeKinds?.[i]??'improvement',Icon=ICONS[kind];return <li key={i} className="release-change" data-change-kind={kind}><span className="release-change-icon" title={t(`release.${kind}`)}><Icon size={16} aria-hidden="true"/><span className="release-change-label">{t(`release.${kind}`)}</span></span><span>{toFa(change)}</span></li>})}</ul></section>)}
    {visible<entries.length&&<div ref={setSentinel} className="release-notes-more"><button className="chip" type="button" onClick={()=>setVisible(value=>Math.min(value+5,entries.length))}>{t('release.more')}</button></div>}
   </div>

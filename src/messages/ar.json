@@ -1,4 +1,5 @@
 {
+  "reader.experimental": "Beta",
   "quickSearch.previousResult": "النتيجة السابقة",
   "quickSearch.nextResult": "النتيجة التالية",
   "quickSearch.returnTo": "العودة إلى {p0} · {p1}",

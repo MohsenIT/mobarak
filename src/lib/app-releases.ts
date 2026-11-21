@@ -3,6 +3,12 @@ export type ReleaseChangeKind=typeof RELEASE_CHANGE_KINDS[number]
 export interface AppRelease { version:string; date:string; title:string; changes:string[];changeKinds?:ReleaseChangeKind[] }
 /** Newest first. Append a versioned entry for each user-facing release; retain history. */
 export const APP_RELEASES:AppRelease[]=[{
+  version:'0.4.84',date:'2026-11-21',title:'دسترسی ساده‌تر به جست‌وجو و تنظیمات',changeKinds:['improvement','improvement','fix'],changes:[
+    'از کنار نام سوره می‌توانید سریع در قرآن جست‌وجو کنید یا با «برو» مستقیم به مقصدتان برسید.',
+    'منوی برنامه در سمت راست است و تنظیمات در انتهای آن قرار دارد. مطالعه با حالت پیوسته آغاز می‌شود و مصحف به‌عنوان گزینهٔ آزمایشی در دسترس است.',
+    'فهرست سوره‌ها اطلاعات آیه و جزء را خواناتر نشان می‌دهد و برچسب‌های نوار جزءها در صفحه‌های کوتاه منظم می‌مانند.',
+  ],
+},{
   version:'0.4.83',date:'2026-11-17',title:'نوار جزءهای واکنش‌گرا و فونت یکدست',changeKinds:['fix','improvement'],changes:[
     'تعداد برچسب‌های نوار جزءها از فضای واقعی محاسبه می‌شود؛ جزء ۱ و ۳۰ همیشه دیده می‌شوند و برچسب‌ها در حالت افقی روی هم نمی‌افتند.',
     'فونت متن‌های منوی نمایش با تب‌های باتم‌شیت یکسان شد.',
@@ -451,10 +457,11 @@ export const CURRENT_RELEASE=APP_RELEASES[0].version
 const parts=(s:string)=>/^\d+\.\d+\.\d+$/.test(s)?s.split('.').map(Number):null
 export function compareRelease(a:string,b:string){const x=parts(a),y=parts(b);if(!x||!y)return 0;for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]>y[i]?1:-1;return 0}
 export function missedReleases(releases:AppRelease[],installed:string){return releases.filter(r=>compareRelease(r.version,installed)>0).sort((a,b)=>compareRelease(b.version,a.version))}
-export interface AppUpdate { build:string; releases:AppRelease[]; latest?:AppRelease }
+export interface AppUpdate { build:string; releases:AppRelease[]; latest?:AppRelease; channel?:'beta'; betaNote?:string }
 export function parseAppUpdate(value:unknown):AppUpdate {
-  const data=value as {version?:unknown;releases?:unknown}
+  const data=value as {version?:unknown;releases?:unknown;channel?:unknown;betaNote?:unknown}
   if(typeof data?.version!=='string'||!data.version)throw new Error('invalid-version')
+  if(data.channel==='beta')return {build:data.version,channel:'beta',releases:[],betaNote:typeof data.betaNote==='string'?data.betaNote.trim().slice(0,1000)||undefined:undefined}
   const releases:AppRelease[]=[];const seen=new Set<string>()
   if(Array.isArray(data.releases))for(const raw of data.releases.slice(0,200)){
     const r=raw as AppRelease
