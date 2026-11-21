@@ -8,6 +8,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## Web release workflow
+
+Push requested web changes to `origin/beta` first. Vercel provides the
+protected branch preview and GitHub Actions runs reader regression checks.
+Share the preview and check results with the user. Only an explicit production
+release request authorizes updating `main`. Publish the exact previewed SHA
+after its Reader regression checks pass (`bash scripts/publish-web.sh SHA`).
+
 ## Interface text
 
 All user-facing interface labels, messages, placeholders and accessibility names
