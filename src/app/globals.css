@@ -1462,6 +1462,7 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .reader-surah-link { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 36px; border-radius: 10px; padding: 4px 8px; border: 1px solid var(--line); }
 .reader-surah-link svg { flex-shrink: 0; color: var(--ink-soft); }
 .reader-surah-link { flex: 0 0 auto; }
+.reader-surah-name { padding-inline: 5px; }
 .reader-surah-name { display: grid; }
 .reader-surah-name-sizer { display: grid; visibility: hidden; height: 0; pointer-events: none; }
 .reader-surah-name-sizer > span { grid-area: 1 / 1; white-space: nowrap; }

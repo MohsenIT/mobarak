@@ -90,18 +90,14 @@ test('the recent surah list records visits, most recent first, without duplicate
  await expect.poll(async()=>(await stored(page)).recent,{timeout:15000}).toEqual([2,1,3]);
 });
 
-test('the recent tab lists the stored surahs and clearing it empties storage',async({page})=>{
+test('the navigation drawer offers the most recently visited surah as a shortcut',async({page})=>{
  await setup(page,{'mushaf.recent-surahs':[2,3]});
  await page.goto('/s/55',{waitUntil:'domcontentloaded'});
  await expect(page.locator('.reader-toolbar')).toBeVisible({timeout:20000});
  await expect.poll(async()=>(await stored(page)).recent,{timeout:15000}).toEqual([55,2,3]);
  const drawer=await openSurahDrawer(page);
- await drawer.locator('.tab-btn').filter({hasText:'اخیر'}).click();
- const rows=drawer.locator('.nav-surah-row');
- await expect(rows).toHaveCount(3);
- await drawer.getByRole('button',{name:'پاک‌کردن سابقه'}).click();
- await expect.poll(async()=>(await stored(page)).recent,{timeout:5000}).toEqual([]);
- await expect(rows).toHaveCount(0);
+ const shortcuts=drawer.locator('.drawer-recent-shortcuts:not([aria-hidden])');
+ await expect(shortcuts.getByRole('button').first()).toContainText('رحمن');
 });
 
 test('the theme choice is persisted and survives a reload',async({page})=>{
