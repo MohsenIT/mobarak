@@ -48,8 +48,12 @@ export default function PwaRegistration() {
       try { optional = [...JSON.parse(localStorage.getItem('offline-optional-books') || '[]'),...JSON.parse(localStorage.getItem('offline-optional-translations') || '[]')] } catch {}
       void downloadOffline(['core', 'tahqiq', ...optional]).catch(() => {})
     }
-    if ('serviceWorker' in navigator) void navigator.serviceWorker.ready.then(download)
-    window.addEventListener('online', download)
+    // Beta must be testable on mobile connections before downloading offline packs.
+    // Its manual download controls still use the registered service worker.
+    if (location.hostname !== 'beta.mobarak.app') {
+      if ('serviceWorker' in navigator) void navigator.serviceWorker.ready.then(download)
+      window.addEventListener('online', download)
+    }
     let live = true
     let pending = false
     const controller = new AbortController()
