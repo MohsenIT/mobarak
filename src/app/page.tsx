@@ -176,7 +176,7 @@ export default function Home() {
   useComparisonHold(mainRef, !!comparisonRange && Object.keys(comparisonRoots).length > 0 && !showComparison && !showIndex, focusComparisonRoot)
   const pinchRef = useRef<{ d: number; s: number } | null>(null)
 
-  useEffect(() => { loadMeta().then(setMeta) }, [])
+  useEffect(() => { loadMeta().then(setMeta).catch(() => { /* Splash offers retry. */ }) }, [])
   // The splash and the theme share the theme-color meta tag: the splash's
   // paper tone while it is up, the reading theme's paper once it is gone.
   useEffect(() => {
@@ -471,7 +471,7 @@ export default function Home() {
 
   return (
     <>
-    {!startupComplete && <StartupSplash leaving={startupLeaving} onHoldChange={setStartupHeld} />}
+    {!startupComplete && <StartupSplash leaving={startupLeaving} stalled={splash.stalled} onHoldChange={setStartupHeld} />}
     {meta && <div className={`reader-app h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} data-side-navigation={drawerOpen||showIndex||showComparison?'open':undefined} data-portaled-analysis={sel&&(showIndex||showComparison)&&!panelMax?'open':undefined} style={{ background: 'var(--paper)', ['--desktop-navigation-width' as string]: `${desktopPaneWidths.navigation}px`, ['--desktop-analysis-width' as string]: `${desktopPaneWidths.analysis}px` }}>
       <CarStudySync reader={mainRef} revision={`${mode}:${surah}:${page}:${mushafContentRevision}:${showTrans}:${flowSurah?.n}:${loadingPage}`} />
       <PatternBG />

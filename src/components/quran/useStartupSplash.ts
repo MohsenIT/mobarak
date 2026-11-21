@@ -22,6 +22,13 @@ export function useStartupSplash(ready: boolean) {
   const [minimumElapsed, setMinimumElapsed] = useState(false)
   /** Holding the splash pauses its departure; releasing lets it carry on. */
   const [held, setHeld] = useState(false)
+  const [timedOut, setTimedOut] = useState(false)
+
+  useEffect(() => {
+    if (ready) return
+    const timer = setTimeout(() => setTimedOut(true), 15000)
+    return () => clearTimeout(timer)
+  }, [ready])
 
   useEffect(() => {
     const timer = setTimeout(() => setMinimumElapsed(true), 1000)
@@ -37,5 +44,5 @@ export function useStartupSplash(ready: boolean) {
     return () => clearTimeout(timer)
   }, [leaving, held])
 
-  return { complete, leaving, setHeld }
+  return { complete, leaving, setHeld, stalled: timedOut && !ready }
 }
