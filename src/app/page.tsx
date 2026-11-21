@@ -36,9 +36,10 @@ import SettingsScreen from '@/components/quran/SettingsScreen'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, Search, Settings, ChevronDown } from 'lucide-react'
+import { ArrowRight, Settings, ChevronDown } from 'lucide-react'
 import AudioToolbarButton from '@/components/quran/AudioToolbarButton'
 import ReaderDisplayMenu from '@/components/quran/ReaderDisplayMenu'
+import ReaderSearchIcon from '@/components/quran/ReaderSearchIcon'
 import QuranSearch from '@/components/quran/QuranSearch'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import ReaderSearchHighlights from '@/components/quran/ReaderSearchHighlights'
@@ -492,13 +493,18 @@ export default function Home() {
           onAdvanced={search.advance} /> : <>
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><IconMenu /></button>
 
-        <button className="reader-surah-link flex-1 min-w-0" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
-          <span className="font-bold text-[14px] sm:text-[15px] truncate" style={{ color: 'var(--ink)' }}>
+        <button className="reader-surah-link" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
+          <ChevronDown size={16} aria-hidden="true" />
+          <span className="reader-surah-name font-bold text-[14px] sm:text-[15px]" style={{ color: 'var(--ink)' }}>
+            <span className="reader-surah-name-sizer" aria-hidden="true">{meta.surahs.map(item=><span key={item.n}>{item.ar}</span>)}</span>
+            <span className="reader-surah-current">
             {mode === 'mushaf' ? pageInfo.names : meta.surahs[surah - 1]?.ar}
-          </span><ChevronDown size={16} aria-hidden="true" />
+            </span>
+          </span><ReaderSearchIcon />
         </button>
 
-        <button className="icon-btn" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { route.captureQuickOrigin(); setSel(null); search.openQuick() }}><Search size={20} /></button>
+        <button className="icon-btn reader-quick-search-trigger" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { route.captureQuickOrigin(); setSel(null); search.openQuick() }}><ReaderSearchIcon quick /></button>
+        <span className="reader-toolbar-spacer" aria-hidden="true" />
 
         <AudioToolbarButton
           open={audioOpen}

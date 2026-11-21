@@ -1461,6 +1461,18 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 /* Reading navigation and the full settings/analysis workspace have separate entries. */
 .reader-surah-link { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 36px; border-radius: 10px; padding: 4px 8px; border: 1px solid var(--line); }
 .reader-surah-link svg { flex-shrink: 0; color: var(--ink-soft); }
+.reader-surah-link { flex: 0 0 auto; }
+.reader-surah-name { display: grid; }
+.reader-surah-name-sizer { display: grid; visibility: hidden; height: 0; pointer-events: none; }
+.reader-surah-name-sizer > span { grid-area: 1 / 1; white-space: nowrap; }
+.reader-surah-current { grid-area: 1 / 1; width: 0; min-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reader-toolbar-spacer { flex: 1; }
+@media(max-width:380px) {
+  .reader-toolbar { gap: 2px; padding-inline: 4px; }
+  .reader-toolbar > .icon-btn,.reader-toolbar > [data-slot="popover-trigger"] { width: 28px; min-width: 28px; padding-inline: 2px; }
+  .reader-surah-link { gap: 3px; padding-inline: 5px; }
+  .reader-surah-name { font-size: 13px; }
+}
 
 .quick-jump-options, .search-jump-options { display:flex; flex-wrap:wrap; gap:6px; padding:6px 12px; }
 .quick-jump-options button, .search-jump-options button { border:1px solid var(--line); border-radius:10px; padding:6px 10px; font-size:11px; min-height:36px; color:var(--ink); background:var(--word-root); }
