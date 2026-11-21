@@ -85,7 +85,9 @@ for(const path of ['/s/1','/p/1'])test(`translation toggle does not open Mizan (
  await page.route('**/api/version',r=>r.fulfill({json:{version:'fixture',releases:[]}}));
  await page.route('**/offline-manifest.json',r=>r.fulfill({json:{groups:{core:[],tahqiq:[]}}}));
  await page.goto(path,{waitUntil:'domcontentloaded'});
- await page.getByRole('button',{name:'نمایش ترجمه',exact:true}).click();
+ await page.locator('.reader-toolbar').getByRole('button',{name:'تنظیمات نمایش',exact:true}).click();
+ await page.getByRole('switch',{name:'نمایش ترجمه',exact:true}).click();
+ await page.keyboard.press('Escape');
  const reader=page.locator('[data-reading-scroll]');await expect(reader.locator('[data-translation-verse]').first()).toBeVisible();
  await expect(reader.locator('.mizan-commentary')).toHaveCount(0);
  await expect(reader.locator('.verse-source-block')).toHaveCount(0);

@@ -1,7 +1,7 @@
 const {defineConfig}=require('@playwright/test');
 module.exports=defineConfig({
  testDir:'./tests/e2e',timeout:45000,expect:{timeout:10000},fullyParallel:false,workers:2,
- reporter:process.env.CI?[['list'],['html',{open:'never'}]]:'list',
+ reporter:process.env.CI?[['list'],['github'],['html',{open:'never'}]]:'list',
  use:{baseURL:process.env.READER_URL||'http://127.0.0.1:3009',serviceWorkers:'block',trace:'retain-on-failure',screenshot:'only-on-failure'},
  projects:[
   {name:'chromium-phone',use:{browserName:'chromium',viewport:{width:360,height:800}}},
