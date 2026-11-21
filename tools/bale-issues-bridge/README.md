@@ -1,0 +1,74 @@
+# Bale ↔ GitHub Issues Bridge
+
+پل TypeScript برای Cloudflare Workers + D1 و API رسمی بله/GitHub. GitHub مرجع وضعیت است؛ هر Issue یک پست کانال و یک ترد دیدگاه متناظر دارد. وضعیت استقرار و آزمون واقعی در [PHASE_ZERO.md](PHASE_ZERO.md) ثبت می‌شود؛ عبور تست محلی به‌تنهایی پذیرش E2E نیست.
+
+## امکانات
+
+- گزارش خصوصی، تشخیص دسته، جستجوی موضوع مشابه و تأیید صریح قبل از انتشار عمومی.
+- نگاشت خودکار پست به ترد واقعی گروه دیدگاه، همگام‌سازی نظرها و ویرایش‌ها، جلوگیری از حلقه.
+- به‌روزرسانی همان پست برای وضعیت/برچسب و اطلاع به گزارش‌دهنده اولیه.
+- D1 inbox و effect journal، جلوگیری از تکرار، backoff، توقف عملیات مبهم برای جلوگیری از ساخت پست تکراری.
+- اعتبارسنجی HMAC گیت‌هاب، راز مسیر وب‌هوک بله، محدودیت ورودی و دسترسی مدیر.
+- گزارش محتوای نامناسب، شناسه نمایشی نویسنده بله، حذف پیش‌نویس و توقف پیگیری خصوصی.
+
+## توسعه و تست
+
+Node.js 24 و npm لازم است:
+
+```sh
+npm ci --ignore-scripts
+npm test
+npm run typecheck
+npm run test:integration
+python3 -m unittest discover -s tests -v
+```
+
+آزمون یکپارچه از D1 واقعی شبیه‌ساز Cloudflare و HTTP mock استفاده می‌کند؛ داده محلی ساختگی جدا از شواهد واقعی بله است. ساخت `npm run build` dry-run است و استقرار نمی‌کند.
+
+## استقرار
+
+1. حساب Cloudflare Free و API Token با Workers Scripts Edit و D1 Edit آماده شود. دامنه پولی یا VPS لازم نیست.
+2. D1 ساخته و database_id واقعی در wrangler.jsonc تنظیم شود. سپس migrationها با Wrangler اعمال شوند.
+3. Secrets: BALE_TOKEN، GITHUB_TOKEN، BALE_WEBHOOK_SECRET، GITHUB_WEBHOOK_SECRET، ADMIN_SECRET. رازها را در فایل Git یا فرمان دارای مقدار مستقیم ننویسید؛ از ورودی امن `wrangler secret put` استفاده کنید.
+4. vars عمومی شامل مخزن، شناسه کانال/گروه/بات و username کانال تنظیم شوند. CATEGORIES_JSON اختیاری فهرست `{key,label,hashtag}` است. BRIDGE_ENABLED تا آماده‌شدن تنظیمات و تست true نشود.
+5. `npm run deploy` و ساخت وب‌هوک GitHub برای events: issues و issue_comment، content_type: json، TLS فعال. URL: `/webhooks/github` با secret مستقل.
+6. وب‌هوک رسمی بله به `/webhooks/bale/SECRET` تنظیم شود. بات باید در کانال مجوز ارسال/ویرایش و در گروه متصل دسترسی پیام‌ها داشته باشد. حریم خصوصی و نمایش عمومی دیدگاه‌ها به کاربران اعلام شود.
+7. برای Issueهای قدیمی از مسیر مدیر `/admin/sync` استفاده شود؛ در حالت عادی webhookها ادامه همگام‌سازی را انجام می‌دهند.
+
+اسکریپت‌های Python پوشه scripts برای راه‌اندازی همین محیط از `.secrets` استفاده می‌کنند و توکن را در argv چاپ نمی‌کنند. `.secrets`، `.tools` و داده‌های محلی داخل سورس منتشر نمی‌شوند. برای CI، Wrangler از متغیرهای محیطی Secrets استفاده می‌کند.
+
+جزئیات خطا، آشتی‌دادن عملیات مبهم، نگه‌داری داده و محدودیت‌ها: [راهنمای راهبری](docs/OPERATIONS.fa.md). آزمون فاز صفر: [راهنما](docs/phase-zero-runbook.md)، [نتایج](PHASE_ZERO.md).
+
+## محل سورس و CI/CD
+
+گردش‌کار GitHub برای قرارگیری مستقل این سرویس در `tools/bale-issues-bridge` مخزن MohsenIT/mobarak آماده شده است. فایل گردش‌کار باید در `.github/workflows/bale-issues-bridge.yml` ریشه مخزن قرار گیرد؛ تغییرات اپ اصلی وارد ساخت این سرویس نمی‌شوند. پس از عبور تست‌ها، push به main فقط برای مسیرهای همین سرویس باعث migration و deploy می‌شود. Secrets لازم در GitHub: `MOBARAK_BRIDGE_CF_TOKEN` و `MOBARAK_BRIDGE_CF_ACCOUNT_ID`. توکن بله/GitHub و رازهای وب‌هوک در Cloudflare باقی می‌مانند و به GitHub Actions منتقل نمی‌شوند. فعال‌بودن واقعی CI/CD پس از انتشار سورس و ثبت این دو Secret قابل تأیید است.
+
+## نتیجه آزمون واقعی
+
+در ۲۰ آبان ۱۴۰۵، گزارش از رابط رسمی بات به Issue آزمایشی [#5](https://github.com/MohsenIT/mobarak/issues/5) و پست [36 کانال](https://ble.ir/mobarak_issues/36) تبدیل شد. دیدگاه بله به GitHub و پاسخ GitHub به دیدگاه همان پست رسید؛ تغییر برچسب به enhancement متن اصلی را به #بهبود تغییر داد و بستن Issue همان پست را ویرایش کرد. اعلان خصوصی نتیجه نیز دریافت شد. گزارش واقعی #4 باز ماند. جزئیات و محدودیت‌های تحویل در [گزارش پذیرش](docs/ACCEPTANCE.fa.md) است.
+
+## دریافت هوشمند مشارکت
+
+لایه intake با migration 0004 و پرچم INTAKE_ENABLED اضافه می‌شود. گزارش واضح مستقیم به پیش‌نمایش می‌رود؛ ابهام ضروری سؤال کوتاه دارد؛ پرسش راهنمایی Issue خودکار نمی‌سازد. اصلاح همان گزارش، بازگشت به گفتگو، /my، پیگیری مشارکت، پالایش متن، دریافت حداکثر چهار تصویر و تأیید انتشار وجود دارند. متن کامل Issue پشت دکمه اختیاری است. اسکلت Issue از اطلاعات شناخته‌شده ساخته می‌شود؛ متن قرآن و تفسیر خودکار تصحیح نمی‌شود.
+
+[Discovery](docs/intake/01-discovery.fa.md)، [طراحی گفتگو و ماتریس دکمه‌ها](docs/intake/02-design.fa.md)، [قراردادها و راهبری](docs/intake/03-contracts.fa.md) و [نتایج آزمون](docs/intake/04-validation.fa.md).
+
+مدل سازگار با chat completions از AI_ENDPOINT، AI_MODEL و Secret به نام AI_API_TOKEN تنظیم می‌شود. AI_ENABLED پیش‌فرض false و بودجه پیش‌فرض صفر است. بدون provider تأییدشده و سقف هزینه، مدل فراخوانی نمی‌شود؛ مسیر قواعد همچنان عملیاتی است. نرخ‌های تومان قابل تنظیم و تخمین‌اند، نه تضمین صورتحساب. هیچ درخواست واقعی هزینه‌دار یا آزمون عمومی خودکار در تست‌ها وجود ندارد. ویس و تحلیل محتوای تصویر هنوز پشتیبانی نمی‌شوند؛ بات محدودیت را روشن می‌گوید. عکس بزرگ‌تر از ۵۱۲ کیلوبایت باید کوچک‌تر ارسال شود.
+
+در دیدگاه‌ها تشکر و پیام کوتاه بی‌اطلاعات به GitHub کپی نمی‌شوند. مشارکت گروه به‌تنهایی مجوز پیام خصوصی نیست؛ اشتراک از مسیر خصوصی بات انجام می‌شود. اعلان‌های فنی جزئی ارسال نمی‌شوند و اعلان‌های چندکاربره جداگانه صف‌بندی می‌شوند تا سقف D1 Free رعایت شود.
+
+دریافت بله برای رفع تأخیر مشاهده‌شدهٔ وب‌هوک از polling رسمی دقیقه‌ای استفاده می‌کند؛ این تأخیر در صف سبک حدود یک دقیقه است. تغییر مسیر با `scripts/switch_bale_polling.py` و حفظ پیام‌های صف و rollback انجام می‌شود. GitHub webhook باقی می‌ماند.
+
+### Current AI and image intake
+
+The deployed configuration uses GLM through the owner's Coarena endpoint, with no paid fallback. `AI_FREE_ONLY=true` and `AI_VISION_ENABLED=true` enable the verified free route and at most two latest images per analysis (`detail: low`). The provider's allowance still applies; there is no application-wide daily request cap. No credentials are committed.
+
+Send photos normally, optionally in several messages, then choose **پایان توضیحات**. Images up to 1.5 MiB each are accepted; the bot prefers the available medium-sized Bale photo variant. Core ambiguity gets one useful question; engineering details can be added through **تکمیل اختیاری**, or skipped. Buttons use one full row each. Images remain private until explicit publication consent; AI observations are marked unverified in GitHub. No automatic visual privacy redaction is claimed.
+
+The optional live test uses a synthetic fixture and is never run by CI. To test the configured free model explicitly:
+
+```sh
+RUN_AI_LIVE=approved-1000-toman AI_LIVE_MODEL=glm-5-3-flash AI_LIVE_CASE=image RUN_AI_VISION=1 node --experimental-strip-types test/ai-live.ts
+```
+
+Reception runs independently of analysis through the authenticated self service binding; cron polls on a bounded three-second cadence. This is a scheduling target, not a promise of instant replies.

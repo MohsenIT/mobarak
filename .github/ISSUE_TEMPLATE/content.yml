@@ -1,0 +1,23 @@
+name: گزارش اشکال محتوایی
+description: گزارش برای بررسی متخصص؛ اصلاح خودکار انجام نمی‌شود
+title: "[Content] "
+labels: [needs-content-review]
+body:
+  - type: markdown
+    attributes:
+      value: "این گزارش نیازمند بررسی متخصص است. متن قرآن، ترجمه و تفسیر صرفاً با خروجی AI اصلاح یا تأیید نمی‌شود."
+  - type: textarea
+    id: problem
+    attributes:
+      label: Reported Problem
+    validations:
+      required: true
+  - type: input
+    id: reference
+    attributes:
+      label: Surah / Ayah / Word Reference
+  - type: textarea
+    id: source
+    attributes:
+      label: Suggested Correction and Sources
+      description: اختیاری؛ اصلاح پیشنهادی تا بررسی تخصصی تأیید نشده است.

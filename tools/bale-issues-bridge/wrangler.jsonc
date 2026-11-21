@@ -1,0 +1,52 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mobarak-issues-bridge",
+  "main": "src/bridge-worker.ts",
+  "compatibility_date": "2026-11-09",
+  "workers_dev": true,
+  "observability": {
+    "enabled": false
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bridge-db",
+      "database_id": "9acc5aa2-62ca-4b6a-b0b8-00c12c961bbb",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    "GITHUB_REPO": "MohsenIT/mobarak",
+    "BALE_CHANNEL_ID": "4357475772",
+    "BALE_GROUP_ID": "4961157767",
+    "BALE_CHANNEL_USERNAME": "mobarak_issues",
+    "BALE_BOT_ID": "1025805170",
+    "BRIDGE_ENABLED": "true",
+    "INTAKE_ENABLED": "true",
+    "PUBLIC_BASE_URL": "https://mobarak-issues-bridge.mobarak-issues-cbf441aa.workers.dev",
+    "GITHUB_GOVERNANCE_READY": "true",
+    "AI_ENABLED": "true",
+    "AI_REPORT_BUDGET_TOMAN": "0",
+    "AI_MODEL": "glm-5-3-flash",
+    "AI_INPUT_TOMAN_PER_MILLION": "0",
+    "AI_OUTPUT_TOMAN_PER_MILLION": "0",
+    "BALE_TRANSPORT": "polling",
+    "AI_ENDPOINT": "https://coarena.ai/api/v1/chat/completions",
+    "AI_REASONING_EFFORT": "low",
+    "AI_TIMEOUT_MS": "45000",
+    "AI_FREE_ONLY": "true",
+    "AI_VISION_ENABLED": "true"
+  },
+  "triggers": {
+    "crons": [
+      "* * * * *"
+    ]
+  },
+  "preview_urls": false,
+  "services": [
+    {
+      "binding": "PUMP",
+      "service": "mobarak-issues-bridge"
+    }
+  ]
+}

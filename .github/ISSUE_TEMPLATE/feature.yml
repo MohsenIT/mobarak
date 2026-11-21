@@ -1,0 +1,22 @@
+name: پیشنهاد بهبود
+description: نیاز یا قابلیت پیشنهادی برای قرآن مبارک
+title: "[Feature] "
+type: Feature
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Problem / User Need
+      description: چه نیازی دارید؟
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired Outcome
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Solution
+      description: اختیاری؛ نیاز و راه‌حل پیشنهادی جدا بررسی می‌شوند.
