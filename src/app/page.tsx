@@ -492,6 +492,7 @@ export default function Home() {
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false,true) }}
           onAdvanced={search.advance} /> : <>
 
+        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
         <button className="reader-surah-link" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
           <ChevronDown size={16} aria-hidden="true" />
           <span className="reader-surah-name font-bold text-[14px] sm:text-[15px]" style={{ color: 'var(--ink)' }}>
@@ -516,7 +517,6 @@ export default function Home() {
         />
 
           <ReaderDisplayMenu mode={mode} onMode={switchMode} scale={scale} onScale={setScale} showTranslation={showTrans} onTranslation={setShowTrans} />
-        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
 
 
         </>}

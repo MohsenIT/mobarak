@@ -1190,15 +1190,19 @@ input[type='range'].page-slider::-moz-range-thumb {
 .analysis-settings-popover { z-index: 150; background: var(--sheet); color: var(--ink); border-color: var(--line-strong); width: min(280px, calc(100vw - 24px)); max-height: min(480px, 70dvh); overflow-y: auto; }
 .analysis-settings-popover input { accent-color: var(--sage); }
 
-.reader-display-menu { z-index: 150; width: min(340px, calc(100vw - 24px)); max-height: min(520px, calc(100dvh - 100px)); overflow-y: auto; background: var(--sheet); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 16px; padding: 18px; }
+.reader-display-menu { z-index: 150; width: min(300px, calc(100vw - 24px)); max-height: min(520px, calc(100dvh - 100px)); overflow-y: auto; background: var(--sheet); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 12px; padding: 12px; }
 .reader-display-menu { font-size: var(--reader-control-font-size); }
-.reader-display-controls { display: grid; gap: 18px; }
-.reader-display-controls section + section { border-top: 1px solid var(--line); padding-top: 18px; }
-.reader-display-controls h3, .reader-display-translation > span { display: flex; align-items: center; gap: 10px; font-weight: 700; margin: 0 0 14px; }
-.reader-display-modes { display: flex; padding: 3px; border: 1px solid var(--line-strong); border-radius: 10px; gap: 3px; }
-.reader-display-modes button { flex: 1; min-height: 40px; border-radius: 7px; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.reader-display-controls { display: grid; gap: 10px; }
+.reader-display-controls section + section { border-top: 1px solid var(--line); padding-top: 10px; }
+.reader-display-controls h3, .reader-display-translation > span { display: flex; align-items: center; gap: 10px; font-weight: 700; margin: 0 0 8px; }
+.reader-display-modes { display: flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.reader-display-modes button { flex: 1; min-height: 32px; border-radius: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; font-size: var(--reader-control-font-size); font-weight: 500; line-height: 1.5; }
 .reader-display-modes button svg { flex-shrink: 0; }
-.reader-display-modes button[aria-pressed="true"] { background: var(--word-root); color: var(--ink); box-shadow: inset 0 0 0 1px var(--sage); }
+.reader-display-modes button[aria-pressed="true"] { background: var(--word-root); color: var(--ink); }
+.reader-display-modes button + button { border-inline-start: 1px solid var(--line); }
+.reader-experimental-tag { position: static; align-self: center; transform: translateY(-5px); flex-shrink: 0; font-size: .65em; color: var(--ink-soft); font-weight: 400; line-height: 1; }
+.reader-scale-small { font-size: 11px; }
+.reader-scale-large { font-size: 16px; }
 .reader-display-translation { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .reader-display-translation > span { margin: 0; }
 .reader-display-switch { flex-shrink: 0; width: 46px; height: 28px; padding: 3px; border-radius: 999px; background: var(--line-strong); direction: ltr; }
@@ -1209,9 +1213,8 @@ input[type='range'].page-slider::-moz-range-thumb {
 .reader-display-scale input { min-width: 0; flex: 1; accent-color: var(--sage); height: 32px; }
 .reader-display-scale .icon-btn { flex-shrink: 0; font-family: inherit; }
 .reader-display-menu .reader-display-controls h3,
-.reader-display-menu .reader-display-translation > span,
-.reader-display-menu .reader-display-modes button { font-family: inherit; font-size: var(--reader-control-font-size); font-weight: 500; line-height: 1.5; }
-.reader-display-menu .reader-display-modes button[aria-pressed="true"] { font-weight: 700; }
+.reader-display-menu .reader-display-translation > span { font-family: inherit; font-size: var(--reader-control-font-size); font-weight: 500; line-height: 1.5; }
+.reader-display-modes button[aria-pressed="true"] { font-weight: 700; }
 .analysis-order-select { background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 6px; min-width: 0; }
 .analysis-settings-button:focus-visible, .analysis-section-toggle:focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }
 

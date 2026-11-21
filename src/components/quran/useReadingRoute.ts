@@ -41,7 +41,7 @@ export type ReadingRouteHandlers = {
 export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.RefObject<HTMLElement | null>) {
   const [initial] = useState(() =>
     initialReading(
-      { page: readStored('mushaf.page', 1), mode: readStored<ReadingMode>('mushaf.mode', 'flow'), surah: readStored('mushaf.surah', 1) },
+      { page: readStored('mushaf.page', 1), mode: 'flow', surah: readStored('mushaf.surah', 1) },
       typeof window === 'undefined' ? null : window.location,
     ),
   )
@@ -189,10 +189,10 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
   // except while advanced search owns it.
   useEffect(() => {
     writeStored('mushaf.page', page)
+    writeStored('mushaf.mode', mode)
     const url = readingLocation(window.location.href, mode, surah, page, NATIVE)
     if (url) window.history.replaceState(window.history.state, '', url.toString())
   }, [page, mode, surah])
-  useEffect(() => { writeStored('mushaf.mode', mode) }, [mode])
   useEffect(() => { writeStored('mushaf.surah', surah) }, [surah])
 
   return { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, quickOrigin, captureQuickOrigin, prepareQuickVisit, writeReadingVerse, writePageDestination, returnFromQuick }

@@ -1,4 +1,5 @@
 {
+  "reader.experimental": "Experimental",
   "quickSearch.previousResult": "Previous result",
   "quickSearch.nextResult": "Next result",
   "quickSearch.returnTo": "Return to {p0} · {p1}",

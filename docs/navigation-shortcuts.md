@@ -23,9 +23,9 @@ For shared advanced-search links containing relative commands, `at` retains the 
 The unfiltered surah drawer also has a vertical juz index. `juz-navigation.ts`
 owns its thirty slots, adaptive label density, coordinate mapping and
 surah juz ranges, all derived from the existing juz boundary metadata. Labels
-1 and 30 always remain; intermediate labels are distributed evenly at the
-densest count that fits the available pane height. Label and dot rectangles
-have separate measured-size budgets and nonnegative spacing. Short landscape
+1 and 30 always remain. The rail selects the first complete pattern that fits:
+all labels, multiples of five, multiples of ten, or endpoints only. Label and
+dot rectangles have separate height budgets and equal gaps within each rail. Short landscape
 panes compress dot gaps instead of overlapping text. Pointer mapping uses the
 nearest actual slot center, the same geometry as rendering and the preview.
 Taller panes show additional labels; every intervening juz retains its dot.

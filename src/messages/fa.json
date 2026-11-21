@@ -1,4 +1,5 @@
 {
+  "reader.experimental": "آزمایشی",
   "quickSearch.previousResult": "نتیجهٔ قبلی",
   "quickSearch.nextResult": "نتیجهٔ بعدی",
   "quickSearch.returnTo": "بازگشت به {p0} · {p1}",

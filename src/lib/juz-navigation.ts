@@ -16,17 +16,16 @@ export function juzRailLayout(numbers: number[], availableHeight: number) {
   const count = numbers.length
   const height = Math.max(padding * 2 + Math.min(count, 2) * labelHeight + Math.max(0, count - 2) * .5, availableHeight)
   const dotHeight = Math.min(3, Math.max(.5, (height - padding * 2 - Math.min(count, 2) * labelHeight - (count - 1)) / Math.max(1, count - 2)))
-  const anchors = (labels: number) => new Set(Array.from({ length: labels }, (_, i) => labels === 1 ? 0 : Math.round(i * (count - 1) / (labels - 1))))
   const geometry = (labelled: Set<number>) => {
     const sizes = numbers.map((_, i) => labelled.has(i) ? labelHeight : dotHeight)
-    const gaps = numbers.slice(1).map((_, i) => labelled.has(i) || labelled.has(i + 1) ? 12 : 6)
+    const gaps = numbers.slice(1).map(() => 8)
     return { sizes, gaps, required: padding * 2 + sizes.reduce((a,b) => a+b,0) + gaps.reduce((a,b) => a+b,0) }
   }
-  // Pick the densest evenly distributed labels that fit their real boxes.
+  // Choose one complete regular pattern, never rounded scattered labels.
   // Endpoints always remain; in short landscapes only the dot gaps compress.
-  let labelled = anchors(Math.min(2, count))
-  for (let labels = count; labels > 2; labels--) {
-    const candidate = anchors(labels)
+  let labelled = new Set([0, count - 1])
+  for (const interval of [1, 5, 10]) {
+    const candidate = new Set(numbers.flatMap((juz, index) => index === 0 || index === count - 1 || juz % interval === 0 ? [index] : []))
     if (geometry(candidate).required <= height) { labelled = candidate; break }
   }
   const { sizes, gaps } = geometry(labelled)

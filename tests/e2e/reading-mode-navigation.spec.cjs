@@ -84,7 +84,7 @@ test('switching from settings follows the one switch path: surah, URL, persisten
  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('mushaf.mode')))).toBe('flow');
 });
 
-test('a mode chosen in settings survives a reload, and a surah deep link still outranks it',async({page})=>{
+test('a fresh navigation defaults to flow after choosing mushaf',async({page})=>{
  await setup(page);
  await page.goto('/s/1',{waitUntil:'domcontentloaded'});
  await readerReady(page);
@@ -94,10 +94,10 @@ test('a mode chosen in settings survives a reload, and a surah deep link still o
  await screen.locator('button[aria-label="بستن"]').click();
  await expect(page.locator('.settings-screen')).toHaveCount(0);
 
- // Reload with no reading position in the location: the stored mode is used.
+ // Opening the root without a reading position starts in flow.
  await page.goto('/',{waitUntil:'domcontentloaded'});
  await readerReady(page);
- await expect(page.locator('[data-continuous-mushaf]')).toBeVisible({timeout:20000});
+ await expect(page.locator('.surah-pull-content')).toBeVisible({timeout:20000});
 
  // A location naming a surah still outranks the stored mode.
  await page.goto('/s/18/a/10',{waitUntil:'domcontentloaded'});

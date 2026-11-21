@@ -245,7 +245,8 @@ export default function NavDrawer(props: Props) {
                       <span className="flex-1">
                         <span className="block font-bold text-[15px] font-quran" style={{ color: 'var(--ink)' }}>{s.ar}</span>
                         <span className="block text-xs mt-0.5" style={{ color: 'var(--ink-faint)' }}>
-                          {toFa(s.vc)}{' '}{t("ui.d9959426df")}{' · '}{s.rev === 'makkah' ? t("ui.039e791597") : t("ui.40f14b2806")}{' · '}
+                          <span>{toFa(s.vc)} {t("ui.b1b168c791")}</span>{' - '}
+                          <span>{s.rev === 'makkah' ? t("ui.039e791597") : t("ui.40f14b2806")}</span>{' - '}
                           <span className="nav-surah-juz-range">{t('ui.f74f9b04c7')}{' '}<bdi dir="ltr">{toFa(juzRanges.get(s.n)!.from)}{juzRanges.get(s.n)!.to!==juzRanges.get(s.n)!.from&&<>–{toFa(juzRanges.get(s.n)!.to)}</>}</bdi></span>
                         </span>
                       </span>

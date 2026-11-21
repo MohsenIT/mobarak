@@ -22,9 +22,10 @@ export default function ReaderDisplayControls({ mode, onMode, scale, onScale, tr
     <section>
       <h3><BookOpen size={20} aria-hidden="true" />{t('ui.88619bd189')}</h3>
       <div className="reader-display-modes" role="group" aria-label={t('ui.88619bd189')}>
-        {(['mushaf', 'flow'] as const).map(item => <button key={item} type="button" aria-pressed={mode === item} onClick={() => onMode(item)}>
+        {(['flow', 'mushaf'] as const).map(item => <button key={item} type="button" aria-pressed={mode === item} onClick={() => onMode(item)}>
           {item === 'mushaf' ? <BookOpen size={19} aria-hidden="true" /> : <ScrollText size={19} aria-hidden="true" />}
           <span>{item === 'mushaf' ? t('ui.f7c7ba28bb') : t('ui.8fef24ffc4')}</span>
+          {item === 'mushaf' && <sup className="reader-experimental-tag" style={{ fontSize: ".65em", lineHeight: 1, top: "auto", position: "static", transform: "translateY(-5px)" }} aria-hidden="true">{t('reader.experimental')}</sup>}
         </button>)}
       </div>
     </section>
@@ -35,9 +36,9 @@ export default function ReaderDisplayControls({ mode, onMode, scale, onScale, tr
     <section>
       <h3><Type size={20} aria-hidden="true" />{t('ui.1fe7007e7e')}</h3>
       {translation ? <div className="reader-display-scale" dir="ltr">
-        <button type="button" className="icon-btn" aria-label={t('ui.2e81f56c3d')} disabled={scale <= MIN_SCALE} onClick={() => onScale(clampScale(scale - .15))}>A−</button>
+        <button type="button" className="icon-btn" aria-label={t('ui.2e81f56c3d')} disabled={scale <= MIN_SCALE} onClick={() => onScale(clampScale(scale - .15))}><span className="reader-scale-small">A</span>−</button>
         <input type="range" min={MIN_SCALE} max={MAX_SCALE} step={.05} value={scale} aria-label={t('ui.1fe7007e7e')} aria-valuetext={`${toFa(Math.round(scale * 100))}٪`} onChange={event => onScale(clampScale(Number(event.target.value)))} />
-        <button type="button" className="icon-btn" aria-label={t('ui.8b885c6faa')} disabled={scale >= MAX_SCALE} onClick={() => onScale(clampScale(scale + .15))}>A+</button>
+        <button type="button" className="icon-btn" aria-label={t('ui.8b885c6faa')} disabled={scale >= MAX_SCALE} onClick={() => onScale(clampScale(scale + .15))}><span className="reader-scale-large">A</span>+</button>
       </div> : <div className="settings-scale">
         <button type="button" className="icon-btn" aria-label={t('ui.8b885c6faa')} disabled={scale >= MAX_SCALE} onClick={() => onScale(clampScale(scale + .15))}>+</button>
         <output>{toFa(Math.round(scale * 100))}٪</output>
