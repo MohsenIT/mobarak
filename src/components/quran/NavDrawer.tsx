@@ -157,7 +157,7 @@ export default function NavDrawer(props: Props) {
           <section className="drawer-tool-section" aria-labelledby="drawer-find-heading">
             <h3 id="drawer-find-heading">{t('ui.3906317c3a')}</h3>
             <button type="button" className="drawer-tool-row" onClick={props.onAdvancedSearch}>
-              <IconSearch /><span>{t("ui.c51349274d")}</span><small>{t("ui.b390c6bcd0")}</small><ChevronLeft size={17} aria-hidden="true" />
+              <IconSearch /><span>{t("ui.c51349274d")}</span><ChevronLeft size={17} aria-hidden="true" />
             </button>
           </section>
           <section className="drawer-tool-section" aria-labelledby="drawer-analysis-heading">
@@ -171,7 +171,8 @@ export default function NavDrawer(props: Props) {
               </button>
             </div>
           </section>
-          <section className="drawer-tool-section" aria-label={t('ui.6badcac8c1')}>
+          <section className="drawer-tool-section" aria-labelledby="drawer-settings-heading">
+            <h3 id="drawer-settings-heading">{t('ui.6badcac8c1')}</h3>
             <button type="button" className="drawer-tool-row" onClick={props.onOpenSettings}>
               <Settings size={20} aria-hidden="true" /><span>{t('ui.6badcac8c1')}</span><ChevronLeft size={17} aria-hidden="true" />
             </button>
