@@ -493,7 +493,7 @@
   "ui.1313d854c5": "松开以跳转至第 {p0} 章",
   "ui.bd26cfdea8": "滑动以查看第 {p0} 章 {p1}",
   "searchAndGo.help": "搜索帮助",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "章节快捷方式",
   "ui.7c631348f5": "已取消置顶 {p0}。",
   "ui.4fdcf22559": "已置顶 {p0}。",

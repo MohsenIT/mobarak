@@ -492,7 +492,7 @@
   "ui.1313d854c5": "Rilascia per andare alla Sura {p0}",
   "ui.bd26cfdea8": "Trascina per vedere la Sura {p0} {p1}",
   "searchAndGo.help": "Guida alla ricerca",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Scorciatoia Sure",
   "ui.7c631348f5": "Puntina {p0} rimossa.",
   "ui.4fdcf22559": "{p0} appuntato.",

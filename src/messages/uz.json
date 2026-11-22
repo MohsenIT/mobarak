@@ -493,7 +493,7 @@
   "ui.1313d854c5": "{p0}-suraga o'tish uchun qo'yib yuboring",
   "ui.bd26cfdea8": "{p0}-surani ko'rish uchun {p1} suring",
   "searchAndGo.help": "Qidiruv yordami",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Suralar yorlig'i",
   "ui.7c631348f5": "{p0} sanchig'i olib tashlandi.",
   "ui.4fdcf22559": "{p0} sanchildi.",

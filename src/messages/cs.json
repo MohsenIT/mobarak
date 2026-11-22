@@ -493,7 +493,7 @@
   "ui.1313d854c5": "Uvolněte pro přechod na súru {p0}",
   "ui.bd26cfdea8": "Přejeďte pro zobrazení súry {p0} {p1}",
   "searchAndGo.help": "Nápověda k vyhledávání",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Zkratka súr",
   "ui.7c631348f5": "Připnutí {p0} bylo odstraněno.",
   "ui.4fdcf22559": "{p0} bylo připnuto.",

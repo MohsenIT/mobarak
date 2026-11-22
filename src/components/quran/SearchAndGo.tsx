@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { ArrowLeft, ArrowRight, CircleHelp, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
@@ -12,6 +12,8 @@ import SurahNavigationList from './SurahNavigationList'
 import SurahShortcuts from './SurahShortcuts'
 import { DictationInput } from './DictationInput'
 import QuranSearch from './QuranSearch'
+
+const searchExamples = ['س 20', 'اسما الحسنی', 'طه 40', 'صبر', 'صفحه 42', 'جزء 30', 'لا تخف', 'سیاق طه:3']
 
 export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination, onPick, onClose, start, field, translator }: {
   field: RefObject<HTMLInputElement | null>
@@ -68,7 +70,14 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   const rtl = uiDirection() === 'rtl'
   const BackIcon = rtl ? ArrowRight : ArrowLeft
   const searchLabel = t('ui.c51349274d')
-  const placeholder = t('searchAndGo.placeholder', { label: searchLabel })
+  const { placeholder, shorterPlaceholders } = useMemo(() => {
+    const format = (examples: string[]) => t('searchAndGo.placeholder', { label: searchLabel, examples: examples.join(rtl ? '، ' : ', ') })
+    const shorter = searchExamples.slice(2).map((_, index) => format(searchExamples.slice(0, index + 2))).reverse()
+    return {
+      placeholder: format(searchExamples),
+      shorterPlaceholders: [...shorter, format(['س 20', 'صبر']), format(['س 20']), searchLabel],
+    }
+  }, [rtl, searchLabel])
 
   return <Dialog open onOpenChange={open => { if (!open) onClose() }}>
     <DialogContent ref={surface} fullscreen showCloseButton={false} className="search-and-go" data-search-and-go dir={uiDirection()}
@@ -95,7 +104,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
             <Search size={19} aria-hidden="true" onClick={() => field.current?.focus()} />
             <DictationInput {...selection.inputProps} aria-expanded={!help && selection.inputProps['aria-expanded']} ref={field} type="text" enterKeyHint={selection.destination ? 'go' : 'search'}
               value={query} maxLength={160} autoComplete="off" spellCheck={false}
-              aria-label={searchLabel} placeholder={placeholder}
+              aria-label={searchLabel} placeholder={placeholder} fitPlaceholder={shorterPlaceholders}
               onClear={() => changeQuery('')} onChange={event => changeQuery(event.target.value)}
               onKeyDown={event => {
                 if (help || event.nativeEvent.isComposing || selection.move(event)) return

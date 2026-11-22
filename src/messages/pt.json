@@ -518,7 +518,7 @@
   "ui.1313d854c5": "Solte para ir para a Sura {p0}",
   "ui.bd26cfdea8": "Arraste para ver a Sura {p0} {p1}",
   "searchAndGo.help": "Ajuda de pesquisa",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Atalhos de Suras",
   "ui.7c631348f5": "{p0} desafixado.",
   "ui.4fdcf22559": "{p0} fixado.",

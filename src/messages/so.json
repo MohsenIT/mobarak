@@ -493,7 +493,7 @@
   "ui.1313d854c5": "Sii daa si aad u tagto suuradda {p0}",
   "ui.bd26cfdea8": "U jiid si aad u aragto suuradda {p0} {p1}",
   "searchAndGo.help": "Caawinta raadinta",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Gaabka suuradaha",
   "ui.7c631348f5": "Sanjabka {p0} waa laga saaray.",
   "ui.4fdcf22559": "{p0} waa la sanjabay.",

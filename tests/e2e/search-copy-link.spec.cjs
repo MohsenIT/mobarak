@@ -25,7 +25,7 @@ test('copy-link feedback clears when the search state changes',async({page})=>{
  await page.goto('/s/19',{waitUntil:'domcontentloaded'});
  await expect(page.locator('.reader-toolbar')).toBeVisible({timeout:20000});
  await page.locator('.reader-toolbar button[aria-label="منوی برنامه"]').click();
- await page.locator('.drawer-tool-row').filter({hasText:'جست‌وجوی پیشرفته'}).click();
+ await page.locator('.drawer-tool-row').filter({hasText:'جستجوی پیشرفته'}).click();
  const search=page.locator('[data-search-page]');
  await expect(search).toBeVisible({timeout:20000});
 

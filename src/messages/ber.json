@@ -492,7 +492,7 @@
   "ui.1313d854c5": "Senned iwakken ad truḥeḍ ɣer ssurat {p0}",
   "ui.bd26cfdea8": "Senned iwakken ad twaliḍ ssurat {p0} {p1}",
   "searchAndGo.help": "Tallalt n unadi",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Ameskar n tsurat",
   "ui.7c631348f5": "Ssenǧaq {p0} yettwakkes.",
   "ui.4fdcf22559": "{p0} yettwassenǧaq.",

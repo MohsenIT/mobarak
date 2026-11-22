@@ -493,7 +493,7 @@
   "ui.1313d854c5": "ปล่อยเพื่อไปที่ซูเราะห์ {p0}",
   "ui.bd26cfdea8": "ปัดเพื่อดูซูเราะห์ {p0} {p1}",
   "searchAndGo.help": "ความช่วยเหลือการค้นหา",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "ทางลัดซูเราะห์",
   "ui.7c631348f5": "หมุด {p0} ถูกถอดออกแล้ว",
   "ui.4fdcf22559": "{p0} ถูกปักหมุดแล้ว",

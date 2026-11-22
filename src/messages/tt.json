@@ -497,7 +497,7 @@
   "ui.1313d854c5": "{p0} сүрәсенә күчү өчен җибәрегез",
   "ui.bd26cfdea8": "{p0} сүрәсен күрү өчен {p1} тартыгыз",
   "searchAndGo.help": "Эзләү ярдәме",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Сүрәләр кыска юлы",
   "ui.7c631348f5": "{p0} кадакланмады.",
   "ui.4fdcf22559": "{p0} кадакланды.",

@@ -492,7 +492,7 @@
   "ui.1313d854c5": "Lepaskan untuk pergi ke surah {p0}",
   "ui.bd26cfdea8": "Leret untuk melihat surah {p0} {p1}",
   "searchAndGo.help": "Bantuan carian",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Pintasan surah",
   "ui.7c631348f5": "Pin {p0} dialih keluar.",
   "ui.4fdcf22559": "{p0} telah dipin.",

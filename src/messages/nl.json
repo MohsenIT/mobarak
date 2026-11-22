@@ -493,7 +493,7 @@
   "ui.1313d854c5": "Laat los om naar soera {p0} te gaan",
   "ui.bd26cfdea8": "Veeg om soera {p0} {p1} te zien",
   "searchAndGo.help": "Zoekhulp",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Soera-snelkoppelingen",
   "ui.7c631348f5": "Pin {p0} verwijderd.",
   "ui.4fdcf22559": "{p0} gepind.",

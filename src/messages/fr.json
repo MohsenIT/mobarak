@@ -491,7 +491,7 @@
   "ui.1313d854c5": "Relâchez pour aller à la sourate {p0}",
   "ui.bd26cfdea8": "Faites glisser pour voir la sourate {p0} {p1}",
   "searchAndGo.help": "Aide à la recherche",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Raccourci des sourates",
   "ui.7c631348f5": "L'épingle {p0} a été retirée.",
   "ui.4fdcf22559": "{p0} a été épinglé.",

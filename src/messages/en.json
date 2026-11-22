@@ -491,7 +491,7 @@
   "ui.1313d854c5": "Release to go to Surah {p0}",
   "ui.bd26cfdea8": "Swipe to see Surah {p0} {p1}",
   "searchAndGo.help": "Search help",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Surah shortcut",
   "ui.7c631348f5": "Pin {p0} removed.",
   "ui.4fdcf22559": "{p0} pinned.",

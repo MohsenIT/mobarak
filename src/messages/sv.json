@@ -492,7 +492,7 @@
   "ui.1313d854c5": "Släpp för att gå till sura {p0}",
   "ui.bd26cfdea8": "Svep för att se sura {p0} {p1}",
   "searchAndGo.help": "Sökhjälp",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Suragenvägar",
   "ui.7c631348f5": "Nålen {p0} togs bort.",
   "ui.4fdcf22559": "{p0} nålades fast.",

@@ -493,7 +493,7 @@
   "ui.1313d854c5": "Suelte para ir a la sura {p0}",
   "ui.bd26cfdea8": "Deslice para ver la sura {p0} {p1}",
   "searchAndGo.help": "Ayuda de búsqueda",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Atajo de suras",
   "ui.7c631348f5": "Se quitó el pin de {p0}.",
   "ui.4fdcf22559": "Se fijó {p0}.",

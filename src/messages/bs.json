@@ -492,7 +492,7 @@
   "ui.1313d854c5": "Otpustite za odlazak na suru {p0}",
   "ui.bd26cfdea8": "Povucite za prikaz sure {p0} {p1}",
   "searchAndGo.help": "Pomoć za pretragu",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Prečica sura",
   "ui.7c631348f5": "Oznaka {p0} je uklonjena.",
   "ui.4fdcf22559": "{p0} je označeno.",

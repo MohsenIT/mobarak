@@ -492,7 +492,7 @@
   "ui.1313d854c5": "بۆ چوون بۆ سوورەتی {p0} بەری بدە",
   "ui.bd26cfdea8": "بۆ بینینی سوورەتی {p0} {p1} ڕایبکێشە",
   "searchAndGo.help": "Alîkariya lêgerînê",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "کورتکراوەی سوورەتەکان",
   "ui.7c631348f5": "پینەکردنی {p0} لابرا.",
   "ui.4fdcf22559": "{p0} پینە کرا.",

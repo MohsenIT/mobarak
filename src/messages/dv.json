@@ -493,7 +493,7 @@
   "ui.1313d854c5": "ސޫރަތް {p0} އަށް ދިއުމަށް ދޫކޮށްލާ",
   "ui.bd26cfdea8": "ސޫރަތް {p0} {p1} ބެލުމަށް ދަމާ",
   "searchAndGo.help": "ހޯދުމުގެ އެހީ",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "ސޫރަތްތަކުގެ ޝޯޓްކަޓް",
   "ui.7c631348f5": "{p0} ގެ ޕިން ނެގިއްޖެ.",
   "ui.4fdcf22559": "{p0} ޕިންކުރެވިއްޖެ.",

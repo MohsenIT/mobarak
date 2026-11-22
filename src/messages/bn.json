@@ -493,7 +493,7 @@
   "ui.1313d854c5": "সূরা {p0} এ যেতে ছেড়ে দিন",
   "ui.bd26cfdea8": "সূরা {p0} {p1} দেখতে টানুন",
   "searchAndGo.help": "অনুসন্ধান সহায়তা",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "সূরা শর্টকাট",
   "ui.7c631348f5": "{p0} পিন সরানো হয়েছে।",
   "ui.4fdcf22559": "{p0} পিন করা হয়েছে।",

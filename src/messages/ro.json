@@ -493,7 +493,7 @@
   "ui.1313d854c5": "Eliberați pentru a merge la sura {p0}",
   "ui.bd26cfdea8": "Glisați pentru a vedea sura {p0} {p1}",
   "searchAndGo.help": "Ajutor pentru căutare",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Scurtătură sure",
   "ui.7c631348f5": "Pinul {p0} a fost eliminat.",
   "ui.4fdcf22559": "{p0} a fost fixat.",

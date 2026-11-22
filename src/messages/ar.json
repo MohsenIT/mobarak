@@ -493,7 +493,7 @@
   "ui.1313d854c5": "أفلت للذهاب إلى سورة {p0}",
   "ui.bd26cfdea8": "اسحب لرؤية سورة {p0} {p1}",
   "searchAndGo.help": "دليل البحث",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "اختصار السور",
   "ui.7c631348f5": "تمت إزالة تثبيت {p0}.",
   "ui.4fdcf22559": "تم تثبيت {p0}.",

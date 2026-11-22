@@ -491,7 +491,7 @@
   "ui.1313d854c5": "第{p0}章へ移動するには離してください",
   "ui.bd26cfdea8": "第{p0}章 {p1}を見るにはスワイプしてください",
   "searchAndGo.help": "検索ヘルプ",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "章のショートカット",
   "ui.7c631348f5": "{p0}のピンを外しました。",
   "ui.4fdcf22559": "{p0}をピン留めしました。",

@@ -493,7 +493,7 @@
   "ui.1313d854c5": "Slipp for å gå til sura {p0}",
   "ui.bd26cfdea8": "Sveip for å se sura {p0} {p1}",
   "searchAndGo.help": "Søkehjelp",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Sura-snarveier",
   "ui.7c631348f5": "Nål {p0} fjernet.",
   "ui.4fdcf22559": "{p0} festet.",

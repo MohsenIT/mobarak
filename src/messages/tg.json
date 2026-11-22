@@ -493,7 +493,7 @@
   "ui.1313d854c5": "Барои рафтан ба сураи {p0} раҳо кунед",
   "ui.bd26cfdea8": "Барои дидани сураи {p0} {p1} бикашед",
   "searchAndGo.help": "Роҳнамои ҷустуҷӯ",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Миёнбури сураҳо",
   "ui.7c631348f5": "Санҷақи {p0} бардошта шуд.",
   "ui.4fdcf22559": "{p0} санҷақ шуд.",

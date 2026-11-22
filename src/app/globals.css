@@ -1902,6 +1902,15 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-and-go .search-page-input .dictation-field { flex: 1; margin: 0; }
 .search-and-go .search-page-input input { padding-block: 10px; }
 .search-and-go .search-page-input input::placeholder { font-size: clamp(12px, 2vw, 15px); }
+.responsive-placeholder-ruler {
+  position: absolute;
+  inline-size: 0;
+  block-size: 0;
+  overflow: hidden;
+  visibility: hidden;
+  white-space: nowrap;
+}
+.responsive-placeholder-ruler span { display: block; inline-size: max-content; }
 .search-and-go .search-page-input .dictation-button { inset-inline-end: 4px; }
 .search-and-go-shortcuts { grid-column: 2; min-width: 0; }
 .search-and-go-shortcuts .drawer-recent-shortcuts { padding: 0; }

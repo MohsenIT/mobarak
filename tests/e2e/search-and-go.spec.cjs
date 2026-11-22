@@ -46,7 +46,7 @@ test('one field runs live text search and restores browsing when cleared', async
   await openReader(page);
   const dialog = await openSearchAndGo(page);
   const field = dialog.getByRole('combobox');
-  await expect(field).toHaveAttribute('placeholder', /جست‌وجوی پیشرفته.*س ۲۰.*اسما الحسنی/);
+  await expect(field).toHaveAttribute('placeholder', /جستجوی پیشرفته.*س ۲۰/);
   await expect(dialog.locator('header h2:visible')).toHaveCount(0);
   await expect(dialog.locator('.search-and-go-header')).toHaveCSS('border-bottom-width', '0px');
   await expect(dialog.locator('.drawer-content-shell')).toHaveCSS('border-top-width', '1px');
@@ -61,7 +61,7 @@ test('one field runs live text search and restores browsing when cleared', async
   await field.focus();
   await expect(dialog.locator('.search-and-go-history')).toHaveCount(0);
   const href = page.url();
-  await field.fill('«اسما الحسنی»');
+  await field.fill('اسما الحسنی');
   await expect(dialog.locator('[data-surah-row]')).toHaveCount(0);
   await expect(dialog.locator('.search-result-open').first()).toBeVisible({ timeout: 20000 });
   await expect(dialog.locator('.search-result-open')).toHaveCount(4);
@@ -72,11 +72,38 @@ test('one field runs live text search and restores browsing when cleared', async
   await expect(page).toHaveURL(href);
   await dialog.getByRole('button', { name: 'پاک کردن عبارت' }).click();
   await expect(dialog.locator('[data-surah-row]')).toHaveCount(114);
-  const guide = dialog.getByRole('button', { name: 'راهنمای جست‌وجو' });
+  const guide = dialog.getByRole('button', { name: 'راهنمای جستجو' });
   await guide.click();
   await expect(dialog.locator('.search-and-go-help')).toContainText('اسما الحسنی');
   await guide.click();
   await expect(dialog.getByRole('slider')).toBeVisible();
+});
+
+test('the placeholder adds only whole examples that fit as the field resizes', async ({ page }) => {
+  await page.addInitScript(() => { window.SpeechRecognition = class { abort() {} }; });
+  await page.setViewportSize({ width: 320, height: 800 });
+  await openReader(page);
+  const dialog = await openSearchAndGo(page);
+  const field = dialog.getByRole('combobox');
+  await page.evaluate(() => document.fonts.ready.then(() => true));
+  const fits = () => field.evaluate(input => {
+    const style = getComputedStyle(input);
+    const ruler = input.closest('.search-page-input').querySelector('.responsive-placeholder-ruler');
+    const shown = Array.from(ruler?.children ?? []).find(sample => sample.textContent === input.placeholder);
+    return !!shown && shown.getBoundingClientRect().width <= input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  });
+  await expect(field).toHaveAttribute('placeholder', /جستجوی پیشرفته.*…$/);
+  await expect.poll(fits).toBe(true);
+  const narrow = await field.getAttribute('placeholder');
+
+  await page.setViewportSize({ width: 877, height: 909 });
+  await expect(field).toHaveAttribute('placeholder', /س ۲۰، اسما الحسنی، طه ۴۰، صبر، صفحه ۴۲/);
+  await expect(field).not.toHaveAttribute('placeholder', /[«»…]/);
+  await expect.poll(fits).toBe(true);
+  expect((await field.getAttribute('placeholder')).length).toBeGreaterThan(narrow.length);
+
+  await page.setViewportSize({ width: 320, height: 800 });
+  await expect(field).toHaveAttribute('placeholder', narrow);
 });
 
 test('recent Taha restores its last reading passage after a reload', async ({ page }) => {

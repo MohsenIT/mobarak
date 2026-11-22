@@ -493,7 +493,7 @@
   "ui.1313d854c5": "ወደ ሱራ {p0} ለመሄድ ይልቀቁ",
   "ui.bd26cfdea8": "ሱራ {p0}ን ለማየት {p1} ያንሸራትቱ",
   "searchAndGo.help": "የፍለጋ እገዛ",
-  "searchAndGo.placeholder": "{label}: س ۲۰، «اسما الحسنی»",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "የሱራዎች አቋራጭ",
   "ui.7c631348f5": "የ{p0} ፒን ተወግዷል።",
   "ui.4fdcf22559": "{p0} ተፒኗል።",
