@@ -50,16 +50,38 @@ export interface Meta {
 
 export type Translations = Record<string, Record<Translator, string>>
 
+async function loadReadingData<T>(path: string): Promise<T> {
+  const beta = typeof location !== 'undefined' && location.hostname === 'beta.mobarak.app'
+  const read = async (url: string, options?: RequestInit): Promise<T> => {
+    const response = await fetch(url, options)
+    if (!response.ok) throw new Error(`Reading data unavailable (${response.status})`)
+    return response.json()
+  }
+  if (!beta) return read(path)
+  try {
+    return await read(path, { signal: AbortSignal.timeout(6000) })
+  } catch {
+    // Try a fresh URL if the initial preview request was interrupted or cached incorrectly.
+    return read(`${path}?retry=${Date.now()}`, { cache: 'no-store', signal: AbortSignal.timeout(8000) })
+  }
+}
+
 let metaPromise: Promise<Meta> | null = null
 export function loadMeta(): Promise<Meta> {
-  if (!metaPromise) metaPromise = fetch('/data/meta.json').then(r => r.json())
+  if (!metaPromise) metaPromise = loadReadingData<Meta>('/data/meta.json').catch(error => {
+    metaPromise = null
+    throw error
+  })
   return metaPromise
 }
 
 const surahCache = new Map<number, Promise<SurahData>>()
 export function loadSurah(n: number): Promise<SurahData> {
   if (!surahCache.has(n))
-    surahCache.set(n, fetch(`/data/surah/${n}.json`).then(r => r.json()))
+    surahCache.set(n, loadReadingData<SurahData>(`/data/surah/${n}.json`).catch(error => {
+      surahCache.delete(n)
+      throw error
+    }))
   return surahCache.get(n)!
 }
 

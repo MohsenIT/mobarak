@@ -54,7 +54,7 @@ export default function SourceReference({ text = '', source, label = t("ui.8a52f
         {iconOnly?<Info size={17} aria-hidden="true"/>:<><BookOpen size={13} aria-hidden="true"/><span>{label}</span></>}
       </button>
     </PopoverTrigger>
-    <PopoverContent dir={uiDirection()} side="top" aria-labelledby={titleId} className="w-[min(24rem,calc(100vw-2rem))] rounded-xl p-4 text-xs leading-7 break-words [overflow-wrap:anywhere]" style={{ background: 'var(--paper)', color: 'var(--ink)', borderColor: 'var(--line)', zIndex: 100, maxHeight: 'min(70dvh, var(--radix-popover-content-available-height, 70dvh))', overflowY: 'auto', overscrollBehavior: 'contain' }}>
+    <PopoverContent dir={uiDirection()} side="top" aria-labelledby={titleId} className="w-[min(24rem,calc(100vw-2rem))] rounded-xl p-4 text-xs leading-7 break-words [overflow-wrap:anywhere]" style={{ background: 'var(--paper)', color: 'var(--ink)', borderColor: 'var(--line)', zIndex: 220, maxHeight: 'min(70dvh, var(--radix-popover-content-available-height, 70dvh))', overflowY: 'auto', overscrollBehavior: 'contain' }}>
       <header className="flex items-start gap-3 mb-2">
         <h3 id={titleId} className="font-bold text-sm leading-7 flex-1">{info.title}</h3>
         <button type="button" aria-label={t("ui.7f0f10c904")} className="shrink-0 rounded-full p-1 cursor-pointer" onClick={() => setOpen(false)}><X size={16} aria-hidden="true" /></button>

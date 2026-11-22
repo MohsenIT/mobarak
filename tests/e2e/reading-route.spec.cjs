@@ -41,13 +41,13 @@ test('a bare surah deep link restores flow mode at that surah',async({page})=>{
  await expect(page.locator('.surah-pull-content')).toBeVisible();
 });
 
-test('the stored reading position is used when the location carries none',async({page})=>{
+test('the home route starts in continuous mode even after using mushaf',async({page})=>{
  await setup(page);
- await page.addInitScript(()=>{localStorage.setItem('mushaf.page','7');localStorage.setItem('mushaf.mode','"mushaf"')});
+ await page.addInitScript(()=>{localStorage.setItem('mushaf.page','7');localStorage.setItem('mushaf.surah','18');localStorage.setItem('mushaf.mode','"mushaf"')});
  await page.goto('/',{waitUntil:'domcontentloaded'});
  await readerReady(page);
  // The first navigation of the reader makes the location canonical.
- await expect(page).toHaveURL(/\/p\/7$/);
+ await expect(page).toHaveURL(/\/s\/18$/);
 });
 
 test('navigating between pages rewrites the URL in place rather than growing history',async({page})=>{
