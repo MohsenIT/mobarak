@@ -70,7 +70,7 @@ add a second instance without discussing it first.
   | Concern | Module |
   |---|---|
   | Reading position, URL, history, `mushaf.page/mode/surah` | `useReadingRoute.ts` (+ pure logic in `src/lib/reading-route.ts`) |
-  | Search panel orchestration (quick/advanced open, occurrence filter, back band) | `useSearchNavigation.ts` |
+  | Search panel orchestration (Search and Go, quick/advanced open, search history, occurrence filter, back band) | `useSearchNavigation.ts` |
   | Range comparison state (sheet, range, roots, mute/solo) | `useComparison.ts` (+ rules in `src/lib/root-comparison.ts`) |
   | Presentation settings + `mushaf.*` persistence (theme, translator, scale, bookmarks, pins) | `useReaderPresentation.ts` (+ update rules in `src/lib/reader-settings.ts`) |
   | Startup splash lifecycle | `useStartupSplash.ts` |
@@ -447,6 +447,12 @@ to be written.
   its own, separate test file.
 
 ## Definition of Done
+
+Search and Go is enabled at build time with `NEXT_PUBLIC_SEARCH_AND_GO=1`.
+`useReadingRoute` owns its single overlay entry and reading-origin snapshot.
+A jump or advanced-search handoff replaces that entry. Typing and focus stay
+local to the surface. The versioned storage keys, rollback and test commands
+are documented in [the phase-one delivery notes](docs/search-and-go-phase-1.md).
 
 Quick-search scope is owned by `useSearchNavigation` and persisted under the
 append-only `mushaf.quick-search-scope` key. Its reading-origin snapshot and

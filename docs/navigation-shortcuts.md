@@ -1,6 +1,11 @@
 # Navigation shortcuts
 
-The Go field is in the drawer opened by tapping the surah title. Explicit shortcuts also work in quick search and advanced text search; choose the destination or press Enter. Ordinary text/root/lemma searches retain their existing behavior.
+Tapping the surah title opens Search and Go when its beta flag is enabled and
+the navigation drawer otherwise. In these surfaces and in advanced search,
+Enter confirms a visibly highlighted exact command or an option selected with
+the arrow keys. A bare number or ranked name requires a choice, even when
+only one suggestion is valid. Tapping a suggestion confirms it directly.
+The independent quick bar retains its own search and navigation behavior.
 
 | Destination | Short forms | Full forms |
 | --- | --- | --- |

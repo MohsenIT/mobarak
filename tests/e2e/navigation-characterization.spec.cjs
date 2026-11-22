@@ -16,6 +16,8 @@ test('opening and closing Go preserves the reading position and URL', async ({ p
   const trigger = page.locator('.reader-surah-link');
   await trigger.click();
   const dialog = page.getByRole('dialog');
+  await expect(dialog).toHaveClass(/\bdrawer\b/);
+  await expect(page.locator('[data-search-and-go]')).toHaveCount(0);
   await expect(dialog).toBeVisible();
   await dialog.getByRole('button', { name: 'بستن', exact: true }).click();
   await expect(dialog).toHaveCount(0);
