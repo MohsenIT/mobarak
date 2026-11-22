@@ -1,4 +1,4 @@
-import { readPageNumber, readSurahNumber, readVerseAddress, readingUrl, type ReadingMode, type VerseAddress } from './verse-link'
+import { readPageNumber, readSurahNumber, readVerseAddress, readingUrl, verseLocation, type ReadingMode, type VerseAddress } from './verse-link'
 import { readSearchLink, searchLink, type SearchLinkState } from './search-link'
 
 export type { ReadingMode } from './verse-link'
@@ -84,4 +84,13 @@ export function searchExit(current: string, historyState: unknown, readingBefore
   if (!readSearchLink(current)) return null
   if ((historyState as { quranSearchEntry?: boolean } | null)?.quranSearchEntry) return { kind: 'back' }
   return { kind: 'replace', href: readingBefore ?? fallback.href }
+}
+
+
+export type ReadingJump = { kind: 'page'; page: number } | { kind: 'verse'; address: VerseAddress; page: number }
+
+export function searchAndGoReadingUrl(current: string, mode: ReadingMode, jump: ReadingJump, native = false) {
+  return mode === 'flow' && jump.kind === 'verse'
+    ? verseLocation(current, jump.address, native)
+    : readingUrl(current, 'mushaf', 1, jump.page, native)
 }

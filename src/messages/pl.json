@@ -492,6 +492,8 @@
   "ui.6d2052087b": "Dotknij każdego rdzenia, aby otworzyć słowa o tym samym rdzeniu w panelu bocznym. Lista pozostaje otwarta, aby zachować miejsce ćwiczeń.",
   "ui.1313d854c5": "Zwolnij, aby przejść do sury {p0}",
   "ui.bd26cfdea8": "Przesuń, aby zobaczyć surę {p0} {p1}",
+  "searchAndGo.help": "Pomoc w wyszukiwaniu",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Skrót sur",
   "ui.7c631348f5": "Przypięcie {p0} zostało usunięte.",
   "ui.4fdcf22559": "{p0} zostało przypięte.",

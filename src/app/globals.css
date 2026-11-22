@@ -1863,3 +1863,66 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .reader-highlight[data-highlight-state] { animation: none; box-decoration-break: clone; -webkit-box-decoration-break: clone; border-radius: 3px; }
 .reader-highlight[data-highlight-state='match'] { background: var(--word-root); }
 .reader-highlight[data-highlight-state='selected'] { background: var(--word-selected); }
+
+.drawer-destination-options [aria-selected="true"],
+.search-jump-options [aria-selected="true"] {
+  outline: 2px solid var(--sage);
+  outline-offset: -2px;
+  background: var(--word-root);
+}
+
+.search-and-go {
+  background: var(--paper);
+  color: var(--ink);
+  height: var(--search-and-go-height, 100dvh);
+  overflow: hidden;
+}
+.search-and-go-shell, .search-and-go-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.search-and-go-shell {
+  width: min(100%, 960px);
+  height: 100%;
+  margin-inline: auto;
+  padding-block-end: env(safe-area-inset-bottom);
+}
+.search-and-go-body { flex: 1; }
+.search-and-go-body[hidden] { display: none; }
+.search-and-go-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  padding: max(8px, env(safe-area-inset-top)) clamp(8px, 2vw, 20px) 8px;
+}
+.search-and-go[dir="rtl"] .search-and-go-help-icon { transform: scaleX(-1); }
+.search-and-go .search-page-input { padding-inline: 10px 0; gap: 6px; }
+.search-and-go .search-page-input .dictation-field { flex: 1; margin: 0; }
+.search-and-go .search-page-input input { padding-block: 10px; }
+.search-and-go .search-page-input input::placeholder { font-size: clamp(12px, 2vw, 15px); }
+.responsive-placeholder-ruler {
+  position: absolute;
+  inline-size: 0;
+  block-size: 0;
+  overflow: hidden;
+  visibility: hidden;
+  white-space: nowrap;
+}
+.responsive-placeholder-ruler span { display: block; inline-size: max-content; }
+.search-and-go .search-page-input .dictation-button { inset-inline-end: 4px; }
+.search-and-go-shortcuts { grid-column: 2; min-width: 0; }
+.search-and-go-shortcuts .drawer-recent-shortcuts { padding: 0; }
+.search-and-go-body > .drawer-content-shell { border-block-start: 1px solid var(--line); }
+.search-and-go .drawer-destination-options { flex-wrap: wrap; max-height: 34dvh; overflow: auto; }
+.search-and-go-results { flex: 1; overflow: hidden; }
+.search-and-go-no-destination { padding: 6px 16px; color: var(--ink-soft); }
+.search-and-go-help { padding: 12px 24px; overflow: auto; line-height: 1.9; }
+.search-and-go-help dl > div { padding-block: 8px; border-bottom: 1px solid var(--line); }
+.search-and-go-help dt { font-weight: 700; }
+.search-and-go-help dd, .search-and-go-help p { color: var(--ink-soft); }
+.search-and-go-help p { margin-block-start: 10px; }
+
+.search-and-go { top: var(--search-and-go-top, 0px); }
+.search-and-go :is(button, [role="slider"]):focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }

@@ -1,3 +1,5 @@
+import type { VerseAddress } from './verse-link'
+
 /** Reader-only navigation geometry; never scroll ancestors or the page itself. */
 export type ReadingWindow={top:number;bottom:number}
 /** Reserve occluded space even during manual reading, without leaving a closed-sheet gap. */
@@ -90,4 +92,44 @@ export function readingVerseBounds(scroll:HTMLElement,target:HTMLElement):DOMRec
 export function revealReadingVerse(scroll:HTMLElement,target:HTMLElement,behavior:ScrollBehavior='smooth'):boolean {
  const rect=readingVerseBounds(scroll,target),visible=readingWindow(scroll,target,rect)
  return scrollReadingDelta(scroll,visible,readingVerseDelta(rect,visible),behavior)
+}
+
+/** Locate a visible word even when a search surface covers the reader. */
+export function captureReadingAnchor(reader: HTMLElement | null, preferred?: VerseAddress, preferSurah = false) {
+  const scroll = reader?.querySelector<HTMLElement>('[data-reading-scroll]')
+  if (!scroll) return null
+  const bounds = scroll.getBoundingClientRect()
+  if (bounds.height <= 0) return null
+  const preferredWord = preferred && scroll.querySelector<HTMLElement>(
+    `[data-surah="${preferred.s}"][data-ayah="${preferred.a}"][data-pos="${preferred.pos}"]`,
+  )
+  const preferredBox = preferredWord?.getBoundingClientRect()
+  const preferredVisible = preferredBox && preferredBox.height > 0 && preferredBox.bottom > bounds.top + 2 && preferredBox.top < bounds.bottom
+  // Narrow the lookup to the visible page in mushaf or the verse wrappers in flow.
+  const pages = Array.from(scroll.querySelectorAll<HTMLElement>('[data-mushaf-page]'))
+    .filter(page => page.getBoundingClientRect().bottom > bounds.top)
+  const verses = Array.from(scroll.querySelectorAll<HTMLElement>('[data-verse]'))
+  const blocks = pages.length ? pages : verses.length ? verses : [scroll]
+  for (const block of blocks) {
+    const box = block.getBoundingClientRect()
+    if (box.bottom <= bounds.top || box.top >= bounds.bottom) continue
+    for (const word of block.querySelectorAll<HTMLElement>('[data-surah][data-ayah][data-pos]')) {
+      const rect = word.getBoundingClientRect()
+      if (rect.bottom <= bounds.top + 2 || rect.top >= bounds.bottom || !rect.height) continue
+      const surah = Number(word.dataset.surah)
+      // Two verses can start on the same line. Keep the explicitly addressed
+      // word there, or the addressed surah while it remains visible in mushaf.
+      if (preferred && preferredWord && preferredVisible &&
+        (Math.abs(preferredBox.top - rect.top) < 4 || (preferSurah && preferred.s !== surah))) {
+        const page = preferredWord.closest<HTMLElement>('[data-mushaf-page]')
+        return { address: preferred, offset: preferredBox.top - bounds.top, page: page && Number(page.dataset.mushafPage) || undefined }
+      }
+      return {
+        address: { s: surah, a: Number(word.dataset.ayah), pos: Number(word.dataset.pos) },
+        offset: rect.top - bounds.top,
+        page: pages.length ? Number(block.dataset.mushafPage) : undefined,
+      }
+    }
+  }
+  return null
 }

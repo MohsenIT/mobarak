@@ -40,13 +40,20 @@ export function readingUrl(current: string, mode: ReadingMode, surah: number, pa
   }
   return url
 }
-export function writeVerseAddress(address: VerseAddress, replace = false) {
-  if(nativeRecitationAvailable())void nativeCommand({op:"library",action:"reading",s:address.s,a:address.a}).catch(()=>{})
-  const url = readingUrl(window.location.href, 'flow', address.s, 1, process.env.NEXT_PUBLIC_DESKTOP === '1')
-  if (process.env.NEXT_PUBLIC_DESKTOP === '1') {
+export function verseLocation(current: string, address: VerseAddress, native = false): URL {
+  const url = readingUrl(current, 'flow', address.s, 1, native)
+  if (native) {
     url.searchParams.set('a', String(address.a))
     if (address.pos > 1) url.searchParams.set('w', String(address.pos))
     else url.searchParams.delete('w')
   } else url.pathname = versePath(address)
+  return url
+}
+export function reportReadingAddress(address: VerseAddress) {
+  if(nativeRecitationAvailable())void nativeCommand({op:"library",action:"reading",s:address.s,a:address.a}).catch(()=>{})
+}
+export function writeVerseAddress(address: VerseAddress, replace = false) {
+  reportReadingAddress(address)
+  const url = verseLocation(window.location.href, address, process.env.NEXT_PUBLIC_DESKTOP === '1')
   if (url.href !== window.location.href) window.history[replace ? 'replaceState' : 'pushState'](window.history.state, '', url)
 }

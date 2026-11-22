@@ -12,7 +12,7 @@ test('opening advanced search from the reader pushes history, and the back butto
  await page.goto('/s/1/a/3',{waitUntil:'domcontentloaded'});
  await expect(page).toHaveURL(/\/s\/1\/a\/3$/);
  await page.locator('button[aria-label="منوی برنامه"]').click();
- await page.locator('.drawer-tool-row').filter({hasText:'جست‌وجوی پیشرفته'}).click();
+ await page.locator('.drawer-tool-row').filter({hasText:'جستجوی پیشرفته'}).click();
  await expect(page).toHaveURL(/\/q(\?|$)/);
  await page.goBack();
  await expect(page).toHaveURL(/\/s\/1\/a\/3$/);

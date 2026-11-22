@@ -22,7 +22,7 @@ async function readerReady(page){
 }
 async function openAdvancedFromMenu(page){
  await page.locator('.reader-toolbar button[aria-label="منوی برنامه"]').click();
- await page.locator('.drawer-tool-row').filter({hasText:'جست‌وجوی پیشرفته'}).click();
+ await page.locator('.drawer-tool-row').filter({hasText:'جستجوی پیشرفته'}).click();
  await expect(page.locator('[data-search-page]')).toBeVisible({timeout:20000});
 }
 

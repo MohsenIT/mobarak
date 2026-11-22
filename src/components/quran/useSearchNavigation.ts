@@ -1,13 +1,14 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { occurrenceScopeSurahs, type OccurrenceScope } from '@/lib/occurrence-scope'
 import type { AnalysisSelection } from '@/lib/analysis'
-import type { SearchLinkState } from '@/lib/search-link'
-import type { Translator } from '@/lib/quran'
+import type { SearchLinkState, SearchResultPosition, SearchResultSnapshot } from '@/lib/search-link'
+import type { Meta, Translator } from '@/lib/quran'
 import type { SearchStart } from './QuranSearch'
 import type { ReaderSearchState } from './ReaderSearchHighlights'
 import { readStored, writeStored } from '@/lib/reader-storage'
+import { readOperationHistory, rememberOperation, SEARCH_AND_GO_HISTORY_KEY, type SearchOperation } from '@/lib/search-and-go-history'
 
 /**
  * Search, as one owned piece of state instead of six loose ones in page.tsx.
@@ -31,13 +32,38 @@ import { readStored, writeStored } from '@/lib/reader-storage'
 export function useSearchNavigation({
   onReveal,
   onTranslator,
+  operationMeta,
 }: {
   /** Show this location in the reader without closing anything by itself. */
   onReveal: (s: number, a: number, pos: number) => void
   /** A search URL may carry its own translator; the reader owns that setting. */
   onTranslator: (translator: Translator) => void
+  operationMeta: Meta | null
 }) {
   const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [searchAndGoOpen, setSearchAndGoOpen] = useState(false)
+  const [unifiedStart, setUnifiedStart] = useState<SearchResultSnapshot | null>(null)
+  const [returnToUnified, setReturnToUnified] = useState<SearchResultSnapshot | null>(null)
+  const showUnified = useCallback((start: SearchResultSnapshot | null = null) => {
+    setUnifiedStart(start)
+    setSearchAndGoOpen(true)
+    setAdvancedOpen(false)
+  }, [])
+  const searchAndGoInput = useRef<HTMLInputElement>(null)
+  const dismissSearchAndGoKeyboard = useCallback(() => {
+    const viewport = window.visualViewport
+    const input = searchAndGoInput.current
+    if (!input || document.activeElement !== input || !viewport || viewport.scale !== 1 || viewport.height >= window.innerHeight - 40) return false
+    input.blur()
+    return true
+  }, [])
+  const [storedOperations, setStoredOperations] = useState<unknown>(() => readStored(SEARCH_AND_GO_HISTORY_KEY, []))
+  const operations = useMemo(() => operationMeta ? readOperationHistory(operationMeta, storedOperations) : [], [operationMeta, storedOperations])
+  const recordOperation = (operation: SearchOperation) => {
+    const next = rememberOperation(operations, operation, Date.now())
+    setStoredOperations(next)
+    writeStored(SEARCH_AND_GO_HISTORY_KEY, next)
+  }
   const [quickOpen, setQuickOpen] = useState(false)
   const [quickScope, setQuickScope] = useState<'surah' | 'quran'>(() => readStored<unknown>('mushaf.quick-search-scope', 'surah') === 'quran' ? 'quran' : 'surah')
   const changeQuickScope = useCallback((scope: 'surah' | 'quran') => {
@@ -59,6 +85,7 @@ export function useSearchNavigation({
    */
   const leaveForReading = useCallback(() => {
     setReturnToSearch(current => advancedOpen || current)
+    if (advancedOpen) setReturnToUnified(null)
     setAdvancedOpen(false)
     setQuickOpen(false)
   }, [advancedOpen])
@@ -98,7 +125,8 @@ export function useSearchNavigation({
   }, [])
 
   /** A hit was chosen: leave search and show it. */
-  const pick = useCallback((s: number, a: number, pos: number) => {
+  const pick = useCallback((s: number, a: number, pos: number, unified: SearchResultSnapshot | null = null) => {
+    setReturnToUnified(unified)
     setReturnToSearch(true)
     setAdvancedOpen(false)
     setQuickOpen(false)
@@ -110,23 +138,33 @@ export function useSearchNavigation({
    * `sameEntry` means the location already matched this panel (a replace, not a
    * new search), so only the translator is re-read.
    */
-  const applyEntry = useCallback((state: SearchLinkState, sameEntry: boolean) => {
+  const applyEntry = useCallback((state: SearchLinkState, sameEntry: boolean, position?: SearchResultPosition) => {
+    if (position) {
+      showUnified({ query: state.query, position })
+      return
+    }
     onTranslator(state.translator)
     if (sameEntry) { setAdvancedOpen(true); return }
     setStart({ query: state.query, mode: state.mode, surahs: state.surahs, revision: Date.now(), state })
     setOccurrence(state.occurrence)
     setAdvancedOpen(true)
-  }, [onTranslator])
+  }, [onTranslator, showUnified])
+
+  const restoreUnifiedReturn = (result?: SearchResultSnapshot) => {
+    if (!result && !returnToUnified) return
+    setReturnToUnified(result ?? null)
+    setReturnToSearch(!!result)
+  }
 
   /** Any reading location: search is not where the reader is any more. */
   const close = useCallback(() => setAdvancedOpen(false), [])
 
   return {
-    advancedOpen, setAdvancedOpen, close,
+    searchAndGoOpen, setSearchAndGoOpen, showUnified, unifiedStart, returnToUnified, searchAndGoInput, dismissSearchAndGoKeyboard, recordOperation, advancedOpen, setAdvancedOpen, close,
     quickOpen, openQuick, setQuickOpen, quickScope, changeQuickScope,
     quickHighlights, setQuickHighlights,
     start, occurrence, clearOccurrence: () => setOccurrence(null),
-    returnToSearch, dismissReturn: () => setReturnToSearch(false),
+    returnToSearch, restoreUnifiedReturn, dismissReturn: () => { setReturnToSearch(false); setReturnToUnified(null) },
     openAdvanced, startOccurrence, advance, pick, leaveForReading, applyEntry,
   }
 }

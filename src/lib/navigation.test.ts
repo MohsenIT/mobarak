@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 import rawMeta from '../../public/data/meta.json'
 import type { Meta } from './quran'
-import { searchSurahs, resolveDestination } from './navigation'
+import { searchSurahs, resolveDestination, activeDestinationIndex, stepDestinationIndex, destinationSuggestions } from './navigation'
 const meta: Meta = { ...rawMeta, juz: Object.fromEntries(Object.entries(rawMeta.juz).map(([key, [s, a]]) => [key, [s, a] as [number, number]])) }
 
 test('named ayah references accept either order, commas, spaces and native digits',async()=>{
@@ -98,4 +98,33 @@ test('search navigation never intercepts ordinary words or standalone surah init
   const {searchDestinations}=await import('./navigation')
   for(const value of ['علم','ق','س','طه','صالح'])expect(searchDestinations(meta,value,20)).toEqual([])
   expect(searchDestinations(meta,'ق۶',20)[0].destination.kind).toBe('context')
+})
+
+test('phase-one examples produce only real destinations', async () => {
+  const { destinationSuggestions } = await import('./navigation')
+  const dest = (input: string, current = 20) => destinationSuggestions(meta, input, current).map(item => item.destination)
+  expect(dest('طه')[0]).toEqual({ kind: 'surah', s: 20 })
+  expect(dest('طه ۴۰')).toEqual([{ kind: 'verse', s: 20, a: 40 }])
+  expect(dest('۳').length).toBeGreaterThan(1)
+  expect(dest('۱۸۰')).toEqual([{ kind: 'page', p: 180 }])
+  expect(dest('۱۸۰', 2)).toEqual([{ kind: 'verse', s: 2, a: 180 }, { kind: 'page', p: 180 }])
+  expect(dest('صفحه ۶۰۴')).toEqual([{ kind: 'page', p: 604 }])
+  const [s, a] = meta.juz['30']
+  expect(dest('جزء ۳۰')).toEqual([{ kind: 'verse', s, a }])
+  expect(dest('سیاق ۳')[0]?.kind).toBe('context')
+  expect(dest('سیاق ۳', 114)).toEqual([])
+  expect(dest('صفحه ۶۰۵')).toEqual([])
+  expect(dest('سوره ۱۱۵')).toEqual([])
+})
+
+test('Enter requires a rendered exact highlight or a valid explicit selection', () => {
+  const active = (query: string, selected?: number) =>
+    activeDestinationIndex(destinationSuggestions(meta, query, 20), selected)
+  for (const query of ['طه', 'حمد', '۳', '۱۸۰', 'علم', 'صفحه ۶۰۵']) expect(active(query)).toBe(-1)
+  for (const query of ['طه ۴۰', 'صفحه ۶۰۴', 'جزء ۳۰', 'سیاق ۳', 'بقره:۲۵۵']) expect(active(query)).toBe(0)
+  expect(active('۳', 1)).toBe(1)
+  expect(active('۱۸۰', 99)).toBe(-1)
+  expect(stepDestinationIndex(-1, 3, 1)).toBe(0)
+  expect(stepDestinationIndex(-1, 3, -1)).toBe(2)
+  expect(stepDestinationIndex(2, 3, 1)).toBe(0)
 })

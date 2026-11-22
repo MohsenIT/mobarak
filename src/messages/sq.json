@@ -492,6 +492,8 @@
   "ui.6d2052087b": "Prekni çdo rrënjë për të hapur fjalët me të njëjtën rrënjë në panelin anësor. Lista mbetet e hapur për të ruajtur vendin e ushtrimit tuaj.",
   "ui.1313d854c5": "Lëshoni për të shkuar te sureja {p0}",
   "ui.bd26cfdea8": "Rrëshqitni për të parë suren {p0} {p1}",
+  "searchAndGo.help": "Ndihmë për kërkimin",
+  "searchAndGo.placeholder": "{label}: {examples}",
   "ui.f94311caeb": "Shkurtorja e sureve",
   "ui.7c631348f5": "Kunjëza {p0} u hoq.",
   "ui.4fdcf22559": "{p0} u vendos me kunjëz.",
