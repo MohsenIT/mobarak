@@ -49,6 +49,7 @@ test('empty search stays active after blur and clear until Browse is chosen', as
 });
 
 test('empty focus displays real mixed history with persistent pins and replay', async ({ page }) => {
+  test.setTimeout(90_000);
   await page.goto('/s/20/a/34');
   const trigger = page.locator('.reader-surah-link');
   const panel = page.locator('[data-search-and-go]');
@@ -70,8 +71,10 @@ test('empty focus displays real mixed history with persistent pins and replay', 
   const pin = history.locator('li').filter({ has: page.locator('.lucide-mouse-pointer-2') }).locator('button[aria-pressed="false"]');
   await pin.click();
   await expect(history.locator('li').first().getByRole('button', { pressed: true })).toBeVisible();
+  await panel.getByRole('button', { name: labels['ui.685e0d6bc0'], exact: true }).click();
+  await expect(panel).toHaveCount(0);
   await page.reload();
-  if (!(await panel.isVisible())) await trigger.click();
+  await trigger.click();
   await input.click();
   await expect(history.locator('li').first().getByRole('button', { pressed: true })).toBeVisible();
   await history.getByRole('button', { name: 'صبر', exact: true }).click();

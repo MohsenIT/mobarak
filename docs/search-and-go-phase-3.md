@@ -30,3 +30,9 @@ A warmed container microbenchmark used ten queries and thirty measured engine ca
 - [Mobile scope options](handoff/validation/search-and-go-phase-3/02-mobile-scope.jpg)
 - [Desktop](handoff/validation/search-and-go-phase-3/03-desktop.jpg)
 - [Desktop research filters in dark theme](handoff/validation/search-and-go-phase-3/04-desktop-research-dark.jpg)
+
+## Application captures after the UX refinement
+
+- 320 px, light theme. [Initial browse](handoff/validation/search-and-go-phase-3/refinement/320-browse.jpg), [empty focus](handoff/validation/search-and-go-phase-3/refinement/320-empty-focus.jpg), [suggestions](handoff/validation/search-and-go-phase-3/refinement/320-suggestions.jpg).
+- 390 px, dark theme. [Pinned history](handoff/validation/search-and-go-phase-3/refinement/390-mixed-space-history.jpg), [panel open](handoff/validation/search-and-go-phase-3/refinement/390-more-open.jpg), [panel closed with active filters](handoff/validation/search-and-go-phase-3/refinement/390-more-closed-active.jpg), [simulated keyboard viewport](handoff/validation/search-and-go-phase-3/refinement/390-keyboard-viewport-simulation.jpg).
+- 1280 px, light theme. [Panel open above the results](handoff/validation/search-and-go-phase-3/refinement/1280-more-open.jpg).
