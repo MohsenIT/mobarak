@@ -7,12 +7,20 @@ test('opening and closing Go preserves the reading position and URL', async ({ p
   });
   await page.route('**/api/version', route => route.fulfill({ json: { version: 'fixture', releases: [] } }));
   await page.route('**/offline-manifest.json', route => route.fulfill({ json: { groups: { core: [] } } }));
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/s/20/a/100');
   await expect(page.locator('.startup-splash')).toHaveCount(0);
   const reader = page.locator('[data-reading-scroll]');
-  await expect.poll(() => reader.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
-  await page.evaluate(() => document.fonts.ready.then(() => true));
-  const offset = await reader.evaluate(el => el.scrollTop);
+  await expect(reader.locator('[data-surah="20"][data-ayah="100"][data-pos="1"]')).toBeAttached();
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
+  const offset = await reader.evaluate(el => {
+    el.scrollTo({ top: 640, behavior: 'instant' });
+    return el.scrollTop;
+  });
+  expect(offset).toBeGreaterThan(0);
   const trigger = page.locator('.reader-surah-link');
   await trigger.click();
   const dialog = page.getByRole('dialog');

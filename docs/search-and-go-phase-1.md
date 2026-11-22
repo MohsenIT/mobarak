@@ -29,7 +29,6 @@ Implementation order follows the seven tasks: characterization and baseline,
 destination selection, integrated surface, per-surah location, operation
 history, browser traversal, and release verification.
 
-
 ## Beta preview and rollback
 
 Build the dedicated branch with `NEXT_PUBLIC_SEARCH_AND_GO=1` in the isolated
@@ -46,7 +45,8 @@ PORT=3017 HOSTNAME=127.0.0.1 node .next/standalone/server.js
 In another terminal, run the phase-one browser tests against that build.
 
 ```sh
-SEARCH_AND_GO_E2E=1 READER_URL=http://127.0.0.1:3017 bunx playwright test   --project=chromium-phone --project=chromium-desktop search-and-go
+SEARCH_AND_GO_E2E=1 READER_URL=http://127.0.0.1:3017 bunx playwright test \
+  --project=chromium-phone --project=chromium-desktop search-and-go
 ```
 
 For the rollback check, rebuild with the flag unset and run
