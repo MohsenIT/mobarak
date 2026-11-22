@@ -421,8 +421,11 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       </>}
       {(!unified || (unified.run && !unified.controls)) && <>
       <div className="search-results-summary">
-        <div role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />{t("ui.63509f3da4")}</span> : !valid ? t("ui.4bfc7b8a3d") : error ? t("ui.12287cefbb") : <><strong className="search-results-total">{t('search.totalResults', { total: results.length })}</strong><span className="search-results-detail">{t(unified ? "search.occurrenceCount" : "ui.9ec9176e66", { p0: toFa(counts.verses), p1: toFa(unified ? counts.occurrences : counts.words) })}</span></>}</div>
-        {!busy && !error && valid && results.length > 0 && <span className="search-results-position" data-current-result={Math.min(currentResult, results.length)} data-total-results={results.length} aria-live="off">{t('search.resultPosition', { current: Math.min(currentResult, results.length), total: results.length })}</span>}
+        <div role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />{t("ui.63509f3da4")}</span> : !valid ? t("ui.4bfc7b8a3d") : error ? t("ui.12287cefbb") : <>
+          {!phase3 && <strong className="search-results-total">{t('search.totalResults', { total: results.length })}</strong>}
+          <span className={phase3 ? "search-results-total" : "search-results-detail"}>{t(unified ? "search.occurrenceCount" : "ui.9ec9176e66", { p0: toFa(counts.verses), p1: toFa(unified ? counts.occurrences : counts.words) })}</span>
+        </>}</div>
+        {!phase3 && !busy && !error && valid && results.length > 0 && <span className="search-results-position" data-current-result={Math.min(currentResult, results.length)} data-total-results={results.length} aria-live="off">{t('search.resultPosition', { current: Math.min(currentResult, results.length), total: results.length })}</span>}
       </div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label={t("ui.57f03a82b0")} aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
         {!phase3 && (!inline || lemmas.length > 0 || forms.length > 0) && facetControls}
@@ -441,8 +444,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       </div>
       </>}
   </>
-  if (unified && !unified.run && !unified.controls && !phase3) return null
-  if (inline) return <div className={unified?.controls ? "search-and-go-settings" : phase3 && !unified?.run ? "phase3-idle" : "search-page-shell search-and-go-results"}>{content}</div>
+  if (unified && !unified.run && !unified.controls) return null
+  if (inline) return <div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"} data-phase3-results={phase3 || undefined}>{content}</div>
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir={uiDirection()} aria-label={t("ui.cd32ebbeba")} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
     <div className="search-page-shell">{content}</div>
   </main>, document.body)

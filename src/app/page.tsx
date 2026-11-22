@@ -711,7 +711,8 @@ export default function Home() {
         onSearchStateChange={SEARCH_AND_GO_PHASE_2 ? route.updateSearchAndGoState : undefined}
         onClearOccurrenceFilter={search.clearOccurrence}
         onReplay={SEARCH_AND_GO_PHASE_2 ? openUnifiedSearch : undefined}
-        textHistory={SEARCH_AND_GO_PHASE_2 ? search.textHistory : undefined}
+        history={SEARCH_AND_GO_PHASE_2 ? search.operations : undefined}
+        onToggleHistoryPin={search.toggleHistoryPin}
         onRecentSurah={s => {
           const position = route.lastSurahPosition(s, meta.surahs[s - 1].vc)
           if (position) navigateFromSearchAndGo({ kind: 'verse', s, a: position.a }, position.pos)

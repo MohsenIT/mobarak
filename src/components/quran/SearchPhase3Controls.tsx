@@ -1,6 +1,7 @@
 'use client'
 
 import { useId, useMemo, useState } from 'react'
+import { ChevronDown, SlidersHorizontal } from 'lucide-react'
 import { t } from '@/lib/i18n'
 import type { Meta } from '@/lib/quran'
 import { morphologyLabel } from '@/lib/quran'
@@ -37,7 +38,7 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
   onRoots: () => void
 }) {
   const groupName = useId()
-  const [expanded, setExpanded] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const [picker, setPicker] = useState(false)
   const [filter, setFilter] = useState('')
   const values = useMemo(() => {
@@ -57,6 +58,9 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
     setObserved(results)
     setCatalogue({ identity, values: values.map((set, index) => new Set([...catalogue.values[index], ...set])) })
   }
+  const sort = config.sorts[0] ?? 'mushaf'
+  const activeFilters = groups.reduce((sum, group) => sum + config[group].length, 0)
+  const moreId = `${groupName}-more`
   return <div className="phase3-controls" data-phase3-controls onKeyDown={event => {
     if (event.key !== 'Escape') return
     const panel = event.currentTarget.querySelector<HTMLDetailsElement>('details[open]')
@@ -66,12 +70,11 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
       panel.querySelector('summary')?.focus()
     }
   }}>
-    <button className="chip phase3-mobile-toggle" type="button" data-phase3-toggle aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>
-      {t('searchP3.settings')} · {t(`searchP3.scope.${scope}`)} · {t(`searchP3.relation.${config.relation}`)}
-    </button>
-    <div className="phase3-options" data-expanded={expanded}>
-      <details name={groupName} data-phase3-scope><summary>{t('searchP3.scope')} · {t(`searchP3.scope.${scope}`)}</summary>
+    <div className="phase3-options" role="group" aria-label={t('searchP3.settings')}>
+      <details name={groupName} data-phase3-scope><summary className="chip" data-changed={scope !== 'all'}
+        aria-label={`${t('searchP3.scope')} · ${t(`searchP3.scope.${scope}`)}`}>{t(`searchP3.scope.${scope}`)}<ChevronDown size={12} aria-hidden="true" /></summary>
         <div className="phase3-popup">
+          <h3>{t('searchP3.scope')}</h3>
           {scopes.map(value => {
             const numbers = phase3ScopeSurahs(meta, origin, value, surahs)
             return <button className="chip" type="button" key={value} aria-pressed={scope === value}
@@ -92,16 +95,29 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
           </div>}
         </div>
       </details>
-      <details name={groupName} data-phase3-relation><summary>{t('searchP3.relation')} · {t(`searchP3.relation.${config.relation}`)}</summary>
-        <div className="phase3-popup">{relations.map(relation => <button className="chip" type="button" key={relation} aria-pressed={config.relation === relation} onClick={() => onConfig({ ...config, relation })}>{t(`searchP3.relation.${relation}`)}</button>)}</div>
+      <details name={groupName} data-phase3-relation><summary className="chip" data-changed={config.relation !== 'all'}
+        aria-label={`${t('searchP3.relation')} · ${t(`searchP3.relation.${config.relation}`)}`}>{t(`searchP3.relation.${config.relation}`)}<ChevronDown size={12} aria-hidden="true" /></summary>
+        <div className="phase3-popup"><h3>{t('searchP3.relation')}</h3>{relations.map(relation => <button className="chip" type="button" key={relation} aria-pressed={config.relation === relation} onClick={() => onConfig({ ...config, relation })}>{t(`searchP3.relation.${relation}`)}</button>)}</div>
       </details>
-      <button type="button" className="chip" data-phase3-roots aria-pressed={includeRoots} onClick={onRoots}>{t('ui.702b74fe3e')}</button>
-      <details name={groupName} data-phase3-sort><summary>{t('searchP3.sort')} · {t(`searchP3.sort.${config.sorts[0] ?? 'mushaf'}`)}</summary>
-        <div className="phase3-popup">{(['mushaf', 'relevance'] as const).map(sort => <button className="chip" type="button" key={sort}
-          aria-pressed={config.sorts[0] === sort} onClick={() => onConfig({ ...config, sorts: [sort, sort === 'mushaf' ? 'relevance' : 'mushaf'] })}>{t(`searchP3.sort.${sort}`)}</button>)}</div>
+      <button type="button" className="chip" data-phase3-roots aria-label={t('ui.702b74fe3e')} aria-pressed={includeRoots} onClick={onRoots}>{t(includeRoots ? 'searchP3.rootsOn' : 'searchP3.rootsOff')}</button>
+      <details name={groupName} data-phase3-sort><summary className="chip" data-changed={sort !== 'mushaf'}
+        aria-label={`${t('searchP3.sort')} · ${t(`searchP3.sort.${sort}`)}`}>{t(`searchP3.sortShort.${sort}`)}<ChevronDown size={12} aria-hidden="true" /></summary>
+        <div className="phase3-popup"><h3>{t('searchP3.sort')}</h3>{(['mushaf', 'relevance'] as const).map(value => <button className="chip" type="button" key={value}
+          aria-pressed={sort === value} onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>{t(`searchP3.sort.${value}`)}</button>)}</div>
       </details>
-      <details name={groupName} className="phase3-research"><summary>{t('searchP3.research')}</summary>
-        <div className="phase3-popup">{groups.map((group, index) => {
+      <button className="chip" type="button" data-phase3-more aria-expanded={moreOpen} aria-controls={moreId}
+        data-changed={activeFilters > 0} onClick={event => {
+          const openPopup = event.currentTarget.closest('.phase3-options')?.querySelector('details[open]')
+          openPopup?.removeAttribute('open')
+          setMoreOpen(open => !open)
+        }}>
+        <SlidersHorizontal size={14} aria-hidden="true" />
+        {t('searchP3.research')}{activeFilters > 0 && <> · {t('searchP3.activeFilters', { count: activeFilters })}</>}
+      </button>
+    </div>
+    <section id={moreId} className="phase3-research nice-scroll" aria-label={t('searchP3.research')} hidden={!moreOpen}>
+        <h3>{t('searchP3.research')}</h3>
+        <div className="phase3-research-groups">{groups.map((group, index) => {
           const available = [...new Set([...config[group], ...catalogue.values[index]])]
           return <fieldset key={group}><legend>{t(`searchP3.filter.${group}`)}</legend>
             {!available.length && <span>{t('searchP3.noFilters')}</span>}
@@ -110,7 +126,6 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
               {group === 'forms' ? morphologyLabel(value) : <QuranText text={group === 'lemmas' ? lemmaDisplay(value) : value} />}
             </button>)}</fieldset>
         })}</div>
-      </details>
-    </div>
+    </section>
   </div>
 }

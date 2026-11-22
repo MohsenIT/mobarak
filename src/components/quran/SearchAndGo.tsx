@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { ArrowLeft, ArrowRight, CircleHelp, Search } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Pin, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
-import { destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, NAVIGATION_HELP, type Destination } from '@/lib/navigation'
+import { destinationLabel, destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, NAVIGATION_HELP, resolveDestination, type Destination } from '@/lib/navigation'
 import { SEARCH_AND_GO_PHASE_2, SEARCH_AND_GO_PHASE_3, readSearchLink, type SearchLinkState, type SearchResultSnapshot } from '@/lib/search-link'
 import type { SearchOperationEntry } from '@/lib/search-and-go-history'
 import type { Meta, Translator } from '@/lib/quran'
@@ -17,7 +17,7 @@ import QuranText from './QuranText'
 
 const searchExamples = ['س 20', 'اسما الحسنی', 'طه 40', 'صبر', 'صفحه 42', 'جزء 30', 'لا تخف', 'سیاق طه:3']
 
-export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination, onPick, onClose, start, field, translator, onSearchStateChange, onClearOccurrenceFilter, onReplay, textHistory }: {
+export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination, onPick, onClose, start, field, translator, onSearchStateChange, onClearOccurrenceFilter, onReplay, history, onToggleHistoryPin }: {
   field: RefObject<HTMLInputElement | null>
   meta: Meta
   currentSurah: number
@@ -25,7 +25,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   recent: number[]
   onTogglePin: (surah: number) => void
   onRecentSurah: (surah: number) => void
-  onDestination: (destination: Destination) => void
+  onDestination: (destination: Destination, word?: number) => void
   onPick: React.ComponentProps<typeof QuranSearch>['onPick']
   onClose: () => void
   start: SearchResultSnapshot | null
@@ -33,9 +33,11 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   onSearchStateChange?: (state: SearchLinkState) => void
   onClearOccurrenceFilter?: () => void
   onReplay?: (state: SearchLinkState) => void
-  textHistory?: SearchOperationEntry[]
+  history?: SearchOperationEntry[]
+  onToggleHistoryPin: (id: string) => void
 }) {
   const [query, setQuery] = useState(start?.query ?? '')
+  const [searchActive, setSearchActive] = useState(!!start)
   const [position, setPosition] = useState(start?.position)
   const [help, setHelp] = useState(false)
   const [suggestions, setSuggestions] = useState<string[]>([])
@@ -80,9 +82,16 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
     : letters && !isNavigationInput(value) && !options.some(option => option.exact)
   const completions = SEARCH_AND_GO_PHASE_2 && text && !help && completedQuery !== query ? suggestions.slice(0, 3) : []
   const selection = useDestinationSelection(options, completions.length)
+  const activeOptionId = selection.inputProps['aria-activedescendant']
+  useEffect(() => {
+    if (SEARCH_AND_GO_PHASE_3 && !help && activeOptionId) {
+      document.getElementById(activeOptionId)?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    }
+  }, [activeOptionId, help])
   const changeQuery = (next: string) => {
     if (occurrence) clearOccurrence()
     setQuery(next)
+    setSearchActive(true)
     setPosition(undefined)
     setSelected(undefined)
     setHelp(false)
@@ -95,7 +104,14 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
     setCompletedQuery(next)
     field.current?.focus({ preventScroll: true })
   }
-  const browse = !value && !occurrence
+  const empty = !value && !occurrence
+  const browse = empty && (!SEARCH_AND_GO_PHASE_3 || !searchActive)
+  const examples = SEARCH_AND_GO_PHASE_3 && empty && !browse && !history?.length ? [
+    resolveDestination(meta, 'surah', '20', currentSurah),
+    resolveDestination(meta, 'verse', '40', 20),
+    resolveDestination(meta, 'page', '42', currentSurah),
+    resolveDestination(meta, 'juz', '30', currentSurah),
+  ] : []
   const rtl = uiDirection() === 'rtl'
   const BackIcon = rtl ? ArrowRight : ArrowLeft
   const searchLabel = t('ui.c51349274d')
@@ -140,6 +156,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
               aria-activedescendant={help ? undefined : selection.inputProps['aria-activedescendant']} ref={field} type="text" enterKeyHint={selection.destination ? 'go' : 'search'}
               value={query} maxLength={160} autoComplete="off" spellCheck={false}
               aria-label={searchLabel} placeholder={placeholder} fitPlaceholder={shorterPlaceholders}
+              onFocus={() => setSearchActive(true)}
               onClear={() => changeQuery('')} onChange={event => changeQuery(event.target.value)}
               onKeyDown={event => {
                 if (help || event.nativeEvent.isComposing || selection.move(event)) return
@@ -165,8 +182,8 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           <dl>{NAVIGATION_HELP.map(([kind, examples]) => <div key={kind}><dt>{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl>
           <p>{t('ui.a8175202e6')}</p>
           <p>{placeholder}</p>
-          {SEARCH_AND_GO_PHASE_2 && !!textHistory?.length && onReplay && <div className="drawer-recent-shortcuts">
-            {textHistory.map(entry => {
+          {SEARCH_AND_GO_PHASE_2 && !SEARCH_AND_GO_PHASE_3 && !!history?.some(entry => entry.operation.type === 'text') && onReplay && <div className="drawer-recent-shortcuts">
+            {history.map(entry => {
               if (entry.operation.type !== 'text') return null
               const state = readSearchLink(entry.operation.link)
               return state && <button type="button" className="chip" key={entry.id} onClick={() => onReplay(state)}>{state.query || state.occurrence?.text}</button>
@@ -174,9 +191,11 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           </div>}
         </div>}
         <div className="search-and-go-body" data-show-controls={SEARCH_AND_GO_PHASE_2 && help || undefined} data-text-results={SEARCH_AND_GO_PHASE_2 && text || undefined} hidden={help && !SEARCH_AND_GO_PHASE_2}>
-          {!help && !browse && (options.length > 0 || completions.length > 0) &&
+          {!help && !empty && (options.length > 0 || completions.length > 0) &&
             <div className={SEARCH_AND_GO_PHASE_3 ? "search-and-go-suggestions nice-scroll" : "contents"}>
+              {SEARCH_AND_GO_PHASE_3 && options.length > 0 && <MousePointer2 size={15} aria-hidden="true" className="search-and-go-pointer" />}
               <DestinationOptions id={selection.id} active={selection.active} options={options} onPick={onDestination} className="drawer-destination-options" asChips={SEARCH_AND_GO_PHASE_3} />
+              {SEARCH_AND_GO_PHASE_3 && options.length > 0 && completions.length > 0 && <span className="search-and-go-divider" aria-hidden="true" />}
               {completions.length > 0 && <div className="search-and-go-completions nice-scroll" id={selection.completionId}
                 data-search-completions role="listbox" aria-label={t('ui.7bf42d2a96')}>
                 {completions.map((completion, index) => <button type="button" className="chip" key={completion} id={`${selection.completionId}-${index}`}
@@ -185,11 +204,40 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 </button>)}
               </div>}
             </div>}
-          {!help && !browse && <>
+          {!help && !empty && <>
             {!text && !options.length && <p role="status" className="search-and-go-no-destination">{t('ui.68f830ec5c')}</p>}
           </>}
           {!help && browse && <SurahNavigationList meta={meta} currentSurah={currentSurah} query="" showEmpty={false}
             onGoSurah={s => onDestination({ kind: 'surah', s })} />}
+          {!help && empty && !browse && <section className="search-and-go-empty nice-scroll">
+            {!!history?.length ? <>
+              <h2>{t('searchP3.history')}</h2>
+              <ul className="search-and-go-history nice-scroll">{[...history].sort((a, b) => Number(b.pinned) - Number(a.pinned)).map(entry => {
+                const op = entry.operation
+                const state = op.type === 'text' ? readSearchLink(op.link) : null
+                const label = op.type === 'navigation' ? destinationLabel(meta, op.destination) : state?.query || state?.occurrence?.text
+                const Icon = op.type === 'navigation' ? MousePointer2 : Search
+                return <li key={entry.id}>
+                  <button type="button" className="chip" onClick={() => {
+                    if (op.type === 'navigation') onDestination(op.destination, op.word)
+                    else if (state) onReplay?.(state)
+                  }}><Icon size={14} aria-hidden="true" /><span>{label}</span></button>
+                  <button type="button" className="icon-btn" aria-pressed={entry.pinned} aria-label={t('searchP3.pinHistory', { label })}
+                    onClick={() => onToggleHistoryPin(entry.id)}><Pin size={14} aria-hidden="true" /></button>
+                </li>
+              })}</ul>
+            </> : <>
+              <h2>{t('searchP3.emptyTitle')}</h2>
+              <p>{t('searchP3.emptyDescription')}</p>
+              <div className="search-and-go-examples">
+                <button type="button" className="chip" onClick={() => complete(t('searchP3.exampleText'))}><Search size={14} aria-hidden="true" />{t('searchP3.exampleText')}</button>
+                {examples.map((destination, index) => destination && <button type="button" className="chip" key={index}
+                  onClick={() => onDestination(destination)}><MousePointer2 size={14} aria-hidden="true" />
+                  {index === 3 ? t('searchP3.exampleJuz', { number: 30 }) : destinationLabel(meta, destination)}</button>)}
+              </div>
+            </>}
+            <button type="button" className="search-and-go-browse" onClick={() => { field.current?.blur(); setSearchActive(false) }}>{t('searchP3.browse')}</button>
+          </section>}
           <QuranSearch inline={{
             query: SEARCH_AND_GO_PHASE_2 ? query : value,
             position,
