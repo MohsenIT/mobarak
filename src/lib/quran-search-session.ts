@@ -2,12 +2,19 @@ import { createQuranSearch, normalizeQuranSearch, type SearchVerse, type QuranSe
 import type { AnalysisSelection } from './analysis'
 import { wordKey } from './word-parts'
 import { lemmaDisplay } from './lemma-display'
+import { bm25, createExactSearch, parseSearchQuery, searchOrder, searchProximity, type Phase3SearchOptions } from './search-query'
+
+export type { Phase3SearchOptions, SearchRelation, SearchSort } from './search-query'
 
 export type SearchCorpus = { verses: SearchVerse[]; waw?: Record<string, number[]>; morphology: Record<string, [string | null, string | null, string | null][]> }
 export type SearchMode = 'text' | 'root' | 'lemma'
-export type SearchSessionOptions = QuranSearchOptions & { mode?: SearchMode; surahs?: number[]; includeRoots?: boolean }
+export type SearchSessionOptions = QuranSearchOptions & { mode?: SearchMode; surahs?: number[]; includeRoots?: boolean; phase3?: Phase3SearchOptions }
+
+const spansFor = (result: QuranSearchResult) => result.occurrences ?? result.positions.map(pos => [pos])
+
 export function createSearchSession(corpus: SearchCorpus) {
   const search = createQuranSearch(corpus.verses, corpus.waw)
+  const exactSearch = createExactSearch(corpus.verses, corpus.waw)
   const verseMap = new Map(corpus.verses.map(([s, a, words]) => [`${s}:${a}`, words]))
   const wordText = (s: number, a: number, pos: number) => {
     const text = verseMap.get(`${s}:${a}`)?.[pos - 1] ?? ''
@@ -45,7 +52,7 @@ export function createSearchSession(corpus: SearchCorpus) {
         return positions.length ? [{ s, a, words, waw: corpus.waw?.[`${s}:${a}`] ?? [], positions, parts: Object.fromEntries(positions.map(pos => [pos, filter.part === 'prefix' ? 1 : 2])), kind: 'exact' as const, score: 0 }] : []
       })
     }
-    const literal = search(query, 0, options)
+    const literal = search(query, !options.includeRoots && scope.size === 1 ? scope.values().next().value : 0, options)
     if (!options.includeRoots || normalizeQuranSearch(query).includes(' ')) return literal.filter(r => within(r.s))
     const roots = new Set<string>()
     // Prefer literal matches; only use typo matches as seeds if no literal exists.
@@ -70,9 +77,92 @@ export function createSearchSession(corpus: SearchCorpus) {
     }
     return [...merged.values()].sort((a, b) => a.score - b.score || a.s - b.s || a.a - b.a)
   }
-  return (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null) => execute(query, options, filter).map(result => ({
+
+  const executePhase3 = (query: string, options: SearchSessionOptions, phase: Phase3SearchOptions, filter?: AnalysisSelection | null) => {
+    const scope = new Set(options.surahs ?? [])
+    const within = (s: number) => !scope.size || scope.has(s)
+    const isText = !filter && (!options.mode || options.mode === 'text')
+    const clauses = isText ? parseSearchQuery(query, phase.relation) : [{ text: query, exact: false }]
+    const hits = new Map<string, { result: QuranSearchResult; clause: number }[]>()
+    const frequencies = clauses.map(({ text, exact }, clause) => {
+      const matches = exact || isText && clauses.length > 1 && text.length === 1 ? exactSearch(text, within) : execute(text, options, filter)
+      for (const result of matches) {
+        const id = `${result.s}:${result.a}`
+        const existing = hits.get(id)
+        if (existing) existing.push({ result, clause })
+        else hits.set(id, [{ result, clause }])
+      }
+      return matches.length
+    })
+    const groups = [phase.roots, phase.lemmas, phase.forms]
+    const hasFacets = groups.some(group => group.length)
+    let documents = 0
+    let corpusLength = 0
+    const useRelevance = phase.sorts[0] === 'relevance'
+    if (useRelevance) for (const [s, , words] of corpus.verses) {
+      if (!within(s)) continue
+      documents++
+      corpusLength += words.length
+    }
+    const results: { result: QuranSearchResult; relevance: number }[] = []
+    for (const [id, matches] of hits) {
+      if (phase.relation !== 'any' && matches.length !== clauses.length) continue
+      let strongest = matches[0].result
+      const parts: Record<number, number> = {}
+      const occurrences = new Map<string, number[]>()
+      const weights = new Map<string, number>()
+      for (const { result, clause } of matches) {
+        if (result.score < strongest.score) strongest = result
+        const metadata = corpus.morphology[id]
+        const positions = hasFacets ? result.positions.filter(pos => (result.parts[pos] & 2) && groups.every((values, column) => {
+          const value = metadata?.[pos - 1]?.[column]
+          return !values.length || !!value && values.includes(value)
+        })) : result.positions
+        const retained = new Set(positions)
+        for (const pos of positions) parts[pos] = (parts[pos] ?? 0) | result.parts[pos]
+        const spans = spansFor(result).filter(span => !hasFacets || span.some(pos => retained.has(pos)))
+        const repetitions = new Map<string, number>()
+        for (const span of spans) {
+          const location = span.join(',')
+          const repeat = (repetitions.get(location) ?? 0) + 1
+          repetitions.set(location, repeat)
+          const normalizedClause = clauses[clause].text.replace(/ /g, '')
+          occurrences.set(`${normalizedClause}:${location}:${repeat}`, span)
+        }
+        if (useRelevance) {
+          const strength = 1 / (1 + 0.25 * result.score)
+          const term = clauses[clause].text
+          const weight = strength * bm25(spansFor(result).length, frequencies[clause], result.words.length, corpusLength / documents, documents)
+          weights.set(term, Math.max(weights.get(term) ?? 0, weight))
+        }
+      }
+      if (!occurrences.size) continue
+      let relevance = 0
+      if (useRelevance) {
+        const positions = matches.map(({ result }) => result.positions)
+        for (const weight of weights.values()) relevance += weight
+        relevance *= 1 + searchProximity(positions) + 0.25 * searchOrder(positions)
+      }
+      results.push({
+        result: { ...strongest, positions: Object.keys(parts).map(Number), parts, occurrences: [...occurrences.values()].sort((a, b) => a[0] - b[0]) },
+        relevance,
+      })
+    }
+    const mushafOrder = (a: QuranSearchResult, b: QuranSearchResult) => a.s - b.s || a.a - b.a
+    return results.sort((a, b) => {
+      for (const sort of phase.sorts) {
+        const difference = sort === 'relevance' ? b.relevance - a.relevance : mushafOrder(a.result, b.result)
+        if (difference) return difference
+      }
+      return mushafOrder(a.result, b.result)
+    }).map(({ result }) => result)
+  }
+
+  return (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null) => (options.phase3
+    ? executePhase3(query, options, options.phase3, filter)
+    : execute(query, options, filter)).map(result => ({
     ...result,
-    occurrences: result.occurrences ?? result.positions.map(pos => [pos]),
+    occurrences: spansFor(result),
     morphology: corpus.morphology[`${result.s}:${result.a}`] ?? [],
   }))
 

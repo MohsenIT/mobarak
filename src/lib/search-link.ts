@@ -1,35 +1,66 @@
 import type { AnalysisSelection } from './analysis'
 import type { SearchMode } from './quran-search-session'
+import type { Phase3SearchOptions } from './search-query'
 import type { Translator } from './quran'
 import type { VerseAddress } from './verse-link'
 import {isTranslator} from './translations'
 
 export const SEARCH_AND_GO_PHASE_2 = process.env.NEXT_PUBLIC_SEARCH_AND_GO === '1' && process.env.NEXT_PUBLIC_SEARCH_AND_GO_PHASE_2 === '1'
+export const SEARCH_AND_GO_PHASE_3 = SEARCH_AND_GO_PHASE_2 && process.env.NEXT_PUBLIC_SEARCH_AND_GO_PHASE_3 === '1'
 
 export type SearchResultPosition = { scrollTop: number; visible: number; anchor?: { s: number; a: number; offset: number } }
 export type SearchResultSnapshot = { query: string; position: SearchResultPosition; state?: SearchLinkState; selected?: VerseAddress }
+
+const scopeVariants = ['all', 'current', 'selected', 'before', 'after', 'meccan', 'medinan'] as const
+export type SearchScopeVariant = typeof scopeVariants[number]
+export type SearchPhase3State = Phase3SearchOptions
 
 export type SearchLinkState = {
   query: string; mode: SearchMode; contextSurah?: number; surahs: number[]; lemmas: string[]; forms: string[]
   includeRoots: boolean; includePartial: boolean; includeNear: boolean
   showTranslation: boolean; translator: Translator; occurrence: AnalysisSelection | null
+  scopeVariant?: SearchScopeVariant; phase3?: SearchPhase3State
 }
 
-export function initialSearchLinkState(translator: Translator, start?: Pick<SearchLinkState, 'query' | 'mode' | 'surahs'>, occurrence: AnalysisSelection | null = null): SearchLinkState {
+export function initialSearchLinkState(
+  translator: Translator,
+  start?: Pick<SearchLinkState, 'query' | 'mode' | 'surahs' | 'contextSurah' | 'scopeVariant' | 'phase3'>,
+  occurrence: AnalysisSelection | null = null,
+): SearchLinkState {
   return {
     query: start?.query ?? '', mode: start?.mode ?? 'text', surahs: start?.surahs ?? [],
     lemmas: [], forms: [], includeRoots: occurrence?.tab === 'root',
     includePartial: true, includeNear: false, showTranslation: false, translator, occurrence,
+    ...(start?.contextSurah ? { contextSurah: start.contextSurah } : {}),
+    ...(start?.scopeVariant ? { scopeVariant: start.scopeVariant } : {}),
+    ...(start?.phase3 ? { phase3: start.phase3 } : {}),
   }
 }
 const tabs = { r: 'root', f: 'form', w: 'word' } as const
 const codes = { root: 'r', form: 'f', word: 'w' } as const
+const phase3Facets = { fr: 'roots', fl: 'lemmas', ff: 'forms' } as const
+
+function sortedFacets(values: string[]) {
+  return [...new Set(values.map(value => value.trim()).filter(Boolean))].sort()
+}
+
 export function readSearchLink(href: string): SearchLinkState | null {
   const url = new URL(href, 'https://quran-vajeh.vercel.app')
   if (!/^\/(q|search)\/?$/.test(url.pathname) && url.searchParams.get('search') !== '1') return null
   const p = url.searchParams
   const bounded = (raw: string | undefined, max: number) => { const n = Number(raw); return Number.isInteger(n) && n >= 1 && n <= max ? n : 0 }
   const values = (key: string) => [...new Set(p.getAll(key).slice(0, 100).map(value => value.slice(0, 160)))]
+  const scope = p.get('scope')
+  const scopeVariant = scopeVariants.find(value => value === scope)
+  const rawRelation = p.get('rel')
+  const relation = rawRelation === 'all' || rawRelation === 'any' || rawRelation === 'phrase' ? rawRelation : undefined
+  const sorts = values('sort').filter(value => value === 'mushaf' || value === 'relevance')
+  const roots = sortedFacets(values('fr'))
+  const lemmas = sortedFacets(values('fl'))
+  const forms = sortedFacets(values('ff'))
+  const phase3 = relation || sorts.length || roots.length || lemmas.length || forms.length
+    ? { relation: relation ?? 'all', sorts, roots, lemmas, forms } satisfies SearchPhase3State
+    : undefined
   const [tab, s, a, pos] = (p.get('o') || '').split('.')
   const occurrence: AnalysisSelection | null = Object.hasOwn(tabs, tab) && bounded(s, 114) && bounded(a, 286) && bounded(pos, 500) ? {
     tab: tabs[tab as keyof typeof tabs], s: Number(s), a: Number(a), pos: Number(pos),
@@ -42,6 +73,8 @@ export function readSearchLink(href: string): SearchLinkState | null {
     surahs: [...new Set((p.get('s') || '').split(',').map(value => bounded(value, 114)).filter(Boolean))].sort((a,b) => a-b),
     lemmas: values('l'), forms: values('b'), includeRoots: p.get('h') !== '0', includePartial: p.get('p') !== '0', includeNear: p.get('n') === '1',
     showTranslation: p.get('t') === '1', translator: isTranslator(p.get('tr')) ? p.get('tr') as Translator : 's', occurrence,
+    ...(scopeVariant ? { scopeVariant } : {}),
+    ...(phase3 ? { phase3 } : {}),
   }
 }
 export function searchLink(current: string, state: SearchLinkState, native = false): URL {
@@ -60,6 +93,14 @@ export function searchLink(current: string, state: SearchLinkState, native = fal
   if (state.includeNear) p.set('n', '1')
   if (state.showTranslation) p.set('t', '1')
   if (state.translator !== 's') p.set('tr', state.translator)
+  if (state.scopeVariant) p.set('scope', state.scopeVariant)
+  if (state.phase3) {
+    p.set('rel', state.phase3.relation)
+    for (const sort of new Set(state.phase3.sorts)) p.append('sort', sort)
+    for (const [param, facet] of Object.entries(phase3Facets)) {
+      for (const value of sortedFacets(state.phase3[facet])) p.append(param, value)
+    }
+  }
   const o = state.occurrence
   if (o && Object.hasOwn(codes, o.tab)) {
     p.set('o', `${codes[o.tab as keyof typeof codes]}.${o.s}.${o.a}.${o.pos}`)

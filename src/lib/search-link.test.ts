@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { readSearchLink, searchLink, type SearchLinkState } from './search-link'
+import { initialSearchLinkState, readSearchLink, searchLink, type SearchLinkState } from './search-link'
 import { readingUrl } from './verse-link'
 const base: SearchLinkState = { query: 'علم', mode: 'root', surahs: [], lemmas: [], forms: [], includeRoots: true, includePartial: true, includeNear: false, showTranslation: false, translator: 's', occurrence: null }
 test('short search URLs omit defaults and remove reading/refresh parameters', () => {
@@ -29,4 +29,38 @@ test('invalid destinations are ignored and reading links shed search state', () 
 test('relative navigation commands keep their surah context when shared',()=>{
   const state:SearchLinkState={...base,query:'ق۶',mode:'text',contextSurah:20}
   expect(readSearchLink(searchLink('https://example.com',state).href)).toEqual(state)
+})
+
+test('phase 3 links preserve scope context, sort precedence and distinct facets', () => {
+  const state: SearchLinkState = {
+    ...base, contextSurah: 20, scopeVariant: 'after', surahs: [21, 22], lemmas: ['legacy-lemma'], forms: ['II'],
+    phase3: { relation: 'phrase', sorts: ['relevance', 'mushaf', 'relevance'], roots: ['علم', 'علم'], lemmas: ['عِلْم'], forms: ['IV'] },
+  }
+  const expected: SearchLinkState = {
+    ...base, contextSurah: 20, scopeVariant: 'after', surahs: [21, 22], lemmas: ['legacy-lemma'], forms: ['II'],
+    phase3: { relation: 'phrase', sorts: ['relevance', 'mushaf'], roots: ['علم'], lemmas: ['عِلْم'], forms: ['IV'] },
+  }
+  const web = searchLink('https://example.com/s/2', state)
+  expect(web.searchParams.getAll('sort')).toEqual(['relevance', 'mushaf'])
+  expect(readSearchLink(web.href)).toEqual(expected)
+  const native = searchLink('https://tauri.localhost', state, true)
+  expect(native.searchParams.get('search')).toBe('1')
+  expect(readSearchLink(native.href)).toEqual(expected)
+})
+
+test('unknown phase 3 settings do not change a legacy link', () => {
+  expect(readSearchLink('/q?q=علم&m=r&scope=unknown&rel=invalid&sort=invalid&fr=&fl=&ff=')).toEqual(base)
+  expect(readSearchLink('/q?q=علم&m=r&scope=medinan&rel=all&sort=mushaf&sort=invalid&sort=mushaf')?.phase3).toEqual({
+    relation: 'all', sorts: ['mushaf'], roots: [], lemmas: [], forms: [],
+  })
+})
+
+test('handoffs keep explicit phase 3 scope and the original reading context', () => {
+  const state = initialSearchLinkState('s', {
+    query: 'لا تخف', mode: 'text', surahs: [19, 20], contextSurah: 21, scopeVariant: 'before',
+    phase3: { relation: 'any', sorts: [], roots: [], lemmas: [], forms: [] },
+  })
+  expect(state).toMatchObject({
+    query: 'لا تخف', surahs: [19, 20], contextSurah: 21, scopeVariant: 'before', phase3: { relation: 'any' },
+  })
 })

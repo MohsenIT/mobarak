@@ -1,7 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
 test.use({ serviceWorkers: 'allow' });
-test.skip(process.env.SEARCH_AND_GO_PHASE_2_E2E !== '1', 'Run against the Search and Go Phase 2 preview build.');
+const phase3 = process.env.SEARCH_AND_GO_PHASE_3_E2E === '1';
+test.skip(!phase3 && process.env.SEARCH_AND_GO_PHASE_2_E2E !== '1', 'Run against the Search and Go Phase 2 preview build.');
 
 test('a downloaded reader can open and follow its first text search offline', async ({ page, context }) => {
   test.setTimeout(120_000);
@@ -43,7 +44,7 @@ test('a downloaded reader can open and follow its first text search offline', as
 
   await page.locator('.reader-surah-link').click();
   const search = page.locator('[data-search-and-go]');
-  await search.getByRole('combobox').fill('اسما الحسنی');
+  await search.getByRole('combobox').fill(phase3 ? '«الأسماء الحسنى»' : 'اسما الحسنی');
   await expect(search.locator('.search-result-open')).toHaveCount(4, { timeout: 20_000 });
   await search.getByRole('button', { name: /اعراف.*۱۸۰/ }).click();
   await expect(search).toBeHidden();
