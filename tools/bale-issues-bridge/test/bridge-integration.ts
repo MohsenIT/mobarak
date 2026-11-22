@@ -3,7 +3,7 @@ import {Miniflare,convertV4MiniflareOptions} from 'miniflare';
 import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import app from '../src/bridge-worker.ts';
-import {drain,type BridgeEnv} from '../src/bridge.ts';
+import {canReopen,drain,type BridgeEnv} from '../src/bridge.ts';
 import type {Database} from '../src/db.ts';
 import {pollBale} from '../src/bale-polling.ts';
 import {effect} from '../src/effects.ts';
@@ -27,7 +27,7 @@ try{
   }
   if(url.pathname==='/search/issues')return Response.json({items:issueCreates?[issue]:[]});
   if(url.pathname.endsWith('/issues')&&method==='POST'){issueCreates++;Object.assign(issue,{title:data.title,body:data.body});return Response.json(issue);}
-  if(url.pathname.endsWith('/issues/42'))return Response.json(issue);
+  if(url.pathname.endsWith('/issues/42')){if(method==='PATCH')Object.assign(issue,data);return Response.json(issue);}
   if(url.pathname.endsWith('/comments')&&method==='POST'){commentCreates++;return Response.json({id:800+commentCreates,body:data.body,html_url:'https://github.com/example/project/issues/42#issuecomment-'+commentCreates,user:{login:'bridge-user'}});}
   throw new Error('Unexpected test HTTP request '+method+' '+url.pathname);
  };
@@ -88,6 +88,19 @@ try{
  assert.equal(issueCreates,1,'another user cannot approve the draft');
  await send(privateMessage(7,'/report 42 محتوای نامناسب'));
  assert.equal((await db.prepare('SELECT COUNT(*) AS n FROM abuse_reports').first<{n:number}>())?.n,1);
+ env.INTAKE_ENABLED='true';
+ const feedback={...approved.callback_query,id:'fixed-test',data:'feedback:publish-fixed:42'};
+ await send({update_id:44,callback_query:feedback});await send({update_id:45,callback_query:feedback});
+ assert.equal(commentCreates,3,'anonymous confirmation appears once');
+ assert.equal(issue.state,'closed');
+ assert.equal(canReopen({...issue,state_reason:'duplicate'},false),false);
+ assert.equal(canReopen(issue,true),false);
+ await send(privateMessage(46,'/still 42 خطا در نسخه جدید هنوز دیده می‌شود'));
+ assert.equal(issue.state,'closed','consent required to reopen');
+ await send({update_id:47,callback_query:{...approved.callback_query,id:'still-approve',data:'approve:d46'}});
+ assert.equal(issue.state,'open');
+ assert.equal(commentCreates,4);
+ env.INTAKE_ENABLED='false';
  const failed=await db.prepare("SELECT id,error_code FROM events WHERE state IN ('failed','uncertain')").all();
  assert.deepEqual(failed.results,[]);
  let attempts=0;

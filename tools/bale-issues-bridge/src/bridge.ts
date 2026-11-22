@@ -26,6 +26,9 @@ interface Candidate {number:number;title:string;url:string;post:number|null;scor
 type GHComment={id:number;body:string;html_url:string;user:{login:string}};
 const now=()=>Math.floor(Date.now()/1000);
 const safeNumber=(v:unknown):v is number=>typeof v==='number'&&Number.isSafeInteger(v)&&v>0;
+export function canReopen(issue:Pick<PublicIssue,'state'|'state_reason'>,duplicate:boolean):boolean {
+ return issue.state==='closed'&&issue.state_reason==='completed'&&!duplicate;
+}
 export class Bridge {
  env:BridgeEnv;api:APIs;available:Category[];
  constructor(env:BridgeEnv){this.env=env;this.api=new APIs(env);this.available=categories(env.CATEGORIES_JSON);}
@@ -85,16 +88,16 @@ export class Bridge {
   return {items:[...map.values()].filter(i=>i.score>=0.15).sort((a,b)=>b.score-a.score).slice(0,3),degraded};
  }
  async newDraft(update:BaleUpdate,message:Message,mode='report',target?:number,replyTo?:number):Promise<void>{
-  const user=message.from!;const text=replyTo?redact(message.text!.trim()).text:message.text!.trim();const id='d'+update.update_id;
+  const user=message.from!;const text=(replyTo||mode==='persists')?redact(message.text!.trim()).text:message.text!.trim();const id='d'+update.update_id;
   if(text.length>2800){await this.say('long:'+update.update_id,message.chat.id,'لطفاً متن را به حداکثر ۲۸۰۰ نویسه کوتاه کنید تا پیش از انتشار، تمام آن قابل بررسی باشد.');return;}
   const count=await one<{n:number}>(this.env.DB,'SELECT COUNT(*) AS n FROM drafts WHERE user_id=? AND created_at>?',user.id,now()-86400);
   if((count?.n??0)>=20){await this.say('limit:'+update.update_id,message.chat.id,'سقف روزانهٔ ثبت گزارش پر شده است؛ فردا دوباره تلاش کنید.');return;}
   const category=classify(text,this.available);const title=mode==='comment'?`توضیح تکمیلی #${target}`:reportTitle(text);
   const similar=mode==='report'?await this.candidates(text):{items:[],degraded:false};
   await execute(this.env.DB,`INSERT OR IGNORE INTO drafts(id,user_id,chat_id,body,title,category,mode,target_issue,candidates_json,expires_at,reply_group_message_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,id,user.id,message.chat.id,text,title,category.key,mode,target??null,JSON.stringify(similar.items),now()+86400,replyTo??null);
-  if(replyTo){
+  if(replyTo||mode==='persists'){
    await this.say('draft-preview:'+id,message.chat.id,
-    `پاسخ به دیدگاه گزارش #${target}\n\n${text}\n\nبا تأیید، این پاسخ زیر همان دیدگاه در بله و در GitHub عمومی می‌شود.`,
+    `${replyTo?'پاسخ به دیدگاه':'ادامهٔ مشکل در'} گزارش #${target}\n\n${text}\n\n${replyTo?'با تأیید، پاسخ زیر همان دیدگاه و در GitHub منتشر می‌شود.':'با تأیید، توضیح در GitHub و بله منتشر می‌شود. اگر گزارش به‌عنوان انجام‌شده بسته شده باشد، دوباره باز می‌شود.'}`,
     [[{text:'انتشار پاسخ',callback_data:`approve:${id}`},{text:'لغو',callback_data:`cancel:${id}`}]]);
    return;
   }
@@ -138,6 +141,23 @@ export class Bridge {
   }
   if(action!=='approve')return;
   await execute(this.env.DB,"UPDATE drafts SET state='publishing' WHERE id=? AND state='draft'",id);
+  if(draft.mode==='persists'){
+   const number=draft.target_issue!;
+   if(!await this.isReporter(number,draft.chat_id))return;
+   const current=await this.issue(number);
+   const saved=await this.syncIssue(current,'persists:'+id);
+   await this.createBaleComment('persists:'+id,saved,draft.body,q.from.id);
+   const reopened=await effect(this.env.DB,'reopen:'+id,async()=>{
+    const latest=await this.issue(number);
+    const duplicate=latest.labels.some(label=>typeof label==='string'?label.toLowerCase()==='duplicate':label.name.toLowerCase()==='duplicate');
+    if(!canReopen(latest,duplicate))return false;
+    await this.api.github(this.api.repo('/issues/'+number),'PATCH',{state:'open',state_reason:'reopened'});
+    return true;
+   },true);
+   await execute(this.env.DB,"UPDATE drafts SET state='created',issue_number=? WHERE id=?",number,id);
+   await this.say('persists-result:'+id,draft.chat_id,reopened?'توضیح ثبت شد و گزارش دوباره باز شد.':'توضیح ثبت شد.\n'+current.html_url);
+   return;
+  }
   if(draft.mode==='comment'){
    const issue=draft.reply_group_message_id
     ? await one<IssueRow>(this.env.DB,'SELECT * FROM issues WHERE number=? AND reporter_chat_id=?',draft.target_issue,draft.chat_id)
@@ -155,6 +175,18 @@ export class Bridge {
   const saved=await this.syncIssue(issue,'report:'+id,draft.chat_id);
   await execute(this.env.DB,"UPDATE drafts SET state='created',issue_number=? WHERE id=?",issue.number,id);
   await this.say('report-result:'+id,draft.chat_id,this.env.INTAKE_ENABLED==='true'?`${ui.success}\nشماره گزارش: #${issue.number}\n${issue.html_url}`:`گزارش #${issue.number} ثبت شد.\n${issue.html_url}\n${this.postLink(saved.channel_post_id!)}\nنتیجه و تغییر وضعیت را همین‌جا دریافت می‌کنید.`,this.env.INTAKE_ENABLED==='true'?[[{text:ui.view,url:issue.html_url},{text:'کانال گزارش‌ها',url:this.postLink(saved.channel_post_id!)},{text:ui.mine,callback_data:'menu:mine'}],[{text:ui.new_short,callback_data:'menu:new'}]]:undefined);
+ }
+ async isReporter(number:number,chat:number):Promise<boolean>{
+  return !!await one(this.env.DB,'SELECT number FROM issues WHERE number=? AND reporter_chat_id=?',number,chat);
+ }
+ async publishFixed(number:number,user:number,chat:number):Promise<void>{
+  if(!await this.isReporter(number,chat))return;
+  const key='feedback-fixed:'+number;
+  await effect(this.env.DB,key,()=>this.api.github(this.api.repo(`/issues/${number}/comments`),'POST',{
+   body:'گزارش‌دهنده تأیید کرد که مشکل برطرف شده است.\n\n<!-- mobarak-bridge:bale:feedback-fixed -->'
+  }));
+  await execute(this.env.DB,"INSERT INTO report_feedback(user_id,issue_number,result) VALUES (?,?,'fixed') ON CONFLICT(user_id,issue_number) DO UPDATE SET result='fixed'",user,number);
+  await this.say(key+':receipt',chat,'تأیید رفع مشکل در GitHub ثبت شد.');
  }
  async createBaleComment(key:string,issue:IssueRow,text:string,userId:number,sourceMessage?:number,replyTo?:number):Promise<void>{
   const marker='bale:'+key;if(replyTo||this.env.INTAKE_ENABLED==='true')text=redact(text).text;const alias=await aliasFor(userId,this.env.ADMIN_SECRET);
@@ -247,6 +279,13 @@ export class Bridge {
   if(status){const issue=await this.issue(Number(status[1]));await this.say('status-result:'+update.update_id,message.chat.id,`#${issue.number} — ${issue.title}\n${statusText(issue)}\n${issue.html_url}`);return;}
   const abuse=text.match(/^\/report\s+#?(\d+)\s+([\s\S]+)$/);
   if(abuse){await execute(this.env.DB,'INSERT OR IGNORE INTO abuse_reports(id,user_id,issue_number,reason) VALUES (?,?,?,?)','abuse:'+update.update_id,message.from.id,Number(abuse[1]),abuse[2].slice(0,2000));await this.say('abuse-result:'+update.update_id,message.chat.id,'گزارش شما برای بررسی مدیر ثبت شد و عمومی منتشر نمی‌شود.');return;}
+  const persists=text.match(/^\/still\s+#?(\d+)\s+([\s\S]+)$/);
+  if(persists){
+   const number=Number(persists[1]);
+   if(safeNumber(number)&&await this.isReporter(number,message.chat.id))await this.newDraft(update,{...message,text:persists[2]},'persists',number);
+   else await this.say('persists-denied:'+update.update_id,message.chat.id,'این گزینه برای گزارش‌دهندهٔ اصلی است.');
+   return;
+  }
   const supplement=text.match(/^\/comment\s+#?(\d+)\s+([\s\S]+)$/);
   if(supplement){await this.newDraft(update,{...message,text:supplement[2]},'comment',Number(supplement[1]));return;}
   if(text.startsWith('/')){await this.say('unknown:'+update.update_id,message.chat.id,'دستور شناخته نشد. /help را بفرستید.');return;}

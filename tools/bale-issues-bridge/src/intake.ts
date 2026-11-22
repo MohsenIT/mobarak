@@ -127,9 +127,13 @@ export class Intake {
    }
    if(q.data.startsWith('feedback:')){
     const [,action,num]=q.data.split(':');const n=Number(num);
-    if(!Number.isSafeInteger(n)||n<1||!['fixed','persists'].includes(action)||!await one(this.db,'SELECT user_id FROM subscriptions WHERE user_id=? AND issue_number=?',user,n))return true;
-    if(action==='persists'){await this.say(key,chat.id,`لطفاً توضیح تازه‌ات را با دستور /comment ${n} و سپس متن توضیح بفرست. پیش از انتشار تأیید می‌گیرم.`);}
-    else {await execute(this.db,"INSERT INTO report_feedback(user_id,issue_number,result) VALUES (?,?,'fixed') ON CONFLICT(user_id,issue_number) DO UPDATE SET result='fixed'",user,n);await this.say(key,chat.id,ui.feedback_saved);}
+    if(!Number.isSafeInteger(n)||n<1||!['fixed','publish-fixed','persists'].includes(action))return true;
+    if(!await one(this.db,'SELECT number FROM issues WHERE number=? AND reporter_chat_id=?',n,chat.id)){
+     await this.say(key,chat.id,'این گزینه برای گزارش‌دهندهٔ اصلی است.');return true;
+    }
+    if(action==='persists')await this.say(key,chat.id,`بگو مشکل چطور ادامه دارد. دستور زیر را همراه توضیح بفرست. پس از تأیید، توضیح منتشر می‌شود و اگر گزارش به‌عنوان انجام‌شده بسته شده باشد، دوباره باز می‌شود.\n\n/still ${n} توضیح`);
+    else if(action==='fixed')await this.say(key,chat.id,'تأییدت بدون نام در GitHub ثبت می‌شود.',[[{text:'ثبت عمومی',callback_data:'feedback:publish-fixed:'+n}]]);
+    else await this.bridge.publishFixed(n,user,chat.id);
     return true;
    }
    const [,action,id,revision,arg]=q.data.split(':');let c=await one<Conversation>(this.db,'SELECT * FROM conversations WHERE id=? AND user_id=? AND chat_id=?',id,user,chat.id);
