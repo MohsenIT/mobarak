@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium-phone, chromium-desktop, android-bridge-phone]
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -18,19 +22,22 @@ jobs:
       - run: bun test src/lib/*.test.ts
       - run: bun run build
       - run: bunx playwright install --with-deps chromium
-      - name: Reader regressions on phone, desktop and Android bridge
+      - name: Reader regressions (${{ matrix.project }})
         env:
           READER_URL: http://127.0.0.1:3000
+          PLAYWRIGHT_PROJECT: ${{ matrix.project }}
         run: |
           PORT=3000 HOSTNAME=127.0.0.1 node .next/standalone/server.js > browser-server.log 2>&1 &
           for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/api/version > /dev/null && break; sleep 1; done
-          bunx playwright test --project=chromium-phone --project=chromium-desktop --project=android-bridge-phone
-          node scripts/verify-desktop-reading.cjs
-          node scripts/verify-quick-highlights.cjs
+          if [ "$PLAYWRIGHT_PROJECT" = chromium-desktop ]; then
+            node scripts/verify-desktop-reading.cjs
+            node scripts/verify-quick-highlights.cjs
+          fi
+          bunx playwright test --project="$PLAYWRIGHT_PROJECT"
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: browser-regression-report
+          name: browser-regression-report-${{ matrix.project }}
           path: |
             playwright-report/
             test-results/

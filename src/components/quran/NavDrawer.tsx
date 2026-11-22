@@ -71,7 +71,9 @@ const TABS = [
 
 export default function NavDrawer(props: Props) {
   const { meta, onClose, onGoPage, onGoSurah, onGoVerse, currentSurah } = props
-  const drawerRef=useDismissiblePanel<HTMLElement>(true,onClose)
+  const drawerRef = useDismissiblePanel<HTMLElement>(true, () => {
+    if (props.view === 'tools' || !window.matchMedia('(min-width:1024px)').matches) onClose()
+  })
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('surah')
   const [pageInput, setPageInput] = useState('')
   const q = pageInput
