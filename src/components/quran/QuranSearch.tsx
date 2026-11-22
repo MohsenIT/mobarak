@@ -17,6 +17,7 @@ import { splitWord } from '@/lib/word-parts'
 import type { SearchMode } from '@/lib/quran-search-session'
 import { lemmaDisplay } from '@/lib/lemma-display'
 import { searchFormLabels } from '@/lib/search-form-labels'
+import DestinationOptions, { useDestinationSelection } from './DestinationOptions'
 import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
 import { searchLink, type SearchLinkState } from '@/lib/search-link'
 import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
@@ -221,7 +222,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     setter(current => current.includes(value) ? current.filter(x => x !== value) : [...current, value]); setCurrentResult(1); setVisible(20); scroll.current = 0; if (list.current) list.current.scrollTop = 0
   }
   const setScope = (s: number, checked: boolean) => setSurahs(current => checked ? [...current, s].sort((a, b) => a - b) : current.filter(n => n !== s))
-  const destinations = mode === 'text' && !occurrenceFilter ? searchDestinations(meta,query,restored?.contextSurah??currentSurah) : []
+  const destinations = onNavigate && mode === 'text' && !occurrenceFilter ? searchDestinations(meta,query,restored?.contextSurah??currentSurah) : []
+  const destinationSelection = useDestinationSelection(destinations)
   const scopeLabel = surahs.length === 0 ? t("ui.5ad7b9b0af") : surahs.length === 1 ? t("ui.0eb0a3f03f",{p0:(meta.surahs[surahs[0] - 1]?.fa)}) : t("ui.bc740afadf",{p0:(toFa(surahs.length))})
   if (!open) return null
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir={uiDirection()} aria-label={t("ui.cd32ebbeba")} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
@@ -232,18 +234,25 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           <button type="button" className="icon-btn" aria-label={t("ui.685e0d6bc0")} onClick={() => onOpenChange(false)}><ArrowRight size={20} /></button>
           <div className="search-page-input">
             <Search size={17} aria-hidden="true" />
-            <DictationInput speechLocale="ar" ref={input} type="search" value={query} maxLength={160} role="combobox" aria-autocomplete="list" aria-expanded={completionOpen && !busy && suggestions.length > 0} aria-controls="search-completions" aria-activedescendant={completionOpen && completionIndex >= 0 ? `search-completion-${completionIndex}` : undefined}
+            <DictationInput speechLocale="ar" ref={input} type="search" value={query} maxLength={160}
+              {...(destinations.length ? destinationSelection.inputProps : {
+                role: 'combobox', 'aria-autocomplete': 'list',
+                'aria-expanded': completionOpen && !busy && suggestions.length > 0,
+                'aria-controls': completionOpen && !busy && suggestions.length ? 'search-completions' : undefined,
+                'aria-activedescendant': completionOpen && completionIndex >= 0 ? `search-completion-${completionIndex}` : undefined,
+              })}
               onFocus={() => setCompletionOpen(true)} onBlur={event => { if (!event.currentTarget.parentElement?.contains(event.relatedTarget)) setCompletionOpen(false) }}
-              onChange={event => { if (occurrenceFilter) onClearOccurrenceFilter?.(); setQuery(event.target.value); setCompletionOpen(true); setCompletionIndex(-1) }}
+              onChange={event => { if (occurrenceFilter) onClearOccurrenceFilter?.(); setQuery(event.target.value); destinationSelection.reset(); setCompletionOpen(true); setCompletionIndex(-1) }}
               onKeyDown={event => {
+                if (event.nativeEvent.isComposing || destinationSelection.move(event)) return
                 if (event.key === 'ArrowDown' && !busy && suggestions.length) { event.preventDefault(); setCompletionOpen(true); setCompletionIndex(i => (i + 1) % suggestions.length) }
                 else if (event.key === 'ArrowUp' && !busy && suggestions.length) { event.preventDefault(); setCompletionOpen(true); setCompletionIndex(i => (i - 1 + suggestions.length) % suggestions.length) }
-                else if (event.key === 'Enter') { event.preventDefault(); if (destinations.length===1&&onNavigate) onNavigate(destinations[0].destination); else if (completionOpen && completionIndex >= 0) setQuery(suggestions[completionIndex]); setCompletionOpen(false); input.current?.blur() }
+                else if (event.key === 'Enter') { event.preventDefault(); if (destinationSelection.destination && onNavigate) onNavigate(destinationSelection.destination); else if (!destinations.length && completionOpen && suggestions[completionIndex]) setQuery(suggestions[completionIndex]); setCompletionOpen(false); input.current?.blur() }
                 else if (event.key === 'Escape' && completionOpen) { event.preventDefault(); event.stopPropagation(); setCompletionOpen(false) }
               }}
               aria-label={mode === 'root' ? t("ui.2f8f10c05a") : mode === 'lemma' ? t("ui.3ccd03be3e") : t("ui.d008c5b1be")} placeholder={occurrenceFilter ? t("ui.de2ec61b2e") : mode === 'root' ? t("ui.726cfb70d6") : mode === 'lemma' ? t("ui.0b020887df") : t("ui.7c498eb144")} autoComplete="off" autoCorrect="off" spellCheck={false} />
             {query && <button type="button" aria-label={t("ui.f37fae1000")} onClick={() => { setQuery(''); input.current?.focus({ preventScroll: true }) }}><X size={15} /></button>}
-            {completionOpen && !busy && suggestions.length > 0 && !occurrenceFilter && <div id="search-completions" className="search-completion-menu" role="listbox" aria-label={t("ui.7bf42d2a96")}>{suggestions.map((value, i) => <button type="button" role="option" id={`search-completion-${i}`} aria-selected={completionIndex === i} key={value} onMouseDown={event => event.preventDefault()} onClick={() => { setQuery(value); setCompletionOpen(false); input.current?.blur() }}><Search size={14} /><QuranText text={value} /><span aria-hidden="true">↖</span></button>)}</div>}
+            {!destinations.length && completionOpen && !busy && suggestions.length > 0 && !occurrenceFilter && <div id="search-completions" className="search-completion-menu" role="listbox" aria-label={t("ui.7bf42d2a96")}>{suggestions.map((value, i) => <button type="button" role="option" id={`search-completion-${i}`} aria-selected={completionIndex === i} key={value} onMouseDown={event => event.preventDefault()} onClick={() => { setQuery(value); setCompletionOpen(false); input.current?.blur() }}><Search size={14} /><QuranText text={value} /><span aria-hidden="true">↖</span></button>)}</div>}
           </div>
           <button type="button" className="icon-btn" aria-label={copyStatus || t("ui.8f0d9edc8e")} title={copyStatus || t("ui.8f0d9edc8e")} onClick={async () => {
             try { await navigator.clipboard.writeText(searchLink(process.env.NEXT_PUBLIC_DESKTOP === '1' ? 'https://quran-vajeh.vercel.app' : window.location.href, linkState).href); setCopyStatus(t("ui.dc5c67b8a3")) }
@@ -265,7 +274,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         {includeNear && mode === 'text' && <button type="button" className="search-active-filter" aria-label={t("ui.74ae9ec1c4")} onClick={() => setIncludeNear(false)}>{t("ui.36ee5635ee")}{' '}<X size={12} /></button>}
         {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? t("ui.0b6f9a295b",{p0:(occurrenceFilter.root ?? '')}) : occurrenceFilter.tab === 'form' ? t("ui.b87b342872",{p0:(occurrenceFilter.form),p1:(occurrenceFilter.root ?? '')}) : t("ui.108e40c64f",{p0:(occurrenceFilter.text)})}</span><button type="button" aria-label={t("ui.96ad94b293")} onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
       </header>
-      {onNavigate&&destinations.length>0&&<div className="search-jump-options" aria-label={t("ui.d289fa208b")}>{destinations.map((item,i)=><button type="button" key={i} onClick={()=>onNavigate(item.destination)}>{t("ui.b7b6972c78")}{' '}{toFa(item.label)} ←</button>)}</div>}
+      {onNavigate && <DestinationOptions id={destinationSelection.id} active={destinationSelection.active} options={destinations} onPick={onNavigate} className="search-jump-options" />}
       <div className="search-results-summary">
         <div role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />{t("ui.63509f3da4")}</span> : !valid ? t("ui.4bfc7b8a3d") : error ? t("ui.12287cefbb") : <><strong className="search-results-total">{t('search.totalResults', { total: results.length })}</strong><span className="search-results-detail">{t("ui.9ec9176e66",{p0:(toFa(results.length)),p1:(toFa(results.reduce((sum, r) => sum + r.positions.length, 0)))})}</span></>}</div>
         {!busy && !error && valid && results.length > 0 && <span className="search-results-position" data-current-result={Math.min(currentResult, results.length)} data-total-results={results.length} aria-live="off">{t('search.resultPosition', { current: Math.min(currentResult, results.length), total: results.length })}</span>}

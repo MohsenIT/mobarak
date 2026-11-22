@@ -16,6 +16,7 @@ import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
 import DownloadsManager from './DownloadsManager'
 import SurahShortcuts from './SurahShortcuts'
+import DestinationOptions, { useDestinationSelection } from './DestinationOptions'
 import JuzRail from './JuzRail'
 import { juzAtVerse, surahJuzRange } from '@/lib/juz-navigation'
 import DesktopPaneResizeHandle from './DesktopPaneResizeHandle'
@@ -23,7 +24,7 @@ import { useDismissiblePanel } from './useDismissiblePanel'
 import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
-import { destinationSuggestions, resolveDestination, normalizeSearch, NAVIGATION_HELP, searchSurahs, type Destination } from '@/lib/navigation'
+import { destinationSuggestions, NAVIGATION_HELP, searchSurahs, type Destination } from '@/lib/navigation'
 import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate, IconSortIndex } from './Ornaments'
 import { ChevronLeft, GitCompareArrows, Settings } from 'lucide-react'
 
@@ -118,6 +119,8 @@ export default function NavDrawer(props: Props) {
   const surahs = useMemo(() => searchSurahs(meta, q), [q, meta])
   const suggestions = useMemo(() => destinationSuggestions(meta, pageInput, currentSurah), [meta, pageInput, currentSurah])
 
+  const selection = useDestinationSelection(suggestions)
+
   const juzList = useMemo(() =>
     Object.entries(meta.juz).map(([j, [s, a]]) => ({
       j: +j, s, a,
@@ -133,9 +136,12 @@ export default function NavDrawer(props: Props) {
   }
   const submitPage = (e: React.FormEvent) => {
     e.preventDefault()
-    const destination = suggestions.length === 1 ? suggestions[0].destination : !/^\d+$/.test(normalizeSearch(pageInput)) ? resolveDestination(meta, 'surah', pageInput, currentSurah) : undefined
+    const { destination } = selection
     if (destination) goTo(destination)
-    else setPageError(true)
+    else {
+      if (window.matchMedia('(pointer: coarse)').matches && document.activeElement instanceof HTMLInputElement) document.activeElement.blur()
+      setPageError(!!pageInput.trim() && !suggestions.length)
+    }
   }
 
   return (
@@ -184,7 +190,9 @@ export default function NavDrawer(props: Props) {
         <form onSubmit={submitPage} className="drawer-navigation-form flex items-center gap-2 px-4 pb-3">
           <DictationInput
             value={pageInput}
-            onChange={e => { setPageInput(e.target.value); setPageError(false) }}
+            onChange={e => { setPageInput(e.target.value); setPageError(false); selection.reset() }}
+            onKeyDown={event => { if (!event.nativeEvent.isComposing) selection.move(event) }}
+            {...selection.inputProps}
             aria-label={t("ui.54778fcf78")}
             aria-invalid={pageError}
             aria-describedby={pageError ? 'page-jump-error' : undefined}
@@ -199,9 +207,7 @@ export default function NavDrawer(props: Props) {
         {!pageInput && <SurahShortcuts meta={meta} pinned={props.pinnedSurahs} recent={props.recentSurahs} onTogglePin={props.onTogglePin} onGo={s => goTo({ kind: 'surah', s })} />}
         {pageError && <p id="page-jump-error" role="alert" className="px-4 pb-3 text-xs">{t("ui.c8cc160d0c")}</p>}
 
-        {suggestions.length > 0 && <div className="drawer-destination-options" aria-label={t("ui.6d7a6c7a7e")}>
-          {suggestions.map((item, index) => <button key={index} type="button" onClick={() => goTo(item.destination)}>{toFa(item.label)}</button>)}
-        </div>}
+        <DestinationOptions id={selection.id} active={selection.active} options={suggestions} onPick={goTo} className="drawer-destination-options" />
         <details className="px-4 pb-3 text-xs leading-7"><summary>{t("ui.f4bf9b146f")}</summary><dl className="mt-2">{NAVIGATION_HELP.map(([kind,examples])=><div key={kind}><dt className="font-bold">{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl><p>{t("ui.a8175202e6")}</p></details>
         </>}
         {props.view !== 'tools' && <div className="drawer-content-shell">

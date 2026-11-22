@@ -1863,3 +1863,10 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .reader-highlight[data-highlight-state] { animation: none; box-decoration-break: clone; -webkit-box-decoration-break: clone; border-radius: 3px; }
 .reader-highlight[data-highlight-state='match'] { background: var(--word-root); }
 .reader-highlight[data-highlight-state='selected'] { background: var(--word-selected); }
+
+.drawer-destination-options [aria-selected="true"],
+.search-jump-options [aria-selected="true"] {
+  outline: 2px solid var(--sage);
+  outline-offset: -2px;
+  background: var(--word-root);
+}

@@ -106,7 +106,20 @@ export function resolveDestination(meta: Meta, kind: JumpKind, input: string, cu
   return n >= 1 && n <= 30 && first ? { kind: 'verse', s: first[0], a: first[1] } : null
 }
 
-export type DestinationSuggestion = { destination: Destination; label: string }
+export type DestinationSuggestion = { destination: Destination; label: string; exact?: true }
+
+/** Return only the option that is visibly active and can be confirmed. */
+export function activeDestinationIndex(options: readonly DestinationSuggestion[], selected?: number) {
+  if (selected !== undefined) return Number.isInteger(selected) && options[selected] ? selected : -1
+  return options.length === 1 && options[0].exact ? 0 : -1
+}
+
+export function stepDestinationIndex(current: number, count: number, direction: 1 | -1) {
+  if (count === 0) return -1
+  if (current < 0) return direction === 1 ? 0 : count - 1
+  return (current + direction + count) % count
+}
+
 /** Infer the destination after typing; show explicit choices for ambiguous numbers. */
 export function destinationSuggestions(meta: Meta, input: string, currentSurah: number): DestinationSuggestion[] {
   const value = input.trim()
@@ -115,12 +128,18 @@ export function destinationSuggestions(meta: Meta, input: string, currentSurah: 
   const command=jumpCommand(value)
   if(!command){
     const named=namedAyah(meta,value)
-    if(named)return [{destination:named,label:label(named)}]
+    if(named)return [{destination:named,label:label(named),exact:true}]
   }
   if (command || /[:：/]/.test(value)) {
     const destination = resolveDestination(meta, /[:：/]/.test(value) ? 'verse' : 'surah', value, currentSurah)
-    const juz=command?.kind==='juz'?indexNumber(command.value,30):undefined
-    return destination?[{destination,label:juz?t('ui.6668c797a2',{p0:(juz)}):label(destination)}]:[]
+    if (!destination) return []
+    const juz = command?.kind === 'juz' ? indexNumber(command.value, 30) : undefined
+    const valueParts = (command?.value ?? value).split(/[:：/]/)
+    const surahPart = destination.kind === 'surah' ? valueParts[0] : valueParts.length === 2 ? valueParts[0] : null
+    const exact = surahPart === null || Number.isInteger(indexNumber(surahPart, 114))
+      || ((destination.kind === 'surah' || destination.kind === 'verse' || destination.kind === 'context')
+        && surahScore(meta.surahs[destination.s - 1], surahPart) === 0)
+    return [{ destination, label: juz ? t('ui.6668c797a2', { p0: juz }) : label(destination), exact: exact ? true : undefined }]
   }
   if (/^\d+$/.test(normalizeSearch(value))) {
     return (['surah', 'verse', 'page', 'juz', 'context'] as const).flatMap(kind => {
