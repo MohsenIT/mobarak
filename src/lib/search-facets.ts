@@ -7,7 +7,10 @@ export function filterSearchFacets(results: QuranSearchResult[], selection: Sear
       const [, lemma, form] = result.morphology?.[pos - 1] ?? []
       return (!selection.lemmas.length || !!lemma && selection.lemmas.includes(lemma)) && (!selection.forms.length || !!form && selection.forms.includes(form))
     })
-    return positions.length ? [{ ...result, positions, parts: Object.fromEntries(positions.map(pos => [pos, result.parts[pos]])) }] : []
+    if (!positions.length) return []
+    const retained = new Set(positions)
+    const occurrences = result.occurrences?.filter(span => span.some(pos => retained.has(pos)))
+    return [{ ...result, positions, occurrences, parts: Object.fromEntries(positions.map(pos => [pos, result.parts[pos]])) }]
   })
 }
 export function searchFacetCounts(results: QuranSearchResult[], selection: SearchFacetSelection, kind: 'lemmas' | 'forms') {

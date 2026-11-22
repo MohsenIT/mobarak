@@ -1926,3 +1926,19 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 
 .search-and-go { top: var(--search-and-go-top, 0px); }
 .search-and-go :is(button, [role="slider"]):focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }
+
+.search-and-go-completions {
+  display: flex;
+  flex: none;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px clamp(8px, 2vw, 20px) 6px;
+}
+.search-and-go-body[data-text-results] .drawer-destination-options { flex-wrap: nowrap; overflow-x: auto; }
+.search-and-go-body[data-text-results] .drawer-destination-options button,
+.search-and-go-completions button { flex: none; white-space: nowrap; }
+.search-and-go-completions button[aria-selected="true"] { background: var(--word-active); border-color: var(--sage); }
+.search-and-go-body[data-show-controls] { flex: 0 1 auto; order: 0; overflow: auto; }
+.search-and-go-help { order: 1; }
+.search-and-go-settings { position: relative; padding: 0 clamp(8px, 2vw, 20px) 8px; }
+.search-result-card:has([aria-current="true"]) { border-color: var(--sage); }

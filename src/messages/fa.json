@@ -749,6 +749,7 @@
   "copy.includeTranslation": "ترجمه هم بیاید",
   "copy.lineBreaks": "میان بخش‌ها خط جدید بگذار",
   "copy.restoreDefault": "بازگرداندن قالب مناسب متن",
+  "search.occurrenceCount": "{p0} آیه · {p1} وقوع تطبیق",
   "search.totalResults": "{total} نتیجه",
   "search.resultPosition": "مورد {current} از {total}",
   "surah.tab": "سوره",

@@ -1,15 +1,26 @@
 import type { AnalysisSelection } from './analysis'
 import type { SearchMode } from './quran-search-session'
 import type { Translator } from './quran'
+import type { VerseAddress } from './verse-link'
 import {isTranslator} from './translations'
 
-export type SearchResultPosition = { scrollTop: number; visible: number }
-export type SearchResultSnapshot = { query: string; position: SearchResultPosition }
+export const SEARCH_AND_GO_PHASE_2 = process.env.NEXT_PUBLIC_SEARCH_AND_GO === '1' && process.env.NEXT_PUBLIC_SEARCH_AND_GO_PHASE_2 === '1'
+
+export type SearchResultPosition = { scrollTop: number; visible: number; anchor?: { s: number; a: number; offset: number } }
+export type SearchResultSnapshot = { query: string; position: SearchResultPosition; state?: SearchLinkState; selected?: VerseAddress }
 
 export type SearchLinkState = {
   query: string; mode: SearchMode; contextSurah?: number; surahs: number[]; lemmas: string[]; forms: string[]
   includeRoots: boolean; includePartial: boolean; includeNear: boolean
   showTranslation: boolean; translator: Translator; occurrence: AnalysisSelection | null
+}
+
+export function initialSearchLinkState(translator: Translator, start?: Pick<SearchLinkState, 'query' | 'mode' | 'surahs'>, occurrence: AnalysisSelection | null = null): SearchLinkState {
+  return {
+    query: start?.query ?? '', mode: start?.mode ?? 'text', surahs: start?.surahs ?? [],
+    lemmas: [], forms: [], includeRoots: occurrence?.tab === 'root',
+    includePartial: true, includeNear: false, showTranslation: false, translator, occurrence,
+  }
 }
 const tabs = { r: 'root', f: 'form', w: 'word' } as const
 const codes = { root: 'r', form: 'f', word: 'w' } as const

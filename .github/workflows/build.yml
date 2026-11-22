@@ -42,3 +42,34 @@ jobs:
             playwright-report/
             test-results/
             browser-server.log
+  search-and-go:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SEARCH_AND_GO: '1'
+      NEXT_PUBLIC_SEARCH_AND_GO_PHASE_2: '1'
+      SEARCH_AND_GO_E2E: '1'
+      SEARCH_AND_GO_PHASE_2_E2E: '1'
+      READER_URL: http://127.0.0.1:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.4
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - run: bunx playwright install --with-deps chromium
+      - name: Search and Go regressions
+        run: |
+          PORT=3000 HOSTNAME=127.0.0.1 node .next/standalone/server.js > browser-server.log 2>&1 &
+          for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/api/version > /dev/null && break; sleep 1; done
+          bunx playwright test --project=chromium-phone --project=chromium-desktop search-and-go.spec search-and-go-phase-2 search-and-go-offline
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: search-and-go-regression-report
+          path: |
+            playwright-report/
+            test-results/
+            browser-server.log

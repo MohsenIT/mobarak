@@ -1,5 +1,6 @@
 import { expect, test } from 'bun:test'
 import { createSearchSession, type SearchCorpus } from './quran-search-session'
+import { countQuranSearchResults } from './quran-search'
 import corpus from '../../public/data/quran-search.json'
 const search = createSearchSession(corpus as unknown as SearchCorpus)
 
@@ -54,4 +55,23 @@ test('رحم does not invent a word from الجوارح مكلبين or other ad
     expect(hits.some(r => r.s === 5 && r.a === 4)).toBe(false)
     expect(hits.every(r => r.positions.every(pos => r.morphology?.[pos - 1]?.[0] === 'رحم'))).toBe(true)
   }
+})
+
+test('real Quran counts distinguish repeated matches, highlighted words and verses', () => {
+  const repeated = search('زَبَد', { surahs: [13] })
+  expect(repeated.map(r => [r.a, r.occurrences])).toEqual([[17, [[10], [21], [29]]]])
+  expect(countQuranSearchResults(repeated)).toEqual({ occurrences: 3, words: 3, verses: 1 })
+
+  for (const query of ['لَا تَخَفْ', 'لاتخف']) {
+    const phrase = search(query, { surahs: [20] })
+    expect(phrase.map(r => [r.a, r.occurrences])).toEqual([[21, [[3, 4]]], [68, [[2, 3]]], [77, [[14, 15]]]])
+    expect(phrase[0].parts).toEqual({ 3: 2, 4: 2 })
+    expect(countQuranSearchResults(phrase)).toEqual({ occurrences: 3, words: 6, verses: 3 })
+  }
+})
+
+test('expanding a literal match counts each new root occurrence once', () => {
+  const expanded = search('اذهب', { surahs: [20], includeRoots: true })
+  expect(expanded.find(r => r.a === 24)?.occurrences).toEqual([[1]])
+  expect(expanded.find(r => r.a === 63)?.occurrences).toEqual([[11]])
 })

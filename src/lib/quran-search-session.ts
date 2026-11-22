@@ -65,10 +65,15 @@ export function createSearchSession(corpus: SearchCorpus) {
       const previous = merged.get(key)
       merged.set(key, { s, a, words, waw: corpus.waw?.[key] ?? [], kind: previous?.kind ?? 'root', score: previous?.score ?? 2,
         positions: [...new Set([...(previous?.positions ?? []), ...positions])].sort((a, b) => a - b),
+        occurrences: [...(previous?.occurrences ?? []), ...positions.filter(pos => !((previous?.parts[pos] ?? 0) & 2)).map(pos => [pos])].sort((a, b) => a[0] - b[0]),
         parts: { ...previous?.parts, ...Object.fromEntries(positions.map(pos => [pos, (previous?.parts[pos] ?? 0) | 2])) } })
     }
     return [...merged.values()].sort((a, b) => a.score - b.score || a.s - b.s || a.a - b.a)
   }
-  return (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null) => execute(query, options, filter).map(result => ({ ...result, morphology: corpus.morphology[`${result.s}:${result.a}`] ?? [] }))
+  return (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null) => execute(query, options, filter).map(result => ({
+    ...result,
+    occurrences: result.occurrences ?? result.positions.map(pos => [pos]),
+    morphology: corpus.morphology[`${result.s}:${result.a}`] ?? [],
+  }))
 
 }

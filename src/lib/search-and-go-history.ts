@@ -8,20 +8,21 @@ const RECENT_LIMIT = 12
 export type SearchOperation = { type: 'navigation'; destination: Destination; word?: number } | { type: 'text'; link: string }
 export type SearchOperationEntry = { id: string; operation: SearchOperation; time: number; pinned: boolean }
 
-export function textSearchOperation(state: SearchLinkState): SearchOperation | null {
-  if (state.mode !== 'text' || state.occurrence || !state.query.trim()) return null
+export function textSearchOperation(state: SearchLinkState, includeCriteria = false): SearchOperation | null {
+  if (!includeCriteria && (state.mode !== 'text' || state.occurrence)) return null
+  if (!state.query.trim() && !state.occurrence) return null
   const url = searchLink('https://mobarak.invalid', state)
   return { type: 'text', link: url.pathname + url.search }
 }
 
-function restoredOperation(meta: Meta, input: unknown): SearchOperation | null {
+function restoredOperation(meta: Meta, input: unknown, includeCriteria: boolean): SearchOperation | null {
   if (!input || typeof input !== 'object') return null
   const operation = input as SearchOperation
   if (operation.type === 'text') {
     const link = operation.link
     if (typeof link !== 'string' || !link.startsWith('/q?')) return null
     const state = readSearchLink(link)
-    return state && textSearchOperation(state)
+    return state && textSearchOperation(state, includeCriteria)
   }
   if (operation.type !== 'navigation') return null
   const target = operation.destination
@@ -68,11 +69,11 @@ function limitRecent(entries: SearchOperationEntry[]) {
   return entries.filter(entry => entry.pinned || ++recent <= RECENT_LIMIT)
 }
 
-export function readOperationHistory(meta: Meta, stored: unknown): SearchOperationEntry[] {
+export function readOperationHistory(meta: Meta, stored: unknown, includeCriteria = false): SearchOperationEntry[] {
   if (!Array.isArray(stored)) return []
   const entries = stored.flatMap((entry): SearchOperationEntry[] => {
     if (!entry || typeof entry !== 'object' || !Number.isFinite(entry.time) || entry.time < 0) return []
-    const operation = restoredOperation(meta, entry.operation)
+    const operation = restoredOperation(meta, entry.operation, includeCriteria)
     return operation ? [{ id: operationId(operation), operation, time: entry.time, pinned: entry.pinned === true }] : []
   }).sort((a, b) => b.time - a.time)
   const byId = new Map<string, SearchOperationEntry>()

@@ -30,17 +30,56 @@ export function typoDistance(a: string, b: string, max: number): number {
 
 export type QuranSearchOptions = { includePartial?: boolean; includeNear?: boolean }
 export type SearchVerse = [s: number, a: number, words: string[]]
-export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; kind: 'exact' | 'partial' | 'near' | 'root'; score: number; morphology?: [string | null, string | null, string | null][] }
-type IndexedVerse = { verse: SearchVerse; keys: string[][]; compact: { text: string; ranges: [number, number][]; boundaries: Set<number> }[] }
+export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; occurrences?: number[][]; kind: 'exact' | 'partial' | 'near' | 'root'; score: number; morphology?: [string | null, string | null, string | null][] }
+export type QuranSearchCounts = { occurrences: number; words: number; verses: number }
+
+export function countQuranSearchResults(results: QuranSearchResult[]): QuranSearchCounts {
+  let occurrences = 0
+  let words = 0
+  for (const result of results) {
+    occurrences += result.occurrences?.length ?? result.positions.length
+    words += result.positions.length
+  }
+  return { occurrences, words, verses: results.length }
+}
+
+type IndexedVerse = { verse: SearchVerse; keys: string[][]; prefixed: Set<number>; compact: { text: string; ranges: [number, number][]; boundaries: Set<number> }[] }
 
 export function createQuranSearch(verses: SearchVerse[], waw: Record<string, number[]> = {}) {
   const vocabulary = new Set<string>()
+  const sourceOffsets = new Map<string, number[][]>()
+  const originalOffset = (word: string, variant: number, offset: number) => {
+    let variants = sourceOffsets.get(word)
+    if (!variants) {
+      // Restoring a small letter can shift a hit while its source span stays the same.
+      variants = [false, true].map(restore => {
+        const offsets: number[] = []
+        for (let end = 1; end <= word.length; end++) {
+          const length = normalizeQuranSearch(word.slice(0, end), restore).length
+          while (offsets.length < length) offsets.push(end - 1)
+          offsets.length = length
+        }
+        return offsets
+      })
+      sourceOffsets.set(word, variants)
+    }
+    return variants[variant][offset] ?? offset
+  }
+  const normalizedWords = new Map<string, string[]>()
   const indexed: IndexedVerse[] = verses.map(verse => {
-    const keys = verse[2].map(word => [...new Set([normalizeQuranSearch(word), normalizeQuranSearch(word, true)])].filter(Boolean))
-    keys.flat().forEach(key => vocabulary.add(key))
-    const compact = [0, 1].map(variant => {
+    const keys = verse[2].map(word => {
+      let options = normalizedWords.get(word)
+      if (!options) {
+        options = [...new Set([normalizeQuranSearch(word), normalizeQuranSearch(word, true)])].filter(Boolean)
+        normalizedWords.set(word, options)
+        options.forEach(key => vocabulary.add(key))
+      }
+      return options
+    })
+    const prefixed = new Set(waw[`${verse[0]}:${verse[1]}`] ?? [])
+    const variants = keys.some(options => options.length > 1) ? [0, 1] : [0]
+    const compact = variants.map(variant => {
       let text = ''; const ranges: [number, number][] = []; const boundaries = new Set<number>()
-      const prefixed = new Set(waw[`${verse[0]}:${verse[1]}`] ?? [])
       keys.forEach((options, i) => {
         const key = options[variant] ?? options[0] ?? ''
         const from = text.length
@@ -53,7 +92,7 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
       })
       return { text, ranges, boundaries }
     })
-    return { verse, keys, compact }
+    return { verse, keys, prefixed, compact }
   })
   return (input: string, surah = 0, { includePartial = true, includeNear = false }: QuranSearchOptions = {}): QuranSearchResult[] => {
     const query = normalizeQuranSearch(input)
@@ -61,8 +100,8 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
     const terms = query.split(' ')
     const compactQuery = terms.join('')
     const budget = terms.length === 1 ? (terms[0].length >= 6 ? 2 : 1) : Math.min(3, Math.max(1, Math.ceil(compactQuery.length / 12)))
-    const distances = terms.map(term => {
-      const max = !includeNear || term.length < 3 ? 0 : term.length < 6 ? 1 : 2
+    const distances = includeNear ? terms.map(term => {
+      const max = term.length < 3 ? 0 : term.length < 6 ? 1 : 2
       const matches = new Map<string, number>()
       if (max === 0) { if (vocabulary.has(term)) matches.set(term, 0); return matches }
       for (const word of vocabulary) {
@@ -70,27 +109,41 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
         if (cost <= max) matches.set(word, cost)
       }
       return matches
-    })
+    }) : null
     const results: QuranSearchResult[] = []
-    for (const { verse: [s, a, words], keys, compact } of indexed) {
+    for (const { verse: [s, a, words], keys, prefixed, compact } of indexed) {
       if (surah && s !== surah) continue
       let score = Infinity; let positions: number[] = []; let parts: Record<number, number> = {}; let kind: QuranSearchResult['kind'] = 'near'
-      const prefixed = new Set(waw[`${s}:${a}`] ?? [])
-      const record = (cost: number, matched: number[], masks: Record<number, number>) => {
-        if (cost < score) { positions = []; parts = {} }
+      let occurrences: Map<string, number[]> | undefined
+      const hitKey = (pos: number, offset: number, variant: number) => {
+        const sourceOffset = keys[pos - 1].length > 1 ? originalOffset(words[pos - 1], variant, offset) : offset
+        return `${pos}:${sourceOffset}`
+      }
+      const record = (cost: number, matched: number[], masks: Record<number, number>, occurrence: string) => {
+        if (cost < score) { positions = []; parts = {}; occurrences?.clear() }
         positions = [...new Set([...positions, ...matched])]
         for (const pos of matched) parts[pos] = (parts[pos] ?? 0) | masks[pos]
+        if (!occurrences) occurrences = new Map()
+        occurrences.set(occurrence, matched)
         score = cost
       }
-      for (let start = 0; start <= keys.length - terms.length; start++) {
+      const lastStart = terms.length > 1 || distances ? keys.length - terms.length : -1
+      for (let start = 0; start <= lastStart; start++) {
         let cost = 0
         for (let offset = 0; offset < terms.length; offset++) {
-          cost += Math.min(...keys[start + offset].map(key => distances[offset].get(key) ?? Infinity))
+          const word = keys[start + offset]
+          if (distances) cost += Math.min(...word.map(key => distances[offset].get(key) ?? Infinity))
+          else if (!word.includes(terms[offset])) cost = Infinity
           if (cost > score || cost > budget) break
         }
         if (cost <= score && cost <= budget) {
           const matched = Array.from({ length: terms.length }, (_, i) => start + i + 1)
-          record(cost, matched, Object.fromEntries(matched.map(pos => [pos, prefixed.has(pos) ? 3 : 2])))
+          const last = start + terms.length - 1
+          const lastTerm = terms[terms.length - 1]
+          const occurrence = cost === 0
+            ? `${hitKey(start + 1, 0, keys[start].indexOf(terms[0]))}-${hitKey(last + 1, lastTerm.length - 1, keys[last].indexOf(lastTerm))}`
+            : `${start + 1}-${last + 1}`
+          record(cost, matched, Object.fromEntries(matched.map(pos => [pos, prefixed.has(pos) ? 3 : 2])), occurrence)
           kind = cost === 0 ? 'exact' : 'near'
         }
       }
@@ -99,8 +152,9 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
       let literalScore = score === 0 ? 0 : Infinity
       const literalPositions = new Set<number>(score === 0 ? positions : [])
       const literalParts: Record<number, number> = score === 0 ? { ...parts } : {}
+      let literalOccurrences: Map<string, number[]> | undefined = score === 0 ? occurrences : undefined
       // Ignore accidental spaces inside words, and also accept incomplete words.
-      for (const item of compact) {
+      for (const [variant, item] of compact.entries()) {
         for (let start = item.text.indexOf(compactQuery); start >= 0; start = item.text.indexOf(compactQuery, start + 1)) {
           const end = start + compactQuery.length
           const matched = item.ranges.flatMap(([from, to], i) => from < end && to > start ? [i + 1] : [])
@@ -111,6 +165,11 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
           if (!whole && !includePartial) continue
           const value = whole ? 0 : 0.5
           literalScore = Math.min(literalScore, value)
+          const first = matched[0]
+          const last = matched[matched.length - 1]
+          const occurrence = `${hitKey(first, start - item.ranges[first - 1][0], variant)}-${hitKey(last, end - 1 - item.ranges[last - 1][0], variant)}`
+          if (!literalOccurrences) literalOccurrences = new Map()
+          literalOccurrences.set(occurrence, matched)
           for (const pos of matched) {
             const [from, to] = item.ranges[pos - 1]
             // Bit 1 selects the independent waw; bit 2 selects the stem.
@@ -124,9 +183,10 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
       }
       if (literalPositions.size) {
         positions = [...literalPositions]; parts = literalParts; score = literalScore
+        occurrences = literalOccurrences
         kind = literalScore === 0 ? 'exact' : 'partial'
       }
-      if (Number.isFinite(score)) results.push({ s, a, words, parts, waw: waw[`${s}:${a}`] ?? [], positions: positions.sort((a, b) => a - b), kind, score })
+      if (occurrences) results.push({ s, a, words, parts, waw: waw[`${s}:${a}`] ?? [], positions: positions.sort((a, b) => a - b), occurrences: [...occurrences.values()].sort((a, b) => a[0] - b[0]), kind, score })
     }
     return results.sort((a, b) => a.score - b.score || a.s - b.s || a.a - b.a)
   }

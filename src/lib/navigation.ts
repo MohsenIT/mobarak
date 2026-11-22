@@ -153,6 +153,15 @@ export function destinationSuggestions(meta: Meta, input: string, currentSurah: 
     return { destination: { kind: 'surah' as const, s: s.n }, label: alias ? t('ui.3ebf05ab85',{p0:(s.fa),p1:(alias)}) : t('ui.0eb0a3f03f',{p0:(s.fa)}) }
   })
 }
+
+/** A clear command can take the place of text results. Bare surah names can do both. */
+export function isExplicitDestinationQuery(input: string, options: readonly DestinationSuggestion[]) {
+  if (options.some(option => option.exact)) return true
+  const command = jumpCommand(input)
+  const reference = command?.value ?? input.trim()
+  return (!!command || /[:：/]/.test(reference)) && /(?:^|[:：/]\s*)(?:\d+|اول|آخر|اخر|ا|آ)$/u.test(commandText(reference))
+}
+
 /** Search bars expose explicit jump commands without stealing ordinary word searches. */
 export function searchDestinations(meta:Meta,input:string,currentSurah:number) {
   return isNavigationInput(input)||namedAyah(meta,input)?destinationSuggestions(meta,input,currentSurah):[]

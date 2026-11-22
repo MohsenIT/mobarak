@@ -9,12 +9,13 @@ import { useReadingRoute } from '@/components/quran/useReadingRoute'
 import { useStartupSplash } from '@/components/quran/useStartupSplash'
 import { useReaderPresentation } from '@/components/quran/useReaderPresentation'
 import { useComparison } from '@/components/quran/useComparison'
-import { useSearchNavigation } from '@/components/quran/useSearchNavigation'
+import { occurrenceSearchStart, useSearchNavigation } from '@/components/quran/useSearchNavigation'
 import type { ReadingJump, ReadingMode } from '@/lib/reading-route'
 import type { VerseAddress } from '@/lib/verse-link'
 import type { Destination } from '@/lib/navigation'
 import { textSearchOperation } from '@/lib/search-and-go-history'
-import type { SearchLinkState, SearchResultPosition } from '@/lib/search-link'
+import { initialSearchLinkState, SEARCH_AND_GO_PHASE_2, type SearchLinkState, type SearchResultPosition, type SearchResultSnapshot } from '@/lib/search-link'
+import type { OccurrenceScope } from '@/lib/occurrence-scope'
 import { wordTarget } from '@/lib/word-parts'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -42,7 +43,7 @@ import { ArrowRight, ChevronDown } from 'lucide-react'
 import AudioToolbarButton from '@/components/quran/AudioToolbarButton'
 import ReaderDisplayMenu from '@/components/quran/ReaderDisplayMenu'
 import ReaderSearchIcon from '@/components/quran/ReaderSearchIcon'
-import QuranSearch from '@/components/quran/QuranSearch'
+import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import SearchAndGo from '@/components/quran/SearchAndGo'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import ReaderSearchHighlights from '@/components/quran/ReaderSearchHighlights'
@@ -114,11 +115,14 @@ export default function Home() {
     onSearchAndGoOpen: search.setSearchAndGoOpen,
     onSearchAndGoReturn: (activeSurah, result) => {
       clearTransientSelection()
-      search.setQuickOpen(false)
-      search.restoreUnifiedReturn(result)
+      if (!SEARCH_AND_GO_PHASE_2) {
+        search.setQuickOpen(false)
+        search.restoreUnifiedReturn(result)
+      }
       setSearchTarget(null)
       setDesktopSurah(activeSurah ?? null)
     },
+    onSearchAndGoContext: search.restoreUnifiedReturn,
     dismissSearchAndGoKeyboard: search.dismissSearchAndGoKeyboard,
   }, mainRef, SEARCH_AND_GO)
   const { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, writeReadingVerse, prepareQuickVisit } = route
@@ -362,11 +366,31 @@ export default function Home() {
     else goVerse(destination.s,destination.kind==='surah'?1:destination.kind==='context'?destination.from:destination.a,1,'start',true,quick)
   }
 
+  const openUnifiedSearch = (state: SearchLinkState, snapshot?: SearchResultSnapshot) => {
+    const start = snapshot ?? { query: state.query, position: { scrollTop: 0, visible: 20 }, state }
+    route.rememberReadingPosition()
+    route.openSearchAndGoWithState(curSurahN, start)
+    search.showUnified(start)
+  }
+
+  const openAdvancedSearch = (start?: Omit<SearchStart, 'revision'>) => {
+    if (SEARCH_AND_GO_PHASE_2) openUnifiedSearch(initialSearchLinkState(translator, start))
+    else if (start) search.advance(start)
+    else search.openAdvanced()
+  }
+
+  const openOccurrences = (selection: AnalysisSelection, scope: OccurrenceScope) => {
+    if (!SEARCH_AND_GO_PHASE_2) { search.startOccurrence(selection, scope); return }
+    const start = occurrenceSearchStart(selection, scope)
+    if (start) openUnifiedSearch(initialSearchLinkState(translator, start, selection))
+  }
+
   const pickSearchResult = (s: number, a: number, pos: number, state: SearchLinkState, position?: SearchResultPosition) => {
-    const enterReading = () => {
-      const operation = SEARCH_AND_GO ? textSearchOperation(state) : null
+    const enterReading = (selected?: VerseAddress) => {
+      const operation = SEARCH_AND_GO ? textSearchOperation(state, SEARCH_AND_GO_PHASE_2) : null
       if (operation) search.recordOperation(operation)
-      search.pick(s, a, pos, position ? { query: state.query, position } : null)
+      const snapshot = position ? { query: state.query, position, ...(SEARCH_AND_GO_PHASE_2 ? { state, selected } : {}) } : null
+      search.pick(s, a, selected?.pos ?? pos, snapshot)
       setSel(null)
       setComparisonRoot(null)
     }
@@ -376,7 +400,7 @@ export default function Home() {
         if (!writeResult(jump)) return false
         search.setSearchAndGoOpen(false)
         setDesktopSurah(s)
-        enterReading()
+        enterReading(jump.kind === 'verse' ? jump.address : undefined)
         return true
       })
     } else {
@@ -390,7 +414,7 @@ export default function Home() {
     const commit: CommitReadingJump = jump => {
       if (!writeDestination(jump)) return false
       search.setSearchAndGoOpen(false)
-      search.dismissReturn()
+      if (!SEARCH_AND_GO_PHASE_2) search.dismissReturn()
       setSel(null)
       setComparisonRoot(null)
       setDesktopSurah(jump.kind === 'verse' ? jump.address.s : null)
@@ -515,7 +539,7 @@ export default function Home() {
   const rootPanel = sel && meta ? (
     <RootPanel
       playbackTarget={playbackTarget}
-      onOpenOccurrences={search.startOccurrence}
+      onOpenOccurrences={openOccurrences}
       onSelectionChange={onAnalysisSelection}
       onCompareContext={compareContext}
       sel={sel}
@@ -554,7 +578,7 @@ export default function Home() {
           scope={search.quickScope} onScopeChange={search.changeQuickScope}
           onHighlights={search.setQuickHighlights}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false,true) }}
-          onAdvanced={search.advance} /> : <>
+          onAdvanced={openAdvancedSearch} /> : <>
 
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
         <button className="reader-surah-link" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={SEARCH_AND_GO ? search.searchAndGoOpen : drawerOpen && drawerView === 'navigation'} onClick={() => {
@@ -599,8 +623,12 @@ export default function Home() {
             setSel(null)
             if (search.returnToUnified) {
               if (!route.returnToSearchAndGoResult()) {
-                route.openSearchAndGo(curSurahN)
-                search.showUnified(search.returnToUnified)
+                const result = search.returnToUnified
+                if (SEARCH_AND_GO_PHASE_2 && result.state) openUnifiedSearch(result.state, result)
+                else {
+                  route.openSearchAndGo(curSurahN)
+                  search.showUnified(result)
+                }
               }
             } else search.setAdvancedOpen(true)
           }}>
@@ -674,12 +702,16 @@ export default function Home() {
           : rootPanel
         )}      </div>
 
-      {SEARCH_AND_GO && search.searchAndGoOpen && <SearchAndGo meta={meta} currentSurah={curSurahN}
+      {SEARCH_AND_GO && search.searchAndGoOpen && <SearchAndGo key={search.unifiedRevision} meta={meta} currentSurah={curSurahN}
         pinned={pinnedSurahs} recent={recentSurahs}
         onTogglePin={n => setPinnedSurahs(old => { const next = togglePinnedSurah(old, n); writeStored('mushaf.pinned-surahs', next); return next })}
         field={search.searchAndGoInput} onClose={route.closeSearchAndGo}
         onDestination={navigateFromSearchAndGo}
         translator={translator} start={search.unifiedStart} onPick={pickSearchResult}
+        onSearchStateChange={SEARCH_AND_GO_PHASE_2 ? route.updateSearchAndGoState : undefined}
+        onClearOccurrenceFilter={search.clearOccurrence}
+        onReplay={SEARCH_AND_GO_PHASE_2 ? openUnifiedSearch : undefined}
+        textHistory={SEARCH_AND_GO_PHASE_2 ? search.textHistory : undefined}
         onRecentSurah={s => {
           const position = route.lastSurahPosition(s, meta.surahs[s - 1].vc)
           if (position) navigateFromSearchAndGo({ kind: 'verse', s, a: position.a }, position.pos)
@@ -696,7 +728,7 @@ export default function Home() {
           pinnedSurahs={pinnedSurahs}
           onTogglePin={n => setPinnedSurahs(old => { const next = togglePinnedSurah(old, n); writeStored('mushaf.pinned-surahs', next); return next })}
           onClearRecent={() => { setRecentSurahs([]); writeStored('mushaf.recent-surahs', []) }}
-          onAdvancedSearch={() => { setDrawerOpen(false); setSel(null); search.openAdvanced() }}
+          onAdvancedSearch={() => { setDrawerOpen(false); setSel(null); openAdvancedSearch() }}
           onOpenSettings={() => { setDrawerOpen(false); setSettingsOpen(true) }}
           onOpenKeywords={() => { setDrawerOpen(false); setShowIndex(true) }}
           onOpenComparison={() => { setDrawerOpen(false); setSel(null); comparison.open(curSurahN) }}

@@ -734,6 +734,7 @@
   "about.github": "View the project on GitHub",
   "copy.verseHeading": "Surah {surah}, verse {verses}:",
   "copy.versesHeading": "Surah {surah}, verses {verses}:",
+  "search.occurrenceCount": "{p0} veršů · {p1} shoda",
   "search.totalResults": "{total} results",
   "search.resultPosition": "Result {current} of {total}",
   "surah.tab": "Surah",

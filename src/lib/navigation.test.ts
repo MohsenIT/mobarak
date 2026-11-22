@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 import rawMeta from '../../public/data/meta.json'
 import type { Meta } from './quran'
-import { searchSurahs, resolveDestination, activeDestinationIndex, stepDestinationIndex, destinationSuggestions } from './navigation'
+import { searchSurahs, resolveDestination, activeDestinationIndex, stepDestinationIndex, destinationSuggestions, isExplicitDestinationQuery } from './navigation'
 const meta: Meta = { ...rawMeta, juz: Object.fromEntries(Object.entries(rawMeta.juz).map(([key, [s, a]]) => [key, [s, a] as [number, number]])) }
 
 test('named ayah references accept either order, commas, spaces and native digits',async()=>{
@@ -127,4 +127,12 @@ test('Enter requires a rendered exact highlight or a valid explicit selection', 
   expect(stepDestinationIndex(-1, 3, 1)).toBe(0)
   expect(stepDestinationIndex(-1, 3, -1)).toBe(2)
   expect(stepDestinationIndex(2, 3, 1)).toBe(0)
+})
+
+test('phase 2 reserves only clear command syntax for destinations', () => {
+  expect(isExplicitDestinationQuery('طه', destinationSuggestions(meta, 'طه', 1))).toBe(false)
+  expect(isExplicitDestinationQuery('طه ۴۰', destinationSuggestions(meta, 'طه ۴۰', 1))).toBe(true)
+  expect(isExplicitDestinationQuery('صفحه ۶۰۵', [])).toBe(true)
+  expect(isExplicitDestinationQuery('جزاء', [])).toBe(false)
+  expect(isExplicitDestinationQuery('سوره: عبارت', [])).toBe(false)
 })

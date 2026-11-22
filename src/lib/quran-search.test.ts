@@ -129,3 +129,13 @@ test('default search includes literal partials but excludes spelling suggestions
   expect(search('ذلک الکتاب لا ریب فیخ').some(r => r.kind === 'near')).toBe(false)
   expect(search('زبد').find(r => r.s === 13 && r.a === 17)?.positions.length).toBe(3)
 })
+
+test('overlapping phrases are separate occurrences with shared highlighted positions', () => {
+  const local = createQuranSearch([[1, 1, ['قَالَ', 'قَالَ', 'قَالَ']]])
+  expect(local('قال قال')[0]).toMatchObject({ positions: [1, 2, 3], occurrences: [[1, 2], [2, 3]] })
+})
+
+test('repeated fragments inside a word are counted once per source span across spellings', () => {
+  const local = createQuranSearch([[1, 1, ['بَاٰبَا']]])
+  expect(local('با')[0]).toMatchObject({ positions: [1], occurrences: [[1], [1]] })
+})

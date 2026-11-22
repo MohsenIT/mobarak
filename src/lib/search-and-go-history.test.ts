@@ -44,3 +44,15 @@ test('recent operations are bounded without evicting pinned operations', () => {
   expect(history[0].operation).toEqual({ type: 'navigation', destination: { kind: 'page', p: 15 } })
   expect(history.at(-1)?.pinned).toBe(true)
 })
+
+test('phase 2 replay preserves explicitly chosen lemma, root, scope and occurrence', () => {
+  for (const url of ['/q?q=علم&m=r&s=20&h=0', '/q?q=علم&m=l&s=20&h=0', '/q?o=f.20.1.1&w=طه&f=II']) {
+    const state = readSearchLink(url)!
+    const operation = textSearchOperation(state, true)!
+    if (operation.type !== 'text') throw new Error('Expected search operation')
+    expect(readSearchLink(operation.link)).toEqual(state)
+    const history = rememberOperation([], operation, 10)
+    expect(readOperationHistory(meta, history, true)).toEqual(history)
+    expect(readOperationHistory(meta, history)).toEqual([])
+  }
+})

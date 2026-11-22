@@ -3,12 +3,21 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { occurrenceScopeSurahs, type OccurrenceScope } from '@/lib/occurrence-scope'
 import type { AnalysisSelection } from '@/lib/analysis'
-import type { SearchLinkState, SearchResultPosition, SearchResultSnapshot } from '@/lib/search-link'
+import { SEARCH_AND_GO_PHASE_2, type SearchLinkState, type SearchResultSnapshot } from '@/lib/search-link'
 import type { Meta, Translator } from '@/lib/quran'
 import type { SearchStart } from './QuranSearch'
 import type { ReaderSearchState } from './ReaderSearchHighlights'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import { readOperationHistory, rememberOperation, SEARCH_AND_GO_HISTORY_KEY, type SearchOperation } from '@/lib/search-and-go-history'
+
+export function occurrenceSearchStart(selection: AnalysisSelection, scope: OccurrenceScope): Omit<SearchStart, 'revision'> | null {
+  const surahs = occurrenceScopeSurahs(scope, selection.s)
+  if (!surahs) return null
+  return {
+    query: selection.tab === 'root' ? selection.root || selection.text : selection.text,
+    mode: selection.tab === 'root' ? 'root' : selection.tab === 'word' ? 'lemma' : 'text', surahs,
+  }
+}
 
 /**
  * Search, as one owned piece of state instead of six loose ones in page.tsx.
@@ -42,10 +51,12 @@ export function useSearchNavigation({
 }) {
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const [searchAndGoOpen, setSearchAndGoOpen] = useState(false)
+  const [unifiedRevision, setUnifiedRevision] = useState(0)
   const [unifiedStart, setUnifiedStart] = useState<SearchResultSnapshot | null>(null)
   const [returnToUnified, setReturnToUnified] = useState<SearchResultSnapshot | null>(null)
   const showUnified = useCallback((start: SearchResultSnapshot | null = null) => {
     setUnifiedStart(start)
+    if (SEARCH_AND_GO_PHASE_2) setUnifiedRevision(revision => revision + 1)
     setSearchAndGoOpen(true)
     setAdvancedOpen(false)
   }, [])
@@ -58,7 +69,8 @@ export function useSearchNavigation({
     return true
   }, [])
   const [storedOperations, setStoredOperations] = useState<unknown>(() => readStored(SEARCH_AND_GO_HISTORY_KEY, []))
-  const operations = useMemo(() => operationMeta ? readOperationHistory(operationMeta, storedOperations) : [], [operationMeta, storedOperations])
+  const operations = useMemo(() => operationMeta ? readOperationHistory(operationMeta, storedOperations, SEARCH_AND_GO_PHASE_2) : [], [operationMeta, storedOperations])
+  const textHistory = useMemo(() => operations.filter(entry => entry.operation.type === 'text'), [operations])
   const recordOperation = (operation: SearchOperation) => {
     const next = rememberOperation(operations, operation, Date.now())
     setStoredOperations(next)
@@ -105,14 +117,9 @@ export function useSearchNavigation({
    * the requested surahs. An empty scope means the whole Quran.
    */
   const startOccurrence = useCallback((selection: AnalysisSelection, scope: OccurrenceScope) => {
-    const surahs = occurrenceScopeSurahs(scope, selection.s)
-    if (!surahs) return
-    setStart({
-      query: selection.tab === 'root' ? selection.root || selection.text : selection.text,
-      mode: selection.tab === 'root' ? 'root' : selection.tab === 'word' ? 'lemma' : 'text',
-      surahs,
-      revision: Date.now(),
-    })
+    const start = occurrenceSearchStart(selection, scope)
+    if (!start) return
+    setStart({ ...start, revision: Date.now() })
     setOccurrence(selection)
     setAdvancedOpen(true)
   }, [])
@@ -138,9 +145,10 @@ export function useSearchNavigation({
    * `sameEntry` means the location already matched this panel (a replace, not a
    * new search), so only the translator is re-read.
    */
-  const applyEntry = useCallback((state: SearchLinkState, sameEntry: boolean, position?: SearchResultPosition) => {
-    if (position) {
-      showUnified({ query: state.query, position })
+  const applyEntry = useCallback((state: SearchLinkState, sameEntry: boolean, snapshot?: SearchResultSnapshot) => {
+    if (SEARCH_AND_GO_PHASE_2) onTranslator(state.translator)
+    if (snapshot) {
+      showUnified(snapshot)
       return
     }
     onTranslator(state.translator)
@@ -151,7 +159,7 @@ export function useSearchNavigation({
   }, [onTranslator, showUnified])
 
   const restoreUnifiedReturn = (result?: SearchResultSnapshot) => {
-    if (!result && !returnToUnified) return
+    if (!SEARCH_AND_GO_PHASE_2 && !result && !returnToUnified) return
     setReturnToUnified(result ?? null)
     setReturnToSearch(!!result)
   }
@@ -160,7 +168,7 @@ export function useSearchNavigation({
   const close = useCallback(() => setAdvancedOpen(false), [])
 
   return {
-    searchAndGoOpen, setSearchAndGoOpen, showUnified, unifiedStart, returnToUnified, searchAndGoInput, dismissSearchAndGoKeyboard, recordOperation, advancedOpen, setAdvancedOpen, close,
+    searchAndGoOpen, setSearchAndGoOpen, showUnified, unifiedStart, unifiedRevision, returnToUnified, searchAndGoInput, dismissSearchAndGoKeyboard, recordOperation, textHistory, advancedOpen, setAdvancedOpen, close,
     quickOpen, openQuick, setQuickOpen, quickScope, changeQuickScope,
     quickHighlights, setQuickHighlights,
     start, occurrence, clearOccurrence: () => setOccurrence(null),
