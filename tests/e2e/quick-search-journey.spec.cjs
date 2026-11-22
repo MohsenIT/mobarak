@@ -9,6 +9,8 @@ async function setup(page,path='/s/6/a/37'){
  await page.route('**/offline-manifest.json',r=>r.fulfill({json:{groups:{core:[]}}}));
  await page.goto(path);
  await expect(page.locator('[data-reading-scroll] [data-surah="6"][data-ayah="37"][data-pos="1"]')).toBeVisible({timeout:20000});
+ await expect(page.locator('.startup-splash')).toHaveCount(0);
+ await page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))) });
 }
 async function open(page){
  await page.locator('.reader-toolbar button[aria-label="جست‌وجو در قرآن"]').click();
@@ -65,7 +67,8 @@ for(const method of ['chip','back'])test(`global results retain one origin and r
  await expect(quick).toHaveCount(0);
  const anchor=page.locator(`[data-reading-scroll] [data-surah="${origin.s}"][data-ayah="${origin.a}"][data-pos="${origin.pos}"]`);
  await expect(anchor).toBeVisible({timeout:20000});
- await expect.poll(()=>anchor.evaluate(w=>w.getBoundingClientRect().top-w.closest('[data-reading-scroll]').getBoundingClientRect().top)).toBeCloseTo(origin.offset,0);
+ // Chromium rounds scrollTop to device pixels even when word bounds are fractional.
+ await expect.poll(async()=>Math.abs(await anchor.evaluate(w=>w.getBoundingClientRect().top-w.closest('[data-reading-scroll]').getBoundingClientRect().top)-origin.offset)).toBeLessThanOrEqual(1);
  if(method==='back'){
   await page.goForward();
   await expect(chip).toHaveText(label);
@@ -93,7 +96,8 @@ test('a global quick-search journey returns to the same mushaf page and offset',
  await expect(page).toHaveURL(url);
  await expect(page.locator('[data-continuous-mushaf]')).toBeVisible();
  const anchor=page.locator(`[data-reading-scroll] [data-surah="${origin.s}"][data-ayah="${origin.a}"][data-pos="${origin.pos}"]`);
- await expect.poll(()=>anchor.evaluate(w=>w.getBoundingClientRect().top-w.closest('[data-reading-scroll]').getBoundingClientRect().top)).toBeCloseTo(origin.offset,0);
+ // Chromium rounds scrollTop to device pixels even when word bounds are fractional.
+ await expect.poll(async()=>Math.abs(await anchor.evaluate(w=>w.getBoundingClientRect().top-w.closest('[data-reading-scroll]').getBoundingClientRect().top)-origin.offset)).toBeLessThanOrEqual(1);
 });
 
 test('returning cancels a result reveal whose surah is still loading',async({page})=>{
