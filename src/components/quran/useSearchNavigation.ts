@@ -1,13 +1,14 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { occurrenceScopeSurahs, type OccurrenceScope } from '@/lib/occurrence-scope'
 import type { AnalysisSelection } from '@/lib/analysis'
 import type { SearchLinkState } from '@/lib/search-link'
-import type { Translator } from '@/lib/quran'
+import type { Meta, Translator } from '@/lib/quran'
 import type { SearchStart } from './QuranSearch'
 import type { ReaderSearchState } from './ReaderSearchHighlights'
 import { readStored, writeStored } from '@/lib/reader-storage'
+import { readOperationHistory, rememberOperation, SEARCH_AND_GO_HISTORY_KEY, toggleOperationPin, type SearchOperation } from '@/lib/search-and-go-history'
 
 /**
  * Search, as one owned piece of state instead of six loose ones in page.tsx.
@@ -31,13 +32,27 @@ import { readStored, writeStored } from '@/lib/reader-storage'
 export function useSearchNavigation({
   onReveal,
   onTranslator,
+  operationMeta,
 }: {
   /** Show this location in the reader without closing anything by itself. */
   onReveal: (s: number, a: number, pos: number) => void
   /** A search URL may carry its own translator; the reader owns that setting. */
   onTranslator: (translator: Translator) => void
+  operationMeta: Meta | null
 }) {
   const [searchAndGoOpen, setSearchAndGoOpen] = useState(false)
+  const [storedOperations, setStoredOperations] = useState<unknown>(() => readStored(SEARCH_AND_GO_HISTORY_KEY, []))
+  const operations = useMemo(() => operationMeta ? readOperationHistory(operationMeta, storedOperations) : [], [operationMeta, storedOperations])
+  const recordOperation = (operation: SearchOperation) => {
+    const next = rememberOperation(operations, operation, Date.now())
+    setStoredOperations(next)
+    writeStored(SEARCH_AND_GO_HISTORY_KEY, next)
+  }
+  const pinOperation = (id: string) => {
+    const next = toggleOperationPin(operations, id)
+    setStoredOperations(next)
+    writeStored(SEARCH_AND_GO_HISTORY_KEY, next)
+  }
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const [quickOpen, setQuickOpen] = useState(false)
   const [quickScope, setQuickScope] = useState<'surah' | 'quran'>(() => readStored<unknown>('mushaf.quick-search-scope', 'surah') === 'quran' ? 'quran' : 'surah')
@@ -123,7 +138,7 @@ export function useSearchNavigation({
   const close = useCallback(() => setAdvancedOpen(false), [])
 
   return {
-    searchAndGoOpen, setSearchAndGoOpen, advancedOpen, setAdvancedOpen, close,
+    searchAndGoOpen, setSearchAndGoOpen, operations, recordOperation, pinOperation, advancedOpen, setAdvancedOpen, close,
     quickOpen, openQuick, setQuickOpen, quickScope, changeQuickScope,
     quickHighlights, setQuickHighlights,
     start, occurrence, clearOccurrence: () => setOccurrence(null),

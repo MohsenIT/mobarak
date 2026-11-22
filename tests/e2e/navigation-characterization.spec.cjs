@@ -7,7 +7,7 @@ test('opening and closing Go preserves the reading position and URL', async ({ p
   });
   await page.route('**/api/version', route => route.fulfill({ json: { version: 'fixture', releases: [] } }));
   await page.route('**/offline-manifest.json', route => route.fulfill({ json: { groups: { core: [] } } }));
-  await page.goto('/s/20/a/34');
+  await page.goto('/s/20/a/100');
   await expect(page.locator('.startup-splash')).toHaveCount(0);
   const reader = page.locator('[data-reading-scroll]');
   await expect.poll(() => reader.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
@@ -19,6 +19,6 @@ test('opening and closing Go preserves the reading position and URL', async ({ p
   await expect(dialog).toBeVisible();
   await dialog.getByRole('button', { name: 'بستن', exact: true }).click();
   await expect(dialog).toHaveCount(0);
-  await expect(page).toHaveURL(/\/s\/20\/a\/34$/);
+  await expect(page).toHaveURL(/\/s\/20\/a\/100$/);
   await expect.poll(() => reader.evaluate(el => el.scrollTop)).toBe(offset);
 });

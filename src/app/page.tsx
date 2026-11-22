@@ -13,6 +13,8 @@ import { useSearchNavigation } from '@/components/quran/useSearchNavigation'
 import type { ReadingMode } from '@/lib/reading-route'
 import type { VerseAddress } from '@/lib/verse-link'
 import type { Destination } from '@/lib/navigation'
+import { textSearchOperation } from '@/lib/search-and-go-history'
+import { readSearchLink } from '@/lib/search-link'
 import { wordTarget } from '@/lib/word-parts'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -83,6 +85,7 @@ export default function Home() {
   const search = useSearchNavigation({
     onReveal: useCallback((s: number, a: number, pos: number) => setSearchTarget({ s, a, pos }), []),
     onTranslator: setTranslator,
+    operationMeta: SEARCH_AND_GO ? meta : null,
   })
   // Destructured so these callbacks depend on a specific function rather than
   // on the whole hook result; the compiler cannot otherwise preserve them.
@@ -340,6 +343,13 @@ export default function Home() {
     else goVerse(destination.s,destination.kind==='surah'?1:destination.kind==='context'?destination.from:destination.a,1,'start',true,quick)
   }
 
+  const navigateFromSearchAndGo = (destination: Destination, word?: number) => {
+    search.setSearchAndGoOpen(false)
+    search.recordOperation({ type: 'navigation', destination, ...(word && word > 1 ? { word } : {}) })
+    if (word && destination.kind === 'verse') goVerse(destination.s, destination.a, word, 'start', false)
+    else navigateDestination(destination)
+  }
+
   useEffect(() => {
     if (!searchTarget || loadingPage || (mode === 'flow' && flowSurah?.n !== searchTarget.s)) return
     const main = mainRef.current
@@ -480,7 +490,9 @@ export default function Home() {
       <CarStudySync reader={mainRef} revision={`${mode}:${surah}:${page}:${mushafContentRevision}:${showTrans}:${flowSurah?.n}:${loadingPage}`} />
       <PatternBG />
 
-      <QuranSearch onNavigate={navigateDestination} key={search.start?.revision ?? 0} onStateChange={writeSearchState} initialSearch={search.start} occurrenceFilter={search.occurrence} onClearOccurrenceFilter={search.clearOccurrence} translator={translator} open={search.advancedOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos) => {
+      <QuranSearch onNavigate={navigateDestination} key={search.start?.revision ?? 0} onStateChange={writeSearchState} initialSearch={search.start} occurrenceFilter={search.occurrence} onClearOccurrenceFilter={search.clearOccurrence} translator={translator} open={search.advancedOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos, state) => {
+        const operation = SEARCH_AND_GO ? textSearchOperation(state) : null
+        if (operation) search.recordOperation(operation)
         search.pick(s, a, pos); setSel(null); setComparisonRoot(null); goVerse(s, a, pos,undefined,false)
       }} />
 
@@ -610,12 +622,19 @@ export default function Home() {
         pinned={pinnedSurahs} recent={recentSurahs}
         onTogglePin={n => setPinnedSurahs(old => { const next = togglePinnedSurah(old, n); writeStored('mushaf.pinned-surahs', next); return next })}
         onClose={() => search.setSearchAndGoOpen(false)}
-        onDestination={destination => { search.setSearchAndGoOpen(false); navigateDestination(destination) }}
+        onDestination={navigateFromSearchAndGo}
+        operations={search.operations} onPinOperation={search.pinOperation}
+        onReplay={operation => {
+          if (operation.type === 'navigation') navigateFromSearchAndGo(operation.destination, operation.word)
+          else {
+            const state = readSearchLink(operation.link)
+            if (state) { search.setSearchAndGoOpen(false); setSel(null); applySearchEntry(state, false) }
+          }
+        }}
         onRecentSurah={s => {
-          search.setSearchAndGoOpen(false)
           const position = route.lastSurahPosition(s, meta.surahs[s - 1].vc)
-          if (position) goVerse(position.s, position.a, position.pos, 'start', false)
-          else navigateDestination({ kind: 'surah', s })
+          if (position) navigateFromSearchAndGo({ kind: 'verse', s, a: position.a }, position.pos)
+          else navigateFromSearchAndGo({ kind: 'surah', s })
         }}
         onText={query => { search.setSearchAndGoOpen(false); setSel(null); search.advance({ query, mode: 'text', surahs: [] }) }}
       />}

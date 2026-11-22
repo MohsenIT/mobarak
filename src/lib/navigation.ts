@@ -106,6 +106,8 @@ export function resolveDestination(meta: Meta, kind: JumpKind, input: string, cu
   return n >= 1 && n <= 30 && first ? { kind: 'verse', s: first[0], a: first[1] } : null
 }
 
+export const destinationLabel = (meta: Meta, d: Destination) => d.kind==='context'?t('ui.6aa4f95889',{p0:(d.index),p1:(meta.surahs[d.s-1]?.fa),p2:(d.from),p3:(d.to)}):d.kind==='surah'?t('ui.0eb0a3f03f',{p0:(meta.surahs[d.s-1]?.fa)}):d.kind==='page'?t('ui.f9119fddb7',{p0:(d.p)}):t('ui.fde7db4d85',{p0:(meta.surahs[d.s-1]?.fa),p1:(d.a)})
+
 export type DestinationSuggestion = { destination: Destination; label: string; exact?: true }
 
 /** Return only the option that is visibly active and can be confirmed. */
@@ -124,11 +126,10 @@ export function stepDestinationIndex(current: number, count: number, direction: 
 export function destinationSuggestions(meta: Meta, input: string, currentSurah: number): DestinationSuggestion[] {
   const value = input.trim()
   if (!value) return []
-  const label = (d: Destination) => d.kind==='context'?t('ui.6aa4f95889',{p0:(d.index),p1:(meta.surahs[d.s-1]?.fa),p2:(d.from),p3:(d.to)}):d.kind==='surah'?t('ui.0eb0a3f03f',{p0:(meta.surahs[d.s-1]?.fa)}):d.kind==='page'?t('ui.f9119fddb7',{p0:(d.p)}):t('ui.fde7db4d85',{p0:(meta.surahs[d.s-1]?.fa),p1:(d.a)})
   const command=jumpCommand(value)
   if(!command){
     const named=namedAyah(meta,value)
-    if(named)return [{destination:named,label:label(named),exact:true}]
+    if(named)return [{destination:named,label:destinationLabel(meta,named),exact:true}]
   }
   if (command || /[:：/]/.test(value)) {
     const destination = resolveDestination(meta, /[:：/]/.test(value) ? 'verse' : 'surah', value, currentSurah)
@@ -139,12 +140,12 @@ export function destinationSuggestions(meta: Meta, input: string, currentSurah: 
     const exact = surahPart === null || Number.isInteger(indexNumber(surahPart, 114))
       || ((destination.kind === 'surah' || destination.kind === 'verse' || destination.kind === 'context')
         && surahScore(meta.surahs[destination.s - 1], surahPart) === 0)
-    return [{ destination, label: juz ? t('ui.6668c797a2', { p0: juz }) : label(destination), exact: exact ? true : undefined }]
+    return [{ destination, label: juz ? t('ui.6668c797a2', { p0: juz }) : destinationLabel(meta,destination), exact: exact ? true : undefined }]
   }
   if (/^\d+$/.test(normalizeSearch(value))) {
     return (['surah', 'verse', 'page', 'juz', 'context'] as const).flatMap(kind => {
       const destination = resolveDestination(meta, kind, value, currentSurah)
-      return destination ? [{ destination, label: kind === 'juz' ? t('ui.6668c797a2',{p0:(normalizeSearch(value))}) : label(destination) }] : []
+      return destination ? [{ destination, label: kind === 'juz' ? t('ui.6668c797a2',{p0:(normalizeSearch(value))}) : destinationLabel(meta,destination) }] : []
     })
   }
   return searchSurahs(meta, value).slice(0, 6).map(s => {

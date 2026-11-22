@@ -71,3 +71,38 @@ test('recent Taha restores its last reading passage after a reload', async ({ pa
   await reopened.locator('.drawer-recent-shortcuts:not([inert])').getByRole('button', { name: 'طه', exact: true }).click();
   await expect(page).toHaveURL(/\/s\/20\/a\/40(?:\/w\/\d+)?$/);
 });
+
+test('empty focus teaches real commands, then shows only executed and pinnable operations', async ({ page }) => {
+  await openReader(page);
+  let dialog = await openSearchAndGo(page);
+  let field = dialog.getByRole('combobox');
+  await field.focus();
+  await expect(dialog.locator('.search-and-go-examples button')).toHaveCount(6);
+  await dialog.locator('.search-and-go-examples').getByRole('button', { name: /صفحه ۶۰۴/ }).click();
+  await expect(field).toHaveValue('صفحه ۶۰۴');
+  expect(await page.evaluate(() => localStorage.getItem('mushaf.search-and-go-history.v1'))).toBeNull();
+  await field.fill('طه ۴۰');
+  await field.press('Enter');
+  await expect(page).toHaveURL(/\/s\/20\/a\/40$/);
+
+  dialog = await openSearchAndGo(page);
+  field = dialog.getByRole('combobox');
+  await field.focus();
+  const history = dialog.locator('.search-and-go-history');
+  const pin = history.getByRole('button', { name: /سنجاق/ });
+  await pin.focus();
+  await pin.press('Space');
+  await expect(pin).toHaveAttribute('aria-pressed', 'true');
+  await dialog.getByRole('button', { name: 'بازگشت به قرآن' }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('.startup-splash')).toHaveCount(0);
+  dialog = await openSearchAndGo(page);
+  await dialog.getByRole('combobox').focus();
+  await expect(pin).toHaveAttribute('aria-pressed', 'true');
+  await pin.click();
+  await expect(pin).toHaveAttribute('aria-pressed', 'false');
+  await history.locator('.search-and-go-replay').click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page).toHaveURL(/\/s\/20\/a\/40$/);
+});
