@@ -41,11 +41,14 @@ import AudioToolbarButton from '@/components/quran/AudioToolbarButton'
 import ReaderDisplayMenu from '@/components/quran/ReaderDisplayMenu'
 import ReaderSearchIcon from '@/components/quran/ReaderSearchIcon'
 import QuranSearch from '@/components/quran/QuranSearch'
+import SearchAndGo from '@/components/quran/SearchAndGo'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
 import ReaderSearchHighlights from '@/components/quran/ReaderSearchHighlights'
 import {
   PatternBG,
 } from '@/components/quran/Ornaments'
+
+const SEARCH_AND_GO = process.env.NEXT_PUBLIC_SEARCH_AND_GO === '1'
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
@@ -493,7 +496,10 @@ export default function Home() {
           onAdvanced={search.advance} /> : <>
 
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
-        <button className="reader-surah-link" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={drawerOpen && drawerView === 'navigation'} onClick={() => { setDrawerView('navigation'); setDrawerOpen(true) }}>
+        <button className="reader-surah-link" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={SEARCH_AND_GO ? search.searchAndGoOpen : drawerOpen && drawerView === 'navigation'} onClick={() => {
+          if (SEARCH_AND_GO) { setDrawerOpen(false); search.setSearchAndGoOpen(true) }
+          else { setDrawerView('navigation'); setDrawerOpen(true) }
+        }}>
           <ChevronDown size={16} aria-hidden="true" />
           <span className="reader-surah-name font-bold text-[14px] sm:text-[15px]" style={{ color: 'var(--ink)' }}>
             <span className="reader-surah-name-sizer" aria-hidden="true">{meta.surahs.map(item=><span key={item.n}>{item.ar}</span>)}</span>
@@ -598,6 +604,14 @@ export default function Home() {
           ? createPortal(rootPanel, document.body)
           : rootPanel
         )}      </div>
+
+      {SEARCH_AND_GO && search.searchAndGoOpen && <SearchAndGo meta={meta} currentSurah={curSurahN}
+        pinned={pinnedSurahs} recent={recentSurahs}
+        onTogglePin={n => setPinnedSurahs(old => { const next = togglePinnedSurah(old, n); writeStored('mushaf.pinned-surahs', next); return next })}
+        onClose={() => search.setSearchAndGoOpen(false)}
+        onDestination={destination => { search.setSearchAndGoOpen(false); navigateDestination(destination) }}
+        onText={query => { search.setSearchAndGoOpen(false); setSel(null); search.advance({ query, mode: 'text', surahs: [] }) }}
+      />}
 
       {/* ===== Drawer ===== */}
       {drawerOpen && (

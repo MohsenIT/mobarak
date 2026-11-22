@@ -37,6 +37,7 @@ export function useSearchNavigation({
   /** A search URL may carry its own translator; the reader owns that setting. */
   onTranslator: (translator: Translator) => void
 }) {
+  const [searchAndGoOpen, setSearchAndGoOpen] = useState(false)
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const [quickOpen, setQuickOpen] = useState(false)
   const [quickScope, setQuickScope] = useState<'surah' | 'quran'>(() => readStored<unknown>('mushaf.quick-search-scope', 'surah') === 'quran' ? 'quran' : 'surah')
@@ -122,7 +123,7 @@ export function useSearchNavigation({
   const close = useCallback(() => setAdvancedOpen(false), [])
 
   return {
-    advancedOpen, setAdvancedOpen, close,
+    searchAndGoOpen, setSearchAndGoOpen, advancedOpen, setAdvancedOpen, close,
     quickOpen, openQuick, setQuickOpen, quickScope, changeQuickScope,
     quickHighlights, setQuickHighlights,
     start, occurrence, clearOccurrence: () => setOccurrence(null),
