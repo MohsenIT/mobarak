@@ -3,7 +3,7 @@ import {t} from '@/lib/i18n'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Meta } from '@/lib/quran'
 
-export default function SurahShortcuts({ meta, pinned, recent, onGo, onTogglePin }: { meta: Meta; pinned: number[]; recent: number[]; onGo: (n: number) => void; onTogglePin: (n: number) => void }) {
+export default function SurahShortcuts({ meta, pinned, recent, onGo, onTogglePin }: { meta: Meta; pinned: number[]; recent: number[]; onGo: (n: number, pinned: boolean) => void; onTogglePin: (n: number) => void }) {
   const hold = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pointer = useRef<{ x: number; y: number } | null>(null)
   const held = useRef(false)
@@ -52,7 +52,7 @@ export default function SurahShortcuts({ meta, pinned, recent, onGo, onTogglePin
         hold.current = setTimeout(() => { held.current = true; onTogglePin(n); setStatus(pinned.includes(n) ? t("ui.7c631348f5",{p0:(meta.surahs[n - 1]?.fa)}) : t("ui.4fdcf22559",{p0:(meta.surahs[n - 1]?.fa)})); cancelHold() }, 550)
       }} onPointerMove={event => { if (pointer.current && Math.hypot(event.clientX-pointer.current.x,event.clientY-pointer.current.y)>8) { held.current = true; cancelHold() } }} onPointerUp={cancelHold} onPointerCancel={cancelHold} onPointerLeave={cancelHold}
       onContextMenu={event => { event.preventDefault(); if (held.current) return; cancelHold(); held.current = true; onTogglePin(n); setStatus(pinned.includes(n) ? t("ui.7c631348f5",{p0:(meta.surahs[n - 1]?.fa)}) : t("ui.4fdcf22559",{p0:(meta.surahs[n - 1]?.fa)})) }}
-      onClick={() => { if (held.current) { held.current = false; return } onGo(n) }} title={pinned.includes(n) ? t("ui.b6c1280f97") : t("ui.9c19bc2926")}>{meta.surahs[n - 1]?.fa}</button>)}
+      onClick={() => { if (held.current) { held.current = false; return } onGo(n, pinned.includes(n)) }} title={pinned.includes(n) ? t("ui.b6c1280f97") : t("ui.9c19bc2926")}>{meta.surahs[n - 1]?.fa}</button>)}
       {shortcuts.length > count && <button type="button" aria-label={expanded ? t("ui.d2c95cb2a1") : t("ui.41bef233fe")} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? t("ui.a023ed0970") : '…'}</button>}
     </div>
     <span className="sr-only" role="status">{status}</span>

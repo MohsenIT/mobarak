@@ -104,7 +104,7 @@ export default function Home() {
   const clearTransientSelection = useCallback(() => { closeSearch(); setSel(null); setFlash(null) }, [closeSearch])
   const route = useReadingRoute({ onSearch: applySearchEntry, onVerse: applyVerseEntry, onReading: clearTransientSelection,
     onQuickReturn: () => { clearTransientSelection(); search.setQuickOpen(false); setSearchTarget(null) },
-  }, mainRef)
+  }, mainRef, SEARCH_AND_GO)
   const { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, writeReadingVerse, prepareQuickVisit } = route
   const scale = presentation.scaleFor(mode)
   const { setScaleFor } = presentation
@@ -322,6 +322,7 @@ export default function Home() {
       if (!isCurrent()) return
       const v = d.v[a - 1]
       if (v) {
+        pos = Math.min(pos, v.w.length)
         revealVerse(s, a, pos, v.p)
         writeReadingVerse({ s, a, pos }, quick)
         setFlash({ s, a, pos })
@@ -497,7 +498,7 @@ export default function Home() {
 
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
         <button className="reader-surah-link" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={SEARCH_AND_GO ? search.searchAndGoOpen : drawerOpen && drawerView === 'navigation'} onClick={() => {
-          if (SEARCH_AND_GO) { setDrawerOpen(false); search.setSearchAndGoOpen(true) }
+          if (SEARCH_AND_GO) { route.rememberReadingPosition(); setDrawerOpen(false); search.setSearchAndGoOpen(true) }
           else { setDrawerView('navigation'); setDrawerOpen(true) }
         }}>
           <ChevronDown size={16} aria-hidden="true" />
@@ -610,6 +611,12 @@ export default function Home() {
         onTogglePin={n => setPinnedSurahs(old => { const next = togglePinnedSurah(old, n); writeStored('mushaf.pinned-surahs', next); return next })}
         onClose={() => search.setSearchAndGoOpen(false)}
         onDestination={destination => { search.setSearchAndGoOpen(false); navigateDestination(destination) }}
+        onRecentSurah={s => {
+          search.setSearchAndGoOpen(false)
+          const position = route.lastSurahPosition(s, meta.surahs[s - 1].vc)
+          if (position) goVerse(position.s, position.a, position.pos, 'start', false)
+          else navigateDestination({ kind: 'surah', s })
+        }}
         onText={query => { search.setSearchAndGoOpen(false); setSel(null); search.advance({ query, mode: 'text', surahs: [] }) }}
       />}
 

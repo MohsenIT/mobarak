@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { readingUrl, writeVerseAddress, type VerseAddress } from '@/lib/verse-link'
 import type { SearchLinkState } from '@/lib/search-link'
 import { readStored, writeStored } from '@/lib/reader-storage'
+import { captureReadingAnchor } from '@/lib/reading-visibility'
+import { readSurahPosition, rememberSurahPosition, SURAH_POSITIONS_KEY } from '@/lib/surah-position'
 import { initialReading, readingLocation, readingRoute, searchEntry, searchExit, type ReadingMode } from '@/lib/reading-route'
 
 const clampPage = (value: number) => Math.min(604, Math.max(1, value))
@@ -38,7 +40,7 @@ export type ReadingRouteHandlers = {
  * reading position. It does not own search panel state, selection, audio or
  * presentation settings — those are passed back through `handlers`.
  */
-export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.RefObject<HTMLElement | null>) {
+export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.RefObject<HTMLElement | null>, trackSurahPositions = false) {
   const [initial] = useState(() =>
     initialReading(
       { page: readStored('mushaf.page', 1), mode: 'flow', surah: readStored('mushaf.surah', 1) },
@@ -48,6 +50,37 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
   const [page, setPage] = useState(initial.page)
   const [mode, setMode] = useState<ReadingMode>(initial.mode)
   const [surah, setSurah] = useState(initial.surah)
+  const rememberReadingPosition = useCallback(() => {
+    if (!trackSurahPositions) return
+    const anchor = captureReadingAnchor(reader.current)
+    if (!anchor || (mode === 'flow' && anchor.address.s !== surah)
+      || (mode === 'mushaf' && !anchor.page)) return
+    const stored = readStored<unknown>(SURAH_POSITIONS_KEY, {})
+    const next = rememberSurahPosition(stored, { ...anchor.address, mode })
+    if (stored !== next) writeStored(SURAH_POSITIONS_KEY, next)
+  }, [reader, mode, surah, trackSurahPositions])
+
+  useEffect(() => {
+    if (!trackSurahPositions) return
+    let lastScroll: ReturnType<typeof setTimeout> | undefined
+    const onScroll = (event: Event) => {
+      const element = event.target
+      if (!(element instanceof HTMLElement) || !element.matches('[data-reading-scroll]') || !reader.current?.contains(element)) return
+      clearTimeout(lastScroll)
+      lastScroll = setTimeout(rememberReadingPosition, 200)
+    }
+    document.addEventListener('scroll', onScroll, true)
+    window.addEventListener('pagehide', rememberReadingPosition)
+    return () => {
+      clearTimeout(lastScroll)
+      document.removeEventListener('scroll', onScroll, true)
+      window.removeEventListener('pagehide', rememberReadingPosition)
+    }
+  }, [reader, rememberReadingPosition, trackSurahPositions])
+
+  const lastSurahPosition = (s: number, verseCount: number) =>
+    readSurahPosition(readStored<unknown>(SURAH_POSITIONS_KEY, {}), s, verseCount)
+
   const [mushafNavigationRevision, setMushafNavigationRevision] = useState(0)
   const [quickOrigin, setQuickOrigin] = useState<QuickOrigin | null>(null)
   const [restoringQuick, setRestoringQuick] = useState<QuickOrigin | null>(null)
@@ -195,5 +228,5 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
   }, [page, mode, surah])
   useEffect(() => { writeStored('mushaf.surah', surah) }, [surah])
 
-  return { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, quickOrigin, captureQuickOrigin, prepareQuickVisit, writeReadingVerse, writePageDestination, returnFromQuick }
+  return { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, quickOrigin, captureQuickOrigin, prepareQuickVisit, writeReadingVerse, writePageDestination, returnFromQuick, rememberReadingPosition, lastSurahPosition }
 }

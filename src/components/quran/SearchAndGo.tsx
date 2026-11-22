@@ -10,12 +10,13 @@ import DestinationOptions, { useDestinationSelection } from './DestinationOption
 import SurahNavigationList from './SurahNavigationList'
 import SurahShortcuts from './SurahShortcuts'
 
-export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onDestination, onText, onClose }: {
+export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination, onText, onClose }: {
   meta: Meta
   currentSurah: number
   pinned: number[]
   recent: number[]
   onTogglePin: (surah: number) => void
+  onRecentSurah: (surah: number) => void
   onDestination: (destination: Destination) => void
   onText: (query: string) => void
   onClose: () => void
@@ -65,7 +66,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           <p>{t('ui.a8175202e6')}</p>
         </div>}
         <div className="search-and-go-body" hidden={help}>
-          {!value && <SurahShortcuts meta={meta} pinned={pinned} recent={recent} onTogglePin={onTogglePin} onGo={s => onDestination({ kind: 'surah', s })} />}
+          {!value && <SurahShortcuts meta={meta} pinned={pinned} recent={recent} onTogglePin={onTogglePin} onGo={(s, isPinned) => isPinned ? onDestination({ kind: 'surah', s }) : onRecentSurah(s)} />}
           <DestinationOptions id={selection.id} active={selection.active} options={options} onPick={onDestination} className="drawer-destination-options" />
           {text && <div className="search-and-go-text"><button type="button" className="chip" onClick={() => onText(value)}><Search size={16} aria-hidden="true" />{t('ui.c51349274d')}</button></div>}
           <SurahNavigationList meta={meta} currentSurah={currentSurah} query={value} showEmpty={!options.length && !text} onGoSurah={s => onDestination({ kind: 'surah', s })} />

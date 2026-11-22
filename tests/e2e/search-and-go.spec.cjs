@@ -52,3 +52,22 @@ test('typed text explicitly hands off to the existing advanced search', async ({
   await expect(page.locator('[data-search-page] input[type=search]').first()).toHaveValue('الحمد لله');
   await expect(page).toHaveURL(/\/q\?/);
 });
+
+test('recent Taha restores its last reading passage after a reload', async ({ page }) => {
+  await openReader(page, '/s/20/a/40');
+  const anchor = page.locator('[data-reading-scroll] [data-surah="20"][data-ayah="40"][data-pos="1"]');
+  await anchor.evaluate(el => {
+    const scroll = el.closest('[data-reading-scroll]');
+    scroll.scrollTop += el.getBoundingClientRect().top - scroll.getBoundingClientRect().top;
+  });
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('mushaf.surah-positions.v1') || '{}')['20']?.a)).toBe(40);
+  const dialog = await openSearchAndGo(page);
+  await dialog.getByRole('combobox').fill('بقره ۲۵۵');
+  await dialog.getByRole('combobox').press('Enter');
+  await expect(page).toHaveURL(/\/s\/2\/a\/255$/);
+  await page.reload();
+  await expect(page.locator('.startup-splash')).toHaveCount(0);
+  const reopened = await openSearchAndGo(page);
+  await reopened.locator('.drawer-recent-shortcuts:not([inert])').getByRole('button', { name: 'طه', exact: true }).click();
+  await expect(page).toHaveURL(/\/s\/20\/a\/40(?:\/w\/\d+)?$/);
+});

@@ -91,3 +91,30 @@ export function revealReadingVerse(scroll:HTMLElement,target:HTMLElement,behavio
  const rect=readingVerseBounds(scroll,target),visible=readingWindow(scroll,target,rect)
  return scrollReadingDelta(scroll,visible,readingVerseDelta(rect,visible),behavior)
 }
+
+/** Locate a visible word even when a search surface covers the reader. */
+export function captureReadingAnchor(reader: HTMLElement | null) {
+  const scroll = reader?.querySelector<HTMLElement>('[data-reading-scroll]')
+  if (!scroll) return null
+  const bounds = scroll.getBoundingClientRect()
+  if (bounds.height <= 0) return null
+  // Narrow the lookup to the visible page in mushaf or the verse wrappers in flow.
+  const pages = Array.from(scroll.querySelectorAll<HTMLElement>('[data-mushaf-page]'))
+    .filter(page => page.getBoundingClientRect().bottom > bounds.top)
+  const verses = Array.from(scroll.querySelectorAll<HTMLElement>('[data-verse]'))
+  const blocks = pages.length ? pages : verses.length ? verses : [scroll]
+  for (const block of blocks) {
+    const box = block.getBoundingClientRect()
+    if (box.bottom <= bounds.top || box.top >= bounds.bottom) continue
+    for (const word of block.querySelectorAll<HTMLElement>('[data-surah][data-ayah][data-pos]')) {
+      const rect = word.getBoundingClientRect()
+      if (rect.bottom <= bounds.top + 2 || rect.top >= bounds.bottom || !rect.height) continue
+      return {
+        address: { s: Number(word.dataset.surah), a: Number(word.dataset.ayah), pos: Number(word.dataset.pos) },
+        offset: rect.top - bounds.top,
+        page: pages.length ? Number(block.dataset.mushafPage) : undefined,
+      }
+    }
+  }
+  return null
+}
