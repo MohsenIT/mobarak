@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { occurrenceScopeSurahs, type OccurrenceScope } from '@/lib/occurrence-scope'
 import type { AnalysisSelection } from '@/lib/analysis'
 import type { SearchLinkState } from '@/lib/search-link'
@@ -41,6 +41,14 @@ export function useSearchNavigation({
   operationMeta: Meta | null
 }) {
   const [searchAndGoOpen, setSearchAndGoOpen] = useState(false)
+  const searchAndGoInput = useRef<HTMLInputElement>(null)
+  const dismissSearchAndGoKeyboard = useCallback(() => {
+    const viewport = window.visualViewport
+    const input = searchAndGoInput.current
+    if (!input || document.activeElement !== input || !viewport || viewport.scale !== 1 || viewport.height >= window.innerHeight - 40) return false
+    input.blur()
+    return true
+  }, [])
   const [storedOperations, setStoredOperations] = useState<unknown>(() => readStored(SEARCH_AND_GO_HISTORY_KEY, []))
   const operations = useMemo(() => operationMeta ? readOperationHistory(operationMeta, storedOperations) : [], [operationMeta, storedOperations])
   const recordOperation = (operation: SearchOperation) => {
@@ -138,7 +146,7 @@ export function useSearchNavigation({
   const close = useCallback(() => setAdvancedOpen(false), [])
 
   return {
-    searchAndGoOpen, setSearchAndGoOpen, operations, recordOperation, pinOperation, advancedOpen, setAdvancedOpen, close,
+    searchAndGoOpen, setSearchAndGoOpen, searchAndGoInput, dismissSearchAndGoKeyboard, operations, recordOperation, pinOperation, advancedOpen, setAdvancedOpen, close,
     quickOpen, openQuick, setQuickOpen, quickScope, changeQuickScope,
     quickHighlights, setQuickHighlights,
     start, occurrence, clearOccurrence: () => setOccurrence(null),

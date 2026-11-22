@@ -106,3 +106,106 @@ test('empty focus teaches real commands, then shows only executed and pinnable o
   await expect(dialog).toHaveCount(0);
   await expect(page).toHaveURL(/\/s\/20\/a\/40$/);
 });
+
+test('typing, closing, Back and Forward preserve the visual reading context', async ({ page }) => {
+  await openReader(page, '/s/20/a/34');
+  const origin = page.locator('[data-reading-scroll] [data-surah="20"][data-ayah="34"][data-pos="1"]');
+  const offset = await origin.evaluate(async el => {
+    await document.fonts.ready;
+    const scroll = el.closest('[data-reading-scroll]');
+    scroll.scrollTop += el.getBoundingClientRect().top - scroll.getBoundingClientRect().top - 19;
+    return el.getBoundingClientRect().top - scroll.getBoundingClientRect().top;
+  });
+  const initialLength = await page.evaluate(() => history.length);
+  let dialog = await openSearchAndGo(page);
+  const field = dialog.getByRole('combobox');
+  await dialog.getByRole('button', { name: 'بازگشت به قرآن' }).press('ArrowLeft');
+  await expect(page).toHaveURL(/\/s\/20\/a\/34$/);
+  await field.pressSequentially('abc');
+  await field.fill('');
+  expect(await page.evaluate(() => history.length)).toBe(initialLength + 1);
+  await dialog.getByRole('button', { name: 'بازگشت به قرآن' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page).toHaveURL(/\/s\/20\/a\/34$/);
+
+  dialog = await openSearchAndGo(page);
+  await field.fill('بقره ۲۵۵');
+  await field.press('Enter');
+  await expect(page).toHaveURL(/\/s\/2\/a\/255$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/s\/20\/a\/34$/);
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator('[data-search-page]')).toHaveCount(0);
+  await expect.poll(() => origin.evaluate((el, offset) => Math.abs(el.getBoundingClientRect().top - el.closest('[data-reading-scroll]').getBoundingClientRect().top - offset), offset)).toBeLessThanOrEqual(2);
+  await page.goForward();
+  await expect(page).toHaveURL(/\/s\/2\/a\/255$/);
+  await expect(dialog).toHaveCount(0);
+});
+
+test('mushaf page commands keep the mode through traversal and reload', async ({ page }) => {
+  await openReader(page, '/p/42');
+  const dialog = await openSearchAndGo(page);
+  await dialog.getByRole('combobox').fill('صفحه ۶۰۴');
+  await dialog.getByRole('combobox').press('Enter');
+  await expect(page).toHaveURL(/\/p\/604$/);
+  await expect(page.locator('[data-mushaf-page="604"]')).toBeAttached();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/p\/42$/);
+  await expect(page.locator('[data-mushaf-page="42"]')).toBeAttached();
+  await page.goForward();
+  await expect(page).toHaveURL(/\/p\/604$/);
+  await page.reload();
+  await expect(page.locator('[data-mushaf-page="604"]')).toBeAttached();
+});
+
+test('mobile keyboard dismissal keeps typed input and uses no extra history entries', async ({ page }, info) => {
+  test.skip(info.project.name === 'chromium-desktop');
+  await openReader(page);
+  const dialog = await openSearchAndGo(page);
+  const field = dialog.getByRole('combobox');
+  await field.fill('۳');
+  const length = await page.evaluate(() => {
+    Object.defineProperty(visualViewport, 'height', { configurable: true, get: () => innerHeight - 260 });
+    visualViewport.dispatchEvent(new Event('resize'));
+    return history.length;
+  });
+  await expect(dialog).toHaveCSS('height', `${(page.viewportSize()?.height ?? 0) - 260}px`);
+  await page.goBack();
+  await expect(field).toHaveValue('۳');
+  await expect(field).not.toBeFocused();
+  await expect.poll(() => page.evaluate(() => history.state?.searchAndGoOverlay)).toBe(true);
+  expect(await page.evaluate(() => history.length)).toBe(length);
+  await page.goBack();
+  await expect(dialog).toHaveCount(0);
+});
+
+test('a verse on a shared mushaf page activates its own surah', async ({ page }) => {
+  await openReader(page, '/p/42');
+  const dialog = await openSearchAndGo(page);
+  const field = dialog.getByRole('combobox');
+  await field.fill('ناس ۴');
+  await field.press('Enter');
+  await expect(page).toHaveURL(/\/p\/604$/);
+  await expect(page.locator('.reader-surah-link')).toContainText('الناس');
+  await expect(page.locator('[data-mushaf-page="604"] [data-surah="114"][data-ayah="4"][data-pos="1"]')).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/p\/42$/);
+  await expect(page.locator('.reader-surah-link')).toContainText('البقرة');
+  await page.goForward();
+  await expect(page.locator('.reader-surah-link')).toContainText('الناس');
+});
+
+test('selecting a real advanced text result records a replayable text operation', async ({ page }) => {
+  await openReader(page);
+  const dialog = await openSearchAndGo(page);
+  await dialog.getByRole('combobox').fill('الحمد لله');
+  await dialog.getByRole('button', { name: 'جست‌وجوی پیشرفته' }).click();
+  await expect(page.locator('[data-search-page]').locator('.search-results-total')).toBeVisible({ timeout: 20000 });
+  expect(await page.evaluate(() => localStorage.getItem('mushaf.search-and-go-history.v1'))).toBeNull();
+  await page.locator('.search-result-open').first().click();
+  await expect(page.locator('[data-search-page]')).toHaveCount(0);
+  const reopened = await openSearchAndGo(page);
+  await reopened.getByRole('combobox').focus();
+  await reopened.locator('.search-and-go-replay').getByText('الحمد لله', { exact: true }).click();
+  await expect(page.locator('[data-search-page] input[type=search]').first()).toHaveValue('الحمد لله');
+});

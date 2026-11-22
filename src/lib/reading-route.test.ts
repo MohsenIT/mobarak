@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { initialReading, readingLocation, readingRoute, searchEntry, searchExit } from './reading-route'
+import { searchAndGoReadingUrl, initialReading, readingLocation, readingRoute, searchEntry, searchExit } from './reading-route'
 import type { SearchLinkState } from './search-link'
 
 const search: SearchLinkState = {
@@ -72,4 +72,13 @@ test('leaving search steps back when we pushed it and replaces a direct deep lin
   expect(searchExit('https://x.test/q?q=الله', null, null, fallback)).toEqual({ kind: 'replace', href: 'https://x.test/s/1' })
   // Not on the search page: nothing to unwind.
   expect(searchExit('https://x.test/s/20', { quranSearchEntry: true }, null, fallback)).toBeNull()
+})
+
+test('Search and Go arrivals preserve the current display mode and have shareable reading URLs', () => {
+  const current = 'https://mobarak.invalid/s/20/a/34'
+  const verse = { kind: 'verse' as const, address: { s: 2, a: 255, pos: 2 }, page: 42 }
+  expect(searchAndGoReadingUrl(current, 'flow', verse).pathname).toBe('/s/2/a/255/w/2')
+  expect(searchAndGoReadingUrl(current, 'mushaf', verse).pathname).toBe('/p/42')
+  expect(searchAndGoReadingUrl(current, 'mushaf', { kind: 'page', page: 604 }).pathname).toBe('/p/604')
+  expect(searchAndGoReadingUrl(current, 'flow', verse, true).search).toBe('?s=2&a=255&w=2')
 })

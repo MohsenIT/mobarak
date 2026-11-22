@@ -10,7 +10,7 @@ import { useStartupSplash } from '@/components/quran/useStartupSplash'
 import { useReaderPresentation } from '@/components/quran/useReaderPresentation'
 import { useComparison } from '@/components/quran/useComparison'
 import { useSearchNavigation } from '@/components/quran/useSearchNavigation'
-import type { ReadingMode } from '@/lib/reading-route'
+import type { ReadingJump, ReadingMode } from '@/lib/reading-route'
 import type { VerseAddress } from '@/lib/verse-link'
 import type { Destination } from '@/lib/navigation'
 import { textSearchOperation } from '@/lib/search-and-go-history'
@@ -49,6 +49,8 @@ import ReaderSearchHighlights from '@/components/quran/ReaderSearchHighlights'
 import {
   PatternBG,
 } from '@/components/quran/Ornaments'
+
+type CommitReadingJump = (jump: ReadingJump) => boolean
 
 const SEARCH_AND_GO = process.env.NEXT_PUBLIC_SEARCH_AND_GO === '1'
 
@@ -92,21 +94,26 @@ export default function Home() {
   const { close: closeSearch, applyEntry: applySearchEntry, setAdvancedOpen: setAdvancedSearchOpen } = search
   // The route hook is created after the search hook because a search location
   // is applied to the search UI; the reveal it asks for is the reader's.
-  const applyVerseEntry = useCallback((address: VerseAddress) => {
+  const applyVerseEntry = useCallback((address: VerseAddress, align?: 'start', isCurrent?: () => boolean) => {
     closeSearch()
     setSel(null)
+    if (align) setDesktopSurah(address.s)
     loadSurah(address.s).then(data => {
+      if (isCurrent && !isCurrent()) return
       const verse = data.v[address.a - 1]
       if (!verse) return
       const pos = Math.min(address.pos, verse.w.length)
       setFlash({ ...address, pos })
-      setSearchTarget({ ...address, pos, wholeVerse:pos===1 })
+      setSearchTarget({ ...address, pos, align, wholeVerse:pos===1 })
     })
   }, [closeSearch])
   /** A surah or page in the location: only transient selection state is dropped. */
   const clearTransientSelection = useCallback(() => { closeSearch(); setSel(null); setFlash(null) }, [closeSearch])
   const route = useReadingRoute({ onSearch: applySearchEntry, onVerse: applyVerseEntry, onReading: clearTransientSelection,
     onQuickReturn: () => { clearTransientSelection(); search.setQuickOpen(false); setSearchTarget(null) },
+    onSearchAndGoOpen: search.setSearchAndGoOpen,
+    onSearchAndGoReturn: activeSurah => { clearTransientSelection(); search.setQuickOpen(false); setSearchTarget(null); setDesktopSurah(activeSurah ?? null) },
+    dismissSearchAndGoKeyboard: search.dismissSearchAndGoKeyboard,
   }, mainRef, SEARCH_AND_GO)
   const { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, writeReadingVerse, prepareQuickVisit } = route
   const scale = presentation.scaleFor(mode)
@@ -267,18 +274,23 @@ export default function Home() {
     return () => el.removeEventListener('wheel', h)
   }, [meta, setScale])
 
-  const goPage = useCallback((p: number) => {
+  const goPage = useCallback((p: number, commit?: CommitReadingJump) => {
     const destination = clamp(p, 1, 604)
     if (mode === 'flow') {
       const first = meta?.pages[destination - 1]?.[0]
       if (!first) return
       const target = { s: first.s, a: first.f, pos: 1 }
       setPullArrival(null)
-      writeVerseAddress(target)
+      if (commit) {
+        if (!commit({ kind: 'verse', address: target, page: destination })) return
+      } else writeVerseAddress(target)
       setSurah(first.s)
       setFlash(target)
       setSearchTarget({ ...target, align: 'start', wholeVerse:true })
-    } else requestMushafPage(destination)
+    } else {
+      if (commit && !commit({ kind: 'page', page: destination })) return
+      requestMushafPage(destination)
+    }
     setSel(null)
     setComparisonRoot(null)
   }, [mode, meta, requestMushafPage, setComparisonRoot, setSurah, setPullArrival, setFlash, setSearchTarget, setSel])
@@ -318,7 +330,7 @@ export default function Home() {
     else setSurah(s)
   }, [mode, requestMushafVerse, setSurah])
 
-  const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start', wholeVerse = true, quick = false) => {
+  const goVerse = useCallback((s: number, a: number, pos = 1, align?: 'start', wholeVerse = true, quick = false, commit?: CommitReadingJump) => {
     setPullArrival(null)
     const isCurrent = quick ? prepareQuickVisit() : () => true
     loadSurah(s).then(d => {
@@ -326,8 +338,9 @@ export default function Home() {
       const v = d.v[a - 1]
       if (v) {
         pos = Math.min(pos, v.w.length)
+        if (commit && !commit({ kind: 'verse', address: { s, a, pos }, page: v.p })) return
         revealVerse(s, a, pos, v.p)
-        writeReadingVerse({ s, a, pos }, quick)
+        if (!commit) writeReadingVerse({ s, a, pos }, quick)
         setFlash({ s, a, pos })
         setSearchTarget({ s, a, pos, align, wholeVerse })
       }
@@ -344,10 +357,20 @@ export default function Home() {
   }
 
   const navigateFromSearchAndGo = (destination: Destination, word?: number) => {
-    search.setSearchAndGoOpen(false)
-    search.recordOperation({ type: 'navigation', destination, ...(word && word > 1 ? { word } : {}) })
-    if (word && destination.kind === 'verse') goVerse(destination.s, destination.a, word, 'start', false)
-    else navigateDestination(destination)
+    const writeDestination = route.prepareSearchAndGoDestination()
+    const commit: CommitReadingJump = jump => {
+      if (!writeDestination(jump)) return false
+      search.setSearchAndGoOpen(false)
+      search.dismissReturn()
+      setSel(null)
+      setComparisonRoot(null)
+      setDesktopSurah(jump.kind === 'verse' ? jump.address.s : null)
+      search.recordOperation({ type: 'navigation', destination, ...(word && word > 1 ? { word } : {}) })
+      return true
+    }
+    if (destination.kind === 'page') goPage(destination.p, commit)
+    else goVerse(destination.s, destination.kind === 'surah' ? 1 : destination.kind === 'context' ? destination.from : destination.a,
+      word ?? 1, 'start', !word || word === 1, false, commit)
   }
 
   useEffect(() => {
@@ -409,7 +432,7 @@ export default function Home() {
   // The sheet handles its active tab's keyboard navigation.
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if (search.advancedOpen || drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select'))) return
+      if (search.advancedOpen || search.searchAndGoOpen || drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select'))) return
       if (sel||window.getSelection()?.toString()) return
       // Mushaf follows native up/down scrolling; flow retains surah shortcuts.
       if (mode !== 'flow') return
@@ -418,7 +441,7 @@ export default function Home() {
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel, search.advancedOpen])
+  }, [page, surah, mode, drawerOpen, showIndex, showComparison, goPage, goSurah, sel, search.advancedOpen, search.searchAndGoOpen])
 
   // Pinch zoom; page reading is vertical in both display modes.
   const touchDist = (t: React.TouchList) =>
@@ -510,7 +533,7 @@ export default function Home() {
 
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
         <button className="reader-surah-link" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={SEARCH_AND_GO ? search.searchAndGoOpen : drawerOpen && drawerView === 'navigation'} onClick={() => {
-          if (SEARCH_AND_GO) { route.rememberReadingPosition(); setDrawerOpen(false); search.setSearchAndGoOpen(true) }
+          if (SEARCH_AND_GO) { route.rememberReadingPosition(); route.openSearchAndGo(curSurahN); setDrawerOpen(false); search.setSearchAndGoOpen(true) }
           else { setDrawerView('navigation'); setDrawerOpen(true) }
         }}>
           <ChevronDown size={16} aria-hidden="true" />
@@ -621,7 +644,7 @@ export default function Home() {
       {SEARCH_AND_GO && search.searchAndGoOpen && <SearchAndGo meta={meta} currentSurah={curSurahN}
         pinned={pinnedSurahs} recent={recentSurahs}
         onTogglePin={n => setPinnedSurahs(old => { const next = togglePinnedSurah(old, n); writeStored('mushaf.pinned-surahs', next); return next })}
-        onClose={() => search.setSearchAndGoOpen(false)}
+        field={search.searchAndGoInput} onClose={route.closeSearchAndGo}
         onDestination={navigateFromSearchAndGo}
         operations={search.operations} onPinOperation={search.pinOperation}
         onReplay={operation => {

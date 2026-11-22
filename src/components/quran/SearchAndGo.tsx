@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { ArrowRight, CircleHelp, Search, X } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
@@ -22,7 +22,8 @@ const examples = [
 ] as const
 
 
-export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination, onText, onClose, operations, onReplay, onPinOperation }: {
+export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination, onText, onClose, operations, onReplay, onPinOperation, field }: {
+  field: RefObject<HTMLInputElement | null>
   meta: Meta
   currentSurah: number
   pinned: number[]
@@ -42,9 +43,10 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   const surface = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const viewport = window.visualViewport
-    const element = surface.current
-    if (!viewport || !element) return
+    if (!viewport) return
     const resize = () => {
+      const element = surface.current
+      if (!element) return
       if (viewport.scale === 1 && viewport.height < window.innerHeight - 40) {
         element.style.setProperty('--search-and-go-height', `${viewport.height}px`)
         element.style.setProperty('--search-and-go-top', `${viewport.offsetTop}px`)
@@ -62,7 +64,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
     }
   }, [])
   const back = useRef<HTMLButtonElement>(null)
-  const field = useRef<HTMLInputElement>(null)
+  const trigger = useRef<HTMLElement>(null)
   const value = query.trim()
   const options = destinationSuggestions(meta, value, currentSurah)
   const selection = useDestinationSelection(options)
@@ -71,7 +73,16 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
 
   return <Dialog open onOpenChange={open => { if (!open) onClose() }}>
     <DialogContent ref={surface} fullscreen showCloseButton={false} className="search-and-go" data-search-and-go dir={uiDirection()}
-      aria-describedby={undefined} onOpenAutoFocus={event => { event.preventDefault(); back.current?.focus({ preventScroll: true }) }}
+      aria-describedby={undefined}
+      onOpenAutoFocus={event => {
+        event.preventDefault()
+        if (document.activeElement instanceof HTMLElement) trigger.current = document.activeElement
+        back.current?.focus({ preventScroll: true })
+      }}
+      onCloseAutoFocus={event => {
+        event.preventDefault()
+        trigger.current?.focus({ preventScroll: true })
+      }}
       onEscapeKeyDown={event => {
         if (document.activeElement === field.current) { event.preventDefault(); field.current?.blur() }
         else if (help) { event.preventDefault(); setHelp(false) }
