@@ -1,6 +1,7 @@
 'use client'
 
 import { useId, useState, type KeyboardEvent } from 'react'
+import { MousePointer2 } from 'lucide-react'
 import { t } from '@/lib/i18n'
 import { activeDestinationIndex, stepDestinationIndex, type Destination, type DestinationSuggestion } from '@/lib/navigation'
 
@@ -30,17 +31,18 @@ export function useDestinationSelection(options: readonly DestinationSuggestion[
   }
 }
 
-export default function DestinationOptions({ id, active, options, onPick, className }: {
+export default function DestinationOptions({ id, active, options, onPick, className, asChips = false }: {
   id: string
   active: number
   options: readonly DestinationSuggestion[]
   onPick: (destination: Destination) => void
   className: string
+  asChips?: boolean
 }) {
   if (!options.length) return null
   return <div id={id} className={className} role="listbox" aria-label={t('ui.6d7a6c7a7e')}>
-    {options.map((item, index) => <button key={index} id={`${id}-${index}`} type="button" role="option"
+    {options.map((item, index) => <button key={index} id={`${id}-${index}`} type="button" role="option" className={asChips ? "chip" : undefined}
       aria-selected={active === index} onMouseDown={event => event.preventDefault()}
-      onClick={() => onPick(item.destination)}>{item.label}</button>)}
+      onClick={() => onPick(item.destination)}>{asChips && <MousePointer2 size={14} aria-hidden="true" />}{item.label}</button>)}
   </div>
 }

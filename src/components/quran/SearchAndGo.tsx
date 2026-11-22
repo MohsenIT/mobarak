@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, CircleHelp, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
 import { destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, NAVIGATION_HELP, type Destination } from '@/lib/navigation'
-import { SEARCH_AND_GO_PHASE_2, readSearchLink, type SearchLinkState, type SearchResultSnapshot } from '@/lib/search-link'
+import { SEARCH_AND_GO_PHASE_2, SEARCH_AND_GO_PHASE_3, readSearchLink, type SearchLinkState, type SearchResultSnapshot } from '@/lib/search-link'
 import type { SearchOperationEntry } from '@/lib/search-and-go-history'
 import type { Meta, Translator } from '@/lib/quran'
 import DestinationOptions, { useDestinationSelection } from './DestinationOptions'
@@ -174,19 +174,22 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           </div>}
         </div>}
         <div className="search-and-go-body" data-show-controls={SEARCH_AND_GO_PHASE_2 && help || undefined} data-text-results={SEARCH_AND_GO_PHASE_2 && text || undefined} hidden={help && !SEARCH_AND_GO_PHASE_2}>
+          {!help && !browse && (options.length > 0 || completions.length > 0) &&
+            <div className={SEARCH_AND_GO_PHASE_3 ? "search-and-go-suggestions nice-scroll" : "contents"}>
+              <DestinationOptions id={selection.id} active={selection.active} options={options} onPick={onDestination} className="drawer-destination-options" asChips={SEARCH_AND_GO_PHASE_3} />
+              {completions.length > 0 && <div className="search-and-go-completions nice-scroll" id={selection.completionId}
+                data-search-completions role="listbox" aria-label={t('ui.7bf42d2a96')}>
+                {completions.map((completion, index) => <button type="button" className="chip" key={completion} id={`${selection.completionId}-${index}`}
+                  role="option" aria-selected={selection.completion === index} onMouseDown={event => event.preventDefault()} onClick={() => complete(completion)}>
+                  <Search size={14} aria-hidden="true" /><QuranText text={completion} />
+                </button>)}
+              </div>}
+            </div>}
           {!help && !browse && <>
-            <DestinationOptions id={selection.id} active={selection.active} options={options} onPick={onDestination} className="drawer-destination-options" />
             {!text && !options.length && <p role="status" className="search-and-go-no-destination">{t('ui.68f830ec5c')}</p>}
           </>}
           {!help && browse && <SurahNavigationList meta={meta} currentSurah={currentSurah} query="" showEmpty={false}
             onGoSurah={s => onDestination({ kind: 'surah', s })} />}
-          {completions.length > 0 && <div className="search-and-go-completions nice-scroll" id={selection.completionId}
-            data-search-completions role="listbox" aria-label={t('ui.7bf42d2a96')}>
-            {completions.map((completion, index) => <button type="button" className="chip" key={completion} id={`${selection.completionId}-${index}`}
-              role="option" aria-selected={selection.completion === index} onMouseDown={event => event.preventDefault()} onClick={() => complete(completion)}>
-              <Search size={14} aria-hidden="true" /><QuranText text={completion} />
-            </button>)}
-          </div>}
           <QuranSearch inline={{
             query: SEARCH_AND_GO_PHASE_2 ? query : value,
             position,
