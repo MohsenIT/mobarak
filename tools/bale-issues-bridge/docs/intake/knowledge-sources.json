@@ -1,0 +1,26 @@
+{
+  "version": "mobarak-local-2026-11-11.v1",
+  "verification": "local source read; deployed application version not independently matched",
+  "sources": [
+    {
+      "path": "src/components/quran/NavDrawer.tsx",
+      "sha256": "fa01984e90c462084a2e4c0858d0ec627237891e9a1d2bef911e1c576b7733ed"
+    },
+    {
+      "path": "src/components/quran/SettingsScreen.tsx",
+      "sha256": "b40f0f4f54bdcb157579c7734f242ce743d4fe97014207f9761b69e8d810d3f7"
+    },
+    {
+      "path": "src/components/quran/LanguageSettings.tsx",
+      "sha256": "cc9b11de4a0eb1ccb0f432b6b9550663aa3498f77d088bb884a06e059f67a738"
+    },
+    {
+      "path": "docs/reader-rendering.md",
+      "sha256": "22891fb3644c571d10aed4b388972ce649ce21f4e0e9650ee18098c3ef670e19"
+    },
+    {
+      "path": "docs/mizan.md",
+      "sha256": "34cfba3a53882ed4c069a81c4e61a8c7034a64b7dcf8d16813e6c31a4f4e2b6f"
+    }
+  ]
+}
