@@ -15,7 +15,7 @@ self.addEventListener('message', async (event: MessageEvent<{ warmup: true } | {
     const { search, suggest } = await engine
     const ready = performance.now()
     const results = search(query, options, filter)
-    const suggestions = filter ? [] : suggest(query, options?.mode, options?.surahs)
+    const suggestions = filter ? [] : suggest(query, options?.mode, options?.surahs, phase2)
     self.postMessage({ id, results, suggestions, ...(phase2 ? { timing: { initMs: ready - start, searchMs: performance.now() - ready } } : {}) })
   } catch { self.postMessage({ id, error: true }) }
 })

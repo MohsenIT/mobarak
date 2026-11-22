@@ -39,3 +39,10 @@ test('root and lemma suggestions stay Arabic and support a single initial letter
   expect(suggest('ع', 'root')).toContain('علم')
   expect(suggest('على', 'lemma').some(value => normalizeQuranSearch(value) === 'علي')).toBe(true)
 })
+
+test('live completions extend the query and obey even a single-word scope', () => {
+  expect(suggest('طه', 'text', [20], true)).toEqual([])
+  expect(suggest('الرح', 'text', [1], true)).toContain('ٱلرَّحْمَـٰنِ')
+  expect(suggest('لا تخف', 'text', [11, 27, 28], true)).toEqual([])
+  expect(suggest('علم', 'root', [1], true)).toEqual([])
+})
