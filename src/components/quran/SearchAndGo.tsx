@@ -1,28 +1,19 @@
 'use client'
 
 import { useEffect, useRef, useState, type RefObject } from 'react'
-import { ArrowRight, CircleHelp, Search, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CircleHelp, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
 import { destinationSuggestions, isNavigationInput, NAVIGATION_HELP, type Destination } from '@/lib/navigation'
-import type { SearchOperation, SearchOperationEntry } from '@/lib/search-and-go-history'
-import type { Meta } from '@/lib/quran'
+import type { SearchResultSnapshot } from '@/lib/search-link'
+import type { Meta, Translator } from '@/lib/quran'
 import DestinationOptions, { useDestinationSelection } from './DestinationOptions'
 import SurahNavigationList from './SurahNavigationList'
 import SurahShortcuts from './SurahShortcuts'
-import SearchAndGoHistory from './SearchAndGoHistory'
+import { DictationInput } from './DictationInput'
+import QuranSearch from './QuranSearch'
 
-const examples = [
-  ['طه', 'ui.a37a87553b'],
-  ['طه ۴۰', 'ui.b1b168c791'],
-  ['صفحه ۶۰۴', 'ui.0572e8936c'],
-  ['جزء ۳۰', 'ui.f74f9b04c7'],
-  ['سیاق طه:۳', 'ui.16836d5471'],
-  ['لا تخف', 'ui.0f4147fe60'],
-] as const
-
-
-export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination, onText, onClose, operations, onReplay, onPinOperation, field }: {
+export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination, onPick, onClose, start, field, translator }: {
   field: RefObject<HTMLInputElement | null>
   meta: Meta
   currentSurah: number
@@ -31,15 +22,14 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   onTogglePin: (surah: number) => void
   onRecentSurah: (surah: number) => void
   onDestination: (destination: Destination) => void
-  onText: (query: string) => void
+  onPick: React.ComponentProps<typeof QuranSearch>['onPick']
   onClose: () => void
-  operations: SearchOperationEntry[]
-  onReplay: (operation: SearchOperation) => void
-  onPinOperation: (id: string) => void
+  start: SearchResultSnapshot | null
+  translator: Translator
 }) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(start?.query ?? '')
+  const [position, setPosition] = useState(start?.position)
   const [help, setHelp] = useState(false)
-  const [focused, setFocused] = useState(false)
   const surface = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const viewport = window.visualViewport
@@ -69,7 +59,16 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   const options = destinationSuggestions(meta, value, currentSurah)
   const selection = useDestinationSelection(options)
   const text = !!value && !isNavigationInput(value) && !options.some(option => option.exact) && /\p{L}/u.test(value)
-  const changeQuery = (next: string) => { setQuery(next); selection.reset() }
+  const changeQuery = (next: string) => {
+    setQuery(next)
+    setPosition(undefined)
+    setHelp(false)
+    selection.reset()
+  }
+  const rtl = uiDirection() === 'rtl'
+  const BackIcon = rtl ? ArrowRight : ArrowLeft
+  const searchLabel = t('ui.c51349274d')
+  const placeholder = t('searchAndGo.placeholder', { label: searchLabel })
 
   return <Dialog open onOpenChange={open => { if (!open) onClose() }}>
     <DialogContent ref={surface} fullscreen showCloseButton={false} className="search-and-go" data-search-and-go dir={uiDirection()}
@@ -88,43 +87,47 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
         else if (help) { event.preventDefault(); setHelp(false) }
       }}>
       <div className="search-and-go-shell">
+        <DialogTitle className="sr-only">{searchLabel}</DialogTitle>
         <header className="search-and-go-header">
-          <div className="search-and-go-title">
-            <button type="button" ref={back} className="icon-btn" aria-label={help ? t('ui.313cbecb4d') : t('ui.685e0d6bc0')}
-              onClick={() => help ? setHelp(false) : onClose()}><ArrowRight size={20} aria-hidden="true" /></button>
-            <DialogTitle>{t(help ? 'ui.f4bf9b146f' : 'ui.54778fcf78')}</DialogTitle>
-            {!help && <button type="button" className="icon-btn" aria-label={t('ui.f4bf9b146f')} onClick={() => setHelp(true)}><CircleHelp size={20} aria-hidden="true" /></button>}
-          </div>
-          {!help && <div className="search-page-input">
-            <Search size={19} aria-hidden="true" />
-            <input {...selection.inputProps} ref={field} type="search" enterKeyHint="go" value={query} maxLength={160}
-              autoComplete="off" spellCheck={false} aria-label={t('ui.54778fcf78')} placeholder={t('ui.5bb212ac5e')}
-              onFocus={() => setFocused(true)} onChange={event => changeQuery(event.target.value)} onKeyDown={event => {
-                if (event.nativeEvent.isComposing || selection.move(event)) return
+          <button type="button" ref={back} className="icon-btn" aria-label={t('ui.685e0d6bc0')}
+            onClick={onClose}><BackIcon size={20} aria-hidden="true" /></button>
+          <div className="search-page-input">
+            <Search size={19} aria-hidden="true" onClick={() => field.current?.focus()} />
+            <DictationInput {...selection.inputProps} aria-expanded={!help && selection.inputProps['aria-expanded']} ref={field} type="text" enterKeyHint={selection.destination ? 'go' : 'search'}
+              value={query} maxLength={160} autoComplete="off" spellCheck={false}
+              aria-label={searchLabel} placeholder={placeholder}
+              onClear={() => changeQuery('')} onChange={event => changeQuery(event.target.value)}
+              onKeyDown={event => {
+                if (help || event.nativeEvent.isComposing || selection.move(event)) return
                 if (event.key === 'Enter') {
                   event.preventDefault()
                   if (selection.destination) onDestination(selection.destination)
-                  else field.current?.blur()
+                  else if (window.matchMedia('(pointer: coarse)').matches) field.current?.blur()
                 }
               }} />
-            {query && <button type="button" aria-label={t('ui.f37fae1000')} onClick={() => { changeQuery(''); field.current?.focus() }}><X size={17} aria-hidden="true" /></button>}
+          </div>
+          <button type="button" className="icon-btn" aria-label={t('searchAndGo.help')} aria-expanded={help}
+            onClick={() => setHelp(open => !open)}>
+            <CircleHelp size={20} className="search-and-go-help-icon" aria-hidden="true" />
+          </button>
+          {!value && !help && <div className="search-and-go-shortcuts">
+            <SurahShortcuts meta={meta} pinned={pinned} recent={recent} onTogglePin={onTogglePin}
+              onGo={(s, isPinned) => isPinned ? onDestination({ kind: 'surah', s }) : onRecentSurah(s)} />
           </div>}
         </header>
         {help && <div className="search-and-go-help nice-scroll">
           <dl>{NAVIGATION_HELP.map(([kind, examples]) => <div key={kind}><dt>{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl>
           <p>{t('ui.a8175202e6')}</p>
+          <p>{placeholder}</p>
         </div>}
         <div className="search-and-go-body" hidden={help}>
-          {!value && <SurahShortcuts meta={meta} pinned={pinned} recent={recent} onTogglePin={onTogglePin} onGo={(s, isPinned) => isPinned ? onDestination({ kind: 'surah', s }) : onRecentSurah(s)} />}
-          {!value && focused && (operations.length
-            ? <SearchAndGoHistory meta={meta} operations={operations} onReplay={onReplay} onPin={onPinOperation} />
-            : <div className="search-and-go-examples" role="group" aria-label={t('ui.f4bf9b146f')}>
-              {examples.map(([example, label]) => <button type="button" className="chip" key={example}
-                onClick={() => { changeQuery(example); field.current?.focus() }}><small>{t(label)}</small><bdi>{example}</bdi></button>)}
-            </div>)}
-          <DestinationOptions id={selection.id} active={selection.active} options={options} onPick={onDestination} className="drawer-destination-options" />
-          {text && <div className="search-and-go-text"><button type="button" className="chip" onClick={() => onText(value)}><Search size={16} aria-hidden="true" />{t('ui.c51349274d')}</button></div>}
-          <SurahNavigationList meta={meta} currentSurah={currentSurah} query={value} showEmpty={!options.length && !text} onGoSurah={s => onDestination({ kind: 'surah', s })} />
+          {value ? <>
+            <DestinationOptions id={selection.id} active={selection.active} options={options} onPick={onDestination} className="drawer-destination-options" />
+            {!text && !options.length && <p role="status" className="search-and-go-no-destination">{t('ui.68f830ec5c')}</p>}
+          </> : <SurahNavigationList meta={meta} currentSurah={currentSurah} query="" showEmpty={false}
+            onGoSurah={s => onDestination({ kind: 'surah', s })} />}
+          <QuranSearch inline={{ query: value, position }} open={text} onOpenChange={onClose}
+            meta={meta} translator={translator} currentSurah={currentSurah} onPick={onPick} />
         </div>
       </div>
     </DialogContent>

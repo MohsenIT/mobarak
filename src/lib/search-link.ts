@@ -3,6 +3,9 @@ import type { SearchMode } from './quran-search-session'
 import type { Translator } from './quran'
 import {isTranslator} from './translations'
 
+export type SearchResultPosition = { scrollTop: number; visible: number }
+export type SearchResultSnapshot = { query: string; position: SearchResultPosition }
+
 export type SearchLinkState = {
   query: string; mode: SearchMode; contextSurah?: number; surahs: number[]; lemmas: string[]; forms: string[]
   includeRoots: boolean; includePartial: boolean; includeNear: boolean

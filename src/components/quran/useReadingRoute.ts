@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { readingUrl, readVerseAddress, reportReadingAddress, writeVerseAddress, type VerseAddress } from '@/lib/verse-link'
-import type { SearchLinkState } from '@/lib/search-link'
+import type { SearchLinkState, SearchResultPosition, SearchResultSnapshot } from '@/lib/search-link'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import { captureReadingAnchor } from '@/lib/reading-visibility'
 import { readSurahPosition, rememberSurahPosition, SURAH_POSITIONS_KEY } from '@/lib/surah-position'
@@ -11,7 +11,7 @@ import { initialReading, readingLocation, readingRoute, searchEntry, searchExit,
 const clampPage = (value: number) => Math.min(604, Math.max(1, value))
 const NATIVE = process.env.NEXT_PUBLIC_DESKTOP === '1'
 type ReadingSnapshot = { href: string; mode: ReadingMode; surah: number; page: number; address: VerseAddress; offset: number; activeSurah?: number }
-type SearchAndGoArrival = { href: string; mode: ReadingMode; jump: ReadingJump }
+type SearchAndGoArrival = { href: string; mode: ReadingMode; jump: ReadingJump; result?: SearchResultSnapshot }
 
 /**
  * What the reader does with a location it did not originate. The hook owns the
@@ -24,14 +24,14 @@ export type ReadingRouteHandlers = {
    * The location describes the advanced search page. `sameEntry` is true for
    * the entry the reader itself just wrote, whose state is already on screen.
    */
-  onSearch: (state: SearchLinkState, sameEntry: boolean) => void
+  onSearch: (state: SearchLinkState, sameEntry: boolean, unified?: SearchResultPosition) => void
   /** The location addresses a verse; the caller reveals it once loaded. */
   onVerse: (address: VerseAddress, align?: 'start', isCurrent?: () => boolean) => void
   /** The location is a surah or page: the caller drops transient selection state. */
   onReading: () => void
   onQuickReturn: () => void
   onSearchAndGoOpen: (open: boolean) => void
-  onSearchAndGoReturn: (activeSurah?: number) => void
+  onSearchAndGoReturn: (activeSurah?: number, result?: SearchResultSnapshot) => void
   dismissSearchAndGoKeyboard: () => boolean
 }
 
@@ -106,13 +106,14 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
     window.history.replaceState({ ...state, searchAndGoOrigin: origin }, '', href)
     window.history.pushState({
       ...state, searchAndGoOverlay: true, searchAndGoOrigin: null, searchAndGoArrival: null,
-      quickJourney: null, quickReadingOrigin: null, quranSearchEntry: null,
+      quickJourney: null, quickReadingOrigin: null, quranSearchEntry: null, unifiedSearchPosition: null,
     }, '', href)
     searchAndGoHref.current = href
     searchAndGoRevision.current++
   }, [mode, page, reader, surah])
   const closeSearchAndGo = useCallback(() => {
-    if (!window.history.state?.searchAndGoOverlay || closingSearchAndGo.current) return
+    const state = window.history.state
+    if ((!state?.searchAndGoOverlay && !state?.unifiedSearchPosition) || closingSearchAndGo.current) return
     closingSearchAndGo.current = true
     searchAndGoRevision.current++
     window.history.back()
@@ -121,10 +122,10 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
     const revision = ++searchAndGoRevision.current
     return (jump: ReadingJump) => {
       const state = window.history.state
-      if (revision !== searchAndGoRevision.current || !state?.searchAndGoOverlay) return false
+      if (revision !== searchAndGoRevision.current || (!state?.searchAndGoOverlay && !state?.unifiedSearchPosition)) return false
       const href = searchAndGoReadingUrl(window.location.href, mode, jump, NATIVE).href
       window.history.replaceState({
-        ...state, searchAndGoOverlay: false, searchAndGoArrival: { href, mode, jump },
+        ...state, searchAndGoOverlay: false, unifiedSearchPosition: null, searchAndGoArrival: { href, mode, jump },
       }, '', href)
       if (jump.kind === 'verse') reportReadingAddress(jump.address)
       searchAndGoHref.current = null
@@ -186,12 +187,12 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
     setMushafNavigationRevision(n => n + 1)
   }, [])
 
-  const writeSearchState = useCallback((state: SearchLinkState) => {
+  const writeSearchState = useCallback((state: SearchLinkState, unifiedSearchPosition?: SearchResultPosition) => {
     const current = window.location.href
     const { href, entering } = searchEntry(current, state, NATIVE)
     if (entering) readingBeforeSearch.current = current
     lastSearchUrl.current = href
-    if (href === current) return
+    if (href === current && !unifiedSearchPosition) return
     const prior = window.history.state
     const fromSearchAndGo = entering && prior?.searchAndGoOverlay
     if (entering) setQuickOrigin(null)
@@ -200,8 +201,38 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
       searchAndGoRevision.current++
     }
     window.history[entering && !fromSearchAndGo ? 'pushState' : 'replaceState'](entering ? {
-      ...prior, quranSearchEntry: true, quickJourney: null, quickReadingOrigin: null, searchAndGoOverlay: false,
-    } : prior, '', href)
+      ...prior, quranSearchEntry: true, quickJourney: null, quickReadingOrigin: null,
+      searchAndGoOverlay: false, unifiedSearchPosition: unifiedSearchPosition ?? null,
+    } : { ...prior, unifiedSearchPosition: unifiedSearchPosition ?? null }, '', href)
+  }, [])
+
+  const prepareSearchAndGoResult = useCallback((searchState: SearchLinkState, position: SearchResultPosition) => {
+    const revision = ++searchAndGoRevision.current
+    return (jump: ReadingJump) => {
+      const state = window.history.state
+      if (revision !== searchAndGoRevision.current || (!state?.searchAndGoOverlay && !state?.unifiedSearchPosition)) return false
+      writeSearchState(searchState, position)
+      const href = searchAndGoReadingUrl(window.location.href, mode, jump, NATIVE).href
+      const arrival: SearchAndGoArrival = { href, mode, jump, result: { query: searchState.query, position } }
+      window.history.pushState({
+        ...window.history.state, quranSearchEntry: null, unifiedSearchPosition: null, searchAndGoArrival: arrival,
+      }, '', href)
+      if (jump.kind === 'verse') reportReadingAddress(jump.address)
+      return true
+    }
+  }, [mode, writeSearchState])
+
+  const returnToSearchAndGoResult = useCallback(() => {
+    const arrival = window.history.state?.searchAndGoArrival as SearchAndGoArrival | undefined
+    if (!arrival?.result || arrival.href !== window.location.href) return false
+    window.history.back()
+    return true
+  }, [])
+
+  const dismissSearchAndGoResult = useCallback(() => {
+    const state = window.history.state
+    const arrival = state?.searchAndGoArrival as SearchAndGoArrival | undefined
+    if (arrival?.result) window.history.replaceState({ ...state, searchAndGoArrival: { ...arrival, result: undefined } }, '', window.location.href)
   }, [])
 
   /**
@@ -243,7 +274,7 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
         const arrival = state?.searchAndGoArrival as SearchAndGoArrival | null
         if (origin?.href === current && event) {
           setQuickOrigin(state.quickJourney ?? null)
-          latest.current.onSearchAndGoReturn(origin.activeSurah)
+          latest.current.onSearchAndGoReturn(origin.activeSurah, arrival?.href === current ? arrival.result : undefined)
           setMode(origin.mode)
           setSurah(origin.surah)
           requestMushafPage(origin.page)
@@ -252,7 +283,7 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
         }
         if (arrival?.href === current) {
           setQuickOrigin(null)
-          latest.current.onSearchAndGoReturn()
+          latest.current.onSearchAndGoReturn(undefined, arrival.result)
           setMode(arrival.mode)
           const { jump } = arrival
           if (arrival.mode === 'mushaf') requestMushafPage(jump.page)
@@ -275,7 +306,7 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
       }
       const route = readingRoute(current)
       if (route?.kind === 'search') {
-        latest.current.onSearch(route.state, lastSearchUrl.current === current)
+        latest.current.onSearch(route.state, lastSearchUrl.current === current, searchAndGoEnabled ? state?.unifiedSearchPosition ?? undefined : undefined)
         return
       }
       if (route?.kind === 'verse') {
@@ -324,5 +355,5 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
   }, [page, mode, surah])
   useEffect(() => { writeStored('mushaf.surah', surah) }, [surah])
 
-  return { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, quickOrigin, captureQuickOrigin, prepareQuickVisit, writeReadingVerse, writePageDestination, returnFromQuick, rememberReadingPosition, lastSurahPosition, openSearchAndGo, closeSearchAndGo, prepareSearchAndGoDestination }
+  return { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, quickOrigin, captureQuickOrigin, prepareQuickVisit, writeReadingVerse, writePageDestination, returnFromQuick, rememberReadingPosition, lastSurahPosition, openSearchAndGo, closeSearchAndGo, prepareSearchAndGoDestination, prepareSearchAndGoResult, returnToSearchAndGoResult, dismissSearchAndGoResult }
 }
