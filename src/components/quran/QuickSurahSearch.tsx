@@ -96,6 +96,12 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
     return () => { clearTimeout(timer); request.current++ }
   }, [query, mode, surah.n, surah.vc, localEngine, scope])
   const expand = (all: boolean) => onAdvanced({ query, mode, surahs: all ? [] : [surah.n] })
+  const activeResult = busy || error ? undefined : results[index]
+  const resultAddress = (result: QuranSearchResult) => `${meta.surahs[result.s - 1].fa} · ${toFa(result.a)}`
+  const adjacentResults = [
+    { direction: 'previous', step: -1, Icon: ChevronRight, globalLabel: 'quickSearch.previousResult', localLabel: 'ui.1cfdb521b9' },
+    { direction: 'next', step: 1, Icon: ChevronLeft, globalLabel: 'quickSearch.nextResult', localLabel: 'ui.3c9bb58eee' },
+  ] as const
   return <div className="quick-surah-search" aria-label={t("ui.a1edc5936b")}>
     <form onSubmit={event => { event.preventDefault(); if(destinations.length===1)onNavigate(destinations[0].destination); else if (results.length) jump(results, (index + 1) % results.length) }}>
       <button type="button" className="icon-btn" aria-label={t("ui.8b070f0497")} onClick={onClose}><ArrowRight size={20} /></button>
@@ -103,11 +109,30 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
       {query && <button type="button" className="icon-btn" aria-label={t("ui.b091494ed6")} onClick={() => { setQuery(''); input.current?.focus({ preventScroll: true }) }}><X size={18} /></button>}
     </form>
     {destinations.length>0&&<div className="quick-jump-options" aria-label={t("ui.d289fa208b")}>{destinations.map((item,i)=><button type="button" key={i} onClick={()=>onNavigate(item.destination)}>{t("ui.b7b6972c78")}{' '}{toFa(item.label)} ←</button>)}</div>}
-    <div className="quick-search-status">
-      <span>{scope === 'quran' ? t('occurrence.wholeQuran') : <>{t("ui.ec5841b226")}{' '}{surah.fa}</>}</span>
-      <span role="status" aria-live="polite">{destinations.length ? t("ui.4f981a291d") : busy ? t("ui.63509f3da4") : error ? t("ui.e5d91b8562") : results.length ? t("ui.53b89ec77a",{p0:(toFa(index + 1)),p1:(toFa(results.length))}) : query.trim().length >= 2 ? t("ui.292cf63931") : t("ui.d1400e3d47")}</span>
-      <button type="button" disabled={!results.length || busy} aria-label={t(scope === 'quran' ? 'quickSearch.previousResult' : 'ui.1cfdb521b9')} onClick={() => jump(results, (index - 1 + results.length) % results.length)}><ChevronRight size={18} /></button>
-      <button type="button" disabled={!results.length || busy} aria-label={t(scope === 'quran' ? 'quickSearch.nextResult' : 'ui.3c9bb58eee')} onClick={() => jump(results, (index + 1) % results.length)}><ChevronLeft size={18} /></button>
+    <div className="quick-search-status" data-has-result={activeResult ? '' : undefined}>
+      {!activeResult && <span className="quick-search-status-scope">{scope === 'quran' ? t('occurrence.wholeQuran') : <>{t("ui.ec5841b226")}{' '}{surah.fa}</>}</span>}
+      <span role="status" aria-live="polite" aria-atomic="true">
+        {activeResult ? <>
+          <bdi className="quick-search-result-address">{resultAddress(activeResult)}</bdi>
+          <span>{t('ui.53b89ec77a', { p0: toFa(index + 1), p1: toFa(results.length) })}</span>
+        </> : destinations.length ? t('ui.4f981a291d') : busy ? t('ui.63509f3da4') : error ? t('ui.e5d91b8562') : query.trim().length >= 2 ? t('ui.292cf63931') : t('ui.d1400e3d47')}
+      </span>
+      {adjacentResults.map(({ direction, step, Icon, globalLabel, localLabel }) => {
+        const targetIndex = activeResult && results.length > 1
+          ? (index + step + results.length) % results.length
+          : -1
+        const target = results[targetIndex]
+        const address = target && resultAddress(target)
+        return <button key={direction} type="button" data-result-direction={direction} disabled={!target}
+          aria-label={t(scope === 'quran' ? globalLabel : localLabel)} aria-description={address}
+          onClick={() => jump(results, targetIndex)}>
+          <Icon size={16} aria-hidden="true" />
+          {address && <span className="quick-search-neighbor-label">
+            <span>{t(globalLabel)}</span>
+            <bdi className="quick-search-result-address">{address}</bdi>
+          </span>}
+        </button>
+      })}
     </div>
     <div className="quick-search-actions">
       <div className="quick-search-mode quick-search-segment" role="group" aria-label={t("ui.5e4040c150")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, title]) => <button type="button" key={key} aria-pressed={key === mode} onClick={() => setMode(key)}><span>{title}</span></button>)}</div>
