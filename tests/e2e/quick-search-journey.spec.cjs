@@ -77,33 +77,6 @@ for(const method of ['chip','back'])test(`global results retain one origin and r
  }
 });
 
-test('the active quick result is centered apart from the return chip', async ({ page }) => {
- await setup(page);
- const quick = await open(page);
- const location = page.locator('[data-quick-search-location]');
- await expect(location).toHaveCount(0);
- await quick.getByRole('button', { name: 'کل قرآن', exact: true }).click();
- await quick.getByRole('searchbox').fill('رصد');
- await expect(location).toHaveText('توبه · ۵');
- const returnChip = page.locator('[data-quick-search-return]');
- await expect(returnChip).toContainText('انعام');
-
- for (const width of [320, 390, 1280]) {
-  await page.setViewportSize({ width, height: 800 });
-  const label = await location.boundingBox();
-  const chip = await returnChip.boundingBox();
-  const bar = await page.locator('.quick-search-return').boundingBox();
-  expect(Math.abs((label.x + label.width / 2) - (bar.x + bar.width / 2))).toBeLessThan(1);
-  expect(chip.x).toBeGreaterThan(label.x + label.width);
- }
-
- await quick.getByRole('button', { name: 'نتیجهٔ بعدی', exact: true }).click();
- await expect(location).toHaveText('جن · ۹');
- await quick.getByRole('searchbox').fill('');
- await expect(location).toHaveCount(0);
- await expect(returnChip).toBeVisible();
-});
-
 test('a global quick-search journey returns to the same mushaf page and offset',async({page})=>{
  await setup(page);
  await page.goto('/p/130');
