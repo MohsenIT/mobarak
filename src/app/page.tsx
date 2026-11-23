@@ -559,6 +559,10 @@ export default function Home() {
     />
   ) : null
 
+  const quickLocation = search.quickOpen && search.quickHighlights
+    ? search.quickHighlights.results[search.quickHighlights.index]
+    : undefined
+
   return (
     <>
     {!startupComplete && <StartupSplash leaving={startupLeaving} stalled={splash.stalled} onHoldChange={setStartupHeld} />}
@@ -616,7 +620,19 @@ export default function Home() {
       <LanguageOnboarding knownPersianReader={knownPersianReader} onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
       <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} pauseRequest={audioPauseRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => { setAudioOpen(false); setAudioVerse(null) }} onFollow={(s,a) => goVerse(s,a)} />
 
-      {route.quickOrigin && !search.advancedOpen && <div className="quick-search-return"><button type="button" className="chip" data-quick-search-return onClick={route.returnFromQuick}><ArrowRight size={14} aria-hidden="true" />{t('quickSearch.returnTo', { p0: meta.surahs[route.quickOrigin.address.s - 1].fa, p1: toFa(route.quickOrigin.address.a) })}</button></div>}
+      {route.quickOrigin && !search.advancedOpen && (
+        <div className="quick-search-return" data-has-location={quickLocation ? '' : undefined}>
+          <button type="button" className="chip" data-quick-search-return onClick={route.returnFromQuick}>
+            <ArrowRight size={14} aria-hidden="true" />
+            <span>{t('quickSearch.returnTo', { p0: meta.surahs[route.quickOrigin.address.s - 1].fa, p1: toFa(route.quickOrigin.address.a) })}</span>
+          </button>
+          {quickLocation && (
+            <span className="quick-search-location" data-quick-search-location aria-live="polite">
+              <bdi>{meta.surahs[quickLocation.s - 1].fa}</bdi>{' · '}{toFa(quickLocation.a)}
+            </span>
+          )}
+        </div>
+      )}
       {search.returnToSearch && !search.advancedOpen && !search.searchAndGoOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
           <button type="button" className="chip gap-1.5 py-1.5" onClick={() => {
