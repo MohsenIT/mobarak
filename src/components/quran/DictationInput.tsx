@@ -1,5 +1,5 @@
 'use client'
-import {forwardRef,useEffect,useImperativeHandle,useRef,useState,type ComponentPropsWithoutRef,type RefObject} from 'react'
+import {forwardRef,useEffect,useImperativeHandle,useRef,useState,type ComponentPropsWithoutRef,type ReactNode,type RefObject} from 'react'
 import {Mic,Square,X} from 'lucide-react'
 import {t,currentLanguage,useUiLanguage} from '@/lib/i18n'
 import ResponsivePlaceholder from './ResponsivePlaceholder'
@@ -46,13 +46,14 @@ function useDictation(ref:RefObject<HTMLInputElement|HTMLTextAreaElement|null>,s
 function Control({supported,starting,listening,error,toggle,disabled}:{supported:boolean;starting:boolean;listening:boolean;error:string;toggle:()=>void;disabled?:boolean}){
  return <>{supported&&<button type="button" className={`dictation-button${listening?' is-listening':''}`} disabled={disabled} aria-label={t(listening?'voice.stop':'voice.start')} aria-pressed={listening} title={t(listening?'voice.stop':'voice.start')} onClick={toggle}>{listening?<Square size={15} fill="currentColor"/>:<Mic size={18}/>}</button>}<span className="sr-only" role="status">{starting?t('voice.preparing'):listening?t('voice.listening'):error?t(error):''}</span></>
 }
-export const DictationInput=forwardRef<HTMLInputElement,ComponentPropsWithoutRef<'input'>&{speechLocale?:string;onClear?:()=>void;fitPlaceholder?:true|readonly string[]}>(function DictationInput({speechLocale,onClear,fitPlaceholder,...props},forwarded){
+export const DictationInput=forwardRef<HTMLInputElement,ComponentPropsWithoutRef<'input'>&{speechLocale?:string;onClear?:()=>void;fitPlaceholder?:true|readonly string[];leadingIcon?:ReactNode}>(function DictationInput({speechLocale,onClear,fitPlaceholder,leadingIcon,...props},forwarded){
  const ref=useRef<HTMLInputElement>(null),state=useDictation(ref,speechLocale)
  useImperativeHandle(forwarded,()=>ref.current!)
  const clear=!!onClear && !!props.value && !state.listening
  const [fittedPlaceholder,setFittedPlaceholder]=useState<string>()
  return <div className="dictation-field"><div className="dictation-input-shell">
-  <input {...props} ref={ref} placeholder={fitPlaceholder ? fittedPlaceholder ?? props.placeholder : props.placeholder} readOnly={props.readOnly||state.listening} aria-busy={state.listening} style={{...props.style,width:'100%',minWidth:0,...(state.supported||clear?{paddingInlineEnd:'44px'}:{})}}/>
+  {leadingIcon && <span className="dictation-leading-icon" aria-hidden="true">{leadingIcon}</span>}
+  <input {...props} ref={ref} placeholder={fitPlaceholder ? fittedPlaceholder ?? props.placeholder : props.placeholder} readOnly={props.readOnly||state.listening} aria-busy={state.listening} style={{...props.style,width:'100%',minWidth:0,...(leadingIcon?{paddingInlineStart:'34px'}:{}),...(state.supported||clear?{paddingInlineEnd:'44px'}:{})}}/>
   {clear
    ? <button type="button" className="dictation-button" aria-label={t('ui.f37fae1000')} onClick={()=>{onClear?.();ref.current?.focus({preventScroll:true})}}><X size={17} aria-hidden="true"/></button>
    : <Control {...state} disabled={props.disabled||props.readOnly}/>}

@@ -21,6 +21,32 @@ async function showControls(page) {
 
 const addresses = panel => panel.locator('[data-search-address]').evaluateAll(cards => cards.map(card => card.dataset.searchAddress));
 
+test('quick and advanced search agree on the matches for a multiword query', async ({ page }) => {
+  await page.goto('/s/20/a/34');
+  await page.locator('.reader-quick-search-trigger').click();
+  const quick = page.locator('.quick-surah-search');
+  await quick.getByRole('button', { name: 'کل قرآن', exact: true }).click();
+  await quick.getByRole('searchbox').fill('صبر و نصر');
+  await page.locator('.quick-search-status .analysis-position-button').click({ timeout: 30000 });
+  const popup = page.locator('.quick-search-result-picker');
+  const rows = popup.locator('[data-search-address]');
+  await expect(rows.first()).toBeVisible();
+  const quickResults = await addresses(popup);
+  const matchedWords = await rows.first().locator('[data-search-match]').allTextContents();
+  const normalize = text => text.replace(/\p{M}|ـ/gu, '');
+  expect(matchedWords.some(word => normalize(word).includes('صبر'))).toBeTruthy();
+  expect(matchedWords.some(word => normalize(word).includes('نصر'))).toBeTruthy();
+  const firstStem = matchedWords.find(word => normalize(word) !== 'و');
+  await expect(rows.first().locator('[data-highlight-state="selected"]')).toHaveText(firstStem);
+  await popup.locator('.occurrence-picker-close').click();
+  await quick.locator('.quick-search-advanced').click();
+  const advanced = page.locator('[data-search-and-go]');
+  await expect(advanced.getByRole('combobox')).toHaveValue('صبر و نصر');
+  await expect(advanced.locator('[data-search-address]').first()).toBeVisible({ timeout: 30000 });
+  const advancedResults = await addresses(advanced);
+  expect(advancedResults).toEqual(quickResults.slice(0, advancedResults.length));
+});
+
 test('empty search stays active after blur and clear until Browse is chosen', async ({ page }) => {
   await page.goto('/s/20/a/34');
   await page.locator('.reader-surah-link').click();

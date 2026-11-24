@@ -55,10 +55,10 @@ export default function QuickSearchResultPicker({ meta, results, index, onSelect
             if (mask & 2) matches.push([result.a, pos, 'stem'])
             return matches
           })
-          const target = locations[0]
+          const target = locations.find(location => location[2] === 'stem') ?? locations[0]
           return <OccurrenceRow key={`${result.s}:${result.a}`} tokens={tokens} a={result.a}
             pos={target?.[1] ?? 1} part={target?.[2]} locations={locations}
-            reference={address(result)} selected={i === index}
+            reference={address(result)} address={`${result.s}:${result.a}`} selected={i === index}
             onPick={() => { onSelect(i); setOpen(false) }}
           />
         })}

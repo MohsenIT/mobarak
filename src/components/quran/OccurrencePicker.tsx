@@ -66,8 +66,8 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
     </PopoverContent>
   </Popover>
 }
-export function OccurrenceRow({ tokens, a, pos, part, locations, selected, reference, onPick }: {
-  tokens: ContextToken[]; a: number; pos: number; part?: 'prefix' | 'stem'; locations: AnalysisLocation[]; selected: boolean; reference?: string; onPick: () => void
+export function OccurrenceRow({ tokens, a, pos, part, locations, selected, reference, address, onPick }: {
+  tokens: ContextToken[]; a: number; pos: number; part?: 'prefix' | 'stem'; locations: AnalysisLocation[]; selected: boolean; reference?: string; address?: string; onPick: () => void
 }) {
   const viewport = useRef<HTMLSpanElement>(null)
   const target = useRef<HTMLSpanElement>(null)
@@ -87,7 +87,7 @@ export function OccurrenceRow({ tokens, a, pos, part, locations, selected, refer
     const observer = new ResizeObserver(align); observer.observe(element)
     return () => observer.disconnect()
   }, [excerpt])
-  return <button type="button" className="analysis-position-option has-excerpt" aria-current={selected ? 'true' : undefined} onClick={event => {
+  return <button type="button" className="analysis-position-option has-excerpt" data-search-address={address} aria-current={selected ? 'true' : undefined} onClick={event => {
     if (Date.now() < suppressClick.current) { event.preventDefault(); return }
     onPick()
   }}>

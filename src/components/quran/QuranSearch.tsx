@@ -15,6 +15,8 @@ import { countQuranSearchResults, normalizeQuranSearch, type QuranSearchResult }
 import QuranText from './QuranText'
 import { splitWord } from '@/lib/word-parts'
 import type { SearchMode } from '@/lib/quran-search-session'
+import { createQuranSearchWorker } from '@/lib/quran-search-client'
+import { defaultPhase3SearchOptions } from '@/lib/search-query'
 import { lemmaDisplay } from '@/lib/lemma-display'
 import { searchFormLabels } from '@/lib/search-form-labels'
 import DestinationOptions, { useDestinationSelection } from './DestinationOptions'
@@ -55,10 +57,6 @@ interface Props {
 }
 const emptyResults: QuranSearchResult[] = []
 
-function createQuranSearchWorker() {
-  return new Worker(new URL('../../lib/quran-search.worker.ts', import.meta.url), { type: 'module' })
-}
-
 function snippet(result: QuranSearchResult, full = false) {
   const first = (result.positions[0] ?? 1) - 1
   let last = first
@@ -89,7 +87,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const [searchOrigin] = useState(restored?.contextSurah ?? currentSurah)
   const [scopeVariant, setScopeVariant] = useState<SearchScopeVariant>(restored?.scopeVariant ?? (restored?.surahs.length || initialSearch?.surahs.length ? 'selected' : 'all'))
   const [config, setConfig] = useState<SearchPhase3State>(() => restored?.phase3 ?? {
-    relation: 'all', sorts: ['mushaf'], roots: [], lemmas: restored?.lemmas ?? [], forms: restored?.forms ?? [],
+    ...defaultPhase3SearchOptions(), lemmas: restored?.lemmas ?? [], forms: restored?.forms ?? [],
   })
   const [copyStatus, setCopyStatus] = useState('')
   const [ownQuery, setQuery] = useState(restored?.query ?? initialSearch?.query ?? '')

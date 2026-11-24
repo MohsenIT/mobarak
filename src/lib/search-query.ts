@@ -10,6 +10,10 @@ export type Phase3SearchOptions = {
   forms: string[]
 }
 
+export function defaultPhase3SearchOptions(): Phase3SearchOptions {
+  return { relation: 'all', sorts: ['mushaf'], roots: [], lemmas: [], forms: [] }
+}
+
 type SearchClause = { text: string; exact: boolean }
 
 export function parseSearchQuery(input: string, relation: SearchRelation): SearchClause[] {
