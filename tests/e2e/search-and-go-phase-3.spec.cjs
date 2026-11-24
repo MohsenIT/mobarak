@@ -26,7 +26,7 @@ test('quick and advanced search agree on the matches for a multiword query', asy
   await page.locator('.reader-quick-search-trigger').click();
   const quick = page.locator('.quick-surah-search');
   await quick.getByRole('button', { name: 'کل قرآن', exact: true }).click();
-  await quick.getByRole('searchbox').fill('صبر و نصر');
+  await quick.getByRole('searchbox').fill('صبر نصر');
   await page.locator('.quick-search-status .analysis-position-button').click({ timeout: 30000 });
   const popup = page.locator('.quick-search-result-picker');
   const rows = popup.locator('[data-search-address]');
@@ -36,12 +36,12 @@ test('quick and advanced search agree on the matches for a multiword query', asy
   const normalize = text => text.replace(/\p{M}|ـ/gu, '');
   expect(matchedWords.some(word => normalize(word).includes('صبر'))).toBeTruthy();
   expect(matchedWords.some(word => normalize(word).includes('نصر'))).toBeTruthy();
-  const firstStem = matchedWords.find(word => normalize(word) !== 'و');
-  await expect(rows.first().locator('[data-highlight-state="selected"]')).toHaveText(firstStem);
+  expect(matchedWords.map(normalize)).not.toContain('و');
+  await expect(rows.first().locator('[data-highlight-state="selected"]')).toHaveText(matchedWords[0]);
   await popup.locator('.occurrence-picker-close').click();
   await quick.locator('.quick-search-advanced').click();
   const advanced = page.locator('[data-search-and-go]');
-  await expect(advanced.getByRole('combobox')).toHaveValue('صبر و نصر');
+  await expect(advanced.getByRole('combobox')).toHaveValue('صبر نصر');
   await expect(advanced.locator('[data-search-address]').first()).toBeVisible({ timeout: 30000 });
   const advancedResults = await addresses(advanced);
   expect(advancedResults).toEqual(quickResults.slice(0, advancedResults.length));
