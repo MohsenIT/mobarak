@@ -22,18 +22,35 @@ export function createSearchSession(corpus: SearchCorpus) {
     return corpus.waw?.[`${s}:${a}`]?.includes(pos) ? key.replace(/^و/, '') : key
   }
 
+  const searchMorphology = (terms: string[], mode: 'root' | 'lemma', within: (s: number) => boolean): QuranSearchResult[] => {
+    const column = mode === 'root' ? 0 : 1
+    const keys = terms.map(term => normalizeQuranSearch(term).replace(/\s/g, ''))
+    if (!keys.length || keys.some(key => !key)) return []
+    const normalized = new Map<string, string>()
+    return corpus.verses.flatMap(([s, a, words]) => {
+      if (!within(s)) return []
+      const id = `${s}:${a}`
+      const stems = corpus.morphology[id] ?? []
+      const occurrences = stems.flatMap((_, index) => {
+        const match = keys.every((key, offset) => {
+          const value = stems[index + offset]?.[column]
+          if (!value) return false
+          if (!normalized.has(value)) normalized.set(value, normalizeQuranSearch(mode === 'lemma' ? lemmaDisplay(value) : value).replace(/\s/g, ''))
+          return normalized.get(value) === key
+        })
+        return match ? [keys.map((_, offset) => index + offset + 1)] : []
+      })
+      if (!occurrences.length) return []
+      const positions = [...new Set(occurrences.flat())]
+      return [{ s, a, words, waw: corpus.waw?.[id] ?? [], positions, occurrences, parts: Object.fromEntries(positions.map(pos => [pos, 2])), kind: 'exact', score: 0 }]
+    })
+  }
+
   const execute = (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null): QuranSearchResult[] => {
     const scope = new Set(options.surahs ?? [])
     const within = (s: number) => !scope.size || scope.has(s)
     if (!filter && options.mode && options.mode !== 'text') {
-      const column = options.mode === 'root' ? 0 : 1
-      const key = normalizeQuranSearch(query).replace(/\s/g, '')
-      if (!key) return []
-      return corpus.verses.flatMap(([s, a, words]) => {
-        if (!within(s)) return []
-        const positions = (corpus.morphology[`${s}:${a}`] ?? []).flatMap((m, i) => m[column] && normalizeQuranSearch(column === 1 ? lemmaDisplay(m[column]!) : m[column]!).replace(/\s/g, '') === key ? [i + 1] : [])
-        return positions.length ? [{ s, a, words, waw: corpus.waw?.[`${s}:${a}`] ?? [], positions, parts: Object.fromEntries(positions.map(pos => [pos, 2])), kind: 'exact' as const, score: 0 }] : []
-      })
+      return searchMorphology([query], options.mode, within)
     }
     if (filter) {
       const source = corpus.morphology[`${filter.s}:${filter.a}`]?.[filter.pos - 1]
@@ -82,10 +99,13 @@ export function createSearchSession(corpus: SearchCorpus) {
     const scope = new Set(options.surahs ?? [])
     const within = (s: number) => !scope.size || scope.has(s)
     const isText = !filter && (!options.mode || options.mode === 'text')
-    const clauses = isText ? parseSearchQuery(query, phase.relation) : [{ text: query, exact: false }]
+    const clauses = filter ? [{ text: query, exact: false }] : parseSearchQuery(query, phase.relation)
     const hits = new Map<string, { result: QuranSearchResult; clause: number }[]>()
     const frequencies = clauses.map(({ text, exact }, clause) => {
-      const matches = exact || isText && clauses.length > 1 && text.length === 1 ? exactSearch(text, within) : execute(text, options, filter)
+      const mode = options.mode
+      const matches = exact && (mode === 'root' || mode === 'lemma')
+        ? searchMorphology(text.split(' '), mode, within)
+        : exact || isText && clauses.length > 1 && text.length === 1 ? exactSearch(text, within) : execute(text, options, filter)
       for (const result of matches) {
         const id = `${result.s}:${result.a}`
         const existing = hits.get(id)

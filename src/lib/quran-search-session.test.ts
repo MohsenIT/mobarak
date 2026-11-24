@@ -78,6 +78,16 @@ test('expanding a literal match counts each new root occurrence once', () => {
 
 const phase3 = { relation: 'all' as const, sorts: ['mushaf' as const], roots: [], lemmas: [], forms: [] }
 
+test('multiword lemma and root searches find both stems in Yusuf 76', () => {
+  for (const mode of ['lemma', 'root'] as const) {
+    const options = { mode, phase3, surahs: [12] }
+    expect(search('دین ملک', options).map(r => [r.a, r.positions])).toEqual([[76, [19, 20]]])
+    expect(search('«دین ملک»', options).map(r => [r.a, r.occurrences])).toEqual([[76, [[19, 20]]]])
+    expect(search('«ملک دین»', options)).toEqual([])
+    expect(search('دین ملک', { ...options, phase3: { ...phase3, relation: 'any' } }).length).toBeGreaterThan(1)
+  }
+})
+
 test('all and any run independent clauses in the same verse, across real Quran data', () => {
   const options = { surahs: [20], phase3 }
   const all = search('تخف موسى', options)
