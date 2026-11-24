@@ -28,6 +28,8 @@ localization. See `docs/internationalization.md` and `src/messages/README.md`.
 Write a surah name and verse number as a single address with a space, for
 example `آل‌عمران ۹`. Use a gap or a separator between that address and other
 metadata such as a result count. Keep Quran occurrence lists in mushaf order.
+In Persian UI, use the baseline full stop `۔` (U+06D4) for a dot separator
+instead of the raised middle dot `·` (U+00B7).
 
 ## Architecture and module ownership
 

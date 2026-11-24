@@ -23,11 +23,11 @@ export default function QuickSearchResultPicker({ meta, results, index, onSelect
   const address = ({ s, a }: QuranSearchResult) => `${meta.surahs[s - 1].fa} ${toFa(a)}`
 
   return <Popover open={open} onOpenChange={setOpen}>
-    <span className="sr-only" role="status">{address(results[index])}{' · '}{t('ui.53b89ec77a', count)}</span>
+    <span className="sr-only" role="status">{address(results[index])}{' ۔ '}{t('ui.53b89ec77a', count)}</span>
     <PopoverTrigger asChild>
       <button type="button" className="analysis-position-button" aria-label={`${address(results[index])}، ${t('ui.f511eddde8', count)}`}>
         <bdi>{address(results[index])}</bdi>
-        <span aria-hidden="true">·</span>
+        <span aria-hidden="true">۔</span>
         <span>{t('ui.53b89ec77a', count)}</span>
       </button>
     </PopoverTrigger>
