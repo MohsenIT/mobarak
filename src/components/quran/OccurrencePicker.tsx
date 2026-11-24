@@ -26,8 +26,8 @@ export function OccurrencePickerHeading({ onClose, onFull, disabled, operation =
 }) {
   return <div className="occurrence-picker-heading">
     {onFull && <div className="occurrence-search-scopes" data-picker-operation={operation}>
-      <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.searchIn')}</span>
-      <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.searchIn')}>
+      <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.advancedIn')}</span>
+      <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.advancedIn')}>
         {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).filter(([scope]) => scopes.includes(scope)).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
           disabled={disabled} onClick={() => { onClose(); onFull(scope) }}><SearchScopeIcon scope={scope} /><span>{t(key)}</span></button>)}
       </div>

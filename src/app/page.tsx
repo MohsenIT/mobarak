@@ -573,7 +573,7 @@ export default function Home() {
       <header dir="rtl" className="reader-toolbar relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
         style={{
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
-          backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
+          backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: 'var(--reader-toolbar-spacing)',
         }}>
         {search.quickOpen ? <QuickSurahSearch meta={meta} resultsBar={quickResultsBar} onNavigate={destination => navigateDestination(destination, true)} surah={meta.surahs[curSurahN - 1]} onClose={() => search.setQuickOpen(false)}
           scope={search.quickScope} onScopeChange={search.changeQuickScope}
