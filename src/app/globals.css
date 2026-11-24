@@ -1343,10 +1343,6 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .quick-surah-search .dictation-field { flex:1 1 0; min-width:0; margin-block-end:0; }
 .quick-surah-search .dictation-input-shell { min-height:44px; }
 .quick-surah-search input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--paper-2); padding: 8px 10px; font-size: 14px; color: var(--ink); }
-.quick-search-status { display: flex; align-items: center; gap: 8px; padding: 3px 5px; font-size: 11px; color: var(--ink-soft); }
-.quick-search-status > span:first-child { flex: 1; }
-.quick-search-status button { min-width: 34px; min-height: 32px; display: grid; place-items: center; }
-.quick-search-status button:disabled { opacity: .3; }
 .quick-search-actions { display: flex; align-items: center; gap: 6px; font-size: 11px; padding-bottom: 3px; }
 .quick-search-actions button, .search-mode-tabs button { padding: 6px 9px; border-radius: 8px; }
 .quick-search-actions button[aria-pressed='true'], .search-mode-tabs button[aria-pressed='true'] { background: var(--word-selected); color: var(--ink); }
@@ -1356,8 +1352,19 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .quick-search-segment button + button { border-inline-start: 1px solid var(--line); }
 .quick-search-scope { margin-inline-start: auto; }
 .quick-search-actions .quick-search-advanced { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; gap: 4px; height: 30px; padding: 0 6px; border: 1px solid var(--sage); border-radius: 6px; background: var(--word-root); white-space: nowrap; }
-.quick-search-return { padding: 4px 12px; border-bottom: 1px solid var(--line); background: var(--paper); }
-.quick-search-return .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; }
+.quick-search-return { display: flex; align-items: center; gap: 6px; padding: 2px 8px; border-bottom: 1px solid var(--line); background: var(--paper); }
+.quick-search-return:empty { display: none; }
+.quick-search-return .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; min-width: 0; }
+.quick-search-return .chip span { overflow: hidden; text-overflow: ellipsis; }
+.quick-search-return svg { flex-shrink: 0; }
+.quick-search-status { margin-inline-start: auto; display: flex; align-items: center; gap: 2px; font-size: 11px; color: var(--ink-soft); }
+.quick-search-status button { min-height: 32px; white-space: nowrap; }
+.quick-search-status button:disabled { opacity: .4; }
+.quick-search-status .analysis-repeat-button { padding-inline: 2px; font-size: 11px; }
+.quick-search-status .analysis-position-button { display: inline-flex; align-items: center; gap: 4px; padding-inline: 6px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--paper-2); }
+.quick-search-status .analysis-position-button bdi { max-width: 11ch; overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
+.quick-search-status .analysis-position-button[data-state='open'] { background: var(--word-selected); }
+.quick-search-result-picker .analysis-position-option { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .search-mode-tabs, .search-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; font-size: 13px; }
 .search-mode-tabs button { border: 1px solid var(--line); }
 .search-suggestions { margin-top: 8px; }

@@ -35,10 +35,10 @@ test('local quick search works without the global corpus',async({page})=>{
  await page.route('**/data/quran-search.json',r=>r.abort());
  const quick=await open(page);
  await quick.getByRole('searchbox').fill('الله');
- await expect(quick.locator('.quick-search-status [role="status"]')).toContainText('از',{timeout:20000});
+ await expect(page.locator('.quick-search-status .analysis-position-button')).toContainText('از',{timeout:20000});
  await expect(page).toHaveURL(/\/s\/6\/a\//);
  const first=page.url();
- await quick.getByRole('button',{name:'نتیجهٔ بعدی در سوره',exact:true}).click();
+ await page.getByRole('button',{name:'نتیجهٔ بعدی در سوره',exact:true}).click();
  await expect(page).not.toHaveURL(first);
 });
 
@@ -59,7 +59,7 @@ for(const method of ['chip','back'])test(`global results retain one origin and r
  await expect(chip).toContainText('انعام');
  const label=await chip.textContent();
  const first=page.url();
- await quick.getByRole('button',{name:'نتیجهٔ بعدی',exact:true}).click();
+ await page.getByRole('button',{name:'نتیجهٔ بعدی',exact:true}).click();
  await expect(page).not.toHaveURL(first);
  await expect(chip).toHaveText(label);
  if(method==='chip')await chip.click();else await page.goBack();
@@ -75,6 +75,47 @@ for(const method of ['chip','back'])test(`global results retain one origin and r
   await chip.click();
   await expect(page).toHaveURL(originUrl);
  }
+});
+
+test('quick search puts the compact result picker beside the return chip', async ({ page }) => {
+ await page.setViewportSize({ width: 320, height: 740 });
+ await setup(page);
+ const quick = await open(page);
+ const band = page.locator('.quick-search-return');
+ const stepper = band.locator('.quick-search-status');
+ const previous = stepper.getByRole('button', { name: 'نتیجهٔ قبلی', exact: true });
+ const next = stepper.getByRole('button', { name: 'نتیجهٔ بعدی', exact: true });
+ const picker = stepper.locator('.analysis-position-button');
+ await quick.getByRole('button', { name: 'کل قرآن', exact: true }).click();
+ await quick.getByRole('searchbox').fill('رصد');
+ await expect(picker).toContainText('توبه · ۵', { timeout: 20000 });
+ await expect(picker).toContainText('۱ از ۳');
+ await expect(previous).toBeDisabled();
+ await expect(next).toHaveText('۲');
+ await expect(next).toHaveAccessibleDescription('جن · ۹');
+ await expect(band.locator('[data-quick-search-return]')).toContainText('انعام');
+
+ for (const width of [320, 1280]) {
+  await page.setViewportSize({ width, height: 740 });
+  const controls = await stepper.boundingBox();
+  const back = await band.locator('[data-quick-search-return]').boundingBox();
+  expect(controls.height).toBeLessThanOrEqual(36);
+  expect(controls.width).toBeLessThan(240);
+  expect(controls.x + controls.width).toBeLessThanOrEqual(back.x);
+ }
+
+ await picker.click();
+ const list = page.getByRole('dialog', { name: 'فهرست تکرارها' });
+ await expect(list.getByRole('button')).toHaveCount(3);
+ await list.getByRole('button', { name: /جن · ۹/ }).click();
+ await expect(list).toBeHidden();
+ await expect(page).toHaveURL(/\/s\/72\/a\/9\/w\//);
+ await expect(picker).toContainText('۲ از ۳');
+ await expect(previous).toHaveText('۱');
+ await expect(next).toHaveText('۱');
+ await next.click();
+ await expect(picker).toContainText('جن · ۲۷');
+ await expect(next).toBeDisabled();
 });
 
 test('a global quick-search journey returns to the same mushaf page and offset',async({page})=>{
@@ -111,7 +152,7 @@ test('returning cancels a result reveal whose surah is still loading',async({pag
  await quick.getByRole('button',{name:'کل قرآن',exact:true}).click();
  await quick.getByRole('searchbox').fill('رصد');
  await expect(page).toHaveURL(/\/s\/9\/a\/5\/w\/14$/,{timeout:20000});
- await quick.getByRole('button',{name:'نتیجهٔ بعدی',exact:true}).click();
+ await page.getByRole('button',{name:'نتیجهٔ بعدی',exact:true}).click();
  await pending;
  await page.locator('[data-quick-search-return]').click();
  await expect(page).toHaveURL(origin);

@@ -58,7 +58,7 @@ test('a quick-bar hit moves the reader but leaves the bar open so results can be
  // A bare verse number is the deterministic path: it resolves to that ayah of
  // the surah being read without needing a corpus search.
  await quick.getByRole('searchbox').fill('۵');
- await expect(quick.locator('.quick-search-status')).toContainText('۱ از ۱',{timeout:20000});
+ await expect(page.locator('.quick-search-status')).toContainText('۱ از ۱',{timeout:20000});
  await expect(page).toHaveURL(/\/s\/19\/a\/5$/,{timeout:20000});
 
  // The bar deliberately stays mounted: its previous/next arrows walk the
