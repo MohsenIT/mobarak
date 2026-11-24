@@ -11,7 +11,6 @@ import { loadSurah, toFa } from '@/lib/quran'
 import { createSearchSession, type SearchCorpus, type SearchSessionOptions } from '@/lib/quran-search-session'
 import { createQuranSearchWorker } from '@/lib/quran-search-client'
 import { defaultPhase3SearchOptions } from '@/lib/search-query'
-import { SEARCH_AND_GO_PHASE_3 } from '@/lib/search-link'
 import type { QuranSearchResult } from '@/lib/quran-search'
 import type { SearchMode } from '@/lib/quran-search-session'
 import type { SearchStart } from './QuranSearch'
@@ -92,7 +91,8 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
         if (id !== request.current) return
         const options: SearchSessionOptions = {
           mode, includePartial: true, surahs: scope === 'surah' ? [surah.n] : [],
-          ...(SEARCH_AND_GO_PHASE_3 ? { phase3: defaultPhase3SearchOptions() } : {}),
+          // Quick search uses the shared query rules even when the advanced UI is off.
+          phase3: defaultPhase3SearchOptions(),
         }
         if (scope === 'quran' && worker.current) {
           worker.current.onmessage = (event: MessageEvent<{id:number;results?:QuranSearchResult[];error?:boolean}>) => {

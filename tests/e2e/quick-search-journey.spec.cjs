@@ -121,6 +121,15 @@ test('quick search puts the compact result picker beside the return chip', async
  await expect(next).toBeDisabled();
 });
 
+test('quick search finds both words without relying on the advanced interface flag', async ({ page }) => {
+ await setup(page);
+ const quick = await open(page);
+ await quick.getByRole('button', { name: 'کل قرآن', exact: true }).click();
+ await quick.getByRole('searchbox').fill('صبر صلا');
+ const picker = page.locator('.quick-search-status .analysis-position-button');
+ await expect(picker).toContainText('بقره ۴۵', { timeout: 20000 });
+});
+
 test('a global quick-search journey returns to the same mushaf page and offset',async({page})=>{
  await setup(page);
  await page.goto('/p/130');
