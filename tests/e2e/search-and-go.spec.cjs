@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const phase3 = process.env.SEARCH_AND_GO_PHASE_3_E2E === '1';
 
 test.skip(process.env.SEARCH_AND_GO_E2E !== '1', 'Run against a build with Search and Go enabled.');
 
@@ -71,6 +72,10 @@ test('one field runs live text search and restores browsing when cleared', async
   await expect(dialog).toBeVisible();
   await expect(page).toHaveURL(href);
   await dialog.getByRole('button', { name: 'پاک کردن عبارت' }).click();
+  if (phase3) {
+    await expect(dialog.locator('[data-surah-row]')).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'مرور سوره‌ها' }).click();
+  }
   await expect(dialog.locator('[data-surah-row]')).toHaveCount(114);
   const guide = dialog.getByRole('button', { name: 'راهنمای جستجو' });
   await guide.click();
@@ -125,7 +130,7 @@ test('recent Taha restores its last reading passage after a reload', async ({ pa
   await expect(page).toHaveURL(/\/s\/20\/a\/40(?:\/w\/\d+)?$/);
 });
 
-test('executed jumps still record history while empty focus keeps only surah shortcuts', async ({ page }) => {
+test('executed jumps record history and empty focus uses the configured phase UI', async ({ page }) => {
   await openReader(page);
   const dialog = await openSearchAndGo(page);
   const field = dialog.getByRole('combobox');
@@ -137,8 +142,13 @@ test('executed jumps still record history while empty focus keeps only surah sho
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('mushaf.search-and-go-history.v1'))[0].operation.type)).toBe('navigation');
   await openSearchAndGo(page);
   await field.focus();
-  await expect(dialog.locator('.search-and-go-history')).toHaveCount(0);
-  await expect(dialog.locator('.drawer-recent-shortcuts:not([inert]) .chip').first()).toBeVisible();
+  if (phase3) {
+    await expect(dialog.locator('.search-and-go-history li')).toHaveCount(1);
+    await expect(dialog.locator('.drawer-content-shell')).toBeHidden();
+  } else {
+    await expect(dialog.locator('.search-and-go-history')).toHaveCount(0);
+    await expect(dialog.locator('.drawer-recent-shortcuts:not([inert]) .chip').first()).toBeVisible();
+  }
 });
 
 test('typing, closing, Back and Forward preserve the visual reading context', async ({ page }) => {

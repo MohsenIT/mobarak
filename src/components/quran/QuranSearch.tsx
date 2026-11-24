@@ -15,14 +15,18 @@ import { countQuranSearchResults, normalizeQuranSearch, type QuranSearchResult }
 import QuranText from './QuranText'
 import { splitWord } from '@/lib/word-parts'
 import type { SearchMode } from '@/lib/quran-search-session'
+import { createQuranSearchWorker } from '@/lib/quran-search-client'
+import { defaultPhase3SearchOptions } from '@/lib/search-query'
 import { lemmaDisplay } from '@/lib/lemma-display'
 import { searchFormLabels } from '@/lib/search-form-labels'
 import DestinationOptions, { useDestinationSelection } from './DestinationOptions'
 import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
 import type { VerseAddress } from '@/lib/verse-link'
-import { SEARCH_AND_GO_PHASE_2, searchLink, type SearchLinkState, type SearchResultPosition } from '@/lib/search-link'
+import { SEARCH_AND_GO_PHASE_2, SEARCH_AND_GO_PHASE_3, searchLink, type SearchScopeVariant, type SearchPhase3State, type SearchLinkState, type SearchResultPosition } from '@/lib/search-link'
 import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
 import SearchFilterRow from './SearchFilterRow'
+import { readStored, writeStored } from '@/lib/reader-storage'
+import SearchPhase3Controls, { phase3ScopeSurahs } from './SearchPhase3Controls'
 import { useDismissiblePanel } from './useDismissiblePanel'
 export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number; state?: SearchLinkState }
 
@@ -51,9 +55,7 @@ interface Props {
   }
   onPick: (s: number, a: number, pos: number, state: SearchLinkState, position: SearchResultPosition) => void
 }
-function createQuranSearchWorker() {
-  return new Worker(new URL('../../lib/quran-search.worker.ts', import.meta.url), { type: 'module' })
-}
+const emptyResults: QuranSearchResult[] = []
 
 function snippet(result: QuranSearchResult, full = false) {
   const first = (result.positions[0] ?? 1) - 1
@@ -81,6 +83,12 @@ const labels = { exact: t("ui.e3aee9c005"), partial: t("ui.b3541360ab"), near: t
 export default function QuranSearch({ open, onOpenChange, meta, currentSurah, onPick, occurrenceFilter, onClearOccurrenceFilter, translator, initialSearch, onStateChange, onNavigate, inline }: Props) {
   const restored = initialSearch?.state
   const unified = inline?.unified
+  const phase3 = SEARCH_AND_GO_PHASE_3 && !!unified
+  const [searchOrigin] = useState(restored?.contextSurah ?? currentSurah)
+  const [scopeVariant, setScopeVariant] = useState<SearchScopeVariant>(restored?.scopeVariant ?? (restored?.surahs.length || initialSearch?.surahs.length ? 'selected' : 'all'))
+  const [config, setConfig] = useState<SearchPhase3State>(() => restored?.phase3 ?? {
+    ...defaultPhase3SearchOptions(), lemmas: restored?.lemmas ?? [], forms: restored?.forms ?? [],
+  })
   const [copyStatus, setCopyStatus] = useState('')
   const [ownQuery, setQuery] = useState(restored?.query ?? initialSearch?.query ?? '')
   const query = inline?.query ?? ownQuery
@@ -92,8 +100,16 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const [forms, setForms] = useState<string[]>(restored?.forms ?? [])
   const [includePartial, setIncludePartial] = useState(restored?.includePartial ?? true)
   const [includeNear, setIncludeNear] = useState(restored?.includeNear ?? false)
-  const [includeRoots, setIncludeRoots] = useState(restored?.includeRoots ?? !unified)
-  const [surahs, setSurahs] = useState<number[]>(restored?.surahs ?? initialSearch?.surahs ?? [])
+  const [includeRoots, setIncludeRoots] = useState(() => phase3 && !restored?.query && !restored?.occurrence && !restored?.phase3 ? readStored('mushaf.search-roots.v1', false) : restored?.includeRoots ?? !unified)
+  const toggleRoots = () => {
+    const next = !includeRoots
+    setIncludeRoots(next)
+    if (phase3) writeStored('mushaf.search-roots.v1', next)
+  }
+  const [surahs, setSurahs] = useState<number[]>(() => {
+    const initialSurahs = restored?.surahs ?? initialSearch?.surahs ?? []
+    return phase3 ? phase3ScopeSurahs(meta, searchOrigin, scopeVariant, initialSurahs) : initialSurahs
+  })
   const [surahQuery, setSurahQuery] = useState('')
   const [scopeOpen, setScopeOpen] = useState(false)
   const [extraOptionsOpen, setExtraOptionsOpen] = useState(false)
@@ -124,7 +140,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const pending = useRef('')
   const facets = { lemmas, forms }
   const formLabels = useMemo(() => searchFormLabels(rawResults), [rawResults])
-  const results = useMemo(() => filterSearchFacets(rawResults, { lemmas, forms }), [rawResults, lemmas, forms])
+  const results = useMemo(() => phase3 ? rawResults : filterSearchFacets(rawResults, { lemmas, forms }), [phase3, rawResults, lemmas, forms])
   const counts = useMemo(() => countQuranSearchResults(results), [results])
   const groupCounts = useMemo(() => {
     const counts = { exact: 0, partial: 0, near: 0, root: 0 }
@@ -142,7 +158,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     setLemmas([])
     setForms([])
   }
-  const linkState: SearchLinkState = { query, mode, ...(isNavigationInput(query)?{contextSurah:restored?.contextSurah??currentSurah}:{}), surahs, lemmas, forms, includeRoots, includePartial, includeNear, showTranslation, translator, occurrence: occurrenceFilter ?? null }
+  const linkState: SearchLinkState = { query, mode, ...(isNavigationInput(query)?{contextSurah:restored?.contextSurah??currentSurah}:{}), surahs, lemmas, forms, includeRoots, includePartial, includeNear, showTranslation, translator, occurrence: occurrenceFilter ?? null, ...(phase3 ? { contextSurah: searchOrigin, scopeVariant, phase3: config } : {}) }
   const linkStateKey = JSON.stringify(linkState)
   // The copy-link feedback is dropped whenever the search state changes while
   // the page is open — adjusted here during render instead of inside the
@@ -166,7 +182,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   // state; `undefined` as the initial "seen" value makes a mount WITH a filter
   // act, exactly like the effect did, while a mount without one stays put.
   const searchOpen = open && (unified?.run ?? true)
-  const engineKey = JSON.stringify({ query, options: { mode, includePartial, includeNear, includeRoots: includeRoots && canExpandRoots, surahs }, filter: occurrenceFilter })
+  const engineKey = JSON.stringify({ query, options: { mode, includePartial, includeNear, includeRoots: includeRoots && (phase3 || canExpandRoots), surahs, ...(phase3 ? { phase3: config } : {}) }, filter: occurrenceFilter })
   const busy = !!unified && searchOpen && valid && answerKey !== engineKey || working
   const onSuggestions = unified?.onSuggestions
   useEffect(() => {
@@ -346,6 +362,12 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           {(lemmas.length > 0 || forms.length > 0) && <div className="search-active-facets">{(['forms', 'lemmas'] as const).flatMap(kind => facets[kind].map(value => <button type="button" key={`${kind}:${value}`} aria-label={t("ui.96ba59563f",{p0:(kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value))})} onClick={() => toggleFacet(kind, value)}>{kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value)}<X size={12} /></button>))}<button type="button" onClick={() => { setLemmas([]); setForms([]) }}>{t("ui.1c36b0e132")}</button></div>}
         </div>
   const content = <>
+      {phase3 && <SearchPhase3Controls
+        identity={`${query}:${surahs.join(',')}:${mode}`}
+        meta={meta} origin={searchOrigin} scope={scopeVariant} surahs={surahs} config={config}
+        results={answerKey === engineKey && !busy ? rawResults : emptyResults} includeRoots={includeRoots} onRoots={toggleRoots} onConfig={setConfig}
+        onScope={(scope, numbers) => { setScopeVariant(scope); setSurahs(numbers) }}
+      />}
       {(!inline || unified?.controls) && <>
       <div className={inline ? "search-and-go-controls" : "search-page-header"}>
         {!inline && <>
@@ -379,10 +401,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         </>}
         <div className="search-controls-row">
           <div className="search-mode-tabs" role="group" aria-label={t("ui.50ca6c9156")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={mode === key && !occurrenceFilter} onClick={() => { onClearOccurrenceFilter?.(); setSuggestions([]); setMode(key); unified?.onModeChange(key); if (!unified) controlsInput.current?.focus({ preventScroll: true }) }}>{label}</button>)}</div>
-          {(mode === 'text' || !!occurrenceFilter) && <button type="button" className="search-roots-toggle" aria-pressed={includeRoots && canExpandRoots} disabled={!canExpandRoots} title={!canExpandRoots ? t("ui.a85026f74c") : t("ui.099da0d424")} onClick={() => setIncludeRoots(value => !value)}>{t("ui.702b74fe3e")}</button>}
-          <details ref={scopePanel} open={scopeOpen} onToggle={event => setScopeOpen(event.currentTarget.open)} className="search-scope"><summary aria-label={t("ui.d67a8d9786")}><Funnel size={14} /><span>{scopeLabel}</span></summary>
+          {(!phase3 || !!occurrenceFilter) && (mode === 'text' || !!occurrenceFilter) && <button type="button" className="search-roots-toggle" aria-pressed={includeRoots && canExpandRoots} disabled={!canExpandRoots} title={!canExpandRoots ? t("ui.a85026f74c") : t("ui.099da0d424")} onClick={toggleRoots}>{t("ui.702b74fe3e")}</button>}
+          {!phase3 && <details ref={scopePanel} open={scopeOpen} onToggle={event => setScopeOpen(event.currentTarget.open)} className="search-scope"><summary aria-label={t("ui.d67a8d9786")}><Funnel size={14} /><span>{scopeLabel}</span></summary>
             <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>{t("ui.5ad7b9b0af")}</button><button type="button" onClick={() => setSurahs([currentSurah])}>{t("ui.35fa085c5c")}</button></div><DictationInput type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder={t("ui.51b594c97e")} aria-label={t("ui.c8c0719ae1")} /><p>{t("ui.831ac25576")}</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label className="choice-row" key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
-          </details>
+          </details>}
           <details ref={extraOptionsPanel} open={extraOptionsOpen} onToggle={event => setExtraOptionsOpen(event.currentTarget.open)} className="search-extra-options"><summary aria-label={t("ui.ba7db1f34f")}><MoreVertical size={19} /></summary><div>
             <label className="choice-row"><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />{t("ui.5105840a21")}</label>
             <label className="choice-row"><input type="checkbox" checked={includeNear} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludeNear(e.target.checked)} />{t("ui.8a8b5ac72e")}</label>
@@ -392,21 +414,24 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         {includeNear && mode === 'text' && <button type="button" className="search-active-filter" aria-label={t("ui.74ae9ec1c4")} onClick={() => setIncludeNear(false)}>{t("ui.36ee5635ee")}{' '}<X size={12} /></button>}
         {occurrenceFilter && <div className="search-active-filter"><span>{includeRoots && canExpandRoots ? t("ui.0b6f9a295b",{p0:(occurrenceFilter.root ?? '')}) : occurrenceFilter.tab === 'form' ? t("ui.b87b342872",{p0:(occurrenceFilter.form),p1:(occurrenceFilter.root ?? '')}) : t("ui.108e40c64f",{p0:(occurrenceFilter.text)})}</span><button type="button" aria-label={t("ui.96ad94b293")} onClick={onClearOccurrenceFilter}><X size={14} /></button></div>}
       </div>
-      {unified?.controls && facetControls}
+      {unified?.controls && !phase3 && facetControls}
       {onNavigate && <DestinationOptions id={destinationSelection.id} active={destinationSelection.active} options={destinations} onPick={onNavigate} className="search-jump-options" />}
       </>}
       {(!unified || (unified.run && !unified.controls)) && <>
       <div className="search-results-summary">
-        <div role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />{t("ui.63509f3da4")}</span> : !valid ? t("ui.4bfc7b8a3d") : error ? t("ui.12287cefbb") : <><strong className="search-results-total">{t('search.totalResults', { total: results.length })}</strong><span className="search-results-detail">{t(unified ? "search.occurrenceCount" : "ui.9ec9176e66", { p0: toFa(counts.verses), p1: toFa(unified ? counts.occurrences : counts.words) })}</span></>}</div>
-        {!busy && !error && valid && results.length > 0 && <span className="search-results-position" data-current-result={Math.min(currentResult, results.length)} data-total-results={results.length} aria-live="off">{t('search.resultPosition', { current: Math.min(currentResult, results.length), total: results.length })}</span>}
+        <div role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />{t("ui.63509f3da4")}</span> : !valid ? t("ui.4bfc7b8a3d") : error ? t("ui.12287cefbb") : <>
+          {!phase3 && <strong className="search-results-total">{t('search.totalResults', { total: results.length })}</strong>}
+          <span className={phase3 ? "search-results-total" : "search-results-detail"}>{t(unified ? "search.occurrenceCount" : "ui.9ec9176e66", { p0: toFa(counts.verses), p1: toFa(unified ? counts.occurrences : counts.words) })}</span>
+        </>}</div>
+        {!phase3 && !busy && !error && valid && results.length > 0 && <span className="search-results-position" data-current-result={Math.min(currentResult, results.length)} data-total-results={results.length} aria-live="off">{t('search.resultPosition', { current: Math.min(currentResult, results.length), total: results.length })}</span>}
       </div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label={t("ui.57f03a82b0")} aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
-        {(!inline || lemmas.length > 0 || forms.length > 0) && facetControls}
+        {!phase3 && (!inline || lemmas.length > 0 || forms.length > 0) && facetControls}
         {!inline && !valid && <div className="search-empty"><BookOpen size={34} /><h2>{t("ui.2c2cdb504e")}</h2><p>{t("ui.9535464700")}</p><div>{[t("ui.cfd7c4bd1f"), t("ui.72dbd6c944"), t("ui.e7e17d45e9")].map(text => <button type="button" key={text} onClick={() => setQuery(text)}>{text}</button>)}</div></div>}
         {error && <button type="button" className="chip" onClick={() => setRetry(value => value + 1)}>{t("ui.be9b8b4f2b")}</button>}
         {!busy && !error && valid && !results.length && <div className="search-empty"><Search size={30} /><h2>{t("ui.b548ad6007")}</h2><p>{t("ui.d0c738e420")}</p></div>}
         {!busy && !error && valid && results.slice(0, visible).map((result, index) => <div key={`${result.s}:${result.a}`}>
-          {!occurrenceFilter && (index === 0 || results[index - 1].kind !== result.kind) && <h2 className="search-result-group">{t(labels[result.kind])}{' · '}{t('search.totalResults', { total: groupCounts[result.kind] })}</h2>}
+          {!phase3 && !occurrenceFilter && (index === 0 || results[index - 1].kind !== result.kind) && <h2 className="search-result-group">{t(labels[result.kind])}{' · '}{t('search.totalResults', { total: groupCounts[result.kind] })}</h2>}
           <article className="search-result-card" data-search-result-index={index + 1} data-search-address={`${result.s}:${result.a}`}><button type="button" className="search-result-open" aria-current={unified?.selected?.s === result.s && unified?.selected?.a === result.a || undefined} aria-label={t("ui.a55b5ca0c4",{p0:(meta.surahs[result.s - 1]?.fa),p1:(toFa(result.a))})} onClick={() => onPick(result.s, result.a, result.positions[0] ?? 1, linkState, capturePosition())}>
             <span className="search-result-meta"><b>{meta.surahs[result.s - 1]?.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(result.a)}</b><span className="search-result-position">{t('search.resultPosition', { current: index + 1, total: results.length })}</span><span>{t("ui.1abf27acd0")}</span></span><span className="search-result-text font-quran" lang="ar">{snippet(result, true)}</span>
           </button>
@@ -418,7 +443,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       </>}
   </>
   if (unified && !unified.run && !unified.controls) return null
-  if (inline) return <div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"}>{content}</div>
+  if (inline) return <div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"} data-phase3-results={phase3 || undefined}>{content}</div>
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir={uiDirection()} aria-label={t("ui.cd32ebbeba")} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
     <div className="search-page-shell">{content}</div>
   </main>, document.body)

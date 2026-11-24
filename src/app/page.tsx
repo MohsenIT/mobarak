@@ -78,6 +78,7 @@ export default function Home() {
   const [analysisSelection, setAnalysisSelection] = useState<AnalysisSelection | null>(null)
   const [flash, setFlash] = useState<{ s: number; a: number; pos: number } | null>(null)
   const mainRef = useRef<HTMLElement>(null)
+  const [quickResultsBar, setQuickResultsBar] = useState<HTMLDivElement | null>(null)
   /**
    * The three ways a location can describe the reader. Only the route hook
    * knows a navigation happened; only this screen knows what it means for the
@@ -572,9 +573,9 @@ export default function Home() {
       <header dir="rtl" className="reader-toolbar relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
         style={{
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
-          backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: '0.5rem',
+          backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: 'var(--reader-toolbar-spacing)',
         }}>
-        {search.quickOpen ? <QuickSurahSearch meta={meta} onNavigate={destination => navigateDestination(destination, true)} surah={meta.surahs[curSurahN - 1]} onClose={() => search.setQuickOpen(false)}
+        {search.quickOpen ? <QuickSurahSearch meta={meta} resultsBar={quickResultsBar} onNavigate={destination => navigateDestination(destination, true)} surah={meta.surahs[curSurahN - 1]} onClose={() => search.setQuickOpen(false)}
           scope={search.quickScope} onScopeChange={search.changeQuickScope}
           onHighlights={search.setQuickHighlights}
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false,true) }}
@@ -616,7 +617,15 @@ export default function Home() {
       <LanguageOnboarding knownPersianReader={knownPersianReader} onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
       <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} pauseRequest={audioPauseRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => { setAudioOpen(false); setAudioVerse(null) }} onFollow={(s,a) => goVerse(s,a)} />
 
-      {route.quickOrigin && !search.advancedOpen && <div className="quick-search-return"><button type="button" className="chip" data-quick-search-return onClick={route.returnFromQuick}><ArrowRight size={14} aria-hidden="true" />{t('quickSearch.returnTo', { p0: meta.surahs[route.quickOrigin.address.s - 1].fa, p1: toFa(route.quickOrigin.address.a) })}</button></div>}
+      {!search.advancedOpen && (route.quickOrigin || search.quickOpen) && (
+        <div className="quick-search-return" dir="rtl">
+          {route.quickOrigin && <button type="button" className="chip" data-quick-search-return onClick={route.returnFromQuick}>
+            <ArrowRight size={14} aria-hidden="true" />
+            <span>{t('quickSearch.returnTo', { p0: meta.surahs[route.quickOrigin.address.s - 1].fa, p1: toFa(route.quickOrigin.address.a) })}</span>
+          </button>}
+          {search.quickOpen && <div className="quick-search-results-slot" ref={setQuickResultsBar} />}
+        </div>
+      )}
       {search.returnToSearch && !search.advancedOpen && !search.searchAndGoOpen && (
         <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
           <button type="button" className="chip gap-1.5 py-1.5" onClick={() => {
@@ -711,7 +720,8 @@ export default function Home() {
         onSearchStateChange={SEARCH_AND_GO_PHASE_2 ? route.updateSearchAndGoState : undefined}
         onClearOccurrenceFilter={search.clearOccurrence}
         onReplay={SEARCH_AND_GO_PHASE_2 ? openUnifiedSearch : undefined}
-        textHistory={SEARCH_AND_GO_PHASE_2 ? search.textHistory : undefined}
+        history={SEARCH_AND_GO_PHASE_2 ? search.operations : undefined}
+        onToggleHistoryPin={search.toggleHistoryPin}
         onRecentSurah={s => {
           const position = route.lastSurahPosition(s, meta.surahs[s - 1].vc)
           if (position) navigateFromSearchAndGo({ kind: 'verse', s, a: position.a }, position.pos)

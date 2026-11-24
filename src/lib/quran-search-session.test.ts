@@ -75,3 +75,55 @@ test('expanding a literal match counts each new root occurrence once', () => {
   expect(expanded.find(r => r.a === 24)?.occurrences).toEqual([[1]])
   expect(expanded.find(r => r.a === 63)?.occurrences).toEqual([[11]])
 })
+
+const phase3 = { relation: 'all' as const, sorts: ['mushaf' as const], roots: [], lemmas: [], forms: [] }
+
+test('multiword lemma and root searches find both stems in Yusuf 76', () => {
+  for (const mode of ['lemma', 'root'] as const) {
+    const options = { mode, phase3, surahs: [12] }
+    expect(search('دین ملک', options).map(r => [r.a, r.positions])).toEqual([[76, [19, 20]]])
+    expect(search('«دین ملک»', options).map(r => [r.a, r.occurrences])).toEqual([[76, [[19, 20]]]])
+    expect(search('«ملک دین»', options)).toEqual([])
+    expect(search('دین ملک', { ...options, phase3: { ...phase3, relation: 'any' } }).length).toBeGreaterThan(1)
+  }
+})
+
+test('all and any run independent clauses in the same verse, across real Quran data', () => {
+  const options = { surahs: [20], phase3 }
+  const all = search('تخف موسى', options)
+  const any = search('تخف موسى', { ...options, phase3: { ...phase3, relation: 'any' } })
+  expect(all.map(r => r.a)).toEqual([77])
+  expect(any.map(r => r.a)).toContain(9)
+  expect(any.length).toBeGreaterThan(all.length)
+})
+
+test('exact phrase boundaries respect the independent waw and canonical positions', () => {
+  const options = { surahs: [20], phase3 }
+  const hits = search('«لا تخف»', options)
+  expect(hits.map(r => r.a)).toEqual([21, 68, 77])
+  expect(hits[0]).toMatchObject({ occurrences: [[3, 4]], parts: { 3: 2, 4: 2 } })
+  expect(search('“و لا تخف”', options)[0]).toMatchObject({ a: 21, parts: { 3: 3, 4: 2 } })
+  expect(search('لاتخف', { ...options, phase3: { ...phase3, relation: 'phrase' } })).toEqual([])
+  const local = createSearchSession({ verses: [[1, 1, ['قال', 'ولا', 'تخف']]], waw: { '1:1': [2] }, morphology: {} })
+  expect(local('"قال لا"', { phase3 })).toEqual([])
+  expect(local('"قال و لا"', { phase3 })[0].occurrences).toEqual([[1, 2]])
+})
+
+test('morphology groups must share one matched stem and values within a group are alternatives', () => {
+  const local = createSearchSession({
+    verses: [[1, 1, ['قال', 'كتب']], [1, 2, ['قال', 'كتب']]],
+    morphology: { '1:1': [['قول', 'say', 'I'], ['كتب', 'write', 'II']], '1:2': [['قول', 'say', 'II'], ['كتب', 'write', 'I']] },
+  })
+  const options = { phase3: { ...phase3, roots: ['قول', 'علم'], lemmas: ['say'], forms: ['II'] } }
+  expect(local('قال كتب', options).map(r => [r.a, r.positions, r.occurrences])).toEqual([[2, [1], [[1]]]])
+  expect(local('"قال كتب"', options).map(r => [r.a, r.occurrences])).toEqual([[2, [[1, 2]]]])
+})
+
+test('relevance uses frequency, proximity and stable verse ordering', () => {
+  const local = createSearchSession({
+    verses: [[1, 1, ['قال', 'من', 'ثم', 'كتب']], [1, 2, ['قال', 'كتب', 'من', 'ثم']], [1, 3, ['قال', 'قال', 'كتب', 'ثم']], [1, 4, ['قال', 'كتب', 'من', 'ثم']]],
+    morphology: {},
+  })
+  expect(local('قال كتب', { phase3 }).map(r => r.a)).toEqual([1, 2, 3, 4])
+  expect(local('قال كتب', { phase3: { ...phase3, sorts: ['relevance', 'mushaf'] } }).map(r => r.a)).toEqual([3, 2, 4, 1])
+})

@@ -1,16 +1,19 @@
 import type { AnalysisLocation } from './analysis'
-import type { SurahData } from './quran'
+import type { SurahData, Word } from './quran'
 import { splitWord, type WordPart } from './word-parts'
 
 export type ContextToken = { kind: 'word'; a: number; pos: number; part: WordPart; text: string } | { kind: 'marker'; a: number }
-export function occurrenceTokens(surah: SurahData): ContextToken[] {
-  return surah.v.flatMap(verse => [
-    ...verse.w.flatMap((word, i): ContextToken[] => {
+export function occurrenceVerseTokens(a: number, words: readonly Pick<Word, 't' | 'wa'>[]): ContextToken[] {
+  return [
+    ...words.flatMap((word, i): ContextToken[] => {
       const { prefix, stem } = splitWord(word)
-      return [...(prefix ? [{ kind: 'word' as const, a: verse.n, pos: i + 1, part: 'prefix' as const, text: prefix }] : []), { kind: 'word', a: verse.n, pos: i + 1, part: 'stem', text: stem }]
+      return [...(prefix ? [{ kind: 'word' as const, a, pos: i + 1, part: 'prefix' as const, text: prefix }] : []), { kind: 'word', a, pos: i + 1, part: 'stem', text: stem }]
     }),
-    { kind: 'marker' as const, a: verse.n },
-  ])
+    { kind: 'marker', a },
+  ]
+}
+export function occurrenceTokens(surah: SurahData): ContextToken[] {
+  return surah.v.flatMap(verse => occurrenceVerseTokens(verse.n, verse.w))
 }
 export function occurrenceWindow(tokens: ContextToken[], a: number, pos: number, part: WordPart = 'stem') {
   const target = tokens.findIndex(t => t.kind === 'word' && t.a === a && t.pos === pos && t.part === part)

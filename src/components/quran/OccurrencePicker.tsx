@@ -15,6 +15,26 @@ import type {OccurrenceScope} from '@/lib/occurrence-scope'
 import SearchScopeIcon from './SearchScopeIcon'
 
 export type PickerOperation = 'exact' | 'similarity'
+type PickerScope = Extract<OccurrenceScope, 'surah' | 'quran'>
+
+export function OccurrencePickerHeading({ onClose, onFull, disabled, operation = 'exact', scopes = ['surah', 'quran'] }: {
+  onClose: () => void
+  onFull?: (scope: PickerScope) => void
+  disabled?: boolean
+  operation?: PickerOperation
+  scopes?: readonly PickerScope[]
+}) {
+  return <div className="occurrence-picker-heading">
+    {onFull && <div className="occurrence-search-scopes" data-picker-operation={operation}>
+      <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.advancedIn')}</span>
+      <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.advancedIn')}>
+        {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).filter(([scope]) => scopes.includes(scope)).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
+          disabled={disabled} onClick={() => { onClose(); onFull(scope) }}><SearchScopeIcon scope={scope} /><span>{t(key)}</span></button>)}
+      </div>
+    </div>}
+    <button type="button" className="occurrence-picker-close" aria-label={t('ui.510fc4baec')} onClick={onClose}><X size={18} /></button>
+  </div>
+}
 
 export default function OccurrencePicker({ open, onOpenChange, items, index, surah, groupKey, label, title, onSelect, onFull, operation = 'exact', scopes = ['surah','quran'] }: {
   open: boolean; onOpenChange: (open: boolean) => void; items: AnalysisLocation[]; index: number
@@ -44,16 +64,7 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
           else selected?.scrollIntoView({ block: 'nearest' })
         })
       }}>
-      <div className="occurrence-picker-heading">
-        {onFull && <div className="occurrence-search-scopes" data-picker-operation={operation}>
-          <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.searchIn')}</span>
-          <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.searchIn')}>
-            {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).filter(([scope]) => scopes.includes(scope)).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
-              disabled={!surah} onClick={() => { onOpenChange(false); onFull(scope) }}><SearchScopeIcon scope={scope} /><span>{t(key)}</span></button>)}
-          </div>
-        </div>}
-        <button type="button" className="occurrence-picker-close" aria-label={t("ui.510fc4baec")} onClick={() => onOpenChange(false)}><X size={18} /></button>
-      </div>
+      <OccurrencePickerHeading onClose={() => onOpenChange(false)} onFull={onFull} disabled={!surah} operation={operation} scopes={scopes} />
       <div ref={list} className="occurrence-picker-list nice-scroll" onScroll={event => { offset.current = event.currentTarget.scrollTop }}>
         {groups.map(group => {
           const selected = group.indexes.includes(index)
@@ -66,8 +77,8 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
     </PopoverContent>
   </Popover>
 }
-function OccurrenceRow({ tokens, a, pos, part, locations, selected, onPick }: {
-  tokens: ContextToken[]; a: number; pos: number; part?: 'prefix' | 'stem'; locations: AnalysisLocation[]; selected: boolean; onPick: () => void
+export function OccurrenceRow({ tokens, a, pos, part, locations, selected, reference, address, onPick }: {
+  tokens: ContextToken[]; a: number; pos: number; part?: 'prefix' | 'stem'; locations: AnalysisLocation[]; selected: boolean; reference?: string; address?: string; onPick: () => void
 }) {
   const viewport = useRef<HTMLSpanElement>(null)
   const target = useRef<HTMLSpanElement>(null)
@@ -87,11 +98,11 @@ function OccurrenceRow({ tokens, a, pos, part, locations, selected, onPick }: {
     const observer = new ResizeObserver(align); observer.observe(element)
     return () => observer.disconnect()
   }, [excerpt])
-  return <button type="button" className="analysis-position-option has-excerpt" aria-current={selected ? 'true' : undefined} onClick={event => {
+  return <button type="button" className="analysis-position-option has-excerpt" data-search-address={address} aria-current={selected ? 'true' : undefined} onClick={event => {
     if (Date.now() < suppressClick.current) { event.preventDefault(); return }
     onPick()
   }}>
-    <span className="analysis-occurrence-reference">{t("ui.b1b168c791")}{' '}{toFa(a)}{locations.length > 1 && t("ui.afc417e2c0",{p0:(toFa(locations.length))})}</span>
+    <span className="analysis-occurrence-reference">{reference ?? <>{t("ui.b1b168c791")}{' '}{toFa(a)}{locations.length > 1 && t("ui.afc417e2c0",{p0:(toFa(locations.length))})}</>}</span>
     <span ref={viewport} className="occurrence-pan font-quran" dir="rtl" title={t("ui.8df9ff79ae")}
       onPointerDown={event => { if (event.isPrimary && event.button === 0) drag.current = { x: event.clientX, y: event.clientY, left: event.currentTarget.scrollLeft, locked: false } }}
       onPointerMove={event => {

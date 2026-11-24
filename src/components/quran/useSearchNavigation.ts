@@ -8,7 +8,7 @@ import type { Meta, Translator } from '@/lib/quran'
 import type { SearchStart } from './QuranSearch'
 import type { ReaderSearchState } from './ReaderSearchHighlights'
 import { readStored, writeStored } from '@/lib/reader-storage'
-import { readOperationHistory, rememberOperation, SEARCH_AND_GO_HISTORY_KEY, type SearchOperation } from '@/lib/search-and-go-history'
+import { readOperationHistory, rememberOperation, SEARCH_AND_GO_HISTORY_KEY, toggleOperationPin, type SearchOperation } from '@/lib/search-and-go-history'
 
 export function occurrenceSearchStart(selection: AnalysisSelection, scope: OccurrenceScope): Omit<SearchStart, 'revision'> | null {
   const surahs = occurrenceScopeSurahs(scope, selection.s)
@@ -70,7 +70,11 @@ export function useSearchNavigation({
   }, [])
   const [storedOperations, setStoredOperations] = useState<unknown>(() => readStored(SEARCH_AND_GO_HISTORY_KEY, []))
   const operations = useMemo(() => operationMeta ? readOperationHistory(operationMeta, storedOperations, SEARCH_AND_GO_PHASE_2) : [], [operationMeta, storedOperations])
-  const textHistory = useMemo(() => operations.filter(entry => entry.operation.type === 'text'), [operations])
+  const toggleHistoryPin = (id: string) => {
+    const next = toggleOperationPin(operations, id)
+    setStoredOperations(next)
+    writeStored(SEARCH_AND_GO_HISTORY_KEY, next)
+  }
   const recordOperation = (operation: SearchOperation) => {
     const next = rememberOperation(operations, operation, Date.now())
     setStoredOperations(next)
@@ -168,7 +172,7 @@ export function useSearchNavigation({
   const close = useCallback(() => setAdvancedOpen(false), [])
 
   return {
-    searchAndGoOpen, setSearchAndGoOpen, showUnified, unifiedStart, unifiedRevision, returnToUnified, searchAndGoInput, dismissSearchAndGoKeyboard, recordOperation, textHistory, advancedOpen, setAdvancedOpen, close,
+    searchAndGoOpen, setSearchAndGoOpen, showUnified, unifiedStart, unifiedRevision, returnToUnified, searchAndGoInput, dismissSearchAndGoKeyboard, recordOperation, operations, toggleHistoryPin, advancedOpen, setAdvancedOpen, close,
     quickOpen, openQuick, setQuickOpen, quickScope, changeQuickScope,
     quickHighlights, setQuickHighlights,
     start, occurrence, clearOccurrence: () => setOccurrence(null),
