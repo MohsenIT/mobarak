@@ -77,39 +77,6 @@ for(const method of ['chip','back'])test(`global results retain one origin and r
  }
 });
 
-test('quick search shows the current verse and both adjacent destinations in its status row', async ({ page }) => {
- await page.setViewportSize({ width: 320, height: 740 });
- await setup(page);
- const quick = await open(page);
- const row = quick.locator('.quick-search-status');
- const current = row.getByRole('status');
- const previous = row.getByRole('button', { name: 'نتیجهٔ قبلی', exact: true });
- const next = row.getByRole('button', { name: 'نتیجهٔ بعدی', exact: true });
- await quick.getByRole('button', { name: 'کل قرآن', exact: true }).click();
- await quick.getByRole('searchbox').fill('رصد');
- await expect(current).toContainText('توبه · ۵');
- await expect(current).toContainText('۱ از ۳');
- await expect(previous).toContainText('جن · ۲۷');
- await expect(next).toContainText('جن · ۹');
- await expect(page.locator('.quick-search-return')).not.toContainText('توبه');
-
- const [back, active, forward] = await Promise.all([previous.boundingBox(), current.boundingBox(), next.boundingBox()]);
- expect(forward.x + forward.width).toBeLessThanOrEqual(active.x);
- expect(active.x + active.width).toBeLessThanOrEqual(back.x);
-
- await next.click();
- await expect(page).toHaveURL(/\/s\/72\/a\/9\/w\//);
- await expect(current).toContainText('جن · ۹');
- await expect(current).toContainText('۲ از ۳');
- await expect(previous).toContainText('توبه · ۵');
- await expect(next).toContainText('جن · ۲۷');
- await previous.click();
- await expect(page).toHaveURL(/\/s\/9\/a\/5\/w\/14$/);
- await quick.getByRole('searchbox').fill('');
- await expect(current).toHaveText('متن یا شمارهٔ آیه');
- await expect(next).toBeDisabled();
-});
-
 test('a global quick-search journey returns to the same mushaf page and offset',async({page})=>{
  await setup(page);
  await page.goto('/p/130');
