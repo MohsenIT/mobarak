@@ -15,6 +15,26 @@ import type {OccurrenceScope} from '@/lib/occurrence-scope'
 import SearchScopeIcon from './SearchScopeIcon'
 
 export type PickerOperation = 'exact' | 'similarity'
+type PickerScope = Extract<OccurrenceScope, 'surah' | 'quran'>
+
+export function OccurrencePickerHeading({ onClose, onFull, disabled, operation = 'exact', scopes = ['surah', 'quran'] }: {
+  onClose: () => void
+  onFull?: (scope: PickerScope) => void
+  disabled?: boolean
+  operation?: PickerOperation
+  scopes?: readonly PickerScope[]
+}) {
+  return <div className="occurrence-picker-heading">
+    {onFull && <div className="occurrence-search-scopes" data-picker-operation={operation}>
+      <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.searchIn')}</span>
+      <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.searchIn')}>
+        {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).filter(([scope]) => scopes.includes(scope)).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
+          disabled={disabled} onClick={() => { onClose(); onFull(scope) }}><SearchScopeIcon scope={scope} /><span>{t(key)}</span></button>)}
+      </div>
+    </div>}
+    <button type="button" className="occurrence-picker-close" aria-label={t('ui.510fc4baec')} onClick={onClose}><X size={18} /></button>
+  </div>
+}
 
 export default function OccurrencePicker({ open, onOpenChange, items, index, surah, groupKey, label, title, onSelect, onFull, operation = 'exact', scopes = ['surah','quran'] }: {
   open: boolean; onOpenChange: (open: boolean) => void; items: AnalysisLocation[]; index: number
@@ -44,16 +64,7 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
           else selected?.scrollIntoView({ block: 'nearest' })
         })
       }}>
-      <div className="occurrence-picker-heading">
-        {onFull && <div className="occurrence-search-scopes" data-picker-operation={operation}>
-          <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.searchIn')}</span>
-          <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.searchIn')}>
-            {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).filter(([scope]) => scopes.includes(scope)).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
-              disabled={!surah} onClick={() => { onOpenChange(false); onFull(scope) }}><SearchScopeIcon scope={scope} /><span>{t(key)}</span></button>)}
-          </div>
-        </div>}
-        <button type="button" className="occurrence-picker-close" aria-label={t("ui.510fc4baec")} onClick={() => onOpenChange(false)}><X size={18} /></button>
-      </div>
+      <OccurrencePickerHeading onClose={() => onOpenChange(false)} onFull={onFull} disabled={!surah} operation={operation} scopes={scopes} />
       <div ref={list} className="occurrence-picker-list nice-scroll" onScroll={event => { offset.current = event.currentTarget.scrollTop }}>
         {groups.map(group => {
           const selected = group.indexes.includes(index)

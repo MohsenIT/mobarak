@@ -1355,7 +1355,7 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .quick-search-advanced svg { width: 18px; height: 18px; }
 .quick-search-return { display: flex; align-items: center; gap: 6px; padding: 2px 8px; border-bottom: 1px solid var(--line); background: var(--paper); }
 .quick-search-return:not(:has(> button, .quick-search-status)) { display: none; }
-.quick-search-return .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; min-width: 0; }
+.quick-search-return > .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; min-width: 0; height: 26px; }
 .quick-search-return .chip span { overflow: hidden; text-overflow: ellipsis; }
 .quick-search-return svg { flex-shrink: 0; }
 .quick-search-results-slot { margin-inline-start: auto; }
@@ -1366,10 +1366,9 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .quick-search-status .analysis-repeat-button { gap: 0; padding-inline: 1px; font-size: 11px; }
 .quick-search-status .analysis-repeat-previous svg { margin-inline-end: -2px; }
 .quick-search-status .analysis-repeat-next svg { margin-inline-start: -2px; }
-.quick-search-status .analysis-position-button { display: inline-flex; align-items: center; gap: 4px; padding-inline: 6px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--paper-2); }
+.quick-search-status .analysis-position-button { display: inline-flex; align-items: center; gap: 8px; padding-inline: 6px; min-height: 26px; height: 26px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--paper-2); }
 .quick-search-status .analysis-position-button bdi { max-width: 11ch; overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
 .quick-search-status .analysis-position-button[data-state='open'] { background: var(--word-selected); }
-.quick-search-result-picker .occurrence-picker-heading { justify-content: space-between; }
 .quick-search-result-picker .analysis-occurrence-reference { overflow: hidden; text-overflow: ellipsis; }
 .search-mode-tabs, .search-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; font-size: 13px; }
 .search-mode-tabs button { border: 1px solid var(--line); }

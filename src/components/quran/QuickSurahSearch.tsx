@@ -141,7 +141,8 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
             count: results.length - index - 1, disabled: index >= results.length - 1,
             description: neighborAddress(results[index + 1]), onClick: () => jump(results, index + 1),
           }}
-          center={<QuickSearchResultPicker key={`${scope}:${mode}:${query}`} meta={meta} results={results} index={index} onSelect={i => jump(results, i)} />}
+          center={<QuickSearchResultPicker key={`${scope}:${mode}:${query}`} meta={meta} results={results} index={index}
+            onSelect={i => jump(results, i)} onFull={targetScope => onAdvanced({ query, mode, surahs: targetScope === 'quran' ? [] : [activeResult.s] })} />}
         /> : <span role="status">{destinations.length ? t('ui.4f981a291d') : busy ? t('ui.63509f3da4') : error ? t('ui.e5d91b8562') : query.trim().length >= 2 ? t('ui.292cf63931') : t('ui.d1400e3d47')}</span>}
       </div>,
       resultsBar,

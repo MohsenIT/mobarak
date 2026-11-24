@@ -2,20 +2,20 @@
 
 import { useRef, useState } from 'react'
 import { Arrow as PopoverArrow } from '@radix-ui/react-popover'
-import { X } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { t } from '@/lib/i18n'
 import { toFa, type Meta } from '@/lib/quran'
 import type { QuranSearchResult } from '@/lib/quran-search'
 import type { AnalysisLocation } from '@/lib/analysis'
 import { occurrenceVerseTokens } from '@/lib/occurrence-context'
-import { OccurrenceRow } from './OccurrencePicker'
+import { OccurrencePickerHeading, OccurrenceRow } from './OccurrencePicker'
 
-export default function QuickSearchResultPicker({ meta, results, index, onSelect }: {
+export default function QuickSearchResultPicker({ meta, results, index, onSelect, onFull }: {
   meta: Meta
   results: QuranSearchResult[]
   index: number
   onSelect: (index: number) => void
+  onFull: (scope: 'surah' | 'quran') => void
 }) {
   const [open, setOpen] = useState(false)
   const list = useRef<HTMLDivElement>(null)
@@ -23,11 +23,10 @@ export default function QuickSearchResultPicker({ meta, results, index, onSelect
   const address = ({ s, a }: QuranSearchResult) => `${meta.surahs[s - 1].fa} ${toFa(a)}`
 
   return <Popover open={open} onOpenChange={setOpen}>
-    <span className="sr-only" role="status">{address(results[index])}{' ۔ '}{t('ui.53b89ec77a', count)}</span>
+    <span className="sr-only" role="status">{address(results[index])}{' '}{t('ui.53b89ec77a', count)}</span>
     <PopoverTrigger asChild>
       <button type="button" className="analysis-position-button" aria-label={`${address(results[index])}، ${t('ui.f511eddde8', count)}`}>
         <bdi>{address(results[index])}</bdi>
-        <span aria-hidden="true">۔</span>
         <span>{t('ui.53b89ec77a', count)}</span>
       </button>
     </PopoverTrigger>
@@ -38,12 +37,7 @@ export default function QuickSearchResultPicker({ meta, results, index, onSelect
         selected?.focus({ preventScroll: true })
         selected?.scrollIntoView({ block: 'nearest' })
       }}>
-      <div className="occurrence-picker-heading">
-        <span className="occurrence-search-label">{t('ui.b55272cf13')}</span>
-        <button type="button" className="occurrence-picker-close" aria-label={t('ui.510fc4baec')} onClick={() => setOpen(false)}>
-          <X size={18} aria-hidden="true" />
-        </button>
-      </div>
+      <OccurrencePickerHeading onClose={() => setOpen(false)} onFull={onFull} />
       <div ref={list} className="occurrence-picker-list nice-scroll">
         {open && results.map((result, i) => {
           const waw = new Set(result.waw)
