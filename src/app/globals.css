@@ -1353,11 +1353,13 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .quick-search-scope { margin-inline-start: auto; }
 .quick-search-actions .quick-search-advanced { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; gap: 4px; height: 30px; padding: 0 6px; border: 1px solid var(--sage); border-radius: 6px; background: var(--word-root); white-space: nowrap; }
 .quick-search-return { display: flex; align-items: center; gap: 6px; padding: 2px 8px; border-bottom: 1px solid var(--line); background: var(--paper); }
-.quick-search-return:empty { display: none; }
+.quick-search-return:not(:has(> button, .quick-search-status)) { display: none; }
 .quick-search-return .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; min-width: 0; }
 .quick-search-return .chip span { overflow: hidden; text-overflow: ellipsis; }
 .quick-search-return svg { flex-shrink: 0; }
-.quick-search-status { margin-inline-start: auto; display: flex; align-items: center; gap: 2px; font-size: 11px; color: var(--ink-soft); }
+.quick-search-results-slot { margin-inline-start: auto; }
+.quick-search-results-slot:empty { display: none; }
+.quick-search-status { display: flex; align-items: center; gap: 2px; font-size: 11px; color: var(--ink-soft); }
 .quick-search-status button { min-height: 32px; white-space: nowrap; }
 .quick-search-status button:disabled { opacity: .4; }
 .quick-search-status .analysis-repeat-button { padding-inline: 2px; font-size: 11px; }

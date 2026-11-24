@@ -618,11 +618,12 @@ export default function Home() {
       <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} pauseRequest={audioPauseRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => { setAudioOpen(false); setAudioVerse(null) }} onFollow={(s,a) => goVerse(s,a)} />
 
       {!search.advancedOpen && (route.quickOrigin || search.quickOpen) && (
-        <div className="quick-search-return" ref={setQuickResultsBar} dir="rtl">
+        <div className="quick-search-return" dir="rtl">
           {route.quickOrigin && <button type="button" className="chip" data-quick-search-return onClick={route.returnFromQuick}>
             <ArrowRight size={14} aria-hidden="true" />
             <span>{t('quickSearch.returnTo', { p0: meta.surahs[route.quickOrigin.address.s - 1].fa, p1: toFa(route.quickOrigin.address.a) })}</span>
           </button>}
+          {search.quickOpen && <div className="quick-search-results-slot" ref={setQuickResultsBar} />}
         </div>
       )}
       {search.returnToSearch && !search.advancedOpen && !search.searchAndGoOpen && (
