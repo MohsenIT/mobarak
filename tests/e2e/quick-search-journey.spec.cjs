@@ -88,11 +88,11 @@ test('quick search puts the compact result picker beside the return chip', async
  const picker = stepper.locator('.analysis-position-button');
  await quick.getByRole('button', { name: 'کل قرآن', exact: true }).click();
  await quick.getByRole('searchbox').fill('رصد');
- await expect(picker).toContainText('توبه · ۵', { timeout: 20000 });
+ await expect(picker).toContainText('توبه ۵', { timeout: 20000 });
  await expect(picker).toContainText('۱ از ۳');
  await expect(previous).toBeDisabled();
- await expect(next).toHaveText('۲');
- await expect(next).toHaveAccessibleDescription('جن · ۹');
+ await expect(next).toHaveText('۲ مورد');
+ await expect(next).toHaveAccessibleDescription('جن ۹');
  await expect(band.locator('[data-quick-search-return]')).toContainText('انعام');
 
  for (const width of [320, 1280]) {
@@ -106,15 +106,18 @@ test('quick search puts the compact result picker beside the return chip', async
 
  await picker.click();
  const list = page.getByRole('dialog', { name: 'فهرست تکرارها' });
- await expect(list.getByRole('button')).toHaveCount(3);
- await list.getByRole('button', { name: /جن · ۹/ }).click();
+ const rows = list.locator('.analysis-position-option.has-excerpt');
+ await expect(rows.locator('.analysis-occurrence-reference')).toHaveText(['توبه ۵', 'جن ۹', 'جن ۲۷']);
+ await expect(rows.nth(1).locator('.occurrence-pan')).toContainText('مَقَـٰعِدَ');
+ await expect(rows.nth(1).locator('[data-search-match]')).toHaveText('رَّصَدًا');
+ await list.getByRole('button', { name: /جن ۹/ }).click();
  await expect(list).toBeHidden();
  await expect(page).toHaveURL(/\/s\/72\/a\/9\/w\//);
  await expect(picker).toContainText('۲ از ۳');
- await expect(previous).toHaveText('۱');
- await expect(next).toHaveText('۱');
+ await expect(previous).toHaveText('۱ مورد');
+ await expect(next).toHaveText('۱ مورد');
  await next.click();
- await expect(picker).toContainText('جن · ۲۷');
+ await expect(picker).toContainText('جن ۲۷');
  await expect(next).toBeDisabled();
 });
 

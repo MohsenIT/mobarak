@@ -66,8 +66,8 @@ export default function OccurrencePicker({ open, onOpenChange, items, index, sur
     </PopoverContent>
   </Popover>
 }
-function OccurrenceRow({ tokens, a, pos, part, locations, selected, onPick }: {
-  tokens: ContextToken[]; a: number; pos: number; part?: 'prefix' | 'stem'; locations: AnalysisLocation[]; selected: boolean; onPick: () => void
+export function OccurrenceRow({ tokens, a, pos, part, locations, selected, reference, onPick }: {
+  tokens: ContextToken[]; a: number; pos: number; part?: 'prefix' | 'stem'; locations: AnalysisLocation[]; selected: boolean; reference?: string; onPick: () => void
 }) {
   const viewport = useRef<HTMLSpanElement>(null)
   const target = useRef<HTMLSpanElement>(null)
@@ -91,7 +91,7 @@ function OccurrenceRow({ tokens, a, pos, part, locations, selected, onPick }: {
     if (Date.now() < suppressClick.current) { event.preventDefault(); return }
     onPick()
   }}>
-    <span className="analysis-occurrence-reference">{t("ui.b1b168c791")}{' '}{toFa(a)}{locations.length > 1 && t("ui.afc417e2c0",{p0:(toFa(locations.length))})}</span>
+    <span className="analysis-occurrence-reference">{reference ?? <>{t("ui.b1b168c791")}{' '}{toFa(a)}{locations.length > 1 && t("ui.afc417e2c0",{p0:(toFa(locations.length))})}</>}</span>
     <span ref={viewport} className="occurrence-pan font-quran" dir="rtl" title={t("ui.8df9ff79ae")}
       onPointerDown={event => { if (event.isPrimary && event.button === 0) drag.current = { x: event.clientX, y: event.clientY, left: event.currentTarget.scrollLeft, locked: false } }}
       onPointerMove={event => {

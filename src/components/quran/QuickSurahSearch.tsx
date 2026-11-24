@@ -102,7 +102,7 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
   const expand = (all: boolean) => onAdvanced({ query, mode, surahs: all ? [] : [surah.n] })
   const activeResult = !busy && !error && results[index]
   const neighborAddress = (result: QuranSearchResult | undefined) => result
-    ? `${meta.surahs[result.s - 1].fa} · ${toFa(result.a)}` : undefined
+    ? `${meta.surahs[result.s - 1].fa} ${toFa(result.a)}` : undefined
   return <div className="quick-surah-search" aria-label={t("ui.a1edc5936b")}>
     <form onSubmit={event => { event.preventDefault(); if(destinations.length===1)onNavigate(destinations[0].destination); else if (!busy) jump(results, index + 1) }}>
       <button type="button" className="icon-btn" aria-label={t("ui.8b070f0497")} onClick={onClose}><ArrowRight size={20} /></button>
@@ -119,7 +119,7 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
     </div>
     {resultsBar && (activeResult || query.trim()) && createPortal(
       <div className="quick-search-status">
-        {activeResult ? <OccurrenceStepper
+        {activeResult ? <OccurrenceStepper countLabel={t('ui.61cf4e03c8')}
           previous={{
             label: t(scope === 'quran' ? 'quickSearch.previousResult' : 'ui.1cfdb521b9'),
             count: index, disabled: index <= 0, description: neighborAddress(results[index - 1]),

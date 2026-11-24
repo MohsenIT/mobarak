@@ -25,6 +25,10 @@ all locales. Source content (Quran, translations, dictionary entries and verifie
 bibliographic metadata) must remain separate and must not be rewritten by UI
 localization. See `docs/internationalization.md` and `src/messages/README.md`.
 
+Write a surah name and verse number as a single address with a space, for
+example `آل‌عمران ۹`. Use a gap or a separator between that address and other
+metadata such as a result count. Keep Quran occurrence lists in mushaf order.
+
 ## Architecture and module ownership
 
 This project is a **layered** architecture, not feature-based. Dependencies flow

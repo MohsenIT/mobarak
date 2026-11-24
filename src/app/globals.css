@@ -1366,7 +1366,8 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .quick-search-status .analysis-position-button { display: inline-flex; align-items: center; gap: 4px; padding-inline: 6px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--paper-2); }
 .quick-search-status .analysis-position-button bdi { max-width: 11ch; overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
 .quick-search-status .analysis-position-button[data-state='open'] { background: var(--word-selected); }
-.quick-search-result-picker .analysis-position-option { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.quick-search-result-picker .occurrence-picker-heading { justify-content: space-between; }
+.quick-search-result-picker .analysis-occurrence-reference { overflow: hidden; text-overflow: ellipsis; }
 .search-mode-tabs, .search-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; font-size: 13px; }
 .search-mode-tabs button { border: 1px solid var(--line); }
 .search-suggestions { margin-top: 8px; }
