@@ -285,13 +285,15 @@ test('return restores the original current-surah scope and same-root setting aft
   await expect((await showControls(page)).locator('[data-phase3-roots]')).toHaveAttribute('aria-pressed', 'true');
 });
 
-test('wide reader entry opens a side panel and research stays beside results after editing the query', async ({ page }) => {
+test('wide reader entry replaces the reading surface with results and a right research panel', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/s/20/a/34');
   await page.locator('.reader-surah-link').click();
   const surface = page.locator('[data-search-workspace]');
   const field = surface.getByRole('combobox');
-  expect((await surface.boundingBox()).width).toBeLessThan(1280);
+  await expect(surface.locator('.search-workspace-research')).toBeVisible();
+  await expect(surface.locator('.search-workspace-research [data-phase3-settings]')).toBeVisible();
+  expect((await surface.boundingBox()).width).toBe(1280);
   await field.fill('صبر');
   await expect(surface.locator('[data-phase3-relation]')).toHaveCount(0);
   const toggle = surface.locator('[data-phase3-more]');
@@ -302,7 +304,7 @@ test('wide reader entry opens a side panel and research stays beside results aft
   await expect(surface.locator('[data-phase3-relation]')).toBeVisible();
   await expect(tools).toBeVisible();
   const [aside, results] = await Promise.all([tools.boundingBox(), surface.locator('.search-page-results').boundingBox()]);
-  expect(Math.abs(aside.x - results.x)).toBeGreaterThan(200);
+  expect(aside.x).toBeGreaterThanOrEqual(results.x + results.width - 1);
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(tools).toBeVisible();
   const [inline, list] = await Promise.all([tools.boundingBox(), surface.locator('.search-page-results').boundingBox()]);

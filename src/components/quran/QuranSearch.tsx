@@ -49,6 +49,7 @@ interface Props {
       controls: boolean
       input: RefObject<HTMLInputElement | null>
       settingsHost: HTMLDivElement | null
+      researchHost: HTMLElement | null
       selected?: VerseAddress
       onSuggestions: (suggestions: string[]) => void
       onModeChange: (mode: SearchMode) => void
@@ -366,13 +367,17 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
             <label className="choice-row"><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />{t("ui.5105840a21")}</label>
             <label className="choice-row"><input type="checkbox" checked={includeNear && !(phase3 && config.spellingSensitive)} disabled={!!occurrenceFilter || mode !== 'text' || (phase3 && config.spellingSensitive)} onChange={e => setIncludeNear(e.target.checked)} />{t("ui.8a8b5ac72e")}</label>
   </>
-  const content = <>
-      {phase3 && <SearchPhase3Controls
+  const controls = phase3 && <SearchPhase3Controls
         query={query} matching={matchingOptions} identity={`${query}:${surahs.join(',')}:${mode}`}
         meta={meta} origin={searchOrigin} scope={scopeVariant} surahs={surahs} config={config}
         results={answerKey === engineKey && !busy ? rawResults : emptyResults} includeRoots={includeRoots} onRoots={toggleRoots} onConfig={setConfig}
         onScope={(scope, numbers) => { setScopeVariant(scope); setSurahs(numbers) }}
-      />}
+      />
+  const research = phase3 && unified?.researchHost
+    ? createPortal(<><SearchWorkspaceSettings config={config} onConfig={setConfig} />{controls}</>, unified.researchHost)
+    : null
+  const content = <>
+      {!unified?.researchHost && controls}
       {(!inline || unified?.controls) && <>
       <div className={inline ? "search-and-go-controls" : "search-page-header"}>
         {!inline && <>
@@ -452,8 +457,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const settings = phase3 && unified?.settingsHost
     ? createPortal(<SearchWorkspaceSettings config={config} onConfig={setConfig} />, unified.settingsHost)
     : null
-  if (unified && !unified.run && !unified.controls) return settings
-  if (inline) return <>{settings}<div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"} data-phase3-results={phase3 || undefined}>{content}</div></>
+  if (unified && !unified.run && !unified.controls) return <>{settings}{research}</>
+  if (inline) return <>{settings}{research}<div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"} data-phase3-results={phase3 || undefined}>{content}</div></>
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir={uiDirection()} aria-label={t("ui.cd32ebbeba")} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
     <div className="search-page-shell">{content}</div>
   </main>, document.body)

@@ -73,6 +73,16 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
     }
   }, [])
   const [settingsHost, setSettingsHost] = useState<HTMLDivElement | null>(null)
+  const [researchHost, setResearchHost] = useState<HTMLElement | null>(null)
+  const [wideWorkspace, setWideWorkspace] = useState(false)
+  useEffect(() => {
+    const element = surface.current
+    if (!SEARCH_AND_GO_PHASE_3 || !element) return
+    const observer = new ResizeObserver(([entry]) => setWideWorkspace(entry.contentRect.width >= 660))
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+  const useResearchColumn = SEARCH_AND_GO_PHASE_3 && wideWorkspace && !help
   const back = useRef<HTMLButtonElement>(null)
   const trigger = useRef<HTMLElement>(null)
   const value = query.trim()
@@ -177,7 +187,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 }
               }} />
           </div>
-          {SEARCH_AND_GO_PHASE_3 && <div className="search-workspace-settings-host" ref={setSettingsHost} />}
+          {SEARCH_AND_GO_PHASE_3 && !useResearchColumn && <div className="search-workspace-settings-host" ref={setSettingsHost} />}
           <button type="button" className="icon-btn" aria-label={t('searchAndGo.help')} aria-expanded={help}
             onClick={() => { selection.reset(); setHelp(open => !open) }}>
             <CircleHelp size={20} className="search-and-go-help-icon" aria-hidden="true" />
@@ -199,7 +209,8 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
             })}
           </div>}
         </div>}
-        <div className="search-and-go-body" data-show-controls={SEARCH_AND_GO_PHASE_2 && help || undefined} data-text-results={SEARCH_AND_GO_PHASE_2 && text || undefined} hidden={help && !SEARCH_AND_GO_PHASE_2}>
+        <div className="search-and-go-body" data-show-controls={SEARCH_AND_GO_PHASE_2 && help || undefined} data-text-results={SEARCH_AND_GO_PHASE_2 && text || undefined} data-research-column={useResearchColumn || undefined} hidden={help && !SEARCH_AND_GO_PHASE_2}>
+          <div className="search-workspace-main">
           {!help && !empty && (options.length > 0 || completions.length > 0) &&
             <div className={SEARCH_AND_GO_PHASE_3 ? "search-and-go-suggestions nice-scroll" : "contents"}>
               {SEARCH_AND_GO_PHASE_3 && options.length > 0 && <MousePointer2 size={15} aria-hidden="true" className="search-and-go-pointer" />}
@@ -250,11 +261,13 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           <QuranSearch inline={{
             query: SEARCH_AND_GO_PHASE_2 ? query : value,
             position,
-            unified: SEARCH_AND_GO_PHASE_2 ? { run: text, controls: help, input: field, settingsHost, selected, onSuggestions: setSuggestions, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
+            unified: SEARCH_AND_GO_PHASE_2 ? { run: text, controls: help, input: field, settingsHost, researchHost, selected, onSuggestions: setSuggestions, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
           }} open={SEARCH_AND_GO_PHASE_2 || text} onOpenChange={onClose}
             initialSearch={start?.state ? { query: start.query, mode: start.state.mode, surahs: start.state.surahs, revision: 0, state: start.state } : null}
             occurrenceFilter={occurrence} onClearOccurrenceFilter={clearOccurrence} onStateChange={onSearchStateChange}
             meta={meta} translator={translator} currentSurah={currentSurah} onPick={onPick} />
+          </div>
+          {useResearchColumn && <aside className="search-workspace-research" ref={setResearchHost} aria-label={t('searchP3.research')} />}
         </div>
       </div>
     </DialogContent>
