@@ -58,8 +58,11 @@ export function readSearchLink(href: string): SearchLinkState | null {
   const roots = sortedFacets(values('fr'))
   const lemmas = sortedFacets(values('fl'))
   const forms = sortedFacets(values('ff'))
-  const phase3 = relation || sorts.length || roots.length || lemmas.length || forms.length
-    ? { relation: relation ?? 'all', sorts, roots, lemmas, forms } satisfies SearchPhase3State
+  const cooccurrence = p.get('co')
+  const broader = cooccurrence === 'context' || cooccurrence === 'surah'
+  const spellingSensitive = p.get('sp') === '1'
+  const phase3 = relation || sorts.length || roots.length || lemmas.length || forms.length || broader || spellingSensitive
+    ? { relation: relation ?? 'all', sorts, roots, lemmas, forms, ...(broader ? { cooccurrence } : {}), ...(spellingSensitive ? { spellingSensitive } : {}) } satisfies SearchPhase3State
     : undefined
   const [tab, s, a, pos] = (p.get('o') || '').split('.')
   const occurrence: AnalysisSelection | null = Object.hasOwn(tabs, tab) && bounded(s, 114) && bounded(a, 286) && bounded(pos, 500) ? {
@@ -96,6 +99,8 @@ export function searchLink(current: string, state: SearchLinkState, native = fal
   if (state.scopeVariant) p.set('scope', state.scopeVariant)
   if (state.phase3) {
     p.set('rel', state.phase3.relation)
+    if (state.phase3.cooccurrence && state.phase3.cooccurrence !== 'verse') p.set('co', state.phase3.cooccurrence)
+    if (state.phase3.spellingSensitive) p.set('sp', '1')
     for (const sort of new Set(state.phase3.sorts)) p.append('sort', sort)
     for (const [param, facet] of Object.entries(phase3Facets)) {
       for (const value of sortedFacets(state.phase3[facet])) p.append(param, value)

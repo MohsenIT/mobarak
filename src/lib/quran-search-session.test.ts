@@ -127,3 +127,41 @@ test('relevance uses frequency, proximity and stable verse ordering', () => {
   expect(local('قال كتب', { phase3 }).map(r => r.a)).toEqual([1, 2, 3, 4])
   expect(local('قال كتب', { phase3: { ...phase3, sorts: ['relevance', 'mushaf'] } }).map(r => r.a)).toEqual([3, 2, 4, 1])
 })
+
+test('broader all-word search keeps real verses, uses source context ranges and never crosses surahs', () => {
+  const options = { surahs: [20], includePartial: false, phase3 }
+  expect(search('تخف نارا', options)).toEqual([])
+  const contexts = search('تخف نارا', { ...options, phase3: { ...phase3, cooccurrence: 'context' } })
+  expect(contexts.map(r => [r.a, r.occurrences, r.cooccurrenceGroup])).toEqual([
+    [10, [[3], [9]], { unit: 'context', from: 9, to: 23 }],
+    [21, [[4]], { unit: 'context', from: 9, to: 23 }],
+  ])
+  expect(countQuranSearchResults(contexts)).toEqual({ occurrences: 3, words: 3, verses: 2 })
+  const surah = search('تخف نارا', { ...options, phase3: { ...phase3, cooccurrence: 'surah' } })
+  expect(surah.map(r => r.a)).toEqual([10, 21, 68, 77])
+  expect(surah[0].cooccurrenceGroup).toEqual({ unit: 'surah', from: 1, to: 135 })
+  expect(search('"تخف نارا"', { ...options, phase3: { ...phase3, cooccurrence: 'surah' } })).toEqual([])
+  const local = createSearchSession({ verses: [[115, 1, ['تخف']], [115, 2, ['نارا']], [116, 1, ['موسى']]], morphology: {} })
+  expect(local('تخف نارا', { phase3: { ...phase3, cooccurrence: 'context' } })).toEqual([])
+  expect(local('تخف موسى', { phase3: { ...phase3, cooccurrence: 'surah' } })).toEqual([])
+})
+
+test('explicit relaxed spellings use attested verses, while sensitive mode keeps the written distinctions', () => {
+  const relaxed = { phase3, surahs: [12, 24] }
+  const sensitive = { ...relaxed, phase3: { ...phase3, spellingSensitive: true } }
+  for (const spelling of ['رویا', 'رؤیا']) {
+    expect(search(spelling, relaxed).map(r => [r.s, r.a])).toEqual([[12, 5], [12, 43], [12, 100]])
+    expect(search(spelling, { ...sensitive, includeNear: true })).toEqual([])
+  }
+  expect(search('رُءْيَاكَ', sensitive).map(r => [r.s, r.a])).toEqual([[12, 5]])
+  for (const spelling of ['صلاة', 'صلات']) expect(search(spelling, relaxed).some(r => r.s === 24 && r.a === 58)).toBe(true)
+  expect(search('صلاة صلات', relaxed).find(r => r.s === 24 && r.a === 58)?.occurrences).toEqual([[8], [16]])
+  expect(search('صلات', sensitive).some(r => r.s === 24 && r.a === 58)).toBe(false)
+  expect(search('صلاة', sensitive).some(r => r.s === 24 && r.a === 58)).toBe(false)
+  expect(search('"صَلَوٰة"', sensitive).map(r => [r.s, r.a])).toEqual([[24, 58]])
+  expect(search('«لا تخف»', { ...sensitive, surahs: [20] })[0]).toMatchObject({ a: 21, parts: { 3: 2, 4: 2 } })
+  const local = createSearchSession({ verses: [[1, 1, ['رُويَا']], [1, 2, ['رُؤيَا']], [1, 3, ['صَلاة']], [1, 4, ['صَلات']]], morphology: {} })
+  for (const [index, word] of ['رویا', 'رؤیا', 'صلاة', 'صلات'].entries()) {
+    expect(local(word, { phase3: sensitive.phase3 }).map(r => r.a)).toEqual([index + 1])
+  }
+})

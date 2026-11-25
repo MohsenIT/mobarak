@@ -1,13 +1,16 @@
-import { normalizeQuranSearch, type QuranSearchResult, type SearchVerse } from './quran-search'
+import { normalizeQuranSearch, quranSearchKeys, type QuranSearchResult, type SearchVerse } from './quran-search'
 
 export type SearchRelation = 'all' | 'any' | 'phrase'
 export type SearchSort = 'mushaf' | 'relevance'
+export type SearchCooccurrence = 'verse' | 'context' | 'surah'
 export type Phase3SearchOptions = {
   relation: SearchRelation
   sorts: SearchSort[]
   roots: string[]
   lemmas: string[]
   forms: string[]
+  cooccurrence?: SearchCooccurrence
+  spellingSensitive?: boolean
 }
 
 export function defaultPhase3SearchOptions(): Phase3SearchOptions {
@@ -16,16 +19,16 @@ export function defaultPhase3SearchOptions(): Phase3SearchOptions {
 
 type SearchClause = { text: string; exact: boolean }
 
-export function parseSearchQuery(input: string, relation: SearchRelation): SearchClause[] {
+export function parseSearchQuery(input: string, relation: SearchRelation, spellingSensitive = false): SearchClause[] {
   if (relation === 'phrase') {
-    const text = normalizeQuranSearch(input)
+    const text = normalizeQuranSearch(input, false, spellingSensitive)
     return text ? [{ text, exact: true }] : []
   }
   const clauses = new Map<string, SearchClause>()
   for (const [plain, straight, curly, angled] of input.matchAll(/"([^"]*)(?:"|$)|“([^”]*)(?:”|$)|«([^»]*)(?:»|$)|[^"“«]+/g)) {
     const quoted = straight ?? curly ?? angled
     const exact = quoted !== undefined
-    const normalized = normalizeQuranSearch(quoted ?? plain)
+    const normalized = normalizeQuranSearch(quoted ?? plain, false, spellingSensitive)
     for (const text of exact ? [normalized] : normalized.split(' ')) {
       if (text) clauses.set(`${exact}:${text}`, { text, exact })
     }
@@ -33,12 +36,12 @@ export function parseSearchQuery(input: string, relation: SearchRelation): Searc
   return [...clauses.values()]
 }
 
-export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<string, number[]> = {}) {
+export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<string, number[]> = {}, spellingSensitive = false) {
   const keysByWord = new Map<string, string[]>()
   const keysFor = (word: string) => {
     let keys = keysByWord.get(word)
     if (!keys) {
-      keys = [...new Set([normalizeQuranSearch(word), normalizeQuranSearch(word, true)])].filter(Boolean)
+      keys = quranSearchKeys(word, spellingSensitive)
       keysByWord.set(word, keys)
     }
     return keys
