@@ -160,6 +160,8 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
         const options = surface?.querySelector<HTMLDetailsElement>(`details[name="${searchPopupName}"][open]`)
         if (options) {
           event.preventDefault()
+          const picker = options.querySelector<HTMLButtonElement>('.phase3-scope-pick[aria-expanded="true"]')
+          if (picker) { picker.click(); picker.focus(); return }
           options.open = false
           options.querySelector('summary')?.focus()
           return

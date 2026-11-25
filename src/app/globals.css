@@ -1972,7 +1972,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 [data-phase3-results] { --search-controls-inset: clamp(12px, 3vw, 34px); }
 [data-phase3-results] :is(.phase3-options, .search-results-summary) { padding-inline: var(--search-controls-inset); }
 .phase3-options > * { flex: none; }
-.phase3-options summary.chip, .phase3-options > button.chip, .phase3-sort > summary.chip {
+.phase3-options summary.chip, .phase3-options > button.chip, .phase3-sort > summary.chip, .phase3-scope-control > summary.chip {
   min-height: 28px;
   padding: 2px 8px;
   border-color: var(--line);
@@ -1996,8 +1996,6 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 }
 .phase3-research[hidden], .phase3-research:not(:has(.search-facet-row)) { display: none; }
 .phase3-popup h3 { font-size: 12px; color: var(--ink-soft); }
-.phase3-picker { flex-basis: 100%; overflow: auto; }
-.phase3-picker input[type='search'] { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
 .phase3-controls [aria-pressed='true'], .phase3-controls [data-changed='true'] { background: var(--word-active); border-color: var(--sage); }
 .search-and-go-settings .phase3-controls { padding-block-end: 4px; }
 [data-phase3-results] .search-results-summary { background: transparent; border-block-end: 0; padding-block: 3px 5px; color: var(--ink-soft); }
@@ -2036,16 +2034,17 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-page-input .reader-display-menu .reader-display-modes button { padding: 4px; }
 .search-page-input .reader-display-menu .reader-display-switch { padding: 3px; }
 .phase3-settings .reader-display-switch:disabled { opacity: .55; }
-.phase3-settings summary, .phase3-sort summary { list-style: none; cursor: pointer; }
-.phase3-settings summary::-webkit-details-marker, .phase3-sort summary::-webkit-details-marker { display: none; }
+.phase3-settings summary, .phase3-sort summary, .phase3-scope-control > summary { list-style: none; cursor: pointer; }
+.phase3-settings summary::-webkit-details-marker, .phase3-sort summary::-webkit-details-marker, .phase3-scope-control > summary::-webkit-details-marker { display: none; }
 .phase3-sort { position: relative; }
 .phase3-sort > .reader-display-menu { position: absolute; inset-block-start: calc(100% + 7px); inset-inline-end: 0; z-index: 6; width: min(232px, calc(100vw - 36px)); }
 .phase3-options > details > summary,
 .phase3-options > button,
 .phase3-sort > summary,
+.phase3-scope-control > summary,
 .phase3-settings > summary { position: relative; z-index: 9; }
 .search-and-go:has(details[name="mobarak-search-popup"][open]) .phase3-options > details > summary,
-.phase3-sort > summary { background: var(--paper); }
+.phase3-sort > summary, .phase3-scope-control > summary { background: var(--paper); }
 
 /* The right panel shares the search surface with the main content. */
 [data-search-workspace] .search-and-go-shell { width: 100%; }
@@ -2113,7 +2112,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   color: var(--ink);
 }
 .phase3-relation-option:has(input:checked) .phase3-radio-indicator { border-color: transparent; }
-:is(.phase3-options details, .phase3-sort, .phase3-settings)[open] > summary,
+:is(.phase3-options details, .phase3-sort, .phase3-settings, .phase3-scope-control)[open] > summary,
 .search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true'] {
   position: relative;
   --search-notch-fill: var(--sheet);
@@ -2121,8 +2120,8 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true'] {
   --search-notch-fill: var(--paper-2);
 }
-:is(.phase3-options details, .phase3-sort, .phase3-settings)[open] > summary::before,
-:is(.phase3-options details, .phase3-sort, .phase3-settings)[open] > summary::after,
+:is(.phase3-options details, .phase3-sort, .phase3-settings, .phase3-scope-control)[open] > summary::before,
+:is(.phase3-options details, .phase3-sort, .phase3-settings, .phase3-scope-control)[open] > summary::after,
 .search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true']::before,
 .search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true']::after {
   content: "";
@@ -2136,7 +2135,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   clip-path: polygon(50% 0, 100% 80%, 100% 100%, 0 100%, 0 80%);
   background: var(--line-strong);
 }
-:is(.phase3-options details, .phase3-sort, .phase3-settings)[open] > summary::after,
+:is(.phase3-options details, .phase3-sort, .phase3-settings, .phase3-scope-control)[open] > summary::after,
 .search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true']::after {
   background: var(--search-notch-fill);
   clip-path: polygon(50% 16%, 100% 96%, 100% 100%, 0 100%, 0 96%);
@@ -2151,3 +2150,63 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   inset-block: -1px;
   border-inline-start: 1px solid var(--line-strong);
 }
+
+.phase3-result-controls { position: relative; }
+[data-phase3-results] .search-results-summary > .phase3-result-controls {
+  margin-inline-start: auto;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+.phase3-scope-control > .phase3-scope-menu {
+  position: absolute;
+  z-index: 6;
+  inset-block-start: calc(100% + 7px);
+  inset-inline-end: 0;
+  inline-size: min(355px, calc(100vw - 24px));
+  max-block-size: min(440px, calc(var(--search-and-go-height, 100dvh) - 125px));
+  padding: 10px;
+}
+.phase3-scope-tabs, .phase3-scope-stepper { display: flex; align-items: stretch; gap: 5px; }
+.phase3-scope-tabs { border-block-end: 1px solid var(--line); margin-block-end: 10px; }
+.phase3-scope-tabs > button, .phase3-scope-stepper > button, .phase3-scope-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-block-size: 34px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.phase3-scope-tabs > button { flex: 1; border-block-end: 2px solid transparent; }
+.phase3-scope-tabs > button[aria-selected="true"] { border-block-end-color: var(--sage); color: var(--ink); font-weight: 700; }
+.phase3-scope-menu svg { flex: none; }
+.phase3-scope-body { display: grid; gap: 8px; }
+.phase3-scope-query {
+  display: flex; align-items: center; gap: 6px; padding-inline: 8px;
+  border: 1px solid var(--line); border-radius: 8px; color: var(--ink-soft);
+}
+.phase3-scope-query:focus-within { border-color: var(--sage); }
+.phase3-scope-query input { flex: 1; min-inline-size: 0; min-block-size: 34px; outline: none; font: inherit; }
+.phase3-scope-list {
+  max-block-size: min(210px, 29dvh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.phase3-scope-item { inline-size: 100%; justify-content: flex-start; padding-inline: 8px; }
+.phase3-scope-item + .phase3-scope-item { border-block-start: 1px solid var(--line); }
+.phase3-scope-item:is([aria-checked="true"], [aria-pressed="true"]) { background: var(--word-active); }
+.phase3-scope-check { display: grid; place-items: center; inline-size: 16px; block-size: 16px; border: 1px solid var(--line-strong); border-radius: 4px; }
+.phase3-scope-number { min-inline-size: 25px; text-align: center; }
+.phase3-scope-count { margin-inline-start: auto; }
+.phase3-scope-count, .phase3-scope-number, .phase3-scope-current, .phase3-scope-hint { color: var(--ink-soft); font-size: 11px; }
+.phase3-scope-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; }
+.phase3-scope-footer > button { min-block-size: 26px; color: var(--ink); text-decoration: underline; }
+.phase3-scope-menu button:disabled { opacity: .5; cursor: default; }
+.phase3-scope-stepper > button { border: 1px solid var(--line); border-radius: 8px; padding-inline: 7px; }
+.phase3-scope-stepper .phase3-scope-pick { flex: 1; justify-content: space-between; padding-block: 5px; }
+.phase3-scope-pick > span { display: grid; text-align: start; }
+.phase3-scope-stepper:dir(ltr) > button:not(.phase3-scope-pick) > svg { scale: -1 1; }
+.phase3-scope-empty { padding: 8px; color: var(--ink-soft); }

@@ -70,3 +70,13 @@ test('handoffs keep explicit phase 3 scope and the original reading context', ()
     query: 'لا تخف', surahs: [19, 20], contextSurah: 21, scopeVariant: 'before', phase3: { relation: 'any' },
   })
 })
+
+test('single and explicitly empty multi-surah scopes survive search links', () => {
+  for (const scope of [
+    { scopeVariant: 'single' as const, surahs: [114] },
+    { scopeVariant: 'selected' as const, surahs: [] },
+  ]) {
+    const state = { ...base, ...scope }
+    expect(readSearchLink(searchLink('https://example.com', state).href)).toEqual(state)
+  }
+})

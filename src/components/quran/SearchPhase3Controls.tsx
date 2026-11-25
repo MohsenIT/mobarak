@@ -1,14 +1,13 @@
 'use client'
 
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ToggleEvent } from 'react'
-import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, Funnel, ListChecks, ListTodo, Quote, Settings2, Sprout, Tags } from 'lucide-react'
+import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, ListChecks, ListTodo, Quote, Settings2, Sprout, Tags } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import SearchFilterRow from './SearchFilterRow'
 import { t } from '@/lib/i18n'
-import type { Meta } from '@/lib/quran'
-import { morphologyLabel, toFa } from '@/lib/quran'
+import { morphologyLabel } from '@/lib/quran'
 import { lemmaDisplay } from '@/lib/lemma-display'
-import type { SearchScopeVariant, SearchPhase3State } from '@/lib/search-link'
+import type { SearchPhase3State } from '@/lib/search-link'
 import { normalizeQuranSearch, type QuranSearchResult } from '@/lib/quran-search'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import QuranText from './QuranText'
@@ -17,7 +16,6 @@ import { searchPopupName } from './search-popup'
 
 const relations = { all: ListChecks, any: ListTodo, phrase: Quote } as const
 const relationValues = ['all', 'any', 'phrase'] as const
-const scopes = ['all', 'current', 'before', 'after', 'selected', 'meccan', 'medinan'] as const
 const groups = ['roots', 'lemmas', 'forms'] as const
 const matchUnits = [
   ['verse', 'ui.b1b168c791'],
@@ -137,27 +135,12 @@ export function SearchWorkspaceSettings({ config, onConfig, matching }: Workspac
   </details>
 }
 
-export function phase3ScopeSurahs(meta: Meta, origin: number, scope: SearchScopeVariant, surahs: number[]): number[] {
-  return {
-    all: [], current: [origin], selected: surahs,
-    before: meta.surahs.filter(s => s.n < origin).map(s => s.n),
-    after: meta.surahs.filter(s => s.n > origin).map(s => s.n),
-    meccan: meta.surahs.filter(s => s.rev === 'makkah').map(s => s.n),
-    medinan: meta.surahs.filter(s => s.rev === 'madinah').map(s => s.n),
-  }[scope]
-}
-
-export default function SearchPhase3Controls({ meta, origin, scope, surahs, config, query, results, identity, includeRoots, researchHost, onScope, onConfig, onRoots }: {
-  meta: Meta
-  origin: number
-  scope: SearchScopeVariant
-  surahs: number[]
+export default function SearchPhase3Controls({ config, query, results, identity, includeRoots, researchHost, onConfig, onRoots }: {
   query: string
   results: QuranSearchResult[]
   identity: string
   includeRoots: boolean
   researchHost?: HTMLElement | null
-  onScope: (scope: SearchScopeVariant, surahs: number[]) => void
   onRoots: () => void
 } & WorkspaceConfigProps) {
   const groupName = useId()
@@ -173,8 +156,6 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
     return () => observer.disconnect()
   }, [])
   const [moreOpen, setMoreOpen] = useState(() => readStored<unknown>(researchOpenKey, false) === true)
-  const [picker, setPicker] = useState(false)
-  const [filter, setFilter] = useState('')
   const values = useMemo(() => {
     const catalog: Map<string, number>[][] = []
     for (const result of results) {
@@ -200,15 +181,6 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
       groups.map((_, column) => new Map([...catalogue.values[index]?.[column] ?? [], ...values[index]?.[column] ?? []]))) })
   }
   const multipleWords = normalizeQuranSearch(query).includes(' ')
-  const scopeNumbers = phase3ScopeSurahs(meta, origin, scope, surahs)
-  const scopeSurah = meta.surahs.find(surah => surah.n === scopeNumbers[0])
-  const scopeLabel = scope === 'meccan' || scope === 'medinan'
-    ? t(`searchP3.scopeIn.${scope}`)
-    : scopeNumbers.length === 1 && scopeSurah
-      ? t('searchP3.scopeIn.single', { name: scopeSurah.fa })
-      : scopeNumbers.length > 1
-        ? t('searchP3.scopeIn.multiple', { count: toFa(scopeNumbers.length) })
-        : t('searchP3.scopeIn.all')
   const MatchIcon = relations[config.relation]
   const finding = t('searchP3.finding', { relation: t(`searchP3.relation.${config.relation}`) })
   const activeFilters = groups.reduce((sum, group) => sum + config[group].length, 0)
@@ -240,33 +212,6 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
   </section>
   return <div className="phase3-controls" data-phase3-controls onKeyDown={dismissPopup}>
     <div className="phase3-options" ref={toolbar} role="group" aria-label={t('searchP3.settings')}>
-      <details name={searchPopupName} onToggle={positionFilterPopup} data-phase3-scope><summary className="chip" aria-label={scopeLabel}>
-        <Funnel size={14} aria-hidden="true" />
-        <span>{scopeLabel}</span>
-        <ChevronDown size={12} aria-hidden="true" />
-      </summary>
-        <div className="phase3-popup">
-          <h3>{t('searchP3.scope')}</h3>
-          {scopes.map(value => {
-            const numbers = phase3ScopeSurahs(meta, origin, value, surahs)
-            return <button className="chip" type="button" key={value} aria-pressed={scope === value}
-            disabled={value !== 'all' && value !== 'selected' && !numbers.length} onClick={() => {
-              if (value === 'selected') { setPicker(!picker); return }
-              setPicker(false)
-              onScope(value, numbers)
-            }}>{t(`searchP3.scope.${value}`)}</button>
-          })}
-          {(picker || scope === 'selected') && <div className="phase3-picker">
-            <input type="search" aria-label={t('searchP3.scope.selected')} value={filter} onChange={event => setFilter(event.target.value)} />
-            {meta.surahs.filter(s => `${s.fa} ${s.ar} ${s.n}`.includes(filter)).map(s => <label className="choice-row" key={s.n}>
-              <input type="checkbox" checked={scope === 'selected' && surahs.includes(s.n)} onChange={event => {
-                const selected = scope === 'selected' ? surahs : []
-                const next = event.target.checked ? [...selected, s.n].sort((a,b) => a-b) : selected.filter(n => n !== s.n)
-                onScope(next.length ? 'selected' : 'all', next)
-              }} />{s.fa}</label>)}
-          </div>}
-        </div>
-      </details>
       {multipleWords && <details name={searchPopupName} onToggle={positionFilterPopup} data-phase3-relation><summary className="chip">
         <MatchIcon size={14} aria-hidden="true" />
         <span>{finding}</span>

@@ -11,7 +11,7 @@ export const SEARCH_AND_GO_PHASE_3 = SEARCH_AND_GO_PHASE_2 && process.env.NEXT_P
 export type SearchResultPosition = { scrollTop: number; visible: number; anchor?: { s: number; a: number; offset: number } }
 export type SearchResultSnapshot = { query: string; position: SearchResultPosition; state?: SearchLinkState; selected?: VerseAddress }
 
-const scopeVariants = ['all', 'current', 'selected', 'before', 'after', 'meccan', 'medinan'] as const
+const scopeVariants = ['all', 'current', 'selected', 'before', 'after', 'meccan', 'medinan', 'single'] as const
 export type SearchScopeVariant = typeof scopeVariants[number]
 export type SearchPhase3State = Phase3SearchOptions
 

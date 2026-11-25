@@ -26,7 +26,9 @@ import { SEARCH_AND_GO_PHASE_2, SEARCH_AND_GO_PHASE_3, searchLink, type SearchSc
 import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
 import SearchFilterRow from './SearchFilterRow'
 import { readStored, writeStored } from '@/lib/reader-storage'
-import SearchPhase3Controls, { phase3ScopeSurahs, SearchWorkspaceSettings, SearchWorkspaceSort } from './SearchPhase3Controls'
+import SearchPhase3Controls, { SearchWorkspaceSettings, SearchWorkspaceSort } from './SearchPhase3Controls'
+import SearchWorkspaceScope from './SearchWorkspaceScope'
+import { readSearchScope, scopeSurahs, searchScopeStorage, type SearchScopeSelection } from '@/lib/search-scope'
 import { useDismissiblePanel } from './useDismissiblePanel'
 export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number; state?: SearchLinkState }
 
@@ -87,7 +89,12 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const unified = inline?.unified
   const phase3 = SEARCH_AND_GO_PHASE_3 && !!unified
   const [searchOrigin] = useState(restored?.contextSurah ?? currentSurah)
-  const [scopeVariant, setScopeVariant] = useState<SearchScopeVariant>(restored?.scopeVariant ?? (restored?.surahs.length || initialSearch?.surahs.length ? 'selected' : 'all'))
+  const [initialScope] = useState<SearchScopeSelection>(() => {
+    const explicit = restored?.surahs ?? initialSearch?.surahs ?? []
+    if (restored?.scopeVariant || explicit.length) return { variant: restored?.scopeVariant ?? 'selected', surahs: explicit }
+    return phase3 ? readSearchScope() : { variant: 'all', surahs: [] }
+  })
+  const [scopeVariant, setScopeVariant] = useState<SearchScopeVariant>(initialScope.variant)
   const [config, setConfig] = useState<SearchPhase3State>(() => restored?.phase3 ?? {
     ...defaultPhase3SearchOptions(), lemmas: restored?.lemmas ?? [], forms: restored?.forms ?? [],
   })
@@ -110,8 +117,16 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   }
   const [surahs, setSurahs] = useState<number[]>(() => {
     const initialSurahs = restored?.surahs ?? initialSearch?.surahs ?? []
-    return phase3 ? phase3ScopeSurahs(meta, searchOrigin, scopeVariant, initialSurahs) : initialSurahs
+    return phase3 ? scopeSurahs(meta, searchOrigin, scopeVariant, initialScope.surahs) : initialSurahs
   })
+  const [countsActive, setCountsActive] = useState(false)
+  const [scopeCountAnswer, setScopeCountAnswer] = useState<{ key: string; counts: Record<number, number>; error?: boolean } | null>(null)
+  const scopeCountWorker = useRef<Worker | null>(null)
+  const changeWorkspaceScope = (selection: SearchScopeSelection) => {
+    setScopeVariant(selection.variant)
+    setSurahs(selection.surahs)
+    writeStored(searchScopeStorage, selection)
+  }
   const [surahQuery, setSurahQuery] = useState('')
   const [scopeOpen, setScopeOpen] = useState(false)
   const [extraOptionsOpen, setExtraOptionsOpen] = useState(false)
@@ -184,8 +199,32 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   // state; `undefined` as the initial "seen" value makes a mount WITH a filter
   // act, exactly like the effect did, while a mount without one stays put.
   const searchOpen = open && (unified?.run ?? true)
-  const engineKey = JSON.stringify({ query, options: { mode, includePartial, includeNear, includeRoots: includeRoots && (phase3 || canExpandRoots), surahs, ...(phase3 ? { phase3: config } : {}) }, filter: occurrenceFilter })
+  const engineKey = JSON.stringify({ query, options: { mode, includePartial, includeNear, includeRoots: includeRoots && (phase3 || canExpandRoots), surahs, ...(phase3 ? { phase3: config } : {}) }, filter: occurrenceFilter, emptyScope: phase3 && scopeVariant === 'selected' && !surahs.length })
   const busy = !!unified && searchOpen && valid && answerKey !== engineKey || working
+  const scopeCountKey = countsActive && valid ? JSON.stringify({
+    query, options: { mode, includePartial, includeNear, includeRoots, phase3: { ...config, sorts: ['mushaf'], reverseSort: false } },
+    filter: occurrenceFilter,
+  }) : ''
+  const activeScopeAnswer = scopeCountAnswer?.key === scopeCountKey ? scopeCountAnswer : null
+  const scopeCounts = !valid ? {} : activeScopeAnswer?.counts ?? null
+  useEffect(() => () => scopeCountWorker.current?.terminate(), [])
+  useEffect(() => {
+    if (!scopeCountKey) return
+    const timer = setTimeout(() => {
+      try {
+        const countWorker = scopeCountWorker.current ??= createQuranSearchWorker()
+        countWorker.onmessage = (event: MessageEvent<{ key: string; counts?: Record<number, number>; error?: boolean }>) => {
+          if (event.data.key === scopeCountKey) setScopeCountAnswer({ key: scopeCountKey, counts: event.data.counts ?? {}, error: event.data.error })
+        }
+        countWorker.onerror = () => setScopeCountAnswer({ key: scopeCountKey, counts: {}, error: true })
+        countWorker.postMessage({ id: 0, ...JSON.parse(scopeCountKey), countsKey: scopeCountKey })
+      } catch { setScopeCountAnswer({ key: scopeCountKey, counts: {}, error: true }) }
+    }, 100)
+    return () => {
+      clearTimeout(timer)
+      if (scopeCountWorker.current) scopeCountWorker.current.onmessage = null
+    }
+  }, [scopeCountKey])
   const onSuggestions = unified?.onSuggestions
   useEffect(() => {
     if (onSuggestions) onSuggestions(searchOpen && !busy && !error && valid && answerKey === engineKey ? suggestions : [])
@@ -373,9 +412,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       onChange={event => onChange(event.target.checked)} />{label}</label>)
   const controls = phase3 && <SearchPhase3Controls
         query={query} researchHost={unified?.researchHost} identity={JSON.stringify([query, surahs, mode, config.relation, config.cooccurrence, config.spellingSensitive, includeRoots, includePartial, includeNear])}
-        meta={meta} origin={searchOrigin} scope={scopeVariant} surahs={surahs} config={config}
+        config={config}
         results={answerKey === engineKey && !busy ? rawResults : emptyResults} includeRoots={includeRoots} onRoots={toggleRoots} onConfig={setConfig}
-        onScope={(scope, numbers) => { setScopeVariant(scope); setSurahs(numbers) }}
       />
   const content = <>
       {controls}
@@ -434,7 +472,11 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           <span className={phase3 ? "search-results-total" : "search-results-detail"}>{t(unified ? "search.occurrenceCount" : "ui.9ec9176e66", { p0: toFa(counts.verses), p1: toFa(unified ? counts.occurrences : counts.words) })}</span>
         </>}</div>
         {!phase3 && !busy && !error && valid && results.length > 0 && <span className="search-results-position" data-current-result={Math.min(currentResult, results.length)} data-total-results={results.length} aria-live="off">{t('search.resultPosition', { current: Math.min(currentResult, results.length), total: results.length })}</span>}
-        {phase3 && <SearchWorkspaceSort config={config} onConfig={setConfig} />}
+        {phase3 && <div className="phase3-result-controls">
+          <SearchWorkspaceScope meta={meta} currentSurah={currentSurah} selection={{ variant: scopeVariant, surahs }}
+            onScope={changeWorkspaceScope} counts={scopeCounts} countsError={!!activeScopeAnswer?.error} onCountsActive={setCountsActive} />
+          <SearchWorkspaceSort config={config} onConfig={setConfig} />
+        </div>}
       </div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label={t("ui.57f03a82b0")} aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
         {!phase3 && (!inline || lemmas.length > 0 || forms.length > 0) && facetControls}
