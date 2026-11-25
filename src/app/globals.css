@@ -1958,7 +1958,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-and-go-settings { position: relative; padding: 0 clamp(8px, 2vw, 20px) 8px; }
 .search-result-card:has([aria-current="true"]) { border-color: var(--sage); }
 
-.phase3-controls { position: relative; flex: none; z-index: 2; }
+.phase3-controls { position: relative; flex: none; }
 .phase3-options, .search-and-go-suggestions {
   display: flex;
   align-items: center;
@@ -2021,7 +2021,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 
 /* The search surface and its internal columns respond independently. */
 [data-search-workspace] .search-and-go-body { container: search-workspace / inline-size; }
-[data-search-workspace] .search-and-go-header { position: relative; z-index: 4; }
+[data-search-workspace] .search-and-go-header { position: relative; z-index: 8; }
 .search-workspace-settings-host { flex: none; }
 .phase3-settings > .reader-display-menu {
   position: absolute;
@@ -2038,7 +2038,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .phase3-settings summary::-webkit-details-marker, .phase3-sort summary::-webkit-details-marker { display: none; }
 .phase3-sort { position: relative; }
 .phase3-sort > .reader-display-menu { position: absolute; inset-block-start: calc(100% + 7px); inset-inline-end: 0; z-index: 6; width: min(232px, calc(100vw - 36px)); }
-[data-phase3-results] .search-results-summary { position: relative; z-index: 1; }
+.phase3-sort > summary { position: relative; z-index: 7; background: var(--paper); }
 
 /* The right panel shares the search surface with the main content. */
 [data-search-workspace] .search-and-go-shell { width: 100%; }
