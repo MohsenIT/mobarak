@@ -49,13 +49,12 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
     setOccurrence(null)
     onClearOccurrenceFilter?.()
   }
-  const surface = useRef<HTMLDivElement>(null)
+  const [surface, setSurface] = useState<HTMLDivElement | null>(null)
   useEffect(() => {
     const viewport = window.visualViewport
-    if (!viewport) return
+    if (!viewport || !surface) return
     const resize = () => {
-      const element = surface.current
-      if (!element) return
+      const element = surface
       if (viewport.scale === 1 && viewport.height < window.innerHeight - 40) {
         element.style.setProperty('--search-and-go-height', `${viewport.height}px`)
         element.style.setProperty('--search-and-go-top', `${viewport.offsetTop}px`)
@@ -71,17 +70,17 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
       viewport.removeEventListener('resize', resize)
       viewport.removeEventListener('scroll', resize)
     }
-  }, [])
+  }, [surface])
   const [settingsHost, setSettingsHost] = useState<HTMLDivElement | null>(null)
   const [researchHost, setResearchHost] = useState<HTMLElement | null>(null)
   const [wideWorkspace, setWideWorkspace] = useState(false)
   useEffect(() => {
-    const element = surface.current
+    const element = surface
     if (!SEARCH_AND_GO_PHASE_3 || !element) return
     const observer = new ResizeObserver(([entry]) => setWideWorkspace(entry.contentRect.width >= 660))
     observer.observe(element)
     return () => observer.disconnect()
-  }, [])
+  }, [surface])
   const useResearchColumn = SEARCH_AND_GO_PHASE_3 && wideWorkspace && !help
   const back = useRef<HTMLButtonElement>(null)
   const trigger = useRef<HTMLElement>(null)
@@ -136,7 +135,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   }, [rtl, searchLabel])
 
   return <Dialog open onOpenChange={open => { if (!open) onClose() }}>
-    <DialogContent ref={surface} fullscreen showCloseButton={false} className="search-and-go" data-search-and-go data-search-workspace={SEARCH_AND_GO_PHASE_3 || undefined} data-search-and-go-phase-2={SEARCH_AND_GO_PHASE_2 || undefined} data-search-page={SEARCH_AND_GO_PHASE_2 && !!start?.state || undefined} dir={uiDirection()}
+    <DialogContent ref={setSurface} fullscreen showCloseButton={false} className="search-and-go" data-search-and-go data-search-workspace={SEARCH_AND_GO_PHASE_3 || undefined} data-search-and-go-phase-2={SEARCH_AND_GO_PHASE_2 || undefined} data-search-page={SEARCH_AND_GO_PHASE_2 && !!start?.state || undefined} dir={uiDirection()}
       aria-describedby={undefined}
       onOpenAutoFocus={event => {
         event.preventDefault()
