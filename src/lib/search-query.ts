@@ -6,6 +6,7 @@ export type SearchCooccurrence = 'verse' | 'context' | 'surah'
 export type Phase3SearchOptions = {
   relation: SearchRelation
   sorts: SearchSort[]
+  reverseSort?: boolean
   roots: string[]
   lemmas: string[]
   forms: string[]

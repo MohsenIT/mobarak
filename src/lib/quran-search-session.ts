@@ -230,9 +230,9 @@ export function createSearchSession(corpus: SearchCorpus) {
     }
     const mushafOrder = (a: QuranSearchResult, b: QuranSearchResult) => a.s - b.s || a.a - b.a
     return results.sort((a, b) => {
-      for (const sort of phase.sorts) {
+      for (const [index, sort] of (phase.sorts.length ? phase.sorts : ['mushaf']).entries()) {
         const difference = sort === 'relevance' ? b.relevance - a.relevance : mushafOrder(a.result, b.result)
-        if (difference) return difference
+        if (difference) return index === 0 && sort === 'mushaf' && phase.reverseSort ? -difference : difference
       }
       return mushafOrder(a.result, b.result)
     }).map(({ result }) => result)

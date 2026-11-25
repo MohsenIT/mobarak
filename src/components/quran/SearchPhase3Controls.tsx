@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { ArrowDownUp, ChevronDown, Settings2, SlidersHorizontal } from 'lucide-react'
+import { ArrowDownUp, ChevronDown, ListFilter, Settings2, SlidersHorizontal } from 'lucide-react'
 import { t } from '@/lib/i18n'
 import type { Meta } from '@/lib/quran'
 import { morphologyLabel } from '@/lib/quran'
@@ -39,18 +39,31 @@ function dismissPopup(event: KeyboardEvent<HTMLElement>) {
 
 export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) {
   const sort = config.sorts[0] ?? 'mushaf'
+  const reversed = config.reverseSort ?? false
+  const isRelevance = sort === 'relevance'
+  const directionLabel = t(isRelevance ? 'searchP3.mostRelevantFirst' : reversed ? 'searchP3.reverse' : 'searchP3.forward')
   return <details className="phase3-sort" data-phase3-sort onKeyDown={dismissPopup}>
-    <summary className="chip" data-changed={sort !== 'mushaf'} aria-label={`${t('searchP3.sort')} · ${t(`searchP3.sort.${sort}`)}`}>
-      <ArrowDownUp className="phase3-sort-icon" size={14} aria-hidden="true" />
-      <span className="phase3-summary-label">{t('searchP3.sort')}</span>
+    <summary className="chip" data-changed={sort !== 'mushaf' || reversed}
+      aria-label={`${t('searchP3.sort')}، ${t(`searchP3.sort.${sort}`)}، ${directionLabel}`}>
+      <ListFilter className="phase3-sort-icon" data-reversed={isRelevance || reversed} size={16} aria-hidden="true" />
       <span className="phase3-summary-value">{t(`searchP3.sortShort.${sort}`)}</span>
     </summary>
     <div className="phase3-popup">
-      <h3>{t('searchP3.sort')}</h3>
-      {(['mushaf', 'relevance'] as const).map(value => <button className="chip" type="button" key={value}
-        aria-pressed={sort === value} onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>
-        {t(`searchP3.sort.${value}`)}
-      </button>)}
+      <h3><ArrowDownUp size={15} aria-hidden="true" />{t('searchP3.sort')}</h3>
+      <div className="phase3-sort-options" role="group" aria-label={t('searchP3.sort')}>
+        {(['relevance', 'mushaf'] as const).map(value => <button className="chip" type="button" key={value}
+          aria-label={t(`searchP3.sort.${value}`)} aria-pressed={sort === value}
+          onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>
+          {t(`searchP3.sortShort.${value}`)}
+        </button>)}
+      </div>
+      <div className="phase3-sort-directions">
+        {[false, true].map(reverse => <button className="chip" type="button" key={String(reverse)}
+          disabled={isRelevance} aria-pressed={(isRelevance || reversed) === reverse} onClick={() => onConfig({ ...config, reverseSort: reverse || undefined })}>
+          <ListFilter className="phase3-sort-icon" data-reversed={reverse} size={16} aria-hidden="true" />
+          {t(reverse ? 'searchP3.reverse' : 'searchP3.forward')}
+        </button>)}
+      </div>
     </div>
   </details>
 }

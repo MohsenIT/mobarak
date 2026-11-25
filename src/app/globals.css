@@ -2084,3 +2084,12 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 @container search-workspace (max-width: 380px) {
   .phase3-sort .phase3-summary-value { display: none; }
 }
+
+.phase3-sort .phase3-sort-icon[data-reversed='false'] { transform: scaleY(-1); }
+.phase3-sort > .phase3-popup { width: min(282px, calc(100vw - 30px)); gap: 10px; }
+.phase3-sort h3 { display: flex; align-items: center; gap: 6px; }
+.phase3-sort-options, .phase3-sort-directions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+.phase3-sort-options, .phase3-sort-directions { border: 1px solid var(--line); border-radius: 999px; }
+.phase3-sort-options .chip, .phase3-sort-directions .chip { border-color: transparent; }
+.phase3-sort-directions .chip:disabled { opacity: 0.55; cursor: default; }
+.phase3-sort :is(.phase3-sort-options, .phase3-sort-directions) .chip { justify-content: center; }

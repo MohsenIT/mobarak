@@ -125,7 +125,10 @@ test('relevance uses frequency, proximity and stable verse ordering', () => {
     morphology: {},
   })
   expect(local('قال كتب', { phase3 }).map(r => r.a)).toEqual([1, 2, 3, 4])
-  expect(local('قال كتب', { phase3: { ...phase3, sorts: ['relevance', 'mushaf'] } }).map(r => r.a)).toEqual([3, 2, 4, 1])
+  expect(local('قال كتب', { phase3: { ...phase3, reverseSort: true } }).map(r => r.a)).toEqual([4, 3, 2, 1])
+  for (const reverseSort of [false, true]) {
+    expect(local('قال كتب', { phase3: { ...phase3, reverseSort, sorts: ['relevance', 'mushaf'] } }).map(r => r.a)).toEqual([3, 2, 4, 1])
+  }
 })
 
 test('broader all-word search keeps real verses, uses source context ranges and never crosses surahs', () => {
