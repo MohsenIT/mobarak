@@ -366,7 +366,8 @@ test('scope tabs retain selections and count matching surahs outside the active 
   await scope.getByRole('button', { name: labels['searchP3.scopeNext'] }).click();
   await scope.getByRole('tab', { name: labels['searchP3.scopeTab.many'] }).click();
   await expect(scope.locator('[data-surah="114"]')).toHaveAttribute('aria-checked', 'true');
-  await page.reload();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await surface.getByRole('combobox').fill('صبر');
   await scope.locator('summary').click();
   await expect(scope.getByRole('tab', { name: labels['searchP3.scopeTab.many'] })).toHaveAttribute('aria-selected', 'true');
   await expect(scope.locator('[data-surah="114"]')).toHaveAttribute('aria-checked', 'true');
