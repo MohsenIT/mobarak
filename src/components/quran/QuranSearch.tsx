@@ -499,7 +499,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   </>
   const settings = phase3 && unified?.settingsHost
     ? createPortal(<SearchWorkspaceSettings config={config} onConfig={setConfig}
-      matching={[...matchingPreferences, { label: t('ui.37e2fdb79c'), checked: showTranslation, onChange: setShowTranslation }]}
+      matching={[...matchingPreferences, { label: t('ui.2d6258b160'), checked: showTranslation, onChange: setShowTranslation }]}
       actions={<section className="phase3-settings-actions">
         <button type="button" className="chip" onClick={copyLink}>
           {copyStatus === t('ui.dc5c67b8a3') ? <Check size={16} aria-hidden="true" /> : <Link size={16} aria-hidden="true" />}

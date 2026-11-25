@@ -357,7 +357,7 @@ test('scope tabs retain selections and count matching surahs outside the active 
   await scope.locator('[data-surah="114"]').click();
   await scope.getByRole('button', { name: labels['searchP3.scopeHasResults'] }).click();
   await expect(scope.locator('[data-surah="114"]')).toHaveAttribute('aria-checked', 'true');
-  await expect(scope.locator('[data-surah="114"] .phase3-scope-count')).toHaveText('۰');
+  await expect(scope.locator('[data-surah="114"] .phase3-scope-count')).toHaveText('۰ مورد');
   await scope.getByRole('tab', { name: labels['searchP3.scopeTab.single'] }).click();
   await expect(scope.locator('.phase3-scope-pick')).toContainText('طه');
   await expect(scope.locator('.phase3-scope-pick')).toContainText(labels['searchP3.scopeCurrent']);

@@ -17,7 +17,7 @@ test('a surah name has simultaneous destinations and real text results, with saf
   await field.fill('طه')
   await expect(panel.locator('.drawer-destination-options [role="option"]')).toContainText('طه')
   await expect(panel.locator('.search-result-open').first()).toBeVisible()
-  await expect(panel.locator('.search-results-detail')).toContainText('وقوع')
+  await expect(panel.locator('.search-results-detail')).toContainText(/آیه · .+ یافته شده$/)
   await field.press('Enter')
   await expect(panel).toBeVisible()
   await field.fill('۳')

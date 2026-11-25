@@ -96,7 +96,7 @@ export default function SearchWorkspaceScope({ meta, currentSurah, selection, on
           <span className="phase3-scope-number">{toFa(surah.n)}</span>
           <span>{surah.fa}</span>
           {singlePicker && surah.n === currentSurah && <span className="phase3-scope-current">{t('searchP3.scopeCurrent')}</span>}
-          {withCounts && <span className="phase3-scope-count">{toFa(counts?.[surah.n] ?? 0)}</span>}
+          {withCounts && <span className="phase3-scope-count">{toFa(counts?.[surah.n] ?? 0)}{' '}{t('ui.61cf4e03c8')}</span>}
           {singlePicker && chosen && <Check size={15} className="phase3-scope-count" aria-hidden="true" />}
         </button>
       })}
