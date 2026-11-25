@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test'
 import { createSearchSession, type SearchCorpus } from './quran-search-session'
 import { countQuranSearchResults } from './quran-search'
+import { unrecordedSearchForm } from './search-query'
 import corpus from '../../public/data/quran-search.json'
 const search = createSearchSession(corpus as unknown as SearchCorpus)
 
@@ -182,4 +183,13 @@ test('exact phrases retain separate facet positions in query order', () => {
   const results = search('دين الملك', { phase3: { ...phase3, relation: 'phrase' } })
   const verse = results.find(result => result.s === 12 && result.a === 76)!
   expect(verse.facetPositions?.map(group => group.map(pos => verse.morphology?.[pos - 1]?.[0]))).toEqual([['دين'], ['ملك']])
+})
+
+test('unrecorded form keeps the seven prayer matches countable and filterable', () => {
+  const hits = search('صابر صلاه', { includeRoots: true, phase3 })
+  const forms = hits.flatMap(result => result.facetPositions?.[1].map(pos => result.morphology?.[pos - 1]?.[2]) ?? [])
+  expect(forms).toEqual(Array(7).fill(null))
+  const filtered = search('صابر صلاه', { includeRoots: true, phase3: { ...phase3, forms: [unrecordedSearchForm] } })
+  expect(filtered.map(result => [result.s, result.a])).toEqual(hits.map(result => [result.s, result.a]))
+  expect(filtered.flatMap(result => result.positions.map(pos => result.morphology?.[pos - 1]?.[2]))).not.toContain('VIII')
 })

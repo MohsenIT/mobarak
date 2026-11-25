@@ -14,6 +14,7 @@ import SurahShortcuts from './SurahShortcuts'
 import { DictationInput } from './DictationInput'
 import QuranSearch from './QuranSearch'
 import QuranText from './QuranText'
+import { searchPopupName } from './search-popup'
 
 const searchExamples = ['س 20', 'اسما الحسنی', 'طه 40', 'صبر', 'صفحه 42', 'جزء 30', 'لا تخف', 'سیاق طه:3']
 
@@ -81,6 +82,15 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
     observer.observe(element)
     return () => observer.disconnect()
   }, [surface])
+  useEffect(() => {
+    if (!surface || !SEARCH_AND_GO_PHASE_3) return
+    const dismissOutside = (event: MouseEvent) => {
+      const popup = surface.querySelector<HTMLDetailsElement>(`details[name="${searchPopupName}"][open]`)
+      if (popup && event.target instanceof Node && !popup.contains(event.target)) popup.open = false
+    }
+    document.addEventListener('click', dismissOutside, true)
+    return () => document.removeEventListener('click', dismissOutside, true)
+  }, [surface])
   const useResearchColumn = SEARCH_AND_GO_PHASE_3 && wideWorkspace && !help
   const back = useRef<HTMLButtonElement>(null)
   const trigger = useRef<HTMLElement>(null)
@@ -147,7 +157,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
         trigger.current?.focus({ preventScroll: true })
       }}
       onEscapeKeyDown={event => {
-        const options = document.activeElement?.closest<HTMLDetailsElement>(':is([data-phase3-settings], [data-phase3-sort])[open]')
+        const options = surface?.querySelector<HTMLDetailsElement>(`details[name="${searchPopupName}"][open]`)
         if (options) {
           event.preventDefault()
           options.open = false

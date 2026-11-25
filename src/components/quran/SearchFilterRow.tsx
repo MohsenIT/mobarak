@@ -23,7 +23,8 @@ export default function SearchFilterRow({ label, ariaLabel, options, selected, o
     const element = row.current
     if (!element) return
     const measure = () => {
-      const widths = Array.from(element.querySelectorAll<HTMLElement>('[data-measure-facet]')).map(chip => chip.getBoundingClientRect().width)
+      const widths = Array.from(element.querySelectorAll<HTMLElement>('[data-measure-facet]')).map(chip =>
+        chip.getBoundingClientRect().width + (parseFloat(getComputedStyle(chip).marginInlineStart) || 0))
       const more = [0, ...Array.from(element.querySelectorAll<HTMLElement>('[data-measure-more]')).map(chip => chip.getBoundingClientRect().width)]
       const gap = parseFloat(getComputedStyle(element).columnGap) || 0
       setFitting(visibleFacetCount(element.getBoundingClientRect().width, widths, more, gap))

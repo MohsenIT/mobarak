@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ToggleEvent } from 'react'
-import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Funnel, ListChecks, ListTodo, Quote, Settings2, Sprout, Tags } from 'lucide-react'
+import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, Funnel, ListChecks, ListTodo, Quote, Settings2, Sprout, Tags } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import SearchFilterRow from './SearchFilterRow'
 import { t } from '@/lib/i18n'
@@ -12,6 +12,8 @@ import type { SearchScopeVariant, SearchPhase3State } from '@/lib/search-link'
 import { normalizeQuranSearch, type QuranSearchResult } from '@/lib/quran-search'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import QuranText from './QuranText'
+import { unrecordedSearchForm } from '@/lib/search-query'
+import { searchPopupName } from './search-popup'
 
 const relations = { all: ListChecks, any: ListTodo, phrase: Quote } as const
 const relationValues = ['all', 'any', 'phrase'] as const
@@ -63,7 +65,7 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
   const isRelevance = sort === 'relevance'
   const SortIcon = isRelevance ? ArrowDownWideNarrow : reversed ? ArrowDown10 : ArrowDown01
   const directionLabel = t(isRelevance ? 'searchP3.mostRelevantFirst' : reversed ? 'searchP3.reverse' : 'searchP3.forward')
-  return <details className="phase3-sort" data-phase3-sort onKeyDown={dismissPopup}>
+  return <details name={searchPopupName} className="phase3-sort" data-phase3-sort onKeyDown={dismissPopup}>
     <summary className="chip"
       aria-label={`${t('searchP3.sort')}، ${t(`searchP3.sort.${sort}`)}، ${directionLabel}`}>
       <SortIcon className="phase3-sort-icon" size={16} aria-hidden="true" />
@@ -109,7 +111,7 @@ export function SearchWorkspaceSettings({ config, onConfig, matching }: Workspac
     label: t('searchP3.spellingSensitive'), checked: spellingSensitive,
     onChange: (checked: boolean) => onConfig({ ...config, spellingSensitive: checked }),
   }, ...matching]
-  return <details className="phase3-settings" data-phase3-settings onKeyDown={dismissPopup}>
+  return <details name={searchPopupName} className="phase3-settings" data-phase3-settings onKeyDown={dismissPopup}>
     <summary className="icon-btn phase3-settings-trigger" aria-label={label} title={label}>
       <Settings2 size={19} aria-hidden="true" />
     </summary>
@@ -179,7 +181,8 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
       for (const [index, positions] of (result.facetPositions ?? [result.positions]).entries()) {
         const counts = catalog[index] ??= groups.map(() => new Map<string, number>())
         for (const position of positions) result.morphology?.[position - 1]?.forEach((value, column) => {
-          if (value) counts[column].set(value, (counts[column].get(value) ?? 0) + 1)
+          const key = value ?? (column === 2 ? unrecordedSearchForm : null)
+          if (key) counts[column].set(key, (counts[column].get(key) ?? 0) + 1)
         })
       }
     }
@@ -227,7 +230,7 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
           key: `${index}:${value}`,
           separator: index > 0 && position === 0,
           count,
-          label: group === 'forms' ? morphologyLabel(value) : <QuranText text={group === 'lemmas' ? lemmaDisplay(value) : value} />,
+          label: group === 'forms' ? (value === unrecordedSearchForm ? t('searchP3.unrecordedForm') : morphologyLabel(value)) : <QuranText text={group === 'lemmas' ? lemmaDisplay(value) : value} />,
         })))}
         selected={config[group]} onToggle={value => onConfig({
           ...config,
@@ -237,7 +240,7 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
   </section>
   return <div className="phase3-controls" data-phase3-controls onKeyDown={dismissPopup}>
     <div className="phase3-options" ref={toolbar} role="group" aria-label={t('searchP3.settings')}>
-      <details name={groupName} onToggle={positionFilterPopup} data-phase3-scope><summary className="chip" aria-label={scopeLabel}>
+      <details name={searchPopupName} onToggle={positionFilterPopup} data-phase3-scope><summary className="chip" aria-label={scopeLabel}>
         <Funnel size={14} aria-hidden="true" />
         <span>{scopeLabel}</span>
         <ChevronDown size={12} aria-hidden="true" />
@@ -264,24 +267,30 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
           </div>}
         </div>
       </details>
-      {multipleWords && <details name={groupName} onToggle={positionFilterPopup} data-phase3-relation><summary className="chip">
+      {multipleWords && <details name={searchPopupName} onToggle={positionFilterPopup} data-phase3-relation><summary className="chip">
         <MatchIcon size={14} aria-hidden="true" />
         <span>{finding}</span>
         <ChevronDown size={12} aria-hidden="true" />
       </summary>
         <div className="phase3-popup phase3-relation-popup">
-          <div className="reader-display-modes" role="group" aria-label={t('searchP3.relation')}>
+          <div className="phase3-relation-options" role="radiogroup" aria-label={t('searchP3.relation')}>
             {relationValues.map(relation => {
               const Icon = relations[relation]
-              return <button type="button" key={relation} aria-pressed={config.relation === relation}
-                onClick={event => {
-                  onConfig({ ...config, relation })
-                  const popup = event.currentTarget.closest('details')
-                  if (popup) {
-                    popup.open = false
-                    popup.querySelector('summary')?.focus()
-                  }
-                }}><Icon size={15} aria-hidden="true" />{t(`searchP3.relation.${relation}`)}</button>
+              const checked = config.relation === relation
+              return <label key={relation} className="phase3-relation-option">
+                <input type="radio" className="sr-only" name={groupName} checked={checked}
+                  onChange={event => {
+                    onConfig({ ...config, relation })
+                    const popup = event.currentTarget.closest('details')
+                    if (popup) {
+                      popup.open = false
+                      popup.querySelector('summary')?.focus()
+                    }
+                  }} />
+                <Icon size={17} aria-hidden="true" />
+                <span>{t(`searchP3.relation.${relation}`)}</span>
+                <span className="phase3-radio-indicator" aria-hidden="true">{checked && <Check size={17} />}</span>
+              </label>
             })}
           </div>
         </div>

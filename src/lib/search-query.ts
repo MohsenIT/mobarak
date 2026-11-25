@@ -1,6 +1,7 @@
 import { normalizeQuranSearch, quranSearchKeys, type QuranSearchResult, type SearchVerse } from './quran-search'
 
 export type SearchRelation = 'all' | 'any' | 'phrase'
+export const unrecordedSearchForm = 'unrecorded'
 export type SearchSort = 'mushaf' | 'relevance'
 export type SearchCooccurrence = 'verse' | 'context' | 'surah'
 export type Phase3SearchOptions = {

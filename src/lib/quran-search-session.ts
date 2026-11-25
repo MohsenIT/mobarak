@@ -3,7 +3,7 @@ import type { AnalysisSelection } from './analysis'
 import { getSourceSurahContexts } from './contexts'
 import { wordKey } from './word-parts'
 import { lemmaDisplay } from './lemma-display'
-import { bm25, createExactSearch, parseSearchQuery, searchOrder, searchProximity, type Phase3SearchOptions } from './search-query'
+import { bm25, createExactSearch, parseSearchQuery, unrecordedSearchForm, searchOrder, searchProximity, type Phase3SearchOptions } from './search-query'
 
 export type { Phase3SearchOptions, SearchCooccurrence, SearchRelation, SearchSort } from './search-query'
 
@@ -207,7 +207,8 @@ export function createSearchSession(corpus: SearchCorpus) {
         if (result.score < strongest.score) strongest = result
         const metadata = corpus.morphology[id]
         const positions = hasFacets ? result.positions.filter(pos => (result.parts[pos] & 2) && groups.every((values, column) => {
-          const value = metadata?.[pos - 1]?.[column]
+          const stem = metadata?.[pos - 1]
+          const value = stem?.[column] ?? (column === 2 && stem && unrecordedSearchForm)
           return !values.length || !!value && values.includes(value)
         })) : result.positions
         const retained = new Set(positions)

@@ -2080,36 +2080,67 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   inline-size: max-content;
   max-inline-size: calc(100% - 16px);
 }
-.phase3-relation-popup .reader-display-modes { inline-size: 100%; }
-.phase3-relation-popup .reader-display-modes button { padding-inline: 6px; gap: 4px; font-size: 12px; }
-.phase3-relation-popup .reader-display-modes button:lang(fa) { flex: 1 0 auto; white-space: nowrap; }
-.phase3-options details[open] > summary,
-.phase3-sort[open] > summary,
-.phase3-settings[open] > summary,
-.search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true'] { position: relative; }
+.phase3-relation-options { inline-size: 100%; min-inline-size: 175px; overflow: hidden; border-radius: 8px; }
+.phase3-relation-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 38px;
+  padding: 7px 10px;
+  font-size: var(--reader-control-font-size);
+  cursor: pointer;
+}
+.phase3-relation-option + .phase3-relation-option { border-block-start: 1px solid var(--line); }
+.phase3-relation-option:has(input:checked) { background: var(--word-active); font-weight: 700; }
+.phase3-relation-option:has(input:focus-visible) { outline: 2px solid var(--sage); outline-offset: -2px; }
+.phase3-radio-indicator {
+  display: grid;
+  place-items: center;
+  inline-size: 17px;
+  block-size: 17px;
+  flex: none;
+  margin-inline-start: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  color: var(--ink);
+}
+.phase3-relation-option:has(input:checked) .phase3-radio-indicator { border-color: transparent; }
+:is(.phase3-options details, .phase3-sort, .phase3-settings)[open] > summary,
+.search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true'] {
+  position: relative;
+  --search-notch-fill: var(--sheet);
+}
+.search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true'] {
+  --search-notch-fill: var(--paper-2);
+}
+:is(.phase3-options details, .phase3-sort, .phase3-settings)[open] > summary::before,
 :is(.phase3-options details, .phase3-sort, .phase3-settings)[open] > summary::after,
+.search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true']::before,
 .search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true']::after {
   content: "";
   position: absolute;
+  pointer-events: none;
   z-index: 9;
-  inset-inline-start: calc(50% - 5px);
-  inset-block-start: calc(100% + 2px);
-  inline-size: 10px;
+  inset-inline-start: calc(50% - 9px);
+  inset-block-start: 100%;
+  inline-size: 18px;
   block-size: 10px;
-  rotate: 45deg;
-  background: var(--sheet);
-  border-inline-start: 1px solid var(--line-strong);
-  border-block-start: 1px solid var(--line-strong);
+  clip-path: polygon(50% 0, 100% 80%, 100% 100%, 0 100%, 0 80%);
+  background: var(--line-strong);
 }
-:is(.phase3-options details, .phase3-sort, .phase3-settings):dir(rtl)[open] > summary::after,
-.search-and-go-body:not([data-research-column]) [data-phase3-more]:dir(rtl)[aria-expanded='true']::after { rotate: -45deg; }
+:is(.phase3-options details, .phase3-sort, .phase3-settings)[open] > summary::after,
+.search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true']::after {
+  background: var(--search-notch-fill);
+  clip-path: polygon(50% 16%, 100% 96%, 100% 100%, 0 100%, 0 96%);
+}
 .phase3-settings { position: relative; }
-.search-and-go-body:not([data-research-column]) [data-phase3-more][aria-expanded='true']::after { background: var(--paper-2); }
-.search-facet-options button[data-facet-separator='true'] { position: relative; }
+.search-facet-options button[data-facet-separator='true'] { position: relative; margin-inline-start: 14px; }
 .search-facet-options button[data-facet-separator='true']::before {
   content: "";
   position: absolute;
-  inset-inline-start: -4px;
-  inset-block: 20%;
+  pointer-events: none;
+  inset-inline-start: -10px;
+  inset-block: -1px;
   border-inline-start: 1px solid var(--line-strong);
 }
