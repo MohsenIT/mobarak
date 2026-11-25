@@ -1,15 +1,15 @@
 'use client'
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react'
-import { BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, FileText, Funnel, ListChecks, Search, createLucideIcon } from 'lucide-react'
+import { BookOpen, Check, ChevronDown, ChevronLeft, ChevronRight, FileText, Funnel, ListChecks, RotateCcw, Search, Trash2 } from 'lucide-react'
 import { t } from '@/lib/i18n'
 import { toFa, type Meta } from '@/lib/quran'
 import { filterScopeSurahs, scopeSurahs, type SearchScopeSelection } from '@/lib/search-scope'
 import { searchPopupName } from './search-popup'
+import { RevelationIcon } from './Ornaments'
 
-const Kaaba = createLucideIcon('Kaaba', [['path', { d: 'm3 7 9-4 9 4v13l-9 2-9-2zm0 0 9 3 9-3m-9 3v12M3 12l9 3 9-3', key: 'kaaba' }]])
-const Mosque = createLucideIcon('Mosque', [['path', { d: 'M2 21h20M4 21v-8h16v8M6 13c0-5 4-6 6-9 2 3 6 4 6 9M12 4V2M10 21v-5h4v5M2 13V6m20 7V6', key: 'mosque' }]])
-const ranges = { all: BookOpen, meccan: Kaaba, medinan: Mosque } as const
+const ranges = ['all', 'meccan', 'medinan'] as const
+type Range = typeof ranges[number]
 const tabs = { range: BookOpen, many: ListChecks, single: FileText } as const
 type Tab = keyof typeof tabs
 
@@ -31,7 +31,7 @@ export default function SearchWorkspaceScope({ meta, currentSurah, selection, on
   const id = useId()
   const { variant, surahs } = selection
   const tab = tabFor(variant)
-  const [lastRange, setRange] = useState<keyof typeof ranges>(() => variant === 'meccan' || variant === 'medinan' ? variant : 'all')
+  const [lastRange, setRange] = useState<Range>(() => variant === 'meccan' || variant === 'medinan' ? variant : 'all')
   const [lastMany, setMany] = useState(() => tab === 'many' ? surahs : [])
   const [lastSingle, setSingle] = useState(() => tab === 'single' ? surahs[0] ?? currentSurah : currentSurah)
   const [view, setView] = useState<'results' | 'all'>('results')
@@ -51,7 +51,7 @@ export default function SearchWorkspaceScope({ meta, currentSurah, selection, on
     if (tab === next) return
     if (tab === 'many') setMany(surahs)
     if (tab === 'single') setSingle(single)
-    if (tab === 'range' && variant in ranges) setRange(variant as keyof typeof ranges)
+    if (variant === 'all' || variant === 'meccan' || variant === 'medinan') setRange(variant)
     setQuery('')
     setPicker(false)
     onCountsActive(next === 'many' && view === 'results')
@@ -120,14 +120,12 @@ export default function SearchWorkspaceScope({ meta, currentSurah, selection, on
         })}
       </div>
       <div role="tabpanel" id={id} aria-labelledby={`${id}-${tab}`} className="phase3-scope-body">
-        {tab === 'range' && <div className="reader-display-modes" role="group" aria-label={t('searchP3.scopeTab.range')}>
-          {(Object.keys(ranges) as (keyof typeof ranges)[]).map(value => {
-            const Icon = ranges[value]
-            return <button key={value} type="button" aria-pressed={variant === value}
-              onClick={() => onScope({ variant: value, surahs: scopeSurahs(meta, currentSurah, value, []) })}>
-              <Icon size={16} aria-hidden="true" />{t(`searchP3.scope.${value}`)}
-            </button>
-          })}
+        {tab === 'range' && <div className="reader-display-modes phase3-scope-range" role="group" aria-label={t('searchP3.scopeTab.range')}>
+          {ranges.map(value => <button key={value} type="button" aria-pressed={variant === value}
+            onClick={() => onScope({ variant: value, surahs: scopeSurahs(meta, currentSurah, value, []) })}>
+            {value === 'all' ? <BookOpen size={18} aria-hidden="true" /> : <RevelationIcon makki={value === 'meccan'} />}
+            {t(`searchP3.scope.${value}`)}
+          </button>)}
         </div>}
         {tab === 'many' && <>
           <div className="reader-display-modes" role="group" aria-label={t('searchP3.scopeTab.many')}>
@@ -139,12 +137,12 @@ export default function SearchWorkspaceScope({ meta, currentSurah, selection, on
           {listing(false)}
           <div className="phase3-scope-footer">
             <span aria-live="polite">{t('searchP3.scopeChosen', { count: toFa(surahs.length) })}</span>
-            <button type="button" disabled={!surahs.length} onClick={() => onScope({ variant: 'selected', surahs: [] })}>{t('searchP3.scopeClear')}</button>
+            <button className="chip" type="button" disabled={!surahs.length} onClick={() => onScope({ variant: 'selected', surahs: [] })}><Trash2 size={14} aria-hidden="true" />{t('searchP3.scopeClear')}</button>
           </div>
-          <p className="phase3-scope-hint">{t(view === 'results' ? 'searchP3.scopeResultsHint' : 'searchP3.scopeAllHint')}</p>
+          {view === 'results' && <p className="phase3-scope-hint">{t('searchP3.scopeResultsHint')}</p>}
         </>}
         {tab === 'single' && <>
-          <div className="phase3-scope-stepper">
+          <div className="reader-display-modes phase3-scope-stepper">
             <button type="button" aria-label={t('searchP3.scopePrevious')} disabled={single <= 1} onClick={() => onScope({ variant: 'single', surahs: [single - 1] })}>
               <ChevronRight size={16} aria-hidden="true" />{t('searchP3.scopeStepPrevious')}
             </button>
@@ -160,7 +158,7 @@ export default function SearchWorkspaceScope({ meta, currentSurah, selection, on
           </div>
           {picker && listing(true)}
           {single !== currentSurah && <div className="phase3-scope-footer">
-            <button type="button" onClick={() => chooseSingle(currentSurah)}>{t('searchP3.scopeReturn')}</button>
+            <button className="chip" type="button" onClick={() => chooseSingle(currentSurah)}><RotateCcw size={14} aria-hidden="true" />{t('searchP3.scopeReturn')}</button>
           </div>}
         </>}
       </div>

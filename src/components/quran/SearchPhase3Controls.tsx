@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ToggleEvent } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ToggleEvent, type ReactNode } from 'react'
 import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, ListChecks, ListTodo, Quote, Settings2, Sprout, Tags } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import SearchFilterRow from './SearchFilterRow'
@@ -101,7 +101,7 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
 
 type MatchingPreference = { label: string; checked: boolean; disabled?: boolean; onChange: (checked: boolean) => void }
 
-export function SearchWorkspaceSettings({ config, onConfig, matching }: WorkspaceConfigProps & { matching: MatchingPreference[] }) {
+export function SearchWorkspaceSettings({ config, onConfig, matching, actions }: WorkspaceConfigProps & { matching: MatchingPreference[]; actions: ReactNode }) {
   const cooccurrence = config.cooccurrence ?? 'verse'
   const spellingSensitive = config.spellingSensitive ?? false
   const label = t('searchP3.settings')
@@ -130,6 +130,7 @@ export function SearchWorkspaceSettings({ config, onConfig, matching }: Workspac
             data-phase3-spelling={index === 0 || undefined} aria-checked={checked} disabled={disabled}
             onClick={() => onChange(!checked)}><span /></button>
         </section>)}
+        {actions}
       </div>
     </div>
   </details>

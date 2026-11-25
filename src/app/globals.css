@@ -1932,12 +1932,15 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-workspace-main > .drawer-content-shell { border-block-start: 1px solid var(--line); }
 .search-and-go .drawer-destination-options { flex-wrap: wrap; max-height: 34dvh; overflow: auto; }
 .search-and-go-results { flex: 1; overflow: hidden; }
+[data-search-workspace] .search-and-go-results:has(details[name="mobarak-search-popup"][open]) { overflow: visible; }
 .search-and-go-no-destination { padding: 6px 16px; color: var(--ink-soft); }
 .search-and-go-help { padding: 12px 24px; overflow: auto; line-height: 1.9; }
 .search-and-go-help dl > div { padding-block: 8px; border-bottom: 1px solid var(--line); }
 .search-and-go-help dt { font-weight: 700; }
 .search-and-go-help dd, .search-and-go-help p { color: var(--ink-soft); }
 .search-and-go-help p { margin-block-start: 10px; }
+[data-search-workspace] .search-and-go-help { flex: 1; min-height: 0; }
+[data-search-workspace] .search-and-go-help h2 { margin-block: 12px 4px; font-size: 16px; font-weight: 700; }
 
 .search-and-go { top: var(--search-and-go-top, 0px); }
 .search-and-go :is(button, [role="slider"]):focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }
@@ -2023,11 +2026,13 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 [data-search-workspace] .search-and-go-body { container: search-workspace / inline-size; }
 [data-search-workspace] .search-and-go-header { position: relative; }
 .search-workspace-settings-host { flex: none; }
+[data-search-workspace] .search-page-input:has(.search-workspace-settings-host) { padding-inline-end: 6px; }
 .phase3-settings > .reader-display-menu {
   position: absolute;
   inset-block-start: calc(100% + 7px);
-  inset-inline-end: 0;
-  width: min(300px, calc(100vw - 65px));
+  inset-inline-end: 4px;
+  width: min(300px, calc(100vw - 76px));
+  max-height: min(420px, calc(var(--search-and-go-height, 100dvh) - 72px));
   z-index: 8;
 }
 .search-page-input .phase3-settings-trigger { width: 34px; height: 34px; }
@@ -2203,10 +2208,22 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .phase3-scope-count { margin-inline-start: auto; }
 .phase3-scope-count, .phase3-scope-number, .phase3-scope-current, .phase3-scope-hint { color: var(--ink-soft); font-size: 11px; }
 .phase3-scope-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; }
-.phase3-scope-footer > button { min-block-size: 26px; color: var(--ink); text-decoration: underline; }
+.phase3-scope-footer > button { min-block-size: 30px; color: var(--ink); padding-inline: 9px; }
 .phase3-scope-menu button:disabled { opacity: .5; cursor: default; }
-.phase3-scope-stepper > button { border: 1px solid var(--line); border-radius: 8px; padding-inline: 7px; }
-.phase3-scope-stepper .phase3-scope-pick { flex: 1; justify-content: space-between; padding-block: 5px; }
-.phase3-scope-pick > span { display: grid; text-align: start; }
+.phase3-scope-range, .phase3-scope-stepper { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+.phase3-scope-stepper > button { min-width: 0; padding-inline: 7px; }
+.phase3-scope-stepper .phase3-scope-pick { gap: 4px; padding: 5px 3px; }
+.phase3-scope-pick > svg:first-child { display: none; }
+.phase3-scope-pick > svg:last-child { width: 11px; height: 11px; }
+.phase3-scope-pick > span { display: flex; align-items: center; gap: 3px; min-width: 0; }
+.phase3-scope-pick strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.phase3-scope-current { white-space: nowrap; padding: 1px 4px; border-radius: 999px; background: var(--paper-2); }
+.phase3-scope-pick .phase3-scope-current { font-size: 9px; }
 .phase3-scope-stepper:dir(ltr) > button:not(.phase3-scope-pick) > svg { scale: -1 1; }
 .phase3-scope-empty { padding: 8px; color: var(--ink-soft); }
+
+
+.phase3-settings-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.search-page-input .phase3-settings-actions .chip { padding: 4px 9px; }
+[data-search-workspace] details[name="mobarak-search-popup"][open] > :is(.phase3-popup, .reader-display-menu) { z-index: 20; }
+[data-search-workspace] details[name="mobarak-search-popup"][open] > summary { z-index: 21; }

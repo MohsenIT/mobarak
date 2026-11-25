@@ -209,9 +209,18 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           </div>}
         </header>
         {help && <div className="search-and-go-help nice-scroll">
+          {SEARCH_AND_GO_PHASE_3 ? <>
+            <h2>{t('searchAndGo.guide.search')}</h2>
+            <dl>{(['find', 'scope', 'features', 'settings', 'return'] as const).map(topic => <div key={topic}>
+              <dt>{t(`searchAndGo.guide.${topic}`)}</dt>
+              <dd>{t(`searchAndGo.guide.${topic}Description`)}</dd>
+            </div>)}</dl>
+            <h2>{t('searchAndGo.guide.go')}</h2>
+            <p>{t('searchAndGo.guide.goDescription')}</p>
+          </> : null}
           <dl>{NAVIGATION_HELP.map(([kind, examples]) => <div key={kind}><dt>{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl>
           <p>{t('ui.a8175202e6')}</p>
-          <p>{placeholder}</p>
+          {!SEARCH_AND_GO_PHASE_3 && <p>{placeholder}</p>}
           {SEARCH_AND_GO_PHASE_2 && !SEARCH_AND_GO_PHASE_3 && !!history?.some(entry => entry.operation.type === 'text') && onReplay && <div className="drawer-recent-shortcuts">
             {history.map(entry => {
               if (entry.operation.type !== 'text') return null
@@ -220,7 +229,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
             })}
           </div>}
         </div>}
-        <div className="search-and-go-body" data-show-controls={SEARCH_AND_GO_PHASE_2 && help || undefined} data-text-results={SEARCH_AND_GO_PHASE_2 && text || undefined} data-research-column={useResearchColumn || undefined} hidden={help && !SEARCH_AND_GO_PHASE_2}>
+        <div className="search-and-go-body" data-show-controls={SEARCH_AND_GO_PHASE_2 && !SEARCH_AND_GO_PHASE_3 && help || undefined} data-text-results={SEARCH_AND_GO_PHASE_2 && text || undefined} data-research-column={useResearchColumn || undefined} hidden={help && (SEARCH_AND_GO_PHASE_3 || !SEARCH_AND_GO_PHASE_2)}>
           <div className="search-workspace-main">
           {!help && !empty && (options.length > 0 || completions.length > 0) &&
             <div className={SEARCH_AND_GO_PHASE_3 ? "search-and-go-suggestions nice-scroll" : "contents"}>
@@ -272,7 +281,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           <QuranSearch inline={{
             query: SEARCH_AND_GO_PHASE_2 ? query : value,
             position,
-            unified: SEARCH_AND_GO_PHASE_2 ? { run: text, controls: help, input: field, settingsHost, researchHost, selected, onSuggestions: setSuggestions, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
+            unified: SEARCH_AND_GO_PHASE_2 ? { run: text && !(help && SEARCH_AND_GO_PHASE_3), controls: help && !SEARCH_AND_GO_PHASE_3, input: field, settingsHost, researchHost, selected, onSuggestions: setSuggestions, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
           }} open={SEARCH_AND_GO_PHASE_2 || text} onOpenChange={onClose}
             initialSearch={start?.state ? { query: start.query, mode: start.state.mode, surahs: start.state.surahs, revision: 0, state: start.state } : null}
             occurrenceFilter={occurrence} onClearOccurrenceFilter={clearOccurrence} onStateChange={onSearchStateChange}
