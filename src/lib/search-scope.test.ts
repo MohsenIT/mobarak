@@ -3,7 +3,7 @@ import source from '../../public/data/meta.json'
 import type { Meta } from './quran'
 import { filterScopeSurahs, scopeSurahs } from './search-scope'
 
-const meta = source as Meta
+const meta = source as unknown as Meta
 
 test('scope lists use real surahs and preserve selected surahs with zero results', () => {
   expect(filterScopeSurahs(meta, '', [])).toHaveLength(114)
