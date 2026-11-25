@@ -64,7 +64,7 @@ test('empty search stays active after blur and clear until Browse is chosen', as
   await empty.getByRole('button', { name: 'صبر', exact: true }).click();
   await expect(input).toHaveValue('صبر');
   await expect(panel.locator('[data-search-address]').first()).toBeVisible();
-  await expect(panel.locator('.search-results-summary [role=status]')).toHaveText(/آیه · .+ وقوع تطبیق/);
+  await expect(panel.locator('.search-results-summary [role=status]')).toHaveText(/آیه · .+ یافته شده/);
   await input.fill('');
   await expect(empty).toBeVisible();
   await empty.getByRole('button', { name: labels['searchP3.browse'] }).click();
@@ -137,7 +137,7 @@ test('on a narrow surface, research filters open above the summary without movin
   const list = panel.locator('.search-page-results');
   const summary = panel.locator('.search-results-summary');
   await expect(panel.locator('[data-search-address]').first()).toBeVisible();
-  await expect(summary.getByRole('status')).toHaveText('۸۴ آیه · ۹۲ وقوع تطبیق');
+  await expect(summary.getByRole('status')).toHaveText('۸۴ آیه · ۹۲ یافته شده');
   await list.evaluate(element => { element.scrollTop = 300; });
   const before = await summary.boundingBox();
   const historyLength = await page.evaluate(() => history.length);

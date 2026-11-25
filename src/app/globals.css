@@ -1969,8 +1969,10 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   padding: 2px clamp(8px, 2vw, 20px) 5px;
 }
 .phase3-options { flex-wrap: wrap; overflow: visible; padding-block-end: 7px; }
+[data-phase3-results] { --search-controls-inset: clamp(12px, 3vw, 34px); }
+[data-phase3-results] :is(.phase3-options, .search-results-summary) { padding-inline: var(--search-controls-inset); }
 .phase3-options > * { flex: none; }
-.phase3-options summary.chip, .phase3-options > button.chip {
+.phase3-options summary.chip, .phase3-options > button.chip, .phase3-sort > summary.chip {
   min-height: 28px;
   padding: 2px 8px;
   border-color: var(--line);

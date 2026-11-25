@@ -749,7 +749,7 @@
   "copy.includeTranslation": "ترجمه هم بیاید",
   "copy.lineBreaks": "میان بخش‌ها خط جدید بگذار",
   "copy.restoreDefault": "بازگرداندن قالب مناسب متن",
-  "search.occurrenceCount": "{p0} آیه · {p1} وقوع تطبیق",
+  "search.occurrenceCount": "{p0} آیه · {p1} یافته شده",
   "searchP3.settings": "تنظیمات جستجو",
   "searchP3.finding": "یافتن: {relation}",
   "searchP3.scopeIn.all": "در کل قرآن",

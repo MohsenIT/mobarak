@@ -86,7 +86,7 @@ test('one verse card represents multiple separately counted matches', async ({ p
   await page.addInitScript(() => localStorage.setItem('mubarak.ui-language.v1', 'fa'))
   await page.goto('/q?q=%D8%B2%D8%A8%D8%AF&s=13&h=0')
   const panel = page.locator('[data-search-and-go]')
-  await expect(panel.locator('.search-results-detail')).toHaveText('۱ آیه · ۳ وقوع تطبیق')
+  await expect(panel.locator('.search-results-detail')).toHaveText('۱ آیه · ۳ یافته شده')
   await expect(panel.locator('.search-result-card')).toHaveCount(1)
   const highlighted = await panel.locator('.search-result-card [data-search-match]').allTextContents()
   const plain = highlighted.join(' ').normalize('NFD').replace(/\p{M}/gu, '')
