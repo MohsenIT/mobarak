@@ -40,7 +40,7 @@ export function typoDistance(a: string, b: string, max: number): number {
 export type QuranSearchOptions = { includePartial?: boolean; includeNear?: boolean }
 export type SearchVerse = [s: number, a: number, words: string[]]
 export type SearchCooccurrenceGroup = { unit: 'context' | 'surah'; from: number; to: number }
-export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; occurrences?: number[][]; kind: 'exact' | 'partial' | 'near' | 'root'; score: number; morphology?: [string | null, string | null, string | null][]; cooccurrenceGroup?: SearchCooccurrenceGroup }
+export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; facetPositions?: number[][]; occurrences?: number[][]; kind: 'exact' | 'partial' | 'near' | 'root'; score: number; morphology?: [string | null, string | null, string | null][]; cooccurrenceGroup?: SearchCooccurrenceGroup }
 export type QuranSearchCounts = { occurrences: number; words: number; verses: number }
 
 export function countQuranSearchResults(results: QuranSearchResult[]): QuranSearchCounts {

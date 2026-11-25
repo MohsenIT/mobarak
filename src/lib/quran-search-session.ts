@@ -24,7 +24,8 @@ function mergeSpellingHits(matches: QuranSearchResult[]) {
     const occurrences = [...spansFor(previous)]
     const recorded = new Set(occurrences.map(span => span.join(',')))
     occurrences.push(...spansFor(result).filter(span => !recorded.has(span.join(','))))
-    verses.set(id, { ...(result.score < previous.score ? result : previous), positions: Object.keys(parts).map(Number), parts, occurrences })
+    verses.set(id, { ...(result.score < previous.score ? result : previous), positions: Object.keys(parts).map(Number), parts, occurrences,
+      facetPositions: previous.facetPositions?.map((row, index) => [...new Set([...row, ...(result.facetPositions?.[index] ?? [])])]) })
   }
   return [...verses.values()]
 }
@@ -129,18 +130,28 @@ export function createSearchSession(corpus: SearchCorpus) {
     const parsed = filter ? [{ text: query, exact: false }] : parseSearchQuery(query, phase.relation, isText && phase.spellingSensitive)
     const spellingKey = (text: string) => isText && !phase.spellingSensitive && text === 'صلات' ? 'صلاه' : text
     const clauses = [...new Map(parsed.map(clause => [`${clause.exact}:${spellingKey(clause.text)}`, clause])).values()]
+    const facetOffsets: number[] = []
+    let facetCount = 0
+    for (const clause of clauses) {
+      facetOffsets.push(facetCount)
+      facetCount += filter ? 1 : clause.text.split(' ').length
+    }
     const hits = new Map<string, { result: QuranSearchResult; clause: number }[]>()
     const frequencies = clauses.map(({ text, exact }, clause) => {
       const mode = options.mode
       const exactMatcher = phase.spellingSensitive ? sensitiveExactSearch : exactSearch
       const matchesExact = exact || isText && clauses.length > 1 && text.length === 1
+      const usePrayerAlias = isText && !phase.spellingSensitive && spellingKey(text) === 'صلاه'
+      const primary = usePrayerAlias ? 'صلاه' : text
       let matches = exact && (mode === 'root' || mode === 'lemma')
         ? searchMorphology(text.split(' '), mode, within)
-        : matchesExact ? exactMatcher(text, within) : execute(text, options, filter)
+        : matchesExact ? exactMatcher(primary, within) : execute(primary, options, filter)
       if (isText && !phase.spellingSensitive) {
         // The example spellings have explicit alternatives. General Arabic letters retain their existing mappings.
-        const alternative = text === 'صلات' ? 'صلاه' : text === 'صلاه' ? 'صلات' : ''
-        if (alternative) matches = mergeSpellingHits([...matches, ...(matchesExact ? exactSearch(alternative, within) : execute(alternative, options))])
+        // An alternate spelling must not seed a root from a substring of an unrelated word.
+        if (usePrayerAlias) matches = mergeSpellingHits([...matches, ...(matchesExact
+          ? exactSearch('صلات', within)
+          : execute('صلات', { ...options, includePartial: false, includeNear: false }))])
         if (text === 'رويا') {
           const canonical = ['رءيا', 'رءيى'].flatMap(value => matchesExact
             ? sensitiveExactSearch(value, within)
@@ -190,6 +201,7 @@ export function createSearchSession(corpus: SearchCorpus) {
       let strongest = matches[0].result
       const parts: Record<number, number> = {}
       const occurrences = new Map<string, number[]>()
+      const facets = Array.from({ length: facetCount }, () => new Set<number>())
       const weights = new Map<string, number>()
       for (const { result, clause } of matches) {
         if (result.score < strongest.score) strongest = result
@@ -199,6 +211,12 @@ export function createSearchSession(corpus: SearchCorpus) {
           return !values.length || !!value && values.includes(value)
         })) : result.positions
         const retained = new Set(positions)
+        const clauseFacets = result.facetPositions ?? (clauses[clause].exact && !isText
+          ? clauses[clause].text.split(' ').map((_, offset) => spansFor(result).map(span => span[offset]))
+          : [positions.filter(pos => result.parts[pos] & 2)])
+        clauseFacets.forEach((positions, index) => {
+          for (const pos of positions) if (retained.has(pos)) facets[facetOffsets[clause] + index].add(pos)
+        })
         for (const pos of positions) parts[pos] = (parts[pos] ?? 0) | result.parts[pos]
         const spans = spansFor(result).filter(span => !hasFacets || span.some(pos => retained.has(pos)))
         const repetitions = new Map<string, number>()
@@ -224,7 +242,7 @@ export function createSearchSession(corpus: SearchCorpus) {
         relevance *= 1 + searchProximity(positions) + 0.25 * searchOrder(positions)
       }
       results.push({
-        result: { ...strongest, positions: Object.keys(parts).map(Number), parts, occurrences: [...occurrences.values()].sort((a, b) => a[0] - b[0]), ...(group ? { cooccurrenceGroup: group.descriptor } : {}) },
+        result: { ...strongest, positions: Object.keys(parts).map(Number), facetPositions: facets.map(positions => [...positions]), parts, occurrences: [...occurrences.values()].sort((a, b) => a[0] - b[0]), ...(group ? { cooccurrenceGroup: group.descriptor } : {}) },
         relevance,
       })
     }

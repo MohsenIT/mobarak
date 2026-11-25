@@ -5,7 +5,7 @@ import { t } from '@/lib/i18n'
 import { toFa } from '@/lib/quran'
 import { visibleFacetCount } from '@/lib/search-facet-layout'
 
-export type SearchFilterOption = { value: string; label: ReactNode; count?: number; title?: string }
+export type SearchFilterOption = { value: string; label: ReactNode; count?: number; title?: string; key?: string; separator?: boolean }
 
 /** Shared single-line overflow behavior for any search filter, independent of its domain. */
 export default function SearchFilterRow({ label, ariaLabel, options, selected, onToggle }: {
@@ -18,7 +18,7 @@ export default function SearchFilterRow({ label, ariaLabel, options, selected, o
   const [expanded, setExpanded] = useState(false)
   const row = useRef<HTMLDivElement>(null)
   const [fitting, setFitting] = useState(options.length)
-  const layoutIdentity = JSON.stringify(options.map(({ value, count }) => [value, count]))
+  const layoutIdentity = JSON.stringify(options.map(({ value, key, count, separator }) => [key ?? value, count, separator]))
   useEffect(() => {
     const element = row.current
     if (!element) return
@@ -40,10 +40,10 @@ export default function SearchFilterRow({ label, ariaLabel, options, selected, o
     <span>{label}</span>
     <div ref={row} className="search-facet-options">
       <div className="search-facet-measure" aria-hidden="true" inert><div>
-        {options.map(({value,label,count}) => <button type="button" key={value} data-measure-facet tabIndex={-1}><span>{label}</span>{count !== undefined && <small>{toFa(count)}</small>}</button>)}
+        {options.map(({value,key,label,count,separator}) => <button type="button" key={key ?? value} data-facet-separator={separator || undefined} data-measure-facet tabIndex={-1}><span>{label}</span>{count !== undefined && <small>{toFa(count)}</small>}</button>)}
         {options.map((_,index) => <button type="button" key={index} className="search-facet-more" data-measure-more tabIndex={-1}>{t('ui.9b083d9135',{p0:toFa(index + 1)})}</button>)}
       </div></div>
-      {(expanded ? options : options.slice(0, fitting)).map(({value,label,count,title}) => <button type="button" key={value} aria-pressed={selected.includes(value)} title={title} onClick={() => onToggle(value)}><span>{label}</span>{count !== undefined && <small>{toFa(count)}</small>}</button>)}
+      {(expanded ? options : options.slice(0, fitting)).map(({value,key,label,count,title,separator}) => <button type="button" key={key ?? value} data-facet-separator={separator || undefined} aria-pressed={selected.includes(value)} title={title} onClick={() => onToggle(value)}><span>{label}</span>{count !== undefined && <small>{toFa(count)}</small>}</button>)}
       {options.length > fitting && <button type="button" className="search-facet-more" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? t('ui.a023ed0970') : t('ui.9b083d9135',{p0:toFa(options.length - fitting)})}</button>}
     </div>
   </div>

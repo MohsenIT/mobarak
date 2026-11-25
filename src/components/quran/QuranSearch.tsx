@@ -372,7 +372,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     <label className="choice-row" key={label}><input type="checkbox" checked={checked} disabled={disabled}
       onChange={event => onChange(event.target.checked)} />{label}</label>)
   const controls = phase3 && <SearchPhase3Controls
-        query={query} researchHost={unified?.researchHost} identity={`${query}:${surahs.join(',')}:${mode}`}
+        query={query} researchHost={unified?.researchHost} identity={JSON.stringify([query, surahs, mode, config.relation, config.cooccurrence, config.spellingSensitive, includeRoots, includePartial, includeNear])}
         meta={meta} origin={searchOrigin} scope={scopeVariant} surahs={surahs} config={config}
         results={answerKey === engineKey && !busy ? rawResults : emptyResults} includeRoots={includeRoots} onRoots={toggleRoots} onConfig={setConfig}
         onScope={(scope, numbers) => { setScopeVariant(scope); setSurahs(numbers) }}

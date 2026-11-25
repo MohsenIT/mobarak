@@ -56,8 +56,10 @@ export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<stri
       const waw = wawByVerse[`${s}:${a}`] ?? []
       const occurrences: number[][] = []
       const parts: Record<number, number> = {}
+      const facetPositions = terms.map(() => new Set<number>())
       const match = (start: number, afterWaw: boolean) => {
         const hit: number[] = []
+        const stems: [number, number][] = []
         for (let i = start, term = 0; i < words.length; i++) {
           const keys = keysFor(words[i])
           const prefixed = waw.includes(i + 1) && keys.some(key => key.startsWith('و') && key.length > 1)
@@ -71,7 +73,9 @@ export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<stri
             else if (keys.includes(`و${terms[++term]}`)) hit.push(3)
             else return
           } else return
+          if (hit.at(-1)! & 2) stems.push([term, i + 1])
           if (++term === terms.length) {
+            for (const [index, position] of stems) facetPositions[index].add(position)
             occurrences.push(hit.map((mask, offset) => {
               const pos = start + offset + 1
               parts[pos] = (parts[pos] ?? 0) | mask
@@ -85,7 +89,7 @@ export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<stri
         match(i, false)
         if (waw.includes(i + 1)) match(i, true)
       }
-      if (occurrences.length) results.push({ s, a, words, waw, parts, positions: Object.keys(parts).map(Number), occurrences, kind: 'exact', score: 0 })
+      if (occurrences.length) results.push({ s, a, words, waw, parts, positions: Object.keys(parts).map(Number), facetPositions: facetPositions.map(positions => [...positions]), occurrences, kind: 'exact', score: 0 })
     }
     return results
   }

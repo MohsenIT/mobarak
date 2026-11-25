@@ -1,23 +1,20 @@
 'use client'
 
-import { useId, useMemo, useState, type KeyboardEvent } from 'react'
-import { ArrowDownUp, ChevronDown, createLucideIcon, Settings2, SlidersHorizontal, Sprout } from 'lucide-react'
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ToggleEvent } from 'react'
+import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Funnel, ListChecks, ListTodo, Quote, Settings2, Sprout, Tags } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import SearchFilterRow from './SearchFilterRow'
 import { t } from '@/lib/i18n'
 import type { Meta } from '@/lib/quran'
-import { morphologyLabel } from '@/lib/quran'
+import { morphologyLabel, toFa } from '@/lib/quran'
 import { lemmaDisplay } from '@/lib/lemma-display'
 import type { SearchScopeVariant, SearchPhase3State } from '@/lib/search-link'
 import { normalizeQuranSearch, type QuranSearchResult } from '@/lib/quran-search'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import QuranText from './QuranText'
 
-const SortDirectionIcon = createLucideIcon('SortDirection', [
-  ['path', { d: 'M3 6h18 M11 12h10 M17 18h4', key: 'lines' }],
-])
-
-const relations = ['all', 'any', 'phrase'] as const
+const relations = { all: ListChecks, any: ListTodo, phrase: Quote } as const
+const relationValues = ['all', 'any', 'phrase'] as const
 const scopes = ['all', 'current', 'before', 'after', 'selected', 'meccan', 'medinan'] as const
 const groups = ['roots', 'lemmas', 'forms'] as const
 const matchUnits = [
@@ -43,15 +40,33 @@ function dismissPopup(event: KeyboardEvent<HTMLElement>) {
   }
 }
 
+function alignFilterPopup(details: HTMLDetailsElement) {
+  if (!details.open) return
+  const container = details.closest('.phase3-controls')?.getBoundingClientRect()
+  const trigger = details.querySelector('summary')?.getBoundingClientRect()
+  if (!container || !trigger) return
+  details.style.setProperty('--filter-popup-top', `${trigger.bottom - container.top + 7}px`)
+  const menu = details.querySelector('.phase3-relation-popup')?.getBoundingClientRect()
+  if (menu) {
+    const centered = trigger.left - container.left + (trigger.width - menu.width) / 2
+    details.style.setProperty('--filter-popup-left', `${Math.max(8, Math.min(centered, container.width - menu.width - 8))}px`)
+  }
+}
+
+function positionFilterPopup(event: ToggleEvent<HTMLDetailsElement>) {
+  alignFilterPopup(event.currentTarget)
+}
+
 export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) {
   const sort = config.sorts[0] ?? 'mushaf'
   const reversed = config.reverseSort ?? false
   const isRelevance = sort === 'relevance'
+  const SortIcon = isRelevance ? ArrowDownWideNarrow : reversed ? ArrowDown10 : ArrowDown01
   const directionLabel = t(isRelevance ? 'searchP3.mostRelevantFirst' : reversed ? 'searchP3.reverse' : 'searchP3.forward')
   return <details className="phase3-sort" data-phase3-sort onKeyDown={dismissPopup}>
     <summary className="chip"
       aria-label={`${t('searchP3.sort')}، ${t(`searchP3.sort.${sort}`)}، ${directionLabel}`}>
-      <SortDirectionIcon className="phase3-sort-icon" data-reversed={isRelevance || reversed} size={16} aria-hidden="true" />
+      <SortIcon className="phase3-sort-icon" size={16} aria-hidden="true" />
       <span className="phase3-sort-value">{t(`searchP3.sortShort.${sort}`)}</span>
     </summary>
     <div className="reader-display-menu">
@@ -59,7 +74,7 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
         <section>
           <h3><ArrowDownUp size={16} aria-hidden="true" />{t('searchP3.sort')}</h3>
           <div className="reader-display-modes" role="group" aria-label={t('searchP3.sort')}>
-            {(['relevance', 'mushaf'] as const).map(value => <button type="button" key={value}
+            {(['mushaf', 'relevance'] as const).map(value => <button type="button" key={value}
               aria-label={t(`searchP3.sort.${value}`)} aria-pressed={sort === value}
               onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>
               {t(value === 'relevance' ? 'searchP3.sort.relevance' : 'searchP3.sortShort.mushaf')}
@@ -68,13 +83,15 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
         </section>
         <section>
           <div className="reader-display-modes phase3-sort-directions" role="group" aria-label={directionLabel}>
-            {[false, true].map(reverse => <button type="button" key={String(reverse)}
+            {[false, true].map(reverse => {
+              const Icon = isRelevance ? (reverse ? ArrowDownWideNarrow : ArrowDownNarrowWide) : (reverse ? ArrowDown10 : ArrowDown01)
+              return <button type="button" key={String(reverse)}
               disabled={isRelevance} aria-pressed={(isRelevance || reversed) === reverse} onClick={() => onConfig({ ...config, reverseSort: reverse || undefined })}>
-              <SortDirectionIcon className="phase3-sort-icon" data-reversed={reverse} size={16} aria-hidden="true" />
+              <Icon className="phase3-sort-icon" size={16} aria-hidden="true" />
               {isRelevance
                 ? t(reverse ? 'searchP3.highToLow' : 'searchP3.lowToHigh')
                 : t(reverse ? 'searchP3.reverse' : 'searchP3.forward')}
-            </button>)}
+            </button>})}
           </div>
         </section>
       </div>
@@ -142,13 +159,29 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
   onRoots: () => void
 } & WorkspaceConfigProps) {
   const groupName = useId()
+  const toolbar = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const element = toolbar.current
+    if (!element) return
+    const observer = new ResizeObserver(() => {
+      const open = element.querySelector<HTMLDetailsElement>('details[open]')
+      if (open) alignFilterPopup(open)
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
   const [moreOpen, setMoreOpen] = useState(() => readStored<unknown>(researchOpenKey, false) === true)
   const [picker, setPicker] = useState(false)
   const [filter, setFilter] = useState('')
   const values = useMemo(() => {
-    const catalog = [new Map<string, number>(), new Map<string, number>(), new Map<string, number>()]
-    for (const result of results) for (const position of result.positions) {
-      result.morphology?.[position - 1]?.forEach((value, column) => { if (value) catalog[column].set(value, (catalog[column].get(value) ?? 0) + 1) })
+    const catalog: Map<string, number>[][] = []
+    for (const result of results) {
+      for (const [index, positions] of (result.facetPositions ?? [result.positions]).entries()) {
+        const counts = catalog[index] ??= groups.map(() => new Map<string, number>())
+        for (const position of positions) result.morphology?.[position - 1]?.forEach((value, column) => {
+          if (value) counts[column].set(value, (counts[column].get(value) ?? 0) + 1)
+        })
+      }
     }
     return catalog
   }, [results])
@@ -156,27 +189,46 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
   const [catalogue, setCatalogue] = useState({ identity, values })
   const [observed, setObserved] = useState(results)
   if (identity !== catalogue.identity) {
-    setCatalogue({ identity, values: [new Map(), new Map(), new Map()] })
+    setCatalogue({ identity, values })
     setObserved(results)
   } else if (observed !== results) {
     setObserved(results)
-    setCatalogue({ identity, values: values.map((set, index) => new Map([...catalogue.values[index], ...set])) })
+    setCatalogue({ identity, values: Array.from({ length: Math.max(values.length, catalogue.values.length) }, (_, index) =>
+      groups.map((_, column) => new Map([...catalogue.values[index]?.[column] ?? [], ...values[index]?.[column] ?? []]))) })
   }
   const multipleWords = normalizeQuranSearch(query).includes(' ')
+  const scopeNumbers = phase3ScopeSurahs(meta, origin, scope, surahs)
+  const scopeSurah = meta.surahs.find(surah => surah.n === scopeNumbers[0])
+  const scopeLabel = scope === 'meccan' || scope === 'medinan'
+    ? t(`searchP3.scopeIn.${scope}`)
+    : scopeNumbers.length === 1 && scopeSurah
+      ? t('searchP3.scopeIn.single', { name: scopeSurah.fa })
+      : scopeNumbers.length > 1
+        ? t('searchP3.scopeIn.multiple', { count: toFa(scopeNumbers.length) })
+        : t('searchP3.scopeIn.all')
+  const MatchIcon = relations[config.relation]
+  const finding = t('searchP3.finding', { relation: t(`searchP3.relation.${config.relation}`) })
   const activeFilters = groups.reduce((sum, group) => sum + config[group].length, 0)
   const moreId = `${groupName}-more`
   const research = <section id={moreId} className="phase3-research" data-phase3-research
     aria-label={t('searchP3.research')} hidden={!moreOpen}>
     {groups.map((group, index) => {
-      const counts = catalogue.values[index]
-      const available = [...new Set([...config[group], ...counts.keys()])]
       const label = t(`searchP3.filter.${group}`)
+      const selected = config[group]
+      const countsByWord = catalogue.values.map(columns => columns[index])
+      const unassigned = selected.filter(value => !countsByWord.some(counts => counts.has(value)))
+      const words = countsByWord.map(counts => [...counts].sort(([a, ac], [b, bc]) =>
+        Number(selected.includes(b)) - Number(selected.includes(a)) || bc - ac || a.localeCompare(b, 'ar')))
+      if (unassigned.length) words.push(unassigned.map(value => [value, 0]))
+      const nonempty = words.filter(word => word.length)
       return <SearchFilterRow key={`${identity}:${group}`} label={label} ariaLabel={label}
-        options={available.map(value => ({
+        options={nonempty.flatMap((word, index) => word.map(([value, count], position) => ({
           value,
-          count: counts.get(value),
+          key: `${index}:${value}`,
+          separator: index > 0 && position === 0,
+          count,
           label: group === 'forms' ? morphologyLabel(value) : <QuranText text={group === 'lemmas' ? lemmaDisplay(value) : value} />,
-        }))}
+        })))}
         selected={config[group]} onToggle={value => onConfig({
           ...config,
           [group]: config[group].includes(value) ? config[group].filter(item => item !== value) : [...config[group], value],
@@ -184,11 +236,10 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
     })}
   </section>
   return <div className="phase3-controls" data-phase3-controls onKeyDown={dismissPopup}>
-    <div className="phase3-options" role="group" aria-label={t('searchP3.settings')}>
-      <details name={groupName} data-phase3-scope><summary className="chip" data-changed={scope !== 'all'}
-        aria-label={`${t('searchP3.scope')} · ${t(`searchP3.scope.${scope}`)}`}>
-        <span className="phase3-summary-label">{t('searchP3.scope')}</span>
-        <span className="phase3-summary-value">{t(`searchP3.scope.${scope}`)}</span>
+    <div className="phase3-options" ref={toolbar} role="group" aria-label={t('searchP3.settings')}>
+      <details name={groupName} onToggle={positionFilterPopup} data-phase3-scope><summary className="chip" aria-label={scopeLabel}>
+        <Funnel size={14} aria-hidden="true" />
+        <span>{scopeLabel}</span>
         <ChevronDown size={12} aria-hidden="true" />
       </summary>
         <div className="phase3-popup">
@@ -213,14 +264,27 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
           </div>}
         </div>
       </details>
-      {multipleWords && <details name={groupName} data-phase3-relation><summary className="chip" data-changed={config.relation !== 'all'}
-        aria-label={`${t('searchP3.relation')} · ${t(`searchP3.relation.${config.relation}`)}`}>
-        <span className="phase3-summary-label">{t('searchP3.relation')}</span>
-        <span className="phase3-summary-value phase3-relation-long">{t(`searchP3.relation.${config.relation}`)}</span>
-        <span className="phase3-summary-value phase3-summary-short">{t(`searchP3.relationShort.${config.relation}`)}</span>
+      {multipleWords && <details name={groupName} onToggle={positionFilterPopup} data-phase3-relation><summary className="chip">
+        <MatchIcon size={14} aria-hidden="true" />
+        <span>{finding}</span>
         <ChevronDown size={12} aria-hidden="true" />
       </summary>
-        <div className="phase3-popup"><h3>{t('searchP3.relation')}</h3>{relations.map(relation => <button className="chip" type="button" key={relation} aria-pressed={config.relation === relation} onClick={() => onConfig({ ...config, relation })}>{t(`searchP3.relation.${relation}`)}</button>)}</div>
+        <div className="phase3-popup phase3-relation-popup">
+          <div className="reader-display-modes" role="group" aria-label={t('searchP3.relation')}>
+            {relationValues.map(relation => {
+              const Icon = relations[relation]
+              return <button type="button" key={relation} aria-pressed={config.relation === relation}
+                onClick={event => {
+                  onConfig({ ...config, relation })
+                  const popup = event.currentTarget.closest('details')
+                  if (popup) {
+                    popup.open = false
+                    popup.querySelector('summary')?.focus()
+                  }
+                }}><Icon size={15} aria-hidden="true" />{t(`searchP3.relation.${relation}`)}</button>
+            })}
+          </div>
+        </div>
       </details>}
       <button className="chip" type="button" data-phase3-roots aria-pressed={includeRoots} onClick={onRoots}>
         <Sprout size={14} aria-hidden="true" />{t('ui.702b74fe3e')}
@@ -233,8 +297,9 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
           writeStored(researchOpenKey, next)
           setMoreOpen(next)
         }}>
-        <SlidersHorizontal size={14} aria-hidden="true" />
+        <Tags size={14} aria-hidden="true" />
         {t('searchP3.research')}{activeFilters > 0 && <> · {t('searchP3.activeFilters', { count: activeFilters })}</>}
+        <ChevronDown size={12} aria-hidden="true" />
       </button>
     </div>
     {researchHost ? createPortal(research, researchHost) : research}
