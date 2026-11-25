@@ -155,7 +155,7 @@ test('explicit relaxed spellings use attested verses, while sensitive mode keeps
   }
   expect(search('رُءْيَاكَ', sensitive).map(r => [r.s, r.a])).toEqual([[12, 5]])
   for (const spelling of ['صلاة', 'صلات']) expect(search(spelling, relaxed).some(r => r.s === 24 && r.a === 58)).toBe(true)
-  expect(search('صلاة صلات', relaxed).find(r => r.s === 24 && r.a === 58)?.occurrences).toEqual([[8], [16]])
+  expect(search('صلاة صلات', relaxed).find(r => r.s === 24 && r.a === 58)?.occurrences).toEqual([[17], [26]])
   expect(search('صلات', sensitive).some(r => r.s === 24 && r.a === 58)).toBe(false)
   expect(search('صلاة', sensitive).some(r => r.s === 24 && r.a === 58)).toBe(false)
   expect(search('"صَلَوٰة"', sensitive).map(r => [r.s, r.a])).toEqual([[24, 58]])

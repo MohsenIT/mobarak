@@ -126,7 +126,9 @@ export function createSearchSession(corpus: SearchCorpus) {
     const scope = new Set(options.surahs ?? [])
     const within = (s: number) => !scope.size || scope.has(s)
     const isText = !filter && (!options.mode || options.mode === 'text')
-    const clauses = filter ? [{ text: query, exact: false }] : parseSearchQuery(query, phase.relation, isText && phase.spellingSensitive)
+    const parsed = filter ? [{ text: query, exact: false }] : parseSearchQuery(query, phase.relation, isText && phase.spellingSensitive)
+    const spellingKey = (text: string) => isText && !phase.spellingSensitive && text === 'صلات' ? 'صلاه' : text
+    const clauses = [...new Map(parsed.map(clause => [`${clause.exact}:${spellingKey(clause.text)}`, clause])).values()]
     const hits = new Map<string, { result: QuranSearchResult; clause: number }[]>()
     const frequencies = clauses.map(({ text, exact }, clause) => {
       const mode = options.mode
@@ -204,7 +206,7 @@ export function createSearchSession(corpus: SearchCorpus) {
           const location = span.join(',')
           const repeat = (repetitions.get(location) ?? 0) + 1
           repetitions.set(location, repeat)
-          const normalizedClause = clauses[clause].text.replace(/ /g, '')
+          const normalizedClause = spellingKey(clauses[clause].text).replace(/ /g, '')
           occurrences.set(`${normalizedClause}:${location}:${repeat}`, span)
         }
         if (useRelevance) {

@@ -158,7 +158,8 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
       {multipleWords && <details name={groupName} data-phase3-relation><summary className="chip" data-changed={config.relation !== 'all'}
         aria-label={`${t('searchP3.relation')} · ${t(`searchP3.relation.${config.relation}`)}`}>
         <span className="phase3-summary-label">{t('searchP3.relation')}</span>
-        <span className="phase3-summary-value">{t(`searchP3.relationShort.${config.relation}`)}</span>
+        <span className="phase3-summary-value phase3-relation-long">{t(`searchP3.relation.${config.relation}`)}</span>
+        <span className="phase3-summary-value phase3-summary-short">{t(`searchP3.relationShort.${config.relation}`)}</span>
         <ChevronDown size={12} aria-hidden="true" />
       </summary>
         <div className="phase3-popup"><h3>{t('searchP3.relation')}</h3>{relations.map(relation => <button className="chip" type="button" key={relation} aria-pressed={config.relation === relation} onClick={() => onConfig({ ...config, relation })}>{t(`searchP3.relation.${relation}`)}</button>)}</div>
@@ -176,12 +177,14 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
       </button>
     </div>
     <section id={moreId} className="phase3-research nice-scroll" data-phase3-research aria-label={t('searchP3.research')} hidden={!moreOpen}>
-      <h3>{t('searchP3.research')}</h3>
-      <div className="phase3-matching">
-        <button type="button" className="chip" data-phase3-roots aria-label={t('ui.702b74fe3e')} aria-pressed={includeRoots} onClick={onRoots}>
-          {t(includeRoots ? 'searchP3.rootsOn' : 'searchP3.rootsOff')}
-        </button>
-        {matching}
+      <div className="phase3-research-header">
+        <h3>{t('searchP3.research')}</h3>
+        <div className="phase3-matching">
+          <button type="button" className="chip" data-phase3-roots aria-label={t('ui.702b74fe3e')} aria-pressed={includeRoots} onClick={onRoots}>
+            {t(includeRoots ? 'searchP3.rootsOn' : 'searchP3.rootsOff')}
+          </button>
+          {matching}
+        </div>
       </div>
       <div className="phase3-research-groups">{groups.map((group, index) => {
         const available = [...new Set([...config[group], ...catalogue.values[index]])]

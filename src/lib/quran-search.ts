@@ -1,7 +1,7 @@
 /** Search keys only: the displayed Quran words always remain unchanged. */
 export function normalizeQuranSearch(text: string, restoreSmallLetters = false, spellingSensitive = false): string {
   let value = text.normalize('NFKC')
-  if (spellingSensitive) value = value.replace(/ٱ/g, 'ا').replace(/ی/g, 'ي').replace(/ک/g, 'ك')
+  if (spellingSensitive) value = value.replace(/ٱ/g, 'ا').replace(/ی/g, 'ي').replace(/ک/g, 'ك').replace(/[\u0654\u0655]/g, 'ء')
   else {
     if (restoreSmallLetters) value = value.replace(/و\u0670/g, 'ا').replace(/ى\u0670/g, 'ى').replace(/\u0670/g, 'ا').replace(/\u06e7/g, 'ي')
     value = value.replace(/[أإآٱ]/g, 'ا').replace(/[یىئ]/g, 'ي').replace(/ک/g, 'ك').replace(/ؤ/g, 'و').replace(/ة/g, 'ه').replace(/ء/g, '')
