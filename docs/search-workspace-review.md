@@ -1,6 +1,6 @@
 # Search workspace review
 
-This branch starts at beta `0acfff9`. The selected layout uses the existing Mobarak palette, text, chips and result cards. The search dialog docks on the opposite edge from the reader’s existing right-side panels on wide RTL screens. Its research column is selected by a container query on the rendered surface. The same groups collapse inline in narrow space. The dock retains the dialog’s focus management and Back behavior.
+This branch starts at beta `0acfff9`. The selected layout uses the existing Mobarak palette, text, chips and result cards. The wide search workspace replaces the reading surface. Results take the main area and the right panel contains settings and research tools. A resize observer selects the layout from the actual search surface width. The same groups collapse inline in narrow space. The search surface retains the dialog’s focus management and Back behavior.
 
 ## UI review
 
@@ -20,7 +20,7 @@ Relaxed spelling tolerates the documented Persian/Arabic forms, with narrow alia
 
 ## Before and after
 
-Actual browser captures use the same query on each surface. The baseline is the exact beta commit with the three existing search flags enabled so its advanced interface can be compared. The after captures use the new branch's production build.
+Actual browser captures use the same query on each surface. The baseline is the exact beta commit with the three existing search flags enabled so its advanced interface can be compared. The narrow baseline comparison uses the branch’s production build. The updated desktop, tablet and 390 px light captures show the corrected layout in the running browser.
 
 | Width | Light before / after | Dark before / after |
 | --- | --- | --- |
@@ -40,5 +40,6 @@ Actual browser captures use the same query on each surface. The baseline is the 
 - Beta baseline: 248 unit tests, TypeScript and the production build passed. Lint had 18 errors and one warning.
 - New branch: 252 unit tests passed, TypeScript passed, and the production build passed. Lint reported the same 18 errors and one warning. Local exhaustive browser passes were subject to runner timeouts under concurrent builds.
 - GitHub Actions completed the Phase 2 and Phase 3 Playwright jobs, including phone, desktop and offline coverage. See the [regression workflow](https://github.com/MohsenIT/mobarak/actions/runs/45541337241) for the remaining reader matrix status.
+- The targeted Playwright regression passed for the corrected desktop layout and its transition to the narrow layout. TypeScript passed on the same application commit.
 - Real browser checks also verified current-surah scope and the root and lemma search for `دین ملک`, including both highlights at Yusuf 76.
 - The Vercel preview requires existing team access. The beta branch and PR #22 were left in place.
