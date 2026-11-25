@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { ArrowDownUp, ChevronDown, ListFilter, Settings2, SlidersHorizontal } from 'lucide-react'
+import { ArrowDownUp, ChevronDown, createLucideIcon, Settings2, SlidersHorizontal } from 'lucide-react'
 import { t } from '@/lib/i18n'
 import type { Meta } from '@/lib/quran'
 import { morphologyLabel } from '@/lib/quran'
@@ -10,6 +10,10 @@ import type { SearchScopeVariant, SearchPhase3State } from '@/lib/search-link'
 import { normalizeQuranSearch, type QuranSearchResult } from '@/lib/quran-search'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import QuranText from './QuranText'
+
+const SortDirectionIcon = createLucideIcon('SortDirection', [
+  ['path', { d: 'M3 6h18 M11 12h10 M17 18h4', key: 'lines' }],
+])
 
 const relations = ['all', 'any', 'phrase'] as const
 const scopes = ['all', 'current', 'before', 'after', 'selected', 'meccan', 'medinan'] as const
@@ -45,25 +49,29 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
   return <details className="phase3-sort" data-phase3-sort onKeyDown={dismissPopup}>
     <summary className="chip" data-changed={sort !== 'mushaf' || reversed}
       aria-label={`${t('searchP3.sort')}، ${t(`searchP3.sort.${sort}`)}، ${directionLabel}`}>
-      <ListFilter className="phase3-sort-icon" data-reversed={isRelevance || reversed} size={16} aria-hidden="true" />
-      <span className="phase3-summary-value">{t(`searchP3.sortShort.${sort}`)}</span>
+      <SortDirectionIcon className="phase3-sort-icon" data-reversed={isRelevance || reversed} size={16} aria-hidden="true" />
+      <span className="phase3-sort-value">{t(`searchP3.sortShort.${sort}`)}</span>
     </summary>
-    <div className="phase3-popup">
-      <h3><ArrowDownUp size={15} aria-hidden="true" />{t('searchP3.sort')}</h3>
-      <div className="phase3-sort-options" role="group" aria-label={t('searchP3.sort')}>
-        {(['relevance', 'mushaf'] as const).map(value => <button className="chip" type="button" key={value}
-          aria-label={t(`searchP3.sort.${value}`)} aria-pressed={sort === value}
-          onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>
-          {t(`searchP3.sortShort.${value}`)}
-        </button>)}
-      </div>
-      <div className="phase3-sort-directions">
-        {[false, true].map(reverse => <button className="chip" type="button" key={String(reverse)}
-          disabled={isRelevance} aria-pressed={(isRelevance || reversed) === reverse} onClick={() => onConfig({ ...config, reverseSort: reverse || undefined })}>
-          <ListFilter className="phase3-sort-icon" data-reversed={reverse} size={16} aria-hidden="true" />
-          {t(reverse ? 'searchP3.reverse' : 'searchP3.forward')}
-        </button>)}
-      </div>
+    <div className="phase3-popup reader-display-controls">
+      <section>
+        <h3><ArrowDownUp size={16} aria-hidden="true" />{t('searchP3.sort')}</h3>
+        <div className="reader-display-modes" role="group" aria-label={t('searchP3.sort')}>
+          {(['relevance', 'mushaf'] as const).map(value => <button type="button" key={value}
+            aria-label={t(`searchP3.sort.${value}`)} aria-pressed={sort === value}
+            onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>
+            {t(`searchP3.sortShort.${value}`)}
+          </button>)}
+        </div>
+      </section>
+      <section>
+        <div className="reader-display-modes phase3-sort-directions" role="group" aria-label={directionLabel}>
+          {[false, true].map(reverse => <button type="button" key={String(reverse)}
+            disabled={isRelevance} aria-pressed={(isRelevance || reversed) === reverse} onClick={() => onConfig({ ...config, reverseSort: reverse || undefined })}>
+            <SortDirectionIcon className="phase3-sort-icon" data-reversed={reverse} size={16} aria-hidden="true" />
+            {t(reverse ? 'searchP3.reverse' : 'searchP3.forward')}
+          </button>)}
+        </div>
+      </section>
     </div>
   </details>
 }
