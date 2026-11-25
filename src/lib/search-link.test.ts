@@ -55,6 +55,12 @@ test('unknown phase 3 settings do not change a legacy link', () => {
   })
 })
 
+test('search preferences round trip with default legacy behavior', () => {
+  const state: SearchLinkState = { ...base, phase3: { relation: 'all', sorts: ['mushaf'], roots: [], lemmas: [], forms: [], cooccurrence: 'context', spellingSensitive: true, reverseSort: true } }
+  for (const native of [false, true]) expect(readSearchLink(searchLink('https://example.com', state, native).href)).toEqual(state)
+  expect(readSearchLink('/q?q=علم&m=r&co=unknown&sp=garbage')).toEqual(base)
+})
+
 test('handoffs keep explicit phase 3 scope and the original reading context', () => {
   const state = initialSearchLinkState('s', {
     query: 'لا تخف', mode: 'text', surahs: [19, 20], contextSurah: 21, scopeVariant: 'before',
@@ -63,4 +69,14 @@ test('handoffs keep explicit phase 3 scope and the original reading context', ()
   expect(state).toMatchObject({
     query: 'لا تخف', surahs: [19, 20], contextSurah: 21, scopeVariant: 'before', phase3: { relation: 'any' },
   })
+})
+
+test('single and explicitly empty multi-surah scopes survive search links', () => {
+  for (const scope of [
+    { scopeVariant: 'single' as const, surahs: [114] },
+    { scopeVariant: 'selected' as const, surahs: [] },
+  ]) {
+    const state = { ...base, ...scope }
+    expect(readSearchLink(searchLink('https://example.com', state).href)).toEqual(state)
+  }
 })

@@ -1,13 +1,18 @@
-import { normalizeQuranSearch, type QuranSearchResult, type SearchVerse } from './quran-search'
+import { normalizeQuranSearch, quranSearchKeys, type QuranSearchResult, type SearchVerse } from './quran-search'
 
 export type SearchRelation = 'all' | 'any' | 'phrase'
+export const unrecordedSearchForm = 'unrecorded'
 export type SearchSort = 'mushaf' | 'relevance'
+export type SearchCooccurrence = 'verse' | 'context' | 'surah'
 export type Phase3SearchOptions = {
   relation: SearchRelation
   sorts: SearchSort[]
+  reverseSort?: boolean
   roots: string[]
   lemmas: string[]
   forms: string[]
+  cooccurrence?: SearchCooccurrence
+  spellingSensitive?: boolean
 }
 
 export function defaultPhase3SearchOptions(): Phase3SearchOptions {
@@ -16,16 +21,16 @@ export function defaultPhase3SearchOptions(): Phase3SearchOptions {
 
 type SearchClause = { text: string; exact: boolean }
 
-export function parseSearchQuery(input: string, relation: SearchRelation): SearchClause[] {
+export function parseSearchQuery(input: string, relation: SearchRelation, spellingSensitive = false): SearchClause[] {
   if (relation === 'phrase') {
-    const text = normalizeQuranSearch(input)
+    const text = normalizeQuranSearch(input, false, spellingSensitive)
     return text ? [{ text, exact: true }] : []
   }
   const clauses = new Map<string, SearchClause>()
   for (const [plain, straight, curly, angled] of input.matchAll(/"([^"]*)(?:"|$)|“([^”]*)(?:”|$)|«([^»]*)(?:»|$)|[^"“«]+/g)) {
     const quoted = straight ?? curly ?? angled
     const exact = quoted !== undefined
-    const normalized = normalizeQuranSearch(quoted ?? plain)
+    const normalized = normalizeQuranSearch(quoted ?? plain, false, spellingSensitive)
     for (const text of exact ? [normalized] : normalized.split(' ')) {
       if (text) clauses.set(`${exact}:${text}`, { text, exact })
     }
@@ -33,12 +38,12 @@ export function parseSearchQuery(input: string, relation: SearchRelation): Searc
   return [...clauses.values()]
 }
 
-export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<string, number[]> = {}) {
+export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<string, number[]> = {}, spellingSensitive = false) {
   const keysByWord = new Map<string, string[]>()
   const keysFor = (word: string) => {
     let keys = keysByWord.get(word)
     if (!keys) {
-      keys = [...new Set([normalizeQuranSearch(word), normalizeQuranSearch(word, true)])].filter(Boolean)
+      keys = quranSearchKeys(word, spellingSensitive)
       keysByWord.set(word, keys)
     }
     return keys
@@ -52,8 +57,10 @@ export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<stri
       const waw = wawByVerse[`${s}:${a}`] ?? []
       const occurrences: number[][] = []
       const parts: Record<number, number> = {}
+      const facetPositions = terms.map(() => new Set<number>())
       const match = (start: number, afterWaw: boolean) => {
         const hit: number[] = []
+        const stems: [number, number][] = []
         for (let i = start, term = 0; i < words.length; i++) {
           const keys = keysFor(words[i])
           const prefixed = waw.includes(i + 1) && keys.some(key => key.startsWith('و') && key.length > 1)
@@ -67,7 +74,9 @@ export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<stri
             else if (keys.includes(`و${terms[++term]}`)) hit.push(3)
             else return
           } else return
+          if (hit.at(-1)! & 2) stems.push([term, i + 1])
           if (++term === terms.length) {
+            for (const [index, position] of stems) facetPositions[index].add(position)
             occurrences.push(hit.map((mask, offset) => {
               const pos = start + offset + 1
               parts[pos] = (parts[pos] ?? 0) | mask
@@ -81,7 +90,7 @@ export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<stri
         match(i, false)
         if (waw.includes(i + 1)) match(i, true)
       }
-      if (occurrences.length) results.push({ s, a, words, waw, parts, positions: Object.keys(parts).map(Number), occurrences, kind: 'exact', score: 0 })
+      if (occurrences.length) results.push({ s, a, words, waw, parts, positions: Object.keys(parts).map(Number), facetPositions: facetPositions.map(positions => [...positions]), occurrences, kind: 'exact', score: 0 })
     }
     return results
   }

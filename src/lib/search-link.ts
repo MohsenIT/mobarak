@@ -11,7 +11,7 @@ export const SEARCH_AND_GO_PHASE_3 = SEARCH_AND_GO_PHASE_2 && process.env.NEXT_P
 export type SearchResultPosition = { scrollTop: number; visible: number; anchor?: { s: number; a: number; offset: number } }
 export type SearchResultSnapshot = { query: string; position: SearchResultPosition; state?: SearchLinkState; selected?: VerseAddress }
 
-const scopeVariants = ['all', 'current', 'selected', 'before', 'after', 'meccan', 'medinan'] as const
+const scopeVariants = ['all', 'current', 'selected', 'before', 'after', 'meccan', 'medinan', 'single'] as const
 export type SearchScopeVariant = typeof scopeVariants[number]
 export type SearchPhase3State = Phase3SearchOptions
 
@@ -58,8 +58,12 @@ export function readSearchLink(href: string): SearchLinkState | null {
   const roots = sortedFacets(values('fr'))
   const lemmas = sortedFacets(values('fl'))
   const forms = sortedFacets(values('ff'))
-  const phase3 = relation || sorts.length || roots.length || lemmas.length || forms.length
-    ? { relation: relation ?? 'all', sorts, roots, lemmas, forms } satisfies SearchPhase3State
+  const cooccurrence = p.get('co')
+  const broader = cooccurrence === 'context' || cooccurrence === 'surah'
+  const spellingSensitive = p.get('sp') === '1'
+  const reverseSort = p.get('dir') === 'desc'
+  const phase3 = relation || sorts.length || roots.length || lemmas.length || forms.length || broader || spellingSensitive || reverseSort
+    ? { relation: relation ?? 'all', sorts, ...(reverseSort ? { reverseSort } : {}), roots, lemmas, forms, ...(broader ? { cooccurrence } : {}), ...(spellingSensitive ? { spellingSensitive } : {}) } satisfies SearchPhase3State
     : undefined
   const [tab, s, a, pos] = (p.get('o') || '').split('.')
   const occurrence: AnalysisSelection | null = Object.hasOwn(tabs, tab) && bounded(s, 114) && bounded(a, 286) && bounded(pos, 500) ? {
@@ -96,6 +100,9 @@ export function searchLink(current: string, state: SearchLinkState, native = fal
   if (state.scopeVariant) p.set('scope', state.scopeVariant)
   if (state.phase3) {
     p.set('rel', state.phase3.relation)
+    if (state.phase3.cooccurrence && state.phase3.cooccurrence !== 'verse') p.set('co', state.phase3.cooccurrence)
+    if (state.phase3.spellingSensitive) p.set('sp', '1')
+    if (state.phase3.reverseSort) p.set('dir', 'desc')
     for (const sort of new Set(state.phase3.sorts)) p.append('sort', sort)
     for (const [param, facet] of Object.entries(phase3Facets)) {
       for (const value of sortedFacets(state.phase3[facet])) p.append(param, value)

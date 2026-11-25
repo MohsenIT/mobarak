@@ -24,7 +24,7 @@ function SujudIcon() {
   </svg>
 }
 
-function RevelationIcon({ makki }: { makki: boolean }) {
+export function RevelationIcon({ makki }: { makki: boolean }) {
   return makki ? (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 7 13 3l8 4v13l-10 3-8-4Z" /><path d="m3 7 8 4 10-4M11 11v12M3 11l8 4 10-4" /><path d="M6 15v4l2 1v-4Z" fill="currentColor" stroke="none" />

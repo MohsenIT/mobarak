@@ -1,11 +1,20 @@
 /** Search keys only: the displayed Quran words always remain unchanged. */
-export function normalizeQuranSearch(text: string, restoreSmallLetters = false): string {
+export function normalizeQuranSearch(text: string, restoreSmallLetters = false, spellingSensitive = false): string {
   let value = text.normalize('NFKC')
-  if (restoreSmallLetters) value = value.replace(/و\u0670/g, 'ا').replace(/ى\u0670/g, 'ى').replace(/\u0670/g, 'ا').replace(/\u06e7/g, 'ي')
-  return value.replace(/[أإآٱ]/g, 'ا').replace(/[یىئ]/g, 'ي').replace(/ک/g, 'ك')
-    .replace(/ؤ/g, 'و').replace(/ة/g, 'ه').replace(/ء/g, '')
+  if (spellingSensitive) value = value.replace(/ٱ/g, 'ا').replace(/ی/g, 'ي').replace(/ک/g, 'ك').replace(/[\u0654\u0655]/g, 'ء')
+  else {
+    if (restoreSmallLetters) value = value.replace(/و\u0670/g, 'ا').replace(/ى\u0670/g, 'ى').replace(/\u0670/g, 'ا').replace(/\u06e7/g, 'ي')
+    value = value.replace(/[أإآٱ]/g, 'ا').replace(/[یىئ]/g, 'ي').replace(/ک/g, 'ك').replace(/ؤ/g, 'و').replace(/ة/g, 'ه').replace(/ء/g, '')
+  }
+  return value
     .replace(/[\p{M}\u0610-\u061a\u06d6-\u06edـ\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/gu, '')
     .replace(/[^\p{L}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' ').toLowerCase()
+}
+
+export function quranSearchKeys(text: string, spellingSensitive: boolean): string[] {
+  const key = normalizeQuranSearch(text, false, spellingSensitive)
+  if (spellingSensitive) return key ? [key] : []
+  return [...new Set([key, normalizeQuranSearch(text, true)])].filter(Boolean)
 }
 
 /** Bounded Damerau distance also tolerates swapping two adjacent letters. */
@@ -30,7 +39,8 @@ export function typoDistance(a: string, b: string, max: number): number {
 
 export type QuranSearchOptions = { includePartial?: boolean; includeNear?: boolean }
 export type SearchVerse = [s: number, a: number, words: string[]]
-export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; occurrences?: number[][]; kind: 'exact' | 'partial' | 'near' | 'root'; score: number; morphology?: [string | null, string | null, string | null][] }
+export type SearchCooccurrenceGroup = { unit: 'context' | 'surah'; from: number; to: number }
+export type QuranSearchResult = { s: number; a: number; words: string[]; waw: number[]; parts: Record<number, number>; positions: number[]; facetPositions?: number[][]; occurrences?: number[][]; kind: 'exact' | 'partial' | 'near' | 'root'; score: number; morphology?: [string | null, string | null, string | null][]; cooccurrenceGroup?: SearchCooccurrenceGroup }
 export type QuranSearchCounts = { occurrences: number; words: number; verses: number }
 
 export function countQuranSearchResults(results: QuranSearchResult[]): QuranSearchCounts {
@@ -45,7 +55,7 @@ export function countQuranSearchResults(results: QuranSearchResult[]): QuranSear
 
 type IndexedVerse = { verse: SearchVerse; keys: string[][]; prefixed: Set<number>; compact: { text: string; ranges: [number, number][]; boundaries: Set<number> }[] }
 
-export function createQuranSearch(verses: SearchVerse[], waw: Record<string, number[]> = {}) {
+export function createQuranSearch(verses: SearchVerse[], waw: Record<string, number[]> = {}, spellingSensitive = false) {
   const vocabulary = new Set<string>()
   const sourceOffsets = new Map<string, number[][]>()
   const originalOffset = (word: string, variant: number, offset: number) => {
@@ -70,7 +80,7 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
     const keys = verse[2].map(word => {
       let options = normalizedWords.get(word)
       if (!options) {
-        options = [...new Set([normalizeQuranSearch(word), normalizeQuranSearch(word, true)])].filter(Boolean)
+        options = quranSearchKeys(word, spellingSensitive)
         normalizedWords.set(word, options)
         options.forEach(key => vocabulary.add(key))
       }
@@ -95,12 +105,12 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
     return { verse, keys, prefixed, compact }
   })
   return (input: string, surah = 0, { includePartial = true, includeNear = false }: QuranSearchOptions = {}): QuranSearchResult[] => {
-    const query = normalizeQuranSearch(input)
+    const query = normalizeQuranSearch(input, false, spellingSensitive)
     if (query.replace(/\s/g, '').length < 2) return []
     const terms = query.split(' ')
     const compactQuery = terms.join('')
     const budget = terms.length === 1 ? (terms[0].length >= 6 ? 2 : 1) : Math.min(3, Math.max(1, Math.ceil(compactQuery.length / 12)))
-    const distances = includeNear ? terms.map(term => {
+    const distances = includeNear && !spellingSensitive ? terms.map(term => {
       const max = term.length < 3 ? 0 : term.length < 6 ? 1 : 2
       const matches = new Map<string, number>()
       if (max === 0) { if (vocabulary.has(term)) matches.set(term, 0); return matches }

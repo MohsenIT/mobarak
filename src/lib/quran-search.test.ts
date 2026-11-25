@@ -11,6 +11,12 @@ test('search keys normalize Persian/Arabic forms, marks, wasla and presentation 
   expect(normalizeQuranSearch('بِسْمِ\u200c اللّٰه')).toBe('بسم الله')
   expect(normalizeQuranSearch('ﷲ')).toBe('الله')
 })
+
+test('spelling-sensitive keys retain hamza on a Quranic carrier while removing vocalization', () => {
+  expect(normalizeQuranSearch('ٱلْـَٔايَـٰتِ', false, true)).toBe('الءايت')
+  expect(normalizeQuranSearch('رُؤْیَا', false, true)).toBe('رؤيا')
+  expect(normalizeQuranSearch('رُويَا', false, true)).toBe('رويا')
+})
 test('a real Quran phrase accepts Persian letters and ignores diacritics', () => {
   const result = search('ذلک الکتاب لا ریب فیه')[0]
   expect([result.s, result.a, result.kind]).toEqual([2, 2, 'exact'])

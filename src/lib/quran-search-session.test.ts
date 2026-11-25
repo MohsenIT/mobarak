@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test'
 import { createSearchSession, type SearchCorpus } from './quran-search-session'
 import { countQuranSearchResults } from './quran-search'
+import { unrecordedSearchForm } from './search-query'
 import corpus from '../../public/data/quran-search.json'
 const search = createSearchSession(corpus as unknown as SearchCorpus)
 
@@ -125,5 +126,70 @@ test('relevance uses frequency, proximity and stable verse ordering', () => {
     morphology: {},
   })
   expect(local('قال كتب', { phase3 }).map(r => r.a)).toEqual([1, 2, 3, 4])
-  expect(local('قال كتب', { phase3: { ...phase3, sorts: ['relevance', 'mushaf'] } }).map(r => r.a)).toEqual([3, 2, 4, 1])
+  expect(local('قال كتب', { phase3: { ...phase3, reverseSort: true } }).map(r => r.a)).toEqual([4, 3, 2, 1])
+  for (const reverseSort of [false, true]) {
+    expect(local('قال كتب', { phase3: { ...phase3, reverseSort, sorts: ['relevance', 'mushaf'] } }).map(r => r.a)).toEqual([3, 2, 4, 1])
+  }
+})
+
+test('broader all-word search keeps real verses, uses source context ranges and never crosses surahs', () => {
+  const options = { surahs: [20], includePartial: false, phase3 }
+  expect(search('تخف نارا', options)).toEqual([])
+  const contexts = search('تخف نارا', { ...options, phase3: { ...phase3, cooccurrence: 'context' } })
+  expect(contexts.map(r => [r.a, r.occurrences, r.cooccurrenceGroup])).toEqual([
+    [10, [[3], [9]], { unit: 'context', from: 9, to: 23 }],
+    [21, [[4]], { unit: 'context', from: 9, to: 23 }],
+  ])
+  expect(countQuranSearchResults(contexts)).toEqual({ occurrences: 3, words: 3, verses: 2 })
+  const surah = search('تخف نارا', { ...options, phase3: { ...phase3, cooccurrence: 'surah' } })
+  expect(surah.map(r => r.a)).toEqual([10, 21, 68, 77])
+  expect(surah[0].cooccurrenceGroup).toEqual({ unit: 'surah', from: 1, to: 135 })
+  expect(search('"تخف نارا"', { ...options, phase3: { ...phase3, cooccurrence: 'surah' } })).toEqual([])
+  const local = createSearchSession({ verses: [[115, 1, ['تخف']], [115, 2, ['نارا']], [116, 1, ['موسى']]], morphology: {} })
+  expect(local('تخف نارا', { phase3: { ...phase3, cooccurrence: 'context' } })).toEqual([])
+  expect(local('تخف موسى', { phase3: { ...phase3, cooccurrence: 'surah' } })).toEqual([])
+})
+
+test('explicit relaxed spellings use attested verses, while sensitive mode keeps the written distinctions', () => {
+  const relaxed = { phase3, surahs: [12, 24] }
+  const sensitive = { ...relaxed, phase3: { ...phase3, spellingSensitive: true } }
+  for (const spelling of ['رویا', 'رؤیا']) {
+    expect(search(spelling, relaxed).map(r => [r.s, r.a])).toEqual([[12, 5], [12, 43], [12, 100]])
+    expect(search(spelling, { ...sensitive, includeNear: true })).toEqual([])
+  }
+  expect(search('رُءْيَاكَ', sensitive).map(r => [r.s, r.a])).toEqual([[12, 5]])
+  for (const spelling of ['صلاة', 'صلات']) expect(search(spelling, relaxed).some(r => r.s === 24 && r.a === 58)).toBe(true)
+  expect(search('صلاة صلات', relaxed).find(r => r.s === 24 && r.a === 58)?.occurrences).toEqual([[17], [26]])
+  expect(search('صلات', sensitive).some(r => r.s === 24 && r.a === 58)).toBe(false)
+  expect(search('صلاة', sensitive).some(r => r.s === 24 && r.a === 58)).toBe(false)
+  expect(search('"صَلَوٰة"', sensitive).map(r => [r.s, r.a])).toEqual([[24, 58]])
+  expect(search('«لا تخف»', { ...sensitive, surahs: [20] })[0]).toMatchObject({ a: 21, parts: { 3: 2, 4: 2 } })
+  const local = createSearchSession({ verses: [[1, 1, ['رُويَا']], [1, 2, ['رُؤيَا']], [1, 3, ['صَلاة']], [1, 4, ['صَلات']]], morphology: {} })
+  for (const [index, word] of ['رویا', 'رؤیا', 'صلاة', 'صلات'].entries()) {
+    expect(local(word, { phase3: sensitive.phase3 }).map(r => r.a)).toEqual([index + 1])
+  }
+})
+
+test('prayer spelling variants do not seed the unrelated فصل root, and facets retain word order', () => {
+  for (const spelling of ['صلاه', 'صلات']) {
+    const results = search(`صابر ${spelling}`, { includeRoots: true, includePartial: true, phase3 })
+    expect(results.some(result => result.s === 2 && result.a === 249)).toBe(false)
+    const verse = results.find(result => result.s === 2 && result.a === 153)!
+    expect(verse.facetPositions?.map(group => [...new Set(group.map(pos => verse.morphology?.[pos - 1]?.[0]))])).toEqual([['صبر'], ['صلو']])
+  }
+})
+
+test('exact phrases retain separate facet positions in query order', () => {
+  const results = search('دين الملك', { phase3: { ...phase3, relation: 'phrase' } })
+  const verse = results.find(result => result.s === 12 && result.a === 76)!
+  expect(verse.facetPositions?.map(group => group.map(pos => verse.morphology?.[pos - 1]?.[0]))).toEqual([['دين'], ['ملك']])
+})
+
+test('unrecorded form keeps the seven prayer matches countable and filterable', () => {
+  const hits = search('صابر صلاه', { includeRoots: true, phase3 })
+  const forms = hits.flatMap(result => result.facetPositions?.[1].map(pos => result.morphology?.[pos - 1]?.[2]) ?? [])
+  expect(forms).toEqual(Array(7).fill(null))
+  const filtered = search('صابر صلاه', { includeRoots: true, phase3: { ...phase3, forms: [unrecordedSearchForm] } })
+  expect(filtered.map(result => [result.s, result.a])).toEqual(hits.map(result => [result.s, result.a]))
+  expect(filtered.flatMap(result => result.positions.map(pos => result.morphology?.[pos - 1]?.[2]))).not.toContain('VIII')
 })
