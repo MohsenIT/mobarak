@@ -52,26 +52,28 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
       <SortDirectionIcon className="phase3-sort-icon" data-reversed={isRelevance || reversed} size={16} aria-hidden="true" />
       <span className="phase3-sort-value">{t(`searchP3.sortShort.${sort}`)}</span>
     </summary>
-    <div className="phase3-popup reader-display-controls">
-      <section>
-        <h3><ArrowDownUp size={16} aria-hidden="true" />{t('searchP3.sort')}</h3>
-        <div className="reader-display-modes" role="group" aria-label={t('searchP3.sort')}>
-          {(['relevance', 'mushaf'] as const).map(value => <button type="button" key={value}
-            aria-label={t(`searchP3.sort.${value}`)} aria-pressed={sort === value}
-            onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>
-            {t(`searchP3.sortShort.${value}`)}
-          </button>)}
-        </div>
-      </section>
-      <section>
-        <div className="reader-display-modes phase3-sort-directions" role="group" aria-label={directionLabel}>
-          {[false, true].map(reverse => <button type="button" key={String(reverse)}
-            disabled={isRelevance} aria-pressed={(isRelevance || reversed) === reverse} onClick={() => onConfig({ ...config, reverseSort: reverse || undefined })}>
-            <SortDirectionIcon className="phase3-sort-icon" data-reversed={reverse} size={16} aria-hidden="true" />
-            {t(reverse ? 'searchP3.reverse' : 'searchP3.forward')}
-          </button>)}
-        </div>
-      </section>
+    <div className="reader-display-menu">
+      <div className="reader-display-controls">
+        <section>
+          <h3><ArrowDownUp size={16} aria-hidden="true" />{t('searchP3.sort')}</h3>
+          <div className="reader-display-modes" role="group" aria-label={t('searchP3.sort')}>
+            {(['relevance', 'mushaf'] as const).map(value => <button type="button" key={value}
+              aria-label={t(`searchP3.sort.${value}`)} aria-pressed={sort === value}
+              onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>
+              {t(`searchP3.sortShort.${value}`)}
+            </button>)}
+          </div>
+        </section>
+        <section>
+          <div className="reader-display-modes phase3-sort-directions" role="group" aria-label={directionLabel}>
+            {[false, true].map(reverse => <button type="button" key={String(reverse)}
+              disabled={isRelevance} aria-pressed={(isRelevance || reversed) === reverse} onClick={() => onConfig({ ...config, reverseSort: reverse || undefined })}>
+              <SortDirectionIcon className="phase3-sort-icon" data-reversed={reverse} size={16} aria-hidden="true" />
+              {t(reverse ? 'searchP3.reverse' : 'searchP3.forward')}
+            </button>)}
+          </div>
+        </section>
+      </div>
     </div>
   </details>
 }
