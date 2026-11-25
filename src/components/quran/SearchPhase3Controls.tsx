@@ -1,7 +1,9 @@
 'use client'
 
-import { useId, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { ArrowDownUp, ChevronDown, createLucideIcon, Settings2, SlidersHorizontal } from 'lucide-react'
+import { useId, useMemo, useState, type KeyboardEvent } from 'react'
+import { ArrowDownUp, ChevronDown, createLucideIcon, Settings2, SlidersHorizontal, Sprout } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import SearchFilterRow from './SearchFilterRow'
 import { t } from '@/lib/i18n'
 import type { Meta } from '@/lib/quran'
 import { morphologyLabel } from '@/lib/quran'
@@ -47,7 +49,7 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
   const isRelevance = sort === 'relevance'
   const directionLabel = t(isRelevance ? 'searchP3.mostRelevantFirst' : reversed ? 'searchP3.reverse' : 'searchP3.forward')
   return <details className="phase3-sort" data-phase3-sort onKeyDown={dismissPopup}>
-    <summary className="chip" data-changed={sort !== 'mushaf' || reversed}
+    <summary className="chip"
       aria-label={`${t('searchP3.sort')}، ${t(`searchP3.sort.${sort}`)}، ${directionLabel}`}>
       <SortDirectionIcon className="phase3-sort-icon" data-reversed={isRelevance || reversed} size={16} aria-hidden="true" />
       <span className="phase3-sort-value">{t(`searchP3.sortShort.${sort}`)}</span>
@@ -80,25 +82,38 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
   </details>
 }
 
-export function SearchWorkspaceSettings({ config, onConfig }: WorkspaceConfigProps) {
+type MatchingPreference = { label: string; checked: boolean; disabled?: boolean; onChange: (checked: boolean) => void }
+
+export function SearchWorkspaceSettings({ config, onConfig, matching }: WorkspaceConfigProps & { matching: MatchingPreference[] }) {
   const cooccurrence = config.cooccurrence ?? 'verse'
   const spellingSensitive = config.spellingSensitive ?? false
   const label = t('searchP3.settings')
+  const preferences = [{
+    label: t('searchP3.spellingSensitive'), checked: spellingSensitive,
+    onChange: (checked: boolean) => onConfig({ ...config, spellingSensitive: checked }),
+  }, ...matching]
   return <details className="phase3-settings" data-phase3-settings onKeyDown={dismissPopup}>
-    <summary className="icon-btn phase3-settings-trigger" aria-label={label} title={label}
-      data-changed={cooccurrence !== 'verse' || spellingSensitive}>
+    <summary className="icon-btn phase3-settings-trigger" aria-label={label} title={label}>
       <Settings2 size={19} aria-hidden="true" />
     </summary>
-    <div className="phase3-popup">
-      <fieldset className="phase3-settings-group" data-phase3-cooccurrence>
-        <legend>{t('searchP3.matchWithin')}</legend>
-        {matchUnits.map(([unit, key]) => <button className="chip" type="button" key={unit} data-phase3-unit={unit}
-          aria-pressed={cooccurrence === unit} onClick={() => onConfig({ ...config, cooccurrence: unit })}>
-          {t(key)}
-        </button>)}
-      </fieldset>
-      <button className="chip" type="button" data-phase3-spelling aria-pressed={spellingSensitive}
-        onClick={() => onConfig({ ...config, spellingSensitive: !spellingSensitive })}>{t('searchP3.spellingSensitive')}</button>
+    <div className="reader-display-menu">
+      <div className="reader-display-controls">
+        <section data-phase3-cooccurrence>
+          <h3>{t('searchP3.matchWithin')}</h3>
+          <div className="reader-display-modes" role="group" aria-label={t('searchP3.matchWithin')}>
+            {matchUnits.map(([unit, key]) => <button type="button" key={unit} data-phase3-unit={unit}
+              aria-pressed={cooccurrence === unit} onClick={() => onConfig({ ...config, cooccurrence: unit })}>
+              {t(key)}
+            </button>)}
+          </div>
+        </section>
+        {preferences.map(({ label, checked, disabled, onChange }, index) => <section className="reader-display-translation" key={label}>
+          <span>{label}</span>
+          <button className="reader-display-switch" type="button" role="switch" aria-label={label}
+            data-phase3-spelling={index === 0 || undefined} aria-checked={checked} disabled={disabled}
+            onClick={() => onChange(!checked)}><span /></button>
+        </section>)}
+      </div>
     </div>
   </details>
 }
@@ -113,7 +128,7 @@ export function phase3ScopeSurahs(meta: Meta, origin: number, scope: SearchScope
   }[scope]
 }
 
-export default function SearchPhase3Controls({ meta, origin, scope, surahs, config, query, results, identity, includeRoots, matching, onScope, onConfig, onRoots }: {
+export default function SearchPhase3Controls({ meta, origin, scope, surahs, config, query, results, identity, includeRoots, researchHost, onScope, onConfig, onRoots }: {
   meta: Meta
   origin: number
   scope: SearchScopeVariant
@@ -122,7 +137,7 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
   results: QuranSearchResult[]
   identity: string
   includeRoots: boolean
-  matching?: ReactNode
+  researchHost?: HTMLElement | null
   onScope: (scope: SearchScopeVariant, surahs: number[]) => void
   onRoots: () => void
 } & WorkspaceConfigProps) {
@@ -131,9 +146,9 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
   const [picker, setPicker] = useState(false)
   const [filter, setFilter] = useState('')
   const values = useMemo(() => {
-    const catalog = [new Set<string>(), new Set<string>(), new Set<string>()]
+    const catalog = [new Map<string, number>(), new Map<string, number>(), new Map<string, number>()]
     for (const result of results) for (const position of result.positions) {
-      result.morphology?.[position - 1]?.forEach((value, column) => { if (value) catalog[column].add(value) })
+      result.morphology?.[position - 1]?.forEach((value, column) => { if (value) catalog[column].set(value, (catalog[column].get(value) ?? 0) + 1) })
     }
     return catalog
   }, [results])
@@ -141,15 +156,33 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
   const [catalogue, setCatalogue] = useState({ identity, values })
   const [observed, setObserved] = useState(results)
   if (identity !== catalogue.identity) {
-    setCatalogue({ identity, values: [new Set(), new Set(), new Set()] })
+    setCatalogue({ identity, values: [new Map(), new Map(), new Map()] })
     setObserved(results)
   } else if (observed !== results) {
     setObserved(results)
-    setCatalogue({ identity, values: values.map((set, index) => new Set([...catalogue.values[index], ...set])) })
+    setCatalogue({ identity, values: values.map((set, index) => new Map([...catalogue.values[index], ...set])) })
   }
   const multipleWords = normalizeQuranSearch(query).includes(' ')
-  const activeFilters = groups.reduce((sum, group) => sum + config[group].length, Number(includeRoots))
+  const activeFilters = groups.reduce((sum, group) => sum + config[group].length, 0)
   const moreId = `${groupName}-more`
+  const research = <section id={moreId} className="phase3-research" data-phase3-research
+    aria-label={t('searchP3.research')} hidden={!moreOpen}>
+    {groups.map((group, index) => {
+      const counts = catalogue.values[index]
+      const available = [...new Set([...config[group], ...counts.keys()])]
+      const label = t(`searchP3.filter.${group}`)
+      return <SearchFilterRow key={`${identity}:${group}`} label={label} ariaLabel={label}
+        options={available.map(value => ({
+          value,
+          count: counts.get(value),
+          label: group === 'forms' ? morphologyLabel(value) : <QuranText text={group === 'lemmas' ? lemmaDisplay(value) : value} />,
+        }))}
+        selected={config[group]} onToggle={value => onConfig({
+          ...config,
+          [group]: config[group].includes(value) ? config[group].filter(item => item !== value) : [...config[group], value],
+        })} />
+    })}
+  </section>
   return <div className="phase3-controls" data-phase3-controls onKeyDown={dismissPopup}>
     <div className="phase3-options" role="group" aria-label={t('searchP3.settings')}>
       <details name={groupName} data-phase3-scope><summary className="chip" data-changed={scope !== 'all'}
@@ -189,6 +222,9 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
       </summary>
         <div className="phase3-popup"><h3>{t('searchP3.relation')}</h3>{relations.map(relation => <button className="chip" type="button" key={relation} aria-pressed={config.relation === relation} onClick={() => onConfig({ ...config, relation })}>{t(`searchP3.relation.${relation}`)}</button>)}</div>
       </details>}
+      <button className="chip" type="button" data-phase3-roots aria-pressed={includeRoots} onClick={onRoots}>
+        <Sprout size={14} aria-hidden="true" />{t('ui.702b74fe3e')}
+      </button>
       <button className="chip" type="button" data-phase3-more aria-expanded={moreOpen} aria-controls={moreId}
         data-changed={activeFilters > 0} onClick={event => {
           const openPopup = event.currentTarget.closest('.phase3-options')?.querySelector('details[open]')
@@ -201,30 +237,6 @@ export default function SearchPhase3Controls({ meta, origin, scope, surahs, conf
         {t('searchP3.research')}{activeFilters > 0 && <> · {t('searchP3.activeFilters', { count: activeFilters })}</>}
       </button>
     </div>
-    <section id={moreId} className="phase3-research nice-scroll" data-phase3-research aria-label={t('searchP3.research')} hidden={!moreOpen}>
-      <div className="phase3-research-header">
-        <h3>{t('searchP3.research')}</h3>
-        <div className="phase3-matching">
-          <button type="button" className="chip" data-phase3-roots aria-label={t('ui.702b74fe3e')} aria-pressed={includeRoots} onClick={onRoots}>
-            {t(includeRoots ? 'searchP3.rootsOn' : 'searchP3.rootsOff')}
-          </button>
-          {matching}
-        </div>
-      </div>
-      <div className="phase3-research-groups">{groups.map((group, index) => {
-        const available = [...new Set([...config[group], ...catalogue.values[index]])]
-        const label = t(`searchP3.filter.${group}`)
-        return <details className="phase3-research-group" key={group} open>
-          <summary data-changed={config[group].length > 0}>{label}<ChevronDown size={12} aria-hidden="true" /></summary>
-          <fieldset aria-label={label}>
-            {!available.length && <span>{t('searchP3.noFilters')}</span>}
-            {available.map(value => <button className="chip" key={value} type="button" aria-pressed={config[group].includes(value)}
-              onClick={() => onConfig({ ...config, [group]: config[group].includes(value) ? config[group].filter(item => item !== value) : [...config[group], value] })}>
-              {group === 'forms' ? morphologyLabel(value) : <QuranText text={group === 'lemmas' ? lemmaDisplay(value) : value} />}
-            </button>)}
-          </fieldset>
-        </details>
-      })}</div>
-    </section>
+    {researchHost ? createPortal(research, researchHost) : research}
   </div>
 }

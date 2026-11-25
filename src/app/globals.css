@@ -1986,19 +1986,13 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .phase3-popup h3 { flex-basis: 100%; }
 .phase3-research {
   margin: 0 clamp(8px, 2vw, 20px) 4px;
-  max-block-size: min(180px, 26dvh, calc(var(--search-and-go-height, 100dvh) * .26));
-  overflow-y: auto;
-  padding: 8px 10px;
+  padding: 8px 10px 2px;
   background: var(--paper-2);
   border: 1px solid var(--line);
   border-radius: 12px;
 }
-.phase3-research[hidden] { display: none; }
-.phase3-research-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 8px 12px; margin-block-start: 5px; }
-.phase3-research fieldset { min-inline-size: 0; }
-.phase3-research :is(h3, legend), .phase3-popup h3 { font-size: 12px; color: var(--ink-soft); }
-.phase3-research fieldset .chip { margin: 2px; }
-.phase3-research fieldset > span { font-size: 12px; color: var(--ink-soft); }
+.phase3-research[hidden], .phase3-research:not(:has(.search-facet-row)) { display: none; }
+.phase3-popup h3 { font-size: 12px; color: var(--ink-soft); }
 .phase3-picker { flex-basis: 100%; overflow: auto; }
 .phase3-picker input[type='search'] { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
 .phase3-controls [aria-pressed='true'], .phase3-controls [data-changed='true'] { background: var(--word-active); border-color: var(--sage); }
@@ -2026,29 +2020,27 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 
 /* The search surface and its internal columns respond independently. */
 [data-search-workspace] .search-and-go-body { container: search-workspace / inline-size; }
-[data-search-workspace] .search-and-go-header { position: relative; grid-template-columns: auto minmax(0, 1fr) auto auto; }
-.search-workspace-settings-host { z-index: 4; }
-.phase3-settings > .phase3-popup { inset-block-start: calc(100% - 4px); z-index: 8; }
-.phase3-settings-group { flex-basis: 100%; min-width: 0; }
-.phase3-settings-group > legend { margin-block-end: 6px; }
-.phase3-settings-group > button { margin-inline-end: 4px; }
-.phase3-settings [data-changed='true'], .phase3-settings [aria-pressed='true'],
-.phase3-sort summary[data-changed='true'] { background: var(--word-active); border-color: var(--sage); }
+[data-search-workspace] .search-and-go-header { position: relative; z-index: 4; }
+.search-workspace-settings-host { flex: none; }
+.phase3-settings > .reader-display-menu {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-end: clamp(8px, 2vw, 20px);
+  z-index: 8;
+}
+.search-page-input .phase3-settings-trigger { width: 34px; height: 34px; }
+.search-page-input .reader-display-menu .reader-display-modes button { padding: 4px; }
+.search-page-input .reader-display-menu .reader-display-switch { padding: 3px; }
+.phase3-settings .reader-display-switch:disabled { opacity: .55; }
 .phase3-settings summary, .phase3-sort summary { list-style: none; cursor: pointer; }
 .phase3-settings summary::-webkit-details-marker, .phase3-sort summary::-webkit-details-marker { display: none; }
 .phase3-sort { position: relative; }
-.phase3-sort > .reader-display-menu { position: absolute; inset-block-start: calc(100% + 4px); inset-inline-end: 0; z-index: 6; }
+.phase3-sort > .reader-display-menu { position: absolute; inset-block-start: calc(100% + 4px); inset-inline-end: 0; z-index: 6; width: min(232px, calc(100vw - 36px)); }
 [data-phase3-results] .search-results-summary { position: relative; z-index: 1; }
-[data-phase3-results] .phase3-research details summary { cursor: pointer; }
-[data-phase3-results] .phase3-research-group summary { display: flex; align-items: center; justify-content: space-between; padding: 5px 6px; border-block-end: 1px solid var(--line); }
-[data-phase3-results] .phase3-research-header { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-[data-phase3-results] .phase3-research-groups { display: block; }
-[data-phase3-results] .phase3-research-groups > * + * { margin-block-start: 8px; }
 .phase3-summary-short { display: none; }
 
 /* The right panel shares the search surface with the main content. */
 [data-search-workspace] .search-and-go-shell { width: 100%; }
-[data-search-workspace] .search-and-go-header:not(:has(.search-workspace-settings-host)) { grid-template-columns: auto minmax(0, 1fr) auto; }
 .search-workspace-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; flex: 1; }
 .search-and-go-body[data-research-column] {
   display: grid;
@@ -2065,15 +2057,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   border-left: 1px solid var(--line);
   background: var(--paper-2);
 }
-.search-workspace-research .phase3-settings { position: relative; z-index: 4; margin-inline: 8px; }
-.search-workspace-research .phase3-settings > .phase3-popup { inset-block-start: 100%; }
-.search-workspace-research .phase3-options { flex-wrap: wrap; padding-inline: 8px; }
-.search-workspace-research .phase3-options .phase3-summary-label { display: none; }
-.search-workspace-research .phase3-controls > .phase3-research { max-block-size: none; margin-inline: 8px; }
-.search-workspace-research .phase3-research-groups { display: block; }
-.search-workspace-research .phase3-research-group summary { display: flex; justify-content: space-between; cursor: pointer; }
-.search-workspace-research .phase3-research-header .phase3-matching { font-size: 12px; }
-.search-workspace-research input[type="checkbox"] { accent-color: var(--sage); }
+.search-workspace-research > .phase3-research { margin-inline: 8px; }
 
 @container search-workspace (max-width: 460px) {
   .phase3-summary-label { display: none; }
@@ -2089,5 +2073,6 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .phase3-sort .reader-display-controls h3 { font-weight: 700; }
 .phase3-sort .reader-display-modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .phase3-sort .reader-display-modes button { min-width: 0; padding-inline: 8px; }
+.phase3-sort .reader-display-modes button:lang(fa) { white-space: nowrap; }
 .phase3-sort .phase3-sort-directions button { justify-content: start; }
 .phase3-sort .phase3-sort-directions button:disabled { opacity: 0.55; cursor: default; }

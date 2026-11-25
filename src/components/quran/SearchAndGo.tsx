@@ -185,8 +185,8 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                   else if (window.matchMedia('(pointer: coarse)').matches) field.current?.blur()
                 }
               }} />
+            {SEARCH_AND_GO_PHASE_3 && <div className="search-workspace-settings-host" ref={setSettingsHost} />}
           </div>
-          {SEARCH_AND_GO_PHASE_3 && !useResearchColumn && <div className="search-workspace-settings-host" ref={setSettingsHost} />}
           <button type="button" className="icon-btn" aria-label={t('searchAndGo.help')} aria-expanded={help}
             onClick={() => { selection.reset(); setHelp(open => !open) }}>
             <CircleHelp size={20} className="search-and-go-help-icon" aria-hidden="true" />

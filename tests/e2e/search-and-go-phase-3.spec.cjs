@@ -234,7 +234,7 @@ test('shared research filters restore the attested root, lemma, and form togethe
   expect(await addresses(panel)).toEqual(['20:14']);
 
   const controls = await showControls(page);
-  const research = controls.locator('.phase3-research');
+  const research = panel.locator('.phase3-research');
   const toggle = controls.locator('[data-phase3-more]');
   await toggle.click();
   for (const group of ['roots', 'lemmas', 'forms']) {
@@ -292,7 +292,7 @@ test('wide reader entry replaces the reading surface with results and a right re
   const surface = page.locator('[data-search-workspace]');
   const field = surface.getByRole('combobox');
   await expect(surface.locator('.search-workspace-research')).toBeVisible();
-  await expect(surface.locator('.search-workspace-research [data-phase3-settings]')).toBeVisible();
+  await expect(surface.locator('.search-page-input [data-phase3-settings]')).toBeVisible();
   expect((await surface.boundingBox()).width).toBe(1280);
   await field.fill('صبر');
   await expect(surface.locator('[data-phase3-relation]')).toHaveCount(0);
@@ -315,7 +315,11 @@ test('search settings travel with the query while research visibility remains a 
   await page.goto(`/q?q=${encodeURIComponent('صبر نصر')}&h=0`);
   const surface = page.locator('[data-search-workspace]');
   const settings = surface.locator('[data-phase3-settings]');
+  await expect(surface.locator('.search-page-input').locator('[data-phase3-settings]')).toBeVisible();
+  await expect(surface.locator('.phase3-options [data-phase3-roots]')).toBeVisible();
   await settings.locator('summary').click();
+  await expect(settings.getByRole('switch', { name: labels['ui.5105840a21'] })).toBeVisible();
+  await expect(settings.getByRole('switch', { name: labels['ui.8a8b5ac72e'] })).toBeVisible();
   await settings.locator('[data-phase3-unit="surah"]').click();
   await settings.locator('[data-phase3-spelling]').click();
   await expect.poll(() => {
@@ -325,7 +329,7 @@ test('search settings travel with the query while research visibility remains a 
   await page.reload();
   await settings.locator('summary').click();
   await expect(settings.locator('[data-phase3-unit="surah"]')).toHaveAttribute('aria-pressed', 'true');
-  await expect(settings.locator('[data-phase3-spelling]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(settings.locator('[data-phase3-spelling]')).toHaveAttribute('aria-checked', 'true');
   await settings.locator('summary').click();
   await surface.locator('[data-phase3-more]').click();
   await expect(surface.locator('[data-phase3-research]')).toBeVisible();

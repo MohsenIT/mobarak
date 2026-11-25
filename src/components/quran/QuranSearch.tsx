@@ -363,21 +363,22 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
             selected={facets[kind]} onToggle={value => toggleFacet(kind, value)} />)}
           {(lemmas.length > 0 || forms.length > 0) && <div className="search-active-facets">{(['forms', 'lemmas'] as const).flatMap(kind => facets[kind].map(value => <button type="button" key={`${kind}:${value}`} aria-label={t("ui.96ba59563f",{p0:(kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value))})} onClick={() => toggleFacet(kind, value)}>{kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value)}<X size={12} /></button>))}<button type="button" onClick={() => { setLemmas([]); setForms([]) }}>{t("ui.1c36b0e132")}</button></div>}
         </div>
-  const matchingOptions = <>
-            <label className="choice-row"><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />{t("ui.5105840a21")}</label>
-            <label className="choice-row"><input type="checkbox" checked={includeNear && !(phase3 && config.spellingSensitive)} disabled={!!occurrenceFilter || mode !== 'text' || (phase3 && config.spellingSensitive)} onChange={e => setIncludeNear(e.target.checked)} />{t("ui.8a8b5ac72e")}</label>
-  </>
+  const matchingPreferences = [
+    { label: t('ui.5105840a21'), checked: includePartial, disabled: !!occurrenceFilter || mode !== 'text', onChange: setIncludePartial },
+    { label: t('ui.8a8b5ac72e'), checked: includeNear && !(phase3 && config.spellingSensitive),
+      disabled: !!occurrenceFilter || mode !== 'text' || (phase3 && config.spellingSensitive), onChange: setIncludeNear },
+  ]
+  const matchingOptions = matchingPreferences.map(({ label, checked, disabled, onChange }) =>
+    <label className="choice-row" key={label}><input type="checkbox" checked={checked} disabled={disabled}
+      onChange={event => onChange(event.target.checked)} />{label}</label>)
   const controls = phase3 && <SearchPhase3Controls
-        query={query} matching={matchingOptions} identity={`${query}:${surahs.join(',')}:${mode}`}
+        query={query} researchHost={unified?.researchHost} identity={`${query}:${surahs.join(',')}:${mode}`}
         meta={meta} origin={searchOrigin} scope={scopeVariant} surahs={surahs} config={config}
         results={answerKey === engineKey && !busy ? rawResults : emptyResults} includeRoots={includeRoots} onRoots={toggleRoots} onConfig={setConfig}
         onScope={(scope, numbers) => { setScopeVariant(scope); setSurahs(numbers) }}
       />
-  const research = phase3 && unified?.researchHost
-    ? createPortal(<><SearchWorkspaceSettings config={config} onConfig={setConfig} />{controls}</>, unified.researchHost)
-    : null
   const content = <>
-      {!unified?.researchHost && controls}
+      {controls}
       {(!inline || unified?.controls) && <>
       <div className={inline ? "search-and-go-controls" : "search-page-header"}>
         {!inline && <>
@@ -455,10 +456,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       </>}
   </>
   const settings = phase3 && unified?.settingsHost
-    ? createPortal(<SearchWorkspaceSettings config={config} onConfig={setConfig} />, unified.settingsHost)
+    ? createPortal(<SearchWorkspaceSettings config={config} onConfig={setConfig} matching={matchingPreferences} />, unified.settingsHost)
     : null
-  if (unified && !unified.run && !unified.controls) return <>{settings}{research}</>
-  if (inline) return <>{settings}{research}<div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"} data-phase3-results={phase3 || undefined}>{content}</div></>
+  if (unified && !unified.run && !unified.controls) return <>{settings}{unified.researchHost && controls}</>
+  if (inline) return <>{settings}<div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"} data-phase3-results={phase3 || undefined}>{content}</div></>
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir={uiDirection()} aria-label={t("ui.cd32ebbeba")} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
     <div className="search-page-shell">{content}</div>
   </main>, document.body)
