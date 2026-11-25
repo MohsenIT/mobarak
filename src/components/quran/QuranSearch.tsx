@@ -26,7 +26,7 @@ import { SEARCH_AND_GO_PHASE_2, SEARCH_AND_GO_PHASE_3, searchLink, type SearchSc
 import { filterSearchFacets, searchFacetCounts } from '@/lib/search-facets'
 import SearchFilterRow from './SearchFilterRow'
 import { readStored, writeStored } from '@/lib/reader-storage'
-import SearchPhase3Controls, { phase3ScopeSurahs } from './SearchPhase3Controls'
+import SearchPhase3Controls, { phase3ScopeSurahs, SearchWorkspaceSettings, SearchWorkspaceSort } from './SearchPhase3Controls'
 import { useDismissiblePanel } from './useDismissiblePanel'
 export type SearchStart = { query: string; mode: SearchMode; surahs: number[]; revision: number; state?: SearchLinkState }
 
@@ -48,6 +48,7 @@ interface Props {
       run: boolean
       controls: boolean
       input: RefObject<HTMLInputElement | null>
+      settingsHost: HTMLDivElement | null
       selected?: VerseAddress
       onSuggestions: (suggestions: string[]) => void
       onModeChange: (mode: SearchMode) => void
@@ -361,9 +362,13 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
             selected={facets[kind]} onToggle={value => toggleFacet(kind, value)} />)}
           {(lemmas.length > 0 || forms.length > 0) && <div className="search-active-facets">{(['forms', 'lemmas'] as const).flatMap(kind => facets[kind].map(value => <button type="button" key={`${kind}:${value}`} aria-label={t("ui.96ba59563f",{p0:(kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value))})} onClick={() => toggleFacet(kind, value)}>{kind === 'forms' ? formLabels.get(value)?.label ?? morphologyLabel(value) : lemmaDisplay(value)}<X size={12} /></button>))}<button type="button" onClick={() => { setLemmas([]); setForms([]) }}>{t("ui.1c36b0e132")}</button></div>}
         </div>
+  const matchingOptions = <>
+            <label className="choice-row"><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />{t("ui.5105840a21")}</label>
+            <label className="choice-row"><input type="checkbox" checked={includeNear && !(phase3 && config.spellingSensitive)} disabled={!!occurrenceFilter || mode !== 'text' || (phase3 && config.spellingSensitive)} onChange={e => setIncludeNear(e.target.checked)} />{t("ui.8a8b5ac72e")}</label>
+  </>
   const content = <>
       {phase3 && <SearchPhase3Controls
-        identity={`${query}:${surahs.join(',')}:${mode}`}
+        query={query} matching={matchingOptions} identity={`${query}:${surahs.join(',')}:${mode}`}
         meta={meta} origin={searchOrigin} scope={scopeVariant} surahs={surahs} config={config}
         results={answerKey === engineKey && !busy ? rawResults : emptyResults} includeRoots={includeRoots} onRoots={toggleRoots} onConfig={setConfig}
         onScope={(scope, numbers) => { setScopeVariant(scope); setSurahs(numbers) }}
@@ -405,10 +410,9 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           {!phase3 && <details ref={scopePanel} open={scopeOpen} onToggle={event => setScopeOpen(event.currentTarget.open)} className="search-scope"><summary aria-label={t("ui.d67a8d9786")}><Funnel size={14} /><span>{scopeLabel}</span></summary>
             <div className="search-scope-panel"><div className="search-scope-shortcuts"><button type="button" onClick={() => setSurahs([])}>{t("ui.5ad7b9b0af")}</button><button type="button" onClick={() => setSurahs([currentSurah])}>{t("ui.35fa085c5c")}</button></div><DictationInput type="search" value={surahQuery} onChange={e => setSurahQuery(e.target.value)} placeholder={t("ui.51b594c97e")} aria-label={t("ui.c8c0719ae1")} /><p>{t("ui.831ac25576")}</p><div className="search-surah-options">{meta.surahs.filter(s => normalizeQuranSearch(`${s.fa} ${s.ar} ${s.n} ${toFa(s.n)}`).includes(normalizeQuranSearch(surahQuery))).map(s => <label className="choice-row" key={s.n}><input type="checkbox" checked={surahs.includes(s.n)} onChange={event => setScope(s.n, event.target.checked)} /><span>{toFa(s.n)} · {s.fa}</span></label>)}</div></div>
           </details>}
-          <details ref={extraOptionsPanel} open={extraOptionsOpen} onToggle={event => setExtraOptionsOpen(event.currentTarget.open)} className="search-extra-options"><summary aria-label={t("ui.ba7db1f34f")}><MoreVertical size={19} /></summary><div>
-            <label className="choice-row"><input type="checkbox" checked={includePartial} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludePartial(e.target.checked)} />{t("ui.5105840a21")}</label>
-            <label className="choice-row"><input type="checkbox" checked={includeNear} disabled={!!occurrenceFilter || mode !== 'text'} onChange={e => setIncludeNear(e.target.checked)} />{t("ui.8a8b5ac72e")}</label>
-          </div></details>
+          {!phase3 && <details ref={extraOptionsPanel} open={extraOptionsOpen} onToggle={event => setExtraOptionsOpen(event.currentTarget.open)} className="search-extra-options"><summary aria-label={t("ui.ba7db1f34f")}><MoreVertical size={19} /></summary><div>
+            {matchingOptions}
+          </div></details>}
           {unified && commonActions}
         </div>
         {includeNear && mode === 'text' && <button type="button" className="search-active-filter" aria-label={t("ui.74ae9ec1c4")} onClick={() => setIncludeNear(false)}>{t("ui.36ee5635ee")}{' '}<X size={12} /></button>}
@@ -424,6 +428,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
           <span className={phase3 ? "search-results-total" : "search-results-detail"}>{t(unified ? "search.occurrenceCount" : "ui.9ec9176e66", { p0: toFa(counts.verses), p1: toFa(unified ? counts.occurrences : counts.words) })}</span>
         </>}</div>
         {!phase3 && !busy && !error && valid && results.length > 0 && <span className="search-results-position" data-current-result={Math.min(currentResult, results.length)} data-total-results={results.length} aria-live="off">{t('search.resultPosition', { current: Math.min(currentResult, results.length), total: results.length })}</span>}
+        {phase3 && <SearchWorkspaceSort config={config} onConfig={setConfig} />}
       </div>
       <div ref={list} className="search-page-results nice-scroll" tabIndex={-1} aria-label={t("ui.57f03a82b0")} aria-busy={busy} onScroll={event => { scroll.current = event.currentTarget.scrollTop }}>
         {!phase3 && (!inline || lemmas.length > 0 || forms.length > 0) && facetControls}
@@ -433,7 +438,9 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         {!busy && !error && valid && results.slice(0, visible).map((result, index) => <div key={`${result.s}:${result.a}`}>
           {!phase3 && !occurrenceFilter && (index === 0 || results[index - 1].kind !== result.kind) && <h2 className="search-result-group">{t(labels[result.kind])}{' · '}{t('search.totalResults', { total: groupCounts[result.kind] })}</h2>}
           <article className="search-result-card" data-search-result-index={index + 1} data-search-address={`${result.s}:${result.a}`}><button type="button" className="search-result-open" aria-current={unified?.selected?.s === result.s && unified?.selected?.a === result.a || undefined} aria-label={t("ui.a55b5ca0c4",{p0:(meta.surahs[result.s - 1]?.fa),p1:(toFa(result.a))})} onClick={() => onPick(result.s, result.a, result.positions[0] ?? 1, linkState, capturePosition())}>
-            <span className="search-result-meta"><b>{meta.surahs[result.s - 1]?.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(result.a)}</b><span className="search-result-position">{t('search.resultPosition', { current: index + 1, total: results.length })}</span><span>{t("ui.1abf27acd0")}</span></span><span className="search-result-text font-quran" lang="ar">{snippet(result, true)}</span>
+            <span className="search-result-meta"><b>{meta.surahs[result.s - 1]?.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(result.a)}</b><span className="search-result-position">{t('search.resultPosition', { current: index + 1, total: results.length })}</span>{result.cooccurrenceGroup?.unit === 'context' && <span>{t('ui.16836d5471')}{' '}{toFa(result.cooccurrenceGroup.from)}–{toFa(result.cooccurrenceGroup.to)}</span>}
+            {result.cooccurrenceGroup?.unit === 'surah' && <span>{t('occurrence.thisSurah')}</span>}
+            <span>{t("ui.1abf27acd0")}</span></span><span className="search-result-text font-quran" lang="ar">{snippet(result, true)}</span>
           </button>
           {showTranslation && <div className="search-result-translation" dir={translationDirection(translator)} lang={translationLanguage(translator)}>{translations[result.s]?.[String(result.a)]?.[translator] ?? (translationErrors.includes(result.s) ? <button type="button" onClick={() => setTranslationRetry(n => n + 1)}>{t("ui.76f0fc62b1")}</button> : <span role="status">{t("ui.ad34b65e87")}</span>)}</div>}
           </article>
@@ -442,8 +449,11 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       </div>
       </>}
   </>
-  if (unified && !unified.run && !unified.controls) return null
-  if (inline) return <div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"} data-phase3-results={phase3 || undefined}>{content}</div>
+  const settings = phase3 && unified?.settingsHost
+    ? createPortal(<SearchWorkspaceSettings config={config} onConfig={setConfig} />, unified.settingsHost)
+    : null
+  if (unified && !unified.run && !unified.controls) return settings
+  if (inline) return <>{settings}<div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"} data-phase3-results={phase3 || undefined}>{content}</div></>
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir={uiDirection()} aria-label={t("ui.cd32ebbeba")} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
     <div className="search-page-shell">{content}</div>
   </main>, document.body)

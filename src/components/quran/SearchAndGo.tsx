@@ -72,6 +72,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
       viewport.removeEventListener('scroll', resize)
     }
   }, [])
+  const [settingsHost, setSettingsHost] = useState<HTMLDivElement | null>(null)
   const back = useRef<HTMLButtonElement>(null)
   const trigger = useRef<HTMLElement>(null)
   const value = query.trim()
@@ -125,7 +126,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   }, [rtl, searchLabel])
 
   return <Dialog open onOpenChange={open => { if (!open) onClose() }}>
-    <DialogContent ref={surface} fullscreen showCloseButton={false} className="search-and-go" data-search-and-go data-search-and-go-phase-2={SEARCH_AND_GO_PHASE_2 || undefined} data-search-page={SEARCH_AND_GO_PHASE_2 && !!start?.state || undefined} dir={uiDirection()}
+    <DialogContent ref={surface} fullscreen showCloseButton={false} className="search-and-go" data-search-and-go data-search-workspace={SEARCH_AND_GO_PHASE_3 || undefined} data-search-and-go-phase-2={SEARCH_AND_GO_PHASE_2 || undefined} data-search-page={SEARCH_AND_GO_PHASE_2 && !!start?.state || undefined} dir={uiDirection()}
       aria-describedby={undefined}
       onOpenAutoFocus={event => {
         event.preventDefault()
@@ -137,6 +138,13 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
         trigger.current?.focus({ preventScroll: true })
       }}
       onEscapeKeyDown={event => {
+        const options = document.activeElement?.closest<HTMLDetailsElement>(':is([data-phase3-settings], [data-phase3-sort])[open]')
+        if (options) {
+          event.preventDefault()
+          options.open = false
+          options.querySelector('summary')?.focus()
+          return
+        }
         if (document.activeElement === field.current) {
           event.preventDefault()
           selection.reset()
@@ -169,6 +177,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 }
               }} />
           </div>
+          {SEARCH_AND_GO_PHASE_3 && <div className="search-workspace-settings-host" ref={setSettingsHost} />}
           <button type="button" className="icon-btn" aria-label={t('searchAndGo.help')} aria-expanded={help}
             onClick={() => { selection.reset(); setHelp(open => !open) }}>
             <CircleHelp size={20} className="search-and-go-help-icon" aria-hidden="true" />
@@ -241,7 +250,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           <QuranSearch inline={{
             query: SEARCH_AND_GO_PHASE_2 ? query : value,
             position,
-            unified: SEARCH_AND_GO_PHASE_2 ? { run: text, controls: help, input: field, selected, onSuggestions: setSuggestions, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
+            unified: SEARCH_AND_GO_PHASE_2 ? { run: text, controls: help, input: field, settingsHost, selected, onSuggestions: setSuggestions, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
           }} open={SEARCH_AND_GO_PHASE_2 || text} onOpenChange={onClose}
             initialSearch={start?.state ? { query: start.query, mode: start.state.mode, surahs: start.state.surahs, revision: 0, state: start.state } : null}
             occurrenceFilter={occurrence} onClearOccurrenceFilter={clearOccurrence} onStateChange={onSearchStateChange}
