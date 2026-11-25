@@ -60,7 +60,7 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
             {(['relevance', 'mushaf'] as const).map(value => <button type="button" key={value}
               aria-label={t(`searchP3.sort.${value}`)} aria-pressed={sort === value}
               onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>
-              {t(`searchP3.sortShort.${value}`)}
+              {t(value === 'relevance' ? 'searchP3.sort.relevance' : 'searchP3.sortShort.mushaf')}
             </button>)}
           </div>
         </section>
@@ -69,7 +69,9 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
             {[false, true].map(reverse => <button type="button" key={String(reverse)}
               disabled={isRelevance} aria-pressed={(isRelevance || reversed) === reverse} onClick={() => onConfig({ ...config, reverseSort: reverse || undefined })}>
               <SortDirectionIcon className="phase3-sort-icon" data-reversed={reverse} size={16} aria-hidden="true" />
-              {t(reverse ? 'searchP3.reverse' : 'searchP3.forward')}
+              {isRelevance
+                ? t(reverse ? 'searchP3.highToLow' : 'searchP3.lowToHigh')
+                : t(reverse ? 'searchP3.reverse' : 'searchP3.forward')}
             </button>)}
           </div>
         </section>
