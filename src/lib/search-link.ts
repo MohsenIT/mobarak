@@ -1,4 +1,5 @@
 import type { AnalysisSelection } from './analysis'
+import type { QuranSearchHighlight } from './quran-search'
 import type { SearchMode } from './quran-search-session'
 import type { Phase3SearchOptions } from './search-query'
 import type { Translator } from './quran'
@@ -9,7 +10,7 @@ export const SEARCH_AND_GO_PHASE_2 = process.env.NEXT_PUBLIC_SEARCH_AND_GO === '
 export const SEARCH_AND_GO_PHASE_3 = SEARCH_AND_GO_PHASE_2 && process.env.NEXT_PUBLIC_SEARCH_AND_GO_PHASE_3 === '1'
 
 export type SearchResultPosition = { scrollTop: number; visible: number; anchor?: { s: number; a: number; offset: number } }
-export type SearchResultSnapshot = { query: string; position: SearchResultPosition; state?: SearchLinkState; selected?: VerseAddress }
+export type SearchResultSnapshot = { query: string; position: SearchResultPosition; state?: SearchLinkState; selected?: VerseAddress; highlight?: QuranSearchHighlight }
 
 const scopeVariants = ['all', 'current', 'selected', 'before', 'after', 'meccan', 'medinan', 'single'] as const
 export type SearchScopeVariant = typeof scopeVariants[number]

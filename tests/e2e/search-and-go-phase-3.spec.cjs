@@ -64,7 +64,7 @@ test('empty search stays active after blur and clear until Browse is chosen', as
   await empty.getByRole('button', { name: 'صبر', exact: true }).click();
   await expect(input).toHaveValue('صبر');
   await expect(panel.locator('[data-search-address]').first()).toBeVisible();
-  await expect(panel.locator('.search-results-summary [role=status]')).toHaveText(/آیه · .+ یافته شده/);
+  await expect(panel.locator('.search-results-summary [role=status]')).toHaveText(/آیه · .+ واژه$/);
   await input.fill('');
   await expect(empty).toBeVisible();
   await empty.getByRole('button', { name: labels['searchP3.browse'] }).click();
@@ -144,7 +144,7 @@ test('on a narrow surface, research filters open above the summary without movin
   const list = panel.locator('.search-page-results');
   const summary = panel.locator('.search-results-summary');
   await expect(panel.locator('[data-search-address]').first()).toBeVisible();
-  await expect(summary.getByRole('status')).toHaveText('۸۴ آیه · ۹۲ یافته شده');
+  await expect(summary.getByRole('status')).toHaveText('۸۴ آیه · ۹۲ واژه');
   await list.evaluate(element => { element.scrollTop = 300; });
   const before = await summary.boundingBox();
   const historyLength = await page.evaluate(() => history.length);
@@ -368,6 +368,8 @@ test('scope tabs retain selections and count matching surahs outside the active 
   await scope.getByRole('tab', { name: labels['searchP3.scopeTab.single'] }).click();
   await expect(scope.locator('.phase3-scope-pick')).toContainText('طه');
   await expect(scope.locator('.phase3-scope-pick')).toContainText(labels['searchP3.scopeCurrent']);
+  const stepWidths = await scope.locator('.phase3-scope-stepper > button').evaluateAll(buttons => buttons.map(button => button.getBoundingClientRect().width));
+  expect(stepWidths[1]).toBeGreaterThan(Math.max(stepWidths[0], stepWidths[2]));
   await scope.getByRole('button', { name: labels['searchP3.scopePrevious'] }).click();
   await expect(scope.locator('.phase3-scope-pick')).toContainText('مریم');
   await scope.getByRole('button', { name: labels['searchP3.scopeNext'] }).click();
@@ -390,6 +392,9 @@ test('explicit roots match and the word order switch persists through search lin
   await expect(result).toBeVisible({ timeout: 20_000 });
   const settings = surface.locator('[data-phase3-settings]');
   await settings.locator('summary').click();
+  const firstSetting = settings.locator('.reader-display-controls > section').first();
+  await expect(firstSetting.getByRole('heading')).toHaveText(labels['searchP3.matchWithin']);
+  await expect(firstSetting.locator('h3 svg')).toBeVisible();
   await expect(settings.getByRole('switch').first()).toHaveAccessibleName(labels['ui.5105840a21']);
   const order = settings.getByRole('switch', { name: labels['searchP3.orderedWords'] });
   await order.click();
@@ -401,4 +406,16 @@ test('explicit roots match and the word order switch persists through search lin
   await expect(order).toHaveAttribute('aria-checked', 'true');
   await field.fill('برز جحم');
   await expect(result).toBeVisible({ timeout: 20_000 });
+});
+
+test('opening an ayah highlights the matched stems until search is dismissed', async ({ page }) => {
+  await page.goto('/q?q=برز+جحم&s=26&scope=single&rel=all');
+  const result = page.locator('[data-search-address="26:91"] .search-result-open');
+  await result.click({ timeout: 30000 });
+  await expect(page).toHaveURL(/\/s\/26\/a\/91$/);
+  const verse = page.locator('main [data-surah="26"][data-ayah="91"]');
+  await expect(verse.locator('[data-word-part="stem"][data-highlight-state="match"]')).toHaveCount(2);
+  await expect(verse.locator('[data-word-part="prefix"][data-highlight-state]')).toHaveCount(0);
+  await page.getByRole('button', { name: labels['ui.4d21d96f48'], exact: true }).click();
+  await expect(verse.locator('[data-highlight-state="match"]')).toHaveCount(0);
 });

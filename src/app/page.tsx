@@ -46,6 +46,7 @@ import ReaderSearchIcon from '@/components/quran/ReaderSearchIcon'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import SearchAndGo from '@/components/quran/SearchAndGo'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
+import type { QuranSearchHighlight } from '@/lib/quran-search'
 import ReaderSearchHighlights from '@/components/quran/ReaderSearchHighlights'
 import {
   PatternBG,
@@ -386,17 +387,17 @@ export default function Home() {
     if (start) openUnifiedSearch(initialSearchLinkState(translator, start, selection))
   }
 
-  const pickSearchResult = (s: number, a: number, pos: number, state: SearchLinkState, position?: SearchResultPosition) => {
+  const pickSearchResult = (s: number, a: number, pos: number, state: SearchLinkState, position?: SearchResultPosition, highlight?: QuranSearchHighlight) => {
     const enterReading = (selected?: VerseAddress) => {
       const operation = SEARCH_AND_GO ? textSearchOperation(state, SEARCH_AND_GO_PHASE_2) : null
       if (operation) search.recordOperation(operation)
-      const snapshot = position ? { query: state.query, position, ...(SEARCH_AND_GO_PHASE_2 ? { state, selected } : {}) } : null
+      const snapshot = position ? { query: state.query, position, ...(SEARCH_AND_GO_PHASE_2 ? { state, selected, highlight } : {}) } : null
       search.pick(s, a, selected?.pos ?? pos, snapshot)
       setSel(null)
       setComparisonRoot(null)
     }
     if (position) {
-      const writeResult = route.prepareSearchAndGoResult(state, position)
+      const writeResult = route.prepareSearchAndGoResult(state, position, highlight)
       goVerse(s, a, pos, undefined, false, false, jump => {
         if (!writeResult(jump)) return false
         search.setSearchAndGoOpen(false)
@@ -661,7 +662,8 @@ export default function Home() {
         <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main"
           onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd}>
           <QuranClipboard root={mainRef} meta={meta} />
-          <ReaderSearchHighlights value={search.quickOpen?search.quickHighlights:null}>
+          <ReaderSearchHighlights value={search.quickOpen?search.quickHighlights:null}
+            verse={search.returnToSearch && !search.quickOpen && !search.advancedOpen && !search.searchAndGoOpen ? search.returnToUnified?.highlight : undefined}>
           {mode === 'mushaf' ? (
             <ContinuousMushaf meta={meta} page={page} navigationRevision={mushafNavigationRevision}
               onPageChange={setPage} onContentReady={onMushafContentReady} showTrans={showTrans} translator={translator} scale={scale}

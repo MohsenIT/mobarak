@@ -9,7 +9,7 @@ test('advanced search keeps total and current result visible while scrolling and
  await expect(page.locator('.search-results-total')).toContainText('نتیجه');await expect(position).toHaveAttribute('data-current-result','1');
  await expect(page.locator('.search-result-card')).toHaveCount(20);
  await expect(page.locator('.search-result-group').first()).toContainText('نتیجه');
- await expect(page.locator('.search-results-detail')).toContainText('واژهٔ پیدا‌شده');
+ await expect(page.locator('.search-results-detail')).toHaveText(/آیه · .+ واژه$/);
  const tenth=page.locator('[data-search-result-index="10"]');await expect(tenth.locator('.search-result-position')).toContainText('مورد ۱۰ از');
  await page.locator('.search-page-results').evaluate(el=>{const card=el.querySelector('[data-search-result-index="10"]');el.scrollTop+=card.getBoundingClientRect().top-el.getBoundingClientRect().top+1});
  await expect(position).toHaveAttribute('data-current-result','10');await expect(position).toBeInViewport();await expect(position).toHaveAttribute('data-total-results',String(total));

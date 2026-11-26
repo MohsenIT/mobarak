@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ToggleEvent, type ReactNode } from 'react'
-import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, ListChecks, ListTodo, Quote, Settings2, Sprout, Tags } from 'lucide-react'
+import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, Layers3, ListChecks, ListOrdered, ListTodo, Quote, ScanText, Settings2, SpellCheck2, Sprout, Tags, type LucideIcon } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import SearchFilterRow from './SearchFilterRow'
 import { t } from '@/lib/i18n'
@@ -101,9 +101,9 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
 
 type MatchingPreference = { label: string; checked: boolean; disabled?: boolean; onChange: (checked: boolean) => void }
 
-function SearchSettingToggle({ label, checked, disabled, onChange, setting }: MatchingPreference & { setting?: 'spelling' | 'order' }) {
+function SearchSettingToggle({ label, checked, disabled, onChange, icon: Icon, setting }: MatchingPreference & { icon: LucideIcon; setting?: 'spelling' | 'order' }) {
   return <section className="reader-display-translation">
-    <span>{label}</span>
+    <span><Icon size={16} aria-hidden="true" />{label}</span>
     <button className="reader-display-switch" type="button" role="switch" aria-label={label}
       data-phase3-spelling={setting === 'spelling' || undefined} data-phase3-word-order={setting === 'order' || undefined}
       aria-checked={checked} disabled={disabled} onClick={() => onChange(!checked)}><span /></button>
@@ -111,7 +111,7 @@ function SearchSettingToggle({ label, checked, disabled, onChange, setting }: Ma
 }
 
 export function SearchWorkspaceSettings({ config, onConfig, partial, matching, actions }: WorkspaceConfigProps & {
-  partial: MatchingPreference; matching: MatchingPreference[]; actions: ReactNode
+  partial: MatchingPreference; matching: (MatchingPreference & { icon: LucideIcon })[]; actions: ReactNode
 }) {
   const cooccurrence = config.cooccurrence ?? 'verse'
   const label = t('searchP3.settings')
@@ -121,9 +121,8 @@ export function SearchWorkspaceSettings({ config, onConfig, partial, matching, a
     </summary>
     <div className="reader-display-menu">
       <div className="reader-display-controls">
-        <SearchSettingToggle {...partial} />
         <section data-phase3-cooccurrence>
-          <h3>{t('searchP3.matchWithin')}</h3>
+          <h3><Layers3 size={16} aria-hidden="true" />{t('searchP3.matchWithin')}</h3>
           <div className="reader-display-modes" role="group" aria-label={t('searchP3.matchWithin')}>
             {matchUnits.map(([unit, key]) => <button type="button" key={unit} data-phase3-unit={unit}
               aria-pressed={cooccurrence === unit} onClick={() => onConfig({ ...config, cooccurrence: unit })}>
@@ -131,9 +130,10 @@ export function SearchWorkspaceSettings({ config, onConfig, partial, matching, a
             </button>)}
           </div>
         </section>
-        <SearchSettingToggle setting="spelling" label={t('searchP3.spellingSensitive')} checked={!!config.spellingSensitive}
+        <SearchSettingToggle {...partial} icon={ScanText} />
+        <SearchSettingToggle setting="spelling" icon={SpellCheck2} label={t('searchP3.spellingSensitive')} checked={!!config.spellingSensitive}
           onChange={checked => onConfig({ ...config, spellingSensitive: checked })} />
-        <SearchSettingToggle setting="order" label={t('searchP3.orderedWords')} checked={!!config.orderedWords} disabled={config.relation !== 'all'}
+        <SearchSettingToggle setting="order" icon={ListOrdered} label={t('searchP3.orderedWords')} checked={!!config.orderedWords} disabled={config.relation !== 'all'}
           onChange={checked => onConfig({ ...config, orderedWords: checked || undefined })} />
         {matching.map(preference => <SearchSettingToggle key={preference.label} {...preference} />)}
         {actions}

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { readingUrl, readVerseAddress, reportReadingAddress, writeVerseAddress, type VerseAddress } from '@/lib/verse-link'
 import { readSearchLink, SEARCH_AND_GO_PHASE_2, type SearchLinkState, type SearchResultPosition, type SearchResultSnapshot } from '@/lib/search-link'
+import type { QuranSearchHighlight } from '@/lib/quran-search'
 import { readStored, writeStored } from '@/lib/reader-storage'
 import { captureReadingAnchor } from '@/lib/reading-visibility'
 import { readSurahPosition, rememberSurahPosition, SURAH_POSITIONS_KEY } from '@/lib/surah-position'
@@ -237,14 +238,14 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
     if (readSearchLink(window.location.href)) writeSearchState(state)
   }, [writeSearchState])
 
-  const prepareSearchAndGoResult = useCallback((searchState: SearchLinkState, position: SearchResultPosition) => {
+  const prepareSearchAndGoResult = useCallback((searchState: SearchLinkState, position: SearchResultPosition, highlight?: QuranSearchHighlight) => {
     const revision = ++searchAndGoRevision.current
     return (jump: ReadingJump) => {
       const state = window.history.state
       if (revision !== searchAndGoRevision.current || (!state?.searchAndGoOverlay && !state?.unifiedSearchPosition
         && !(SEARCH_AND_GO_PHASE_2 && readSearchLink(window.location.href)))) return false
       const result: SearchResultSnapshot = SEARCH_AND_GO_PHASE_2
-        ? { query: searchState.query, position, state: searchState, selected: jump.kind === 'verse' ? jump.address : undefined }
+        ? { query: searchState.query, position, state: searchState, selected: jump.kind === 'verse' ? jump.address : undefined, highlight }
         : { query: searchState.query, position }
       const previousJourney = state?.unifiedSearchSnapshot?.selected ? activeJourney(state.searchAndGoJourney) : undefined
       const searchAndGoJourney: SearchAndGoJourney | null = SEARCH_AND_GO_PHASE_2

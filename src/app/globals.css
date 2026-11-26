@@ -2038,6 +2038,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-page-input .reader-display-menu .reader-display-modes button { padding: 4px; }
 .search-page-input .reader-display-menu .reader-display-switch { padding: 3px; }
 .phase3-settings .reader-display-switch:disabled { opacity: .55; }
+.phase3-settings .reader-display-controls :is(h3, .reader-display-translation > span) > svg { flex: none; }
 .phase3-settings summary, .phase3-sort summary, .phase3-scope-control > summary { list-style: none; cursor: pointer; }
 .phase3-settings summary::-webkit-details-marker, .phase3-sort summary::-webkit-details-marker, .phase3-scope-control > summary::-webkit-details-marker { display: none; }
 .phase3-sort { position: relative; }
@@ -2210,6 +2211,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .phase3-scope-footer > button { min-block-size: 30px; color: var(--ink); padding-inline: 9px; }
 .phase3-scope-menu button:disabled { opacity: .5; cursor: default; }
 .phase3-scope-range, .phase3-scope-stepper { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+.phase3-scope-stepper { grid-template-columns: minmax(60px, max-content) minmax(0, 1fr) minmax(60px, max-content); }
 .phase3-scope-stepper > button { min-width: 0; padding-inline: 7px; }
 .phase3-scope-stepper .phase3-scope-pick { gap: 4px; padding: 5px 3px; }
 .phase3-scope-pick > svg:first-child { display: none; }

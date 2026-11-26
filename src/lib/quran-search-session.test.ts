@@ -79,6 +79,23 @@ test('expanding a literal match counts each new root occurrence once', () => {
 
 const phase3 = { relation: 'all' as const, sorts: ['mushaf' as const], roots: [], lemmas: [], forms: [] }
 
+test('a conjunction cannot supply the first letter of a partial or fuzzy word match', () => {
+  const options = { phase3, includePartial: true, includeRoots: true }
+  for (const includeNear of [false, true]) {
+    const hits = search('سلم وجه', { ...options, includeNear })
+    expect(hits.some(({ s, a }) => s === 22 && a === 78)).toBe(false)
+    expect(hits.some(({ s, a }) => s === 2 && a === 112)).toBe(true)
+  }
+  const local = createSearchSession({ verses: [[1, 1, ['وَجَهْدٌ', 'وَجْهٌ']]], waw: { '1:1': [1] }, morphology: {} })
+  expect(local('وجه', { phase3, includeNear: true })[0].parts).toEqual({ 2: 2 })
+})
+
+test('the word count includes a separately matched conjunction', () => {
+  const local = createSearchSession({ verses: [[1, 1, ['وَلَا', 'تَخَفْ']]], waw: { '1:1': [1] }, morphology: {} })
+  const phrase = { ...phase3, relation: 'phrase' as const }
+  expect(countQuranSearchResults(local('و لا تخف', { phase3: phrase }))).toEqual({ occurrences: 1, words: 3, verses: 1 })
+})
+
 test('multiword lemma and root searches find both stems in Yusuf 76', () => {
   for (const mode of ['lemma', 'root'] as const) {
     const options = { mode, phase3, surahs: [12] }

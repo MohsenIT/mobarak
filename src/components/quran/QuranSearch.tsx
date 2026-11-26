@@ -7,11 +7,11 @@ import {t,uiDirection} from '@/lib/i18n'
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import {IconTranslate} from './Ornaments'
-import { Search, X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreVertical, Link, Check } from 'lucide-react'
+import { Search, X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreVertical, Link, Check, Languages, SpellCheck } from 'lucide-react'
 import type { Meta, Translator, Translations } from '@/lib/quran'
 import { loadTrans, toFa, morphologyLabel } from '@/lib/quran'
 import { type AnalysisSelection } from '@/lib/analysis'
-import { countQuranSearchResults, normalizeQuranSearch, type QuranSearchResult } from '@/lib/quran-search'
+import { countQuranSearchResults, normalizeQuranSearch, type QuranSearchHighlight, type QuranSearchResult } from '@/lib/quran-search'
 import QuranText from './QuranText'
 import { splitWord } from '@/lib/word-parts'
 import type { SearchMode } from '@/lib/quran-search-session'
@@ -57,7 +57,7 @@ interface Props {
       onModeChange: (mode: SearchMode) => void
     }
   }
-  onPick: (s: number, a: number, pos: number, state: SearchLinkState, position: SearchResultPosition) => void
+  onPick: (s: number, a: number, pos: number, state: SearchLinkState, position: SearchResultPosition, highlight?: QuranSearchHighlight) => void
 }
 const emptyResults: QuranSearchResult[] = []
 
@@ -469,7 +469,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
       <div className="search-results-summary">
         <div role="status" aria-live="polite">{busy ? <span><LoaderCircle size={15} className="animate-spin" />{t("ui.63509f3da4")}</span> : !valid ? t("ui.4bfc7b8a3d") : error ? t("ui.12287cefbb") : <>
           {!phase3 && <strong className="search-results-total">{t('search.totalResults', { total: results.length })}</strong>}
-          <span className={phase3 ? "search-results-total" : "search-results-detail"}>{t(unified ? "search.occurrenceCount" : "ui.9ec9176e66", { p0: toFa(counts.verses), p1: toFa(unified ? counts.occurrences : counts.words) })}</span>
+          <span className={phase3 ? "search-results-total" : "search-results-detail"}>{t(unified && !phase3 ? "search.occurrenceCount" : "ui.9ec9176e66", { p0: toFa(counts.verses), p1: toFa(unified && !phase3 ? counts.occurrences : counts.words) })}</span>
         </>}</div>
         {!phase3 && !busy && !error && valid && results.length > 0 && <span className="search-results-position" data-current-result={Math.min(currentResult, results.length)} data-total-results={results.length} aria-live="off">{t('search.resultPosition', { current: Math.min(currentResult, results.length), total: results.length })}</span>}
         {phase3 && <div className="phase3-result-controls">
@@ -485,7 +485,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         {!phase3 && !busy && !error && valid && !results.length && <div className="search-empty"><Search size={30} /><h2>{t("ui.b548ad6007")}</h2><p>{t("ui.d0c738e420")}</p></div>}
         {!busy && !error && valid && results.slice(0, visible).map((result, index) => <div key={`${result.s}:${result.a}`}>
           {!phase3 && !occurrenceFilter && (index === 0 || results[index - 1].kind !== result.kind) && <h2 className="search-result-group">{t(labels[result.kind])}{' · '}{t('search.totalResults', { total: groupCounts[result.kind] })}</h2>}
-          <article className="search-result-card" data-search-result-index={index + 1} data-search-address={`${result.s}:${result.a}`}><button type="button" className="search-result-open" aria-current={unified?.selected?.s === result.s && unified?.selected?.a === result.a || undefined} aria-label={t("ui.a55b5ca0c4",{p0:(meta.surahs[result.s - 1]?.fa),p1:(toFa(result.a))})} onClick={() => onPick(result.s, result.a, result.positions[0] ?? 1, linkState, capturePosition())}>
+          <article className="search-result-card" data-search-result-index={index + 1} data-search-address={`${result.s}:${result.a}`}><button type="button" className="search-result-open" aria-current={unified?.selected?.s === result.s && unified?.selected?.a === result.a || undefined} aria-label={t("ui.a55b5ca0c4",{p0:(meta.surahs[result.s - 1]?.fa),p1:(toFa(result.a))})} onClick={() => {
+            const { s, a, positions, parts } = result
+            onPick(s, a, positions[0] ?? 1, linkState, capturePosition(), { s, a, positions, parts })
+          }}>
             <span className="search-result-meta"><b>{meta.surahs[result.s - 1]?.fa}{' '}{t("ui.f922b82cb1")}{' '}{toFa(result.a)}</b><span className="search-result-position">{t('search.resultPosition', { current: index + 1, total: results.length })}</span>{result.cooccurrenceGroup?.unit === 'context' && <span>{t('ui.16836d5471')}{' '}{toFa(result.cooccurrenceGroup.from)}–{toFa(result.cooccurrenceGroup.to)}</span>}
             {result.cooccurrenceGroup?.unit === 'surah' && <span>{t('occurrence.thisSurah')}</span>}
             <span>{t("ui.1abf27acd0")}</span></span><span className="search-result-text font-quran" lang="ar">{snippet(result, true)}</span>
@@ -499,7 +502,10 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   </>
   const settings = phase3 && unified?.settingsHost
     ? createPortal(<SearchWorkspaceSettings config={config} onConfig={setConfig}
-      partial={matchingPreferences[0]} matching={[...matchingPreferences.slice(1), { label: t('ui.2d6258b160'), checked: showTranslation, onChange: setShowTranslation }]}
+      partial={matchingPreferences[0]} matching={[
+        { ...matchingPreferences[1], icon: SpellCheck },
+        { icon: Languages, label: t('ui.2d6258b160'), checked: showTranslation, onChange: setShowTranslation },
+      ]}
       actions={<section className="phase3-settings-actions">
         <button type="button" className="chip" onClick={copyLink}>
           {copyStatus === t('ui.dc5c67b8a3') ? <Check size={16} aria-hidden="true" /> : <Link size={16} aria-hidden="true" />}
