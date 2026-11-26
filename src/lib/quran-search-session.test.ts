@@ -88,6 +88,9 @@ test('a conjunction cannot supply the first letter of a partial or fuzzy word ma
   }
   const local = createSearchSession({ verses: [[1, 1, ['وَجَهْدٌ', 'وَجْهٌ']]], waw: { '1:1': [1] }, morphology: {} })
   expect(local('وجه', { phase3, includeNear: true })[0].parts).toEqual({ 2: 2 })
+  expect(local('وجهد', { phase3 })).toEqual([])
+  expect(local('«وجهد»', { phase3 })).toEqual([])
+  expect(local('«و جهد»', { phase3 })[0].parts).toEqual({ 1: 3 })
 })
 
 test('the word count includes a separately matched conjunction', () => {

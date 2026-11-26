@@ -1,6 +1,7 @@
 import { normalizeQuranSearch } from './quran-search'
 import type { SearchCorpus, SearchMode } from './quran-search-session'
 import { lemmaDisplay } from './lemma-display'
+import { splitWord } from './word-parts'
 
 /** Attested words/phrases only; never invent Quran completions. */
 export function createSearchSuggestions(corpus: SearchCorpus) {
@@ -8,7 +9,14 @@ export function createSearchSuggestions(corpus: SearchCorpus) {
   for (const words of Object.values(corpus.morphology)) for (const [root, lemma] of words) { if (root) { rootCounts.set(root, (rootCounts.get(root) ?? 0) + 1) }; if (lemma) { const value = lemmaDisplay(lemma); lemmaCounts.set(value, (lemmaCounts.get(value) ?? 0) + 1) } }
   const vocabulary = new Map<string, { original: string; key: string; count: number }>()
   const wordKeys = new Map<string, { key: string; plain: string; first: string; plainFirst: string }>()
-  for (const [, , words] of corpus.verses) for (const word of words) {
+  const verses = corpus.verses.map(([s, a, words]) => {
+    const waw = new Set(corpus.waw?.[`${s}:${a}`])
+    return { s, words: words.flatMap((word, i) => {
+      const { prefix, stem } = splitWord({ t: word, wa: waw.has(i + 1) })
+      return prefix ? [prefix, stem] : [stem]
+    }) }
+  })
+  for (const { words } of verses) for (const word of words) {
     let spelling = wordKeys.get(word)
     if (!spelling) {
       const key = normalizeQuranSearch(word, true)
@@ -55,7 +63,7 @@ export function createSearchSuggestions(corpus: SearchCorpus) {
       const plainFirst = plainKey.split(' ', 1)[0]
       const size = terms.length + Number(continuesPhrase)
       const matches = new Map<string, { value: string; count: number; exact: boolean }>()
-      for (const [s, , words] of corpus.verses) {
+      for (const { s, words } of verses) {
         if (!within(s)) continue
         for (let i = 0; i <= words.length - size; i++) {
           const spelling = wordKeys.get(words[i])
@@ -79,7 +87,7 @@ export function createSearchSuggestions(corpus: SearchCorpus) {
       return [...matches.values()].sort((a, b) => Number(b.exact) - Number(a.exact) || b.count - a.count).slice(0, 6).map(match => match.value)
     }
     const candidates = completionsOnly && scope.size ? new Map<string, { original: string; key: string; count: number }>() : vocabulary
-    if (candidates !== vocabulary) for (const [s, , words] of corpus.verses) {
+    if (candidates !== vocabulary) for (const { s, words } of verses) {
       if (!within(s)) continue
       for (const original of words) {
         const token = wordKeys.get(original)?.key

@@ -1,3 +1,5 @@
+import { splitWord } from './word-parts'
+
 /** Search keys only: the displayed Quran words always remain unchanged. */
 export function normalizeQuranSearch(text: string, restoreSmallLetters = false, spellingSensitive = false): string {
   let value = text.normalize('NFKC')
@@ -56,7 +58,12 @@ export function countQuranSearchResults(results: QuranSearchResult[]): QuranSear
   return { occurrences, words, verses: results.length }
 }
 
-type IndexedVerse = { verse: SearchVerse; keys: string[][]; prefixed: Set<number>; compact: { text: string; ranges: [number, number][]; boundaries: Set<number> }[] }
+type SearchToken = { text: string; keys: string[]; pos: number; part: 1 | 2 }
+type TokenRange = { token: SearchToken; from: number; to: number }
+type IndexedVerse = {
+  verse: SearchVerse; tokens: SearchToken[]
+  compact: { text: string; ranges: TokenRange[] }[]
+}
 
 export function createQuranSearch(verses: SearchVerse[], waw: Record<string, number[]> = {}, spellingSensitive = false) {
   const vocabulary = new Set<string>()
@@ -79,34 +86,37 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
     return variants[variant][offset] ?? offset
   }
   const normalizedWords = new Map<string, string[]>()
+  const tokenKeys = (word: string) => {
+    let keys = normalizedWords.get(word)
+    if (!keys) {
+      keys = quranSearchKeys(word, spellingSensitive)
+      normalizedWords.set(word, keys)
+      keys.forEach(key => vocabulary.add(key))
+    }
+    return keys
+  }
   const indexed: IndexedVerse[] = verses.map(verse => {
     const prefixed = new Set(waw[`${verse[0]}:${verse[1]}`] ?? [])
-    const keys = verse[2].map((word, i) => {
-      let options = normalizedWords.get(word)
-      if (!options) {
-        options = quranSearchKeys(word, spellingSensitive)
-        normalizedWords.set(word, options)
-        options.forEach(key => vocabulary.add(key))
-      }
-      if (prefixed.has(i + 1)) options.forEach(key => vocabulary.add(key.slice(1)))
-      return options
+    const tokens: SearchToken[] = verse[2].flatMap((word, i) => {
+      const pos = i + 1
+      const { prefix, stem } = splitWord({ t: word, wa: prefixed.has(pos) })
+      const parts: SearchToken[] = []
+      if (prefix) parts.push({ text: prefix, keys: tokenKeys(prefix), pos, part: 1 })
+      const keys = tokenKeys(stem)
+      if (keys.length) parts.push({ text: stem, keys, pos, part: 2 })
+      return parts
     })
-    const variants = keys.some(options => options.length > 1) ? [0, 1] : [0]
+    const variants = tokens.some(token => token.keys.length > 1) ? [0, 1] : [0]
     const compact = variants.map(variant => {
-      let text = ''; const ranges: [number, number][] = []; const boundaries = new Set<number>()
-      keys.forEach((options, i) => {
-        const key = options[variant] ?? options[0] ?? ''
+      let text = ''
+      const ranges = tokens.map(token => {
         const from = text.length
-        ranges.push([from, from + key.length])
-        boundaries.add(from); boundaries.add(from + key.length)
-        // A corpus-tagged waw and its stem are independent lexical units.
-        // Keep canonical positions for result navigation and highlighting.
-        if (prefixed.has(i + 1) && key.startsWith('و')) boundaries.add(from + 1)
-        text += key
+        text += token.keys[variant] ?? token.keys[0]
+        return { token, from, to: text.length }
       })
-      return { text, ranges, boundaries }
+      return { text, ranges }
     })
-    return { verse, keys, prefixed, compact }
+    return { verse, tokens, compact }
   })
   return (input: string, surah = 0, { includePartial = true, includeNear = false }: QuranSearchOptions = {}): QuranSearchResult[] => {
     const query = normalizeQuranSearch(input, false, spellingSensitive)
@@ -131,13 +141,13 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
       return matches
     }) : null
     const results: QuranSearchResult[] = []
-    for (const { verse: [s, a, words], keys, prefixed, compact } of indexed) {
+    for (const { verse: [s, a, words], tokens, compact } of indexed) {
       if (surah && s !== surah) continue
       let score = Infinity; let positions: number[] = []; let parts: Record<number, number> = {}; let kind: QuranSearchResult['kind'] = 'near'
       let occurrences: Map<string, number[]> | undefined
-      const hitKey = (pos: number, offset: number, variant: number) => {
-        const sourceOffset = keys[pos - 1].length > 1 ? originalOffset(words[pos - 1], variant, offset) : offset
-        return `${pos}:${sourceOffset}`
+      const hitKey = (token: SearchToken, offset: number, variant: number) => {
+        const sourceOffset = token.keys.length > 1 ? originalOffset(token.text, variant, offset) : offset
+        return `${token.pos}:${token.part}:${sourceOffset}`
       }
       const record = (cost: number, matched: number[], masks: Record<number, number>, occurrence: string) => {
         if (cost < score) { positions = []; parts = {}; occurrences?.clear() }
@@ -147,35 +157,26 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
         occurrences.set(occurrence, matched)
         score = cost
       }
-      const lastStart = terms.length > 1 || distances ? keys.length - terms.length : -1
+      const lastStart = terms.length > 1 || distances ? tokens.length - terms.length : -1
       for (let start = 0; start <= lastStart; start++) {
         let cost = 0
         for (let offset = 0; offset < terms.length; offset++) {
-          const word = keys[start + offset]
-          if (word.includes(terms[offset])) continue
-          if (distances) {
-            const lexicalKeys = prefixed.has(start + offset + 1) ? word.map(key => key.slice(1)) : word
-            cost += Math.min(...lexicalKeys.map(key => distances[offset].get(key) ?? Infinity))
-          } else cost = Infinity
+          const keys = tokens[start + offset].keys
+          if (keys.includes(terms[offset])) continue
+          cost += distances ? Math.min(...keys.map(key => distances[offset].get(key) ?? Infinity)) : Infinity
           if (cost > score || cost > budget) break
         }
-        if (cost <= score && cost <= budget) {
-          const matched = Array.from({ length: terms.length }, (_, i) => start + i + 1)
-          const last = start + terms.length - 1
-          const lastTerm = terms[terms.length - 1]
-          const exactHit = (index: number, term: string, offset: number) => {
-            const keysAtWord = keys[index]
-            const direct = keysAtWord.indexOf(term)
-            return direct >= 0
-              ? hitKey(index + 1, offset, direct)
-              : hitKey(index + 1, offset + 1, keysAtWord.indexOf(`و${term}`))
-          }
-          const occurrence = cost === 0
-            ? `${exactHit(start, terms[0], 0)}-${exactHit(last, lastTerm, lastTerm.length - 1)}`
-            : `${start + 1}-${last + 1}`
-          record(cost, matched, Object.fromEntries(matched.map((pos, i) => [pos, prefixed.has(pos) && keys[pos - 1].includes(terms[i]) ? 3 : 2])), occurrence)
-          kind = cost === 0 ? 'exact' : 'near'
-        }
+        if (cost > score || cost > budget) continue
+        const matched = tokens.slice(start, start + terms.length)
+        const first = matched[0], last = matched[matched.length - 1]
+        const lastTerm = terms[terms.length - 1]
+        const occurrence = cost === 0
+          ? `${hitKey(first, 0, first.keys.indexOf(terms[0]))}-${hitKey(last, lastTerm.length - 1, last.keys.indexOf(lastTerm))}`
+          : `${start}-${start + terms.length - 1}`
+        const masks: Record<number, number> = {}
+        for (const token of matched) masks[token.pos] = (masks[token.pos] ?? 0) | token.part
+        record(cost, Object.keys(masks).map(Number), masks, occurrence)
+        kind = cost === 0 ? 'exact' : 'near'
       }
       // Rank by the best literal occurrence, but highlight every literal occurrence.
       // A whole-word hit must not hide an occurrence inside another word in the verse.
@@ -187,33 +188,23 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
       for (const [variant, item] of compact.entries()) {
         for (let start = item.text.indexOf(compactQuery); start >= 0; start = item.text.indexOf(compactQuery, start + 1)) {
           const end = start + compactQuery.length
-          const matched = item.ranges.flatMap(([from, to], i) => from < end && to > start ? [i + 1] : [])
-          const whole = item.boundaries.has(start) && item.boundaries.has(end)
-          // A single word may match inside one token, or full adjacent tokens
-          // with omitted spaces; never invent a word from two partial edges.
-          if (terms.length === 1 && matched.length > 1 && !whole) continue
+          const matched = item.ranges.filter(range => range.from < end && range.to > start)
+          const first = matched[0], last = matched[matched.length - 1]
+          const whole = first.from === start && last.to === end
           if (!whole && !includePartial) continue
-          // A compact partial match cannot borrow a conjunction from outside its word.
-          if (!whole && matched.some(pos => {
-            if (!prefixed.has(pos)) return false
-            const [from] = item.ranges[pos - 1]
-            return [from, from + 1].some(boundary => start < boundary && boundary < end && !termBoundaries.has(boundary - start))
-          })) continue
+          // Incomplete terms cannot cross a lexical boundary. Complete phrases
+          // still accept omitted spaces, except a lone word can't merge a clitic with its stem.
+          if (matched.slice(1).some((range, index) =>
+            (!whole && !termBoundaries.has(range.from - start)) ||
+            (terms.length === 1 && range.token.pos === matched[index].token.pos))) continue
           const value = whole ? 0 : 0.5
           literalScore = Math.min(literalScore, value)
-          const first = matched[0]
-          const last = matched[matched.length - 1]
-          const occurrence = `${hitKey(first, start - item.ranges[first - 1][0], variant)}-${hitKey(last, end - 1 - item.ranges[last - 1][0], variant)}`
+          const occurrence = `${hitKey(first.token, start - first.from, variant)}-${hitKey(last.token, end - 1 - last.from, variant)}`
           if (!literalOccurrences) literalOccurrences = new Map()
-          literalOccurrences.set(occurrence, matched)
-          for (const pos of matched) {
-            const [from, to] = item.ranges[pos - 1]
-            // Bit 1 selects the independent waw; bit 2 selects the stem.
-            const mask = prefixed.has(pos)
-              ? (start < from + 1 && end > from ? 1 : 0) | (start < to && end > from + 1 ? 2 : 0)
-              : 2
-            literalPositions.add(pos)
-            literalParts[pos] = (literalParts[pos] ?? 0) | mask
+          literalOccurrences.set(occurrence, [...new Set(matched.map(({ token }) => token.pos))])
+          for (const { token } of matched) {
+            literalPositions.add(token.pos)
+            literalParts[token.pos] = (literalParts[token.pos] ?? 0) | token.part
           }
         }
       }
