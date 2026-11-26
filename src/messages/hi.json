@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "कोई भी",
   "searchP3.relationShort.phrase": "वाक्यांश",
   "searchP3.matchWithin": "सभी शब्द इस इकाई में मिलें",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "सटीक वर्तनी मिलाएँ",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

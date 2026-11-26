@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Lolote",
   "searchP3.relationShort.phrase": "Kirai",
   "searchP3.matchWithin": "Linganisha maneno yote ndani ya",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Linganisha tahajia kamili",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

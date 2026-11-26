@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Herhangi",
   "searchP3.relationShort.phrase": "İfade",
   "searchP3.matchWithin": "Tüm sözcüklerin eşleşeceği alan",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Yazımı birebir eşleştir",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

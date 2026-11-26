@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Теләсә кайсы",
   "searchP3.relationShort.phrase": "Гыйбарә",
   "searchP3.matchWithin": "Барлык сүзләр туры килергә тиешле чик",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Төгәл язылыш буенча эзләү",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

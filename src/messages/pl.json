@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Dowolne",
   "searchP3.relationShort.phrase": "Fraza",
   "searchP3.matchWithin": "Dopasuj wszystkie słowa w obrębie",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Wymagaj dokładnej pisowni",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

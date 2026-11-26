@@ -411,7 +411,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     <label className="choice-row" key={label}><input type="checkbox" checked={checked} disabled={disabled}
       onChange={event => onChange(event.target.checked)} />{label}</label>)
   const controls = phase3 && <SearchPhase3Controls
-        query={query} researchHost={unified?.researchHost} identity={JSON.stringify([query, surahs, mode, config.relation, config.cooccurrence, config.spellingSensitive, includeRoots, includePartial, includeNear])}
+        query={query} researchHost={unified?.researchHost} identity={JSON.stringify([query, surahs, mode, config.relation, config.cooccurrence, config.spellingSensitive, config.orderedWords, includeRoots, includePartial, includeNear])}
         config={config}
         results={answerKey === engineKey && !busy ? rawResults : emptyResults} includeRoots={includeRoots} onRoots={toggleRoots} onConfig={setConfig}
       />
@@ -499,7 +499,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   </>
   const settings = phase3 && unified?.settingsHost
     ? createPortal(<SearchWorkspaceSettings config={config} onConfig={setConfig}
-      matching={[...matchingPreferences, { label: t('ui.2d6258b160'), checked: showTranslation, onChange: setShowTranslation }]}
+      partial={matchingPreferences[0]} matching={[...matchingPreferences.slice(1), { label: t('ui.2d6258b160'), checked: showTranslation, onChange: setShowTranslation }]}
       actions={<section className="phase3-settings-actions">
         <button type="button" className="chip" onClick={copyLink}>
           {copyStatus === t('ui.dc5c67b8a3') ? <Check size={16} aria-hidden="true" /> : <Link size={16} aria-hidden="true" />}

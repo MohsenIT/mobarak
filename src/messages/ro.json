@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Oricare",
   "searchP3.relationShort.phrase": "Expresie",
   "searchP3.matchWithin": "Potrivește toate cuvintele în",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Potrivește ortografia exactă",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

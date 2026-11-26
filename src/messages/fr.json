@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Au moins un",
   "searchP3.relationShort.phrase": "Expression",
   "searchP3.matchWithin": "Trouver tous les mots dans",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Respecter l’orthographe exacte",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Yiwen",
   "searchP3.relationShort.phrase": "Tafyirt",
   "searchP3.matchWithin": "Talast n wanada n wawalen akk",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Tanadi s tira tusdidt",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

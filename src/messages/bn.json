@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "যেকোনো",
   "searchP3.relationShort.phrase": "বাক্যাংশ",
   "searchP3.matchWithin": "সব শব্দ যেখানে মিলতে হবে",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "হুবহু বানান মেলান",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

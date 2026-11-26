@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Mana-mana",
   "searchP3.relationShort.phrase": "Frasa",
   "searchP3.matchWithin": "Padankan semua perkataan dalam",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Padankan ejaan tepat",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "أيّ كلمة",
   "searchP3.relationShort.phrase": "عبارة",
   "searchP3.matchWithin": "مطابقة جميع الكلمات ضمن",
+  "searchP3.orderedWords": "مراعاة ترتيب الكلمات",
   "searchP3.spellingSensitive": "مطابقة الرسم الإملائي بدقة",
   "searchP3.forward": "من الأول إلى الأخير",
   "searchP3.reverse": "من الأخير إلى الأول",

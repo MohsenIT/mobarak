@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "هر یو",
   "searchP3.relationShort.phrase": "عبارت",
   "searchP3.matchWithin": "ټول وییونه په دې واحد کې ومومئ",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "د لیکدود کټ مټ سمون",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Ҳар кадом",
   "searchP3.relationShort.phrase": "Ибора",
   "searchP3.matchWithin": "Мувофиқати ҳамаи калимаҳо дар доираи",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Мувофиқати дақиқи имло",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

@@ -193,3 +193,35 @@ test('unrecorded form keeps the seven prayer matches countable and filterable', 
   expect(filtered.map(result => [result.s, result.a])).toEqual(hits.map(result => [result.s, result.a]))
   expect(filtered.flatMap(result => result.positions.map(pos => result.morphology?.[pos - 1]?.[2]))).not.toContain('VIII')
 })
+
+test('an attested typed root expands without a literal token spelling', () => {
+  const options = { includeRoots: true, phase3, surahs: [79] }
+  expect(search('برز جحم', options).map(r => [r.a, r.positions])).toEqual(
+    search('برز جحیم', options).map(r => [r.a, r.positions]),
+  )
+  expect(search('برز جحم', options).some(r => r.a === 36)).toBe(true)
+  expect(search('برز جحم', { ...options, includeRoots: false })).toEqual([])
+})
+
+test('word order is optional, allows intervening words, and requires repeated words to use distinct hits', () => {
+  const local = createSearchSession({
+    verses: [[1, 1, ['قال', 'ثم', 'كتب']], [1, 2, ['كتب', 'قال']], [1, 3, ['قال', 'ثم', 'قال']]],
+    morphology: {},
+  })
+  const ordered = { ...phase3, orderedWords: true }
+  expect(local('قال كتب', { phase3 }).map(r => r.a)).toEqual([1, 2])
+  expect(local('قال كتب', { phase3: ordered }).map(r => r.a)).toEqual([1])
+  expect(local('كتب قال', { phase3: ordered }).map(r => r.a)).toEqual([2])
+  expect(local('قال قال', { phase3: ordered }).map(r => r.a)).toEqual([3])
+  expect(local('قال كتب', { phase3: { ...ordered, relation: 'phrase' } })).toEqual([])
+  expect(local('قال غفر', { phase3: { ...ordered, relation: 'any' } }).map(r => r.a)).toEqual([1, 2, 3])
+})
+
+test('word order across a surah retains only verses participating in an ordered sequence', () => {
+  const local = createSearchSession({
+    verses: [[1, 1, ['كتب']], [1, 2, ['قال']], [1, 3, ['كتب']], [1, 4, ['قال']], [2, 1, ['كتب']]],
+    morphology: {},
+  })
+  expect(local('قال كتب', { phase3: { ...phase3, orderedWords: true, cooccurrence: 'surah' } }).map(r => [r.s,r.a]))
+    .toEqual([[1,2], [1,3]])
+})

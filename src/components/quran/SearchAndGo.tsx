@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Pin, Search } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
 import { destinationLabel, destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, NAVIGATION_HELP, resolveDestination, type Destination } from '@/lib/navigation'
@@ -15,6 +15,7 @@ import { DictationInput } from './DictationInput'
 import QuranSearch from './QuranSearch'
 import QuranText from './QuranText'
 import { searchPopupName } from './search-popup'
+import { usePinPress } from './usePinPress'
 
 const searchExamples = ['س 20', 'اسما الحسنی', 'طه 40', 'صبر', 'صفحه 42', 'جزء 30', 'لا تخف', 'سیاق طه:3']
 
@@ -40,6 +41,8 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   const [query, setQuery] = useState(start?.query ?? '')
   const [searchActive, setSearchActive] = useState(!!start)
   const [position, setPosition] = useState(start?.position)
+  const historyPinPress = usePinPress()
+  const [pinStatus, setPinStatus] = useState('')
   const [help, setHelp] = useState(false)
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [completedQuery, setCompletedQuery] = useState<string>()
@@ -258,14 +261,18 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 const label = op.type === 'navigation' ? destinationLabel(meta, op.destination) : state?.query || state?.occurrence?.text
                 const Icon = op.type === 'navigation' ? MousePointer2 : Search
                 return <li key={entry.id}>
-                  <button type="button" className="chip" onClick={() => {
-                    if (op.type === 'navigation') onDestination(op.destination, op.word)
-                    else if (state) onReplay?.(state)
-                  }}><Icon size={14} aria-hidden="true" /><span>{label}</span></button>
-                  <button type="button" className="icon-btn" aria-pressed={entry.pinned} aria-label={t('searchP3.pinHistory', { label })}
-                    onClick={() => onToggleHistoryPin(entry.id)}><Pin size={14} aria-hidden="true" /></button>
+                  <button type="button" className="chip" data-pinned={entry.pinned || undefined}
+                    title={t(entry.pinned ? 'ui.b6c1280f97' : 'ui.9c19bc2926')}
+                    {...historyPinPress(() => {
+                      if (op.type === 'navigation') onDestination(op.destination, op.word)
+                      else if (state) onReplay?.(state)
+                    }, () => {
+                      onToggleHistoryPin(entry.id)
+                      setPinStatus(t(entry.pinned ? 'ui.7c631348f5' : 'ui.4fdcf22559', { p0: label ?? '' }))
+                    })}><Icon size={14} aria-hidden="true" /><span>{label}</span></button>
                 </li>
               })}</ul>
+              <span className="sr-only" role="status">{pinStatus}</span>
             </> : <>
               <h2>{t('searchP3.emptyTitle')}</h2>
               <p>{t('searchP3.emptyDescription')}</p>

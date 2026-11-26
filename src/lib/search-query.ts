@@ -13,6 +13,7 @@ export type Phase3SearchOptions = {
   forms: string[]
   cooccurrence?: SearchCooccurrence
   spellingSensitive?: boolean
+  orderedWords?: boolean
 }
 
 export function defaultPhase3SearchOptions(): Phase3SearchOptions {
@@ -21,7 +22,7 @@ export function defaultPhase3SearchOptions(): Phase3SearchOptions {
 
 type SearchClause = { text: string; exact: boolean }
 
-export function parseSearchQuery(input: string, relation: SearchRelation, spellingSensitive = false): SearchClause[] {
+export function parseSearchQuery(input: string, relation: SearchRelation, spellingSensitive = false, keepRepeats = false): SearchClause[] {
   if (relation === 'phrase') {
     const text = normalizeQuranSearch(input, false, spellingSensitive)
     return text ? [{ text, exact: true }] : []
@@ -32,7 +33,7 @@ export function parseSearchQuery(input: string, relation: SearchRelation, spelli
     const exact = quoted !== undefined
     const normalized = normalizeQuranSearch(quoted ?? plain, false, spellingSensitive)
     for (const text of exact ? [normalized] : normalized.split(' ')) {
-      if (text) clauses.set(`${exact}:${text}`, { text, exact })
+      if (text) clauses.set(keepRepeats ? String(clauses.size) : `${exact}:${text}`, { text, exact })
     }
   }
   return [...clauses.values()]

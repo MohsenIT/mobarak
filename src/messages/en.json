@@ -788,6 +788,7 @@
   "searchP3.relationShort.any": "Any",
   "searchP3.relationShort.phrase": "Phrase",
   "searchP3.matchWithin": "Match all words within",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Match exact spelling",
   "searchP3.forward": "First to last",
   "searchP3.reverse": "Last to first",

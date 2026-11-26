@@ -2014,12 +2014,11 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-and-go-empty p { font-size: 13px; color: var(--ink-soft); margin-block-end: 10px; }
 .search-and-go-examples { display: flex; flex-wrap: wrap; gap: 6px; }
 .search-and-go-examples .chip, .search-and-go-history .chip { min-height: 32px; }
-.search-and-go-history { max-block-size: min(240px, 32dvh, calc(var(--search-and-go-height, 100dvh) * .32)); overflow: auto; padding-inline-end: 4px; }
-.search-and-go-history li { display: flex; align-items: center; gap: 4px; padding-block: 2px; }
-.search-and-go-history li .chip { min-width: 0; }
+.search-and-go-history { display: flex; flex-wrap: wrap; gap: 5px; max-block-size: min(240px, 32dvh, calc(var(--search-and-go-height, 100dvh) * .32)); overflow: auto; padding-inline-end: 4px; }
+.search-and-go-history li { min-width: 0; max-width: 100%; }
+.search-and-go-history li .chip { max-width: 100%; cursor: pointer; user-select: none; -webkit-touch-callout: none; }
 .search-and-go-history li .chip > span { overflow: hidden; text-overflow: ellipsis; }
-.search-and-go-history .icon-btn { width: 32px; height: 32px; flex: none; }
-.search-and-go-history [aria-pressed="true"] { background: var(--word-active); }
+.search-and-go-history .chip[data-pinned] { background: var(--word-active); border-color: var(--sage); }
 .search-and-go-browse { min-height: 36px; font-size: 12px; color: var(--ink-soft); text-decoration: underline; margin-block-start: 6px; }
 
 /* The search surface and its internal columns respond independently. */

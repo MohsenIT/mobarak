@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "ማንኛውም",
   "searchP3.relationShort.phrase": "ሐረግ",
   "searchP3.matchWithin": "ሁሉንም ቃላት የሚያዛምድበት ወሰን",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "የፊደል አጻጻፍን በጥብቅ አዛምድ",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

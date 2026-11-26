@@ -1,15 +1,12 @@
 'use client'
 import {t} from '@/lib/i18n'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { Meta } from '@/lib/quran'
+import { usePinPress } from './usePinPress'
 
 export default function SurahShortcuts({ meta, pinned, recent, onGo, onTogglePin }: { meta: Meta; pinned: number[]; recent: number[]; onGo: (n: number, pinned: boolean) => void; onTogglePin: (n: number) => void }) {
-  const hold = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pointer = useRef<{ x: number; y: number } | null>(null)
-  const held = useRef(false)
+  const pinPress = usePinPress()
   const [status, setStatus] = useState('')
-  const cancelHold = () => { if (hold.current) clearTimeout(hold.current); hold.current = null; pointer.current = null }
-  useEffect(() => () => { if (hold.current) clearTimeout(hold.current) }, [])
   const [expanded, setExpanded] = useState(false)
   const [count, setCount] = useState(1)
   const row = useRef<HTMLDivElement>(null)
@@ -45,14 +42,10 @@ export default function SurahShortcuts({ meta, pinned, recent, onGo, onTogglePin
   if (!shortcuts.length) return null
   return <>
     <div ref={row} className="drawer-recent-shortcuts" aria-label={t("ui.f94311caeb")}>
-      {shortcuts.slice(0, expanded ? undefined : count).map(n => <button type="button" key={n} className="chip" data-pinned={pinned.includes(n) || undefined} onPointerDown={event => {
-        cancelHold(); held.current = false
-        if (!event.isPrimary || event.button !== 0) return
-        pointer.current = { x:event.clientX, y:event.clientY }
-        hold.current = setTimeout(() => { held.current = true; onTogglePin(n); setStatus(pinned.includes(n) ? t("ui.7c631348f5",{p0:(meta.surahs[n - 1]?.fa)}) : t("ui.4fdcf22559",{p0:(meta.surahs[n - 1]?.fa)})); cancelHold() }, 550)
-      }} onPointerMove={event => { if (pointer.current && Math.hypot(event.clientX-pointer.current.x,event.clientY-pointer.current.y)>8) { held.current = true; cancelHold() } }} onPointerUp={cancelHold} onPointerCancel={cancelHold} onPointerLeave={cancelHold}
-      onContextMenu={event => { event.preventDefault(); if (held.current) return; cancelHold(); held.current = true; onTogglePin(n); setStatus(pinned.includes(n) ? t("ui.7c631348f5",{p0:(meta.surahs[n - 1]?.fa)}) : t("ui.4fdcf22559",{p0:(meta.surahs[n - 1]?.fa)})) }}
-      onClick={() => { if (held.current) { held.current = false; return } onGo(n, pinned.includes(n)) }} title={pinned.includes(n) ? t("ui.b6c1280f97") : t("ui.9c19bc2926")}>{meta.surahs[n - 1]?.fa}</button>)}
+      {shortcuts.slice(0, expanded ? undefined : count).map(n => <button type="button" key={n} className="chip" data-pinned={pinned.includes(n) || undefined} {...pinPress(() => onGo(n, pinned.includes(n)), () => {
+        onTogglePin(n)
+        setStatus(t(pinned.includes(n) ? 'ui.7c631348f5' : 'ui.4fdcf22559', { p0: meta.surahs[n - 1]?.fa }))
+      })} title={pinned.includes(n) ? t("ui.b6c1280f97") : t("ui.9c19bc2926")}>{meta.surahs[n - 1]?.fa}</button>)}
       {shortcuts.length > count && <button type="button" aria-label={expanded ? t("ui.d2c95cb2a1") : t("ui.41bef233fe")} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{expanded ? t("ui.a023ed0970") : '…'}</button>}
     </div>
     <span className="sr-only" role="status">{status}</span>

@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Minst ett",
   "searchP3.relationShort.phrase": "Fras",
   "searchP3.matchWithin": "Matcha alla ord inom",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Kräv exakt stavning",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",
