@@ -274,3 +274,37 @@ test('word order across a surah retains only verses participating in an ordered 
   expect(local('قال كتب', { phase3: { ...phase3, orderedWords: true, cooccurrence: 'surah' } }).map(r => [r.s,r.a]))
     .toEqual([[1,2], [1,3]])
 })
+
+test('partial highlights in a verse with a whole-word hit do not seed unrelated roots', () => {
+  const hits = search('لکم دینکم', { includeRoots: true, includePartial: true, phase3 })
+  expect(hits.some(hit => hit.s === 109 && hit.a === 6)).toBe(true)
+  for (const [s, a] of [[9, 33], [48, 28], [61, 9]]) {
+    expect(hits.some(hit => hit.s === s && hit.a === a)).toBe(false)
+  }
+})
+
+test('rootless whole words remain required and extended lexical forms keep their lemma', () => {
+  const local = createSearchSession({
+    verses: [
+      [1, 1, ['بِكُمْ', 'قَوْلُكُمْ']],
+      [1, 2, ['يُسَبِّبُكُمْ', 'قَوْل']],
+      [1, 3, ['بِكُمْ', 'يَقُولُ']],
+      [1, 4, ['بِكُمْ', 'قَوْل', 'يَقُولُ']],
+    ],
+    morphology: {
+      '1:1': [[null, null, null], ['قول', 'قَوْل', null]],
+      '1:2': [['سبب', 'سَبَّبَ', null], ['قول', 'قَوْل', null]],
+      '1:3': [[null, null, null], ['قول', 'قَالَ', null]],
+      '1:4': [[null, null, null], ['قول', 'قَوْل', null], ['قول', 'قَالَ', null]],
+    },
+  })
+  const options = { phase3, includeRoots: true, includePartial: true }
+  expect(local('بكم قولكم', options).map(hit => [hit.a, hit.positions])).toEqual([[1, [1, 2]], [4, [1, 2]]])
+  expect(local('قول', options).some(hit => hit.a === 3)).toBe(true)
+
+  const hits = search('لکم دینکم', options)
+  expect(hits.find(hit => hit.s === 109 && hit.a === 6)?.positions).toEqual([1, 2, 4])
+  expect(hits.some(hit => hit.s === 14 && hit.a === 21)).toBe(false)
+  expect(hits.some(hit => hit.s === 4 && hit.a === 11)).toBe(false)
+  expect(hits.every(hit => hit.positions.some(pos => /ل[َّ]*َ|لَ/u.test(hit.words[pos - 1])))).toBe(true)
+})

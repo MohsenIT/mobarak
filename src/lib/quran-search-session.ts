@@ -171,17 +171,33 @@ export function createSearchSession(corpus: SearchCorpus) {
         if (hollowFormX.has(candidate)) roots.add(candidate)
       }
     }
-    const seeds = roots.size ? [] : exact.length ? exact : literal.filter(r => r.score === literal[0]?.score)
+    // Exact verse rankings also include highlighted substrings. Establish the
+    // whole-word positions separately before using them as lexical evidence.
+    const whole = literal.some(result => result.kind === 'exact')
+      ? (options.includePartial === false ? literal : matcher(query, 0, { includePartial: false }))
+        .filter(result => result.kind === 'exact')
+      : []
+    const seeds = roots.size ? [] : whole.length ? whole : exact.length ? exact : literal.filter(r => r.score === literal[0]?.score)
+    const lemmas = new Set<string>()
     for (const result of seeds) {
       for (const pos of result.positions) {
-        const root = corpus.morphology[`${result.s}:${result.a}`]?.[pos - 1]?.[0]
-        if (root && result.parts[pos] & 2) roots.add(root)
+        if (!(result.parts[pos] & 2)) continue
+        const [root, lemma] = corpus.morphology[`${result.s}:${result.a}`]?.[pos - 1] ?? []
+        if (root) roots.add(root)
+        if (root && lemma) lemmas.add(lemma)
       }
     }
-    const merged = new Map(literal.filter(r => within(r.s)).map(r => [`${r.s}:${r.a}`, r]))
+    // When a written form extends a single attested lemma, keep its lexical
+    // base. A shared root alone does not distinguish homographs such as دِين and دَيْن.
+    const lemma = whole.length && roots.size === 1 && lemmas.size === 1 ? lemmas.values().next().value : undefined
+    const base = lemma ? normalizeQuranSearch(lemmaDisplay(lemma), false, sensitive) : ''
+    const requiredLemma = base && key.length > base.length && key.startsWith(base) ? lemma : undefined
+    const literalHits = whole.length && !directRoot ? whole : literal
+    const merged = new Map(literalHits.filter(r => within(r.s)).map(r => [`${r.s}:${r.a}`, r]))
     for (const [s, a, words] of corpus.verses) {
       if (!within(s)) continue
-      const positions = (corpus.morphology[`${s}:${a}`] ?? []).flatMap(([r], i) => r && roots.has(r) ? [i + 1] : [])
+      const positions = (corpus.morphology[`${s}:${a}`] ?? []).flatMap(([r, l], i) =>
+        r && roots.has(r) && (!requiredLemma || l === requiredLemma) ? [i + 1] : [])
       if (!positions.length) continue
       const key = `${s}:${a}`
       const previous = merged.get(key)
