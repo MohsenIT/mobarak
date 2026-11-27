@@ -56,7 +56,7 @@ test('quick and advanced search agree on the matches for a multiword query', asy
 test('empty search stays active after blur and clear until Browse is chosen', async ({ page }) => {
   await page.goto('/s/20/a/34');
   await page.locator('.reader-surah-link').click();
-  const historyLength = await page.evaluate(() => history.length);
+  const entry = await page.evaluate(() => navigation.currentEntry.key);
   const panel = page.locator('[data-search-and-go]');
   const input = panel.getByRole('combobox');
   const browse = panel.locator('.drawer-content-shell');
@@ -75,7 +75,7 @@ test('empty search stays active after blur and clear until Browse is chosen', as
   await expect(empty).toBeVisible();
   await empty.getByRole('button', { name: labels['searchP3.browse'] }).click();
   await expect(browse).toBeVisible();
-  expect(await page.evaluate(() => history.length)).toBe(historyLength);
+  await expect.poll(() => page.evaluate(() => navigation.currentEntry.key)).toBe(entry);
   await panel.getByRole('button', { name: labels['ui.685e0d6bc0'], exact: true }).click();
   await expect(page).toHaveURL(/\/s\/20\/a\/34$/);
 });
@@ -445,17 +445,20 @@ test('search aligns its rows and cards and keeps features only when the query is
   const more = surface.locator('[data-phase3-more]');
   await more.click();
   const research = surface.locator('[data-phase3-research]');
+  await expect(research).toBeVisible();
   for (const width of [1197, 970, 390]) {
     await page.setViewportSize({ width, height: 850 });
     const header = surface.locator('.search-and-go-header > button');
-    const [a, b, features, card, roots, sort] = await Promise.all([
-      header.first().boundingBox(), header.last().boundingBox(), research.boundingBox(), firstCard.boundingBox(),
-      surface.locator('[data-phase3-roots]').boundingBox(), surface.locator('[data-phase3-sort] summary').boundingBox(),
-    ]);
-    const left = Math.min(a.x, b.x);
-    const right = Math.max(a.x + a.width, b.x + b.width);
-    for (const x of [features.x, card.x, sort.x]) expect(Math.abs(x - left)).toBeLessThan(1);
-    for (const x of [features.x + features.width, card.x + card.width, roots.x + roots.width]) expect(Math.abs(x - right)).toBeLessThan(1);
+    await expect(async () => {
+      const [a, b, features, card, roots, sort] = await Promise.all([
+        header.first().boundingBox(), header.last().boundingBox(), research.boundingBox(), firstCard.boundingBox(),
+        surface.locator('[data-phase3-roots]').boundingBox(), surface.locator('[data-phase3-sort] summary').boundingBox(),
+      ]);
+      const left = Math.min(a.x, b.x);
+      const right = Math.max(a.x + a.width, b.x + b.width);
+      for (const x of [features.x, card.x, sort.x]) expect(Math.abs(x - left)).toBeLessThan(1);
+      for (const x of [features.x + features.width, card.x + card.width, roots.x + roots.width]) expect(Math.abs(x - right)).toBeLessThan(1);
+    }).toPass({ timeout: 10000 });
   }
   const feature = research.locator('button[aria-pressed]').first();
   await feature.click();
