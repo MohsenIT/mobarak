@@ -191,6 +191,11 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
     setQuickOrigin(origin)
   }, [])
   const returnFromQuick = useCallback(() => window.history.back(), [])
+  const dismissQuickReturn = useCallback(() => {
+    window.history.replaceState({ ...window.history.state, quickJourney: null }, '', window.location.href)
+    capturedQuick.current = null
+    setQuickOrigin(null)
+  }, [])
   const writeReadingVerse = useCallback((address: VerseAddress, quick = false) => {
     if (quick) beginQuickVisit()
     writeVerseAddress(address, quick)
@@ -410,5 +415,5 @@ export function useReadingRoute(handlers: ReadingRouteHandlers, reader: React.Re
   }, [page, mode, surah])
   useEffect(() => { writeStored('mushaf.surah', surah) }, [surah])
 
-  return { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, quickOrigin, captureQuickOrigin, prepareQuickVisit, writeReadingVerse, writePageDestination, returnFromQuick, rememberReadingPosition, lastSurahPosition, openSearchAndGo, openSearchAndGoWithState, updateSearchAndGoState, closeSearchAndGo, prepareSearchAndGoDestination, prepareSearchAndGoResult, returnToSearchAndGoResult, dismissSearchAndGoResult }
+  return { page, setPage, mode, setMode, surah, setSurah, requestMushafPage, mushafNavigationRevision, writeSearchState, leaveSearch, quickOrigin, captureQuickOrigin, prepareQuickVisit, writeReadingVerse, writePageDestination, returnFromQuick, dismissQuickReturn, rememberReadingPosition, lastSurahPosition, openSearchAndGo, openSearchAndGoWithState, updateSearchAndGoState, closeSearchAndGo, prepareSearchAndGoDestination, prepareSearchAndGoResult, returnToSearchAndGoResult, dismissSearchAndGoResult }
 }

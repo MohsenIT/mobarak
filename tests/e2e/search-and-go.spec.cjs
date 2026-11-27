@@ -90,6 +90,7 @@ test('the placeholder adds only whole examples that fit as the field resizes', a
   await openReader(page);
   const dialog = await openSearchAndGo(page);
   const field = dialog.getByRole('combobox');
+  if (phase3) await field.focus();
   await page.evaluate(() => document.fonts.ready.then(() => true));
   const fits = () => field.evaluate(input => {
     const style = getComputedStyle(input);
@@ -97,7 +98,7 @@ test('the placeholder adds only whole examples that fit as the field resizes', a
     const shown = Array.from(ruler?.children ?? []).find(sample => sample.textContent === input.placeholder);
     return !!shown && shown.getBoundingClientRect().width <= input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
   });
-  await expect(field).toHaveAttribute('placeholder', /جستجوی پیشرفته.*…$/);
+  await expect(field).toHaveAttribute('placeholder', /^(جستجوی پیشرفته.*|یافتن)…$/);
   await expect.poll(fits).toBe(true);
   const narrow = await field.getAttribute('placeholder');
 
@@ -252,14 +253,14 @@ test('the return chip reuses the same search entry and closing restores the read
   await expect(page).toHaveURL(/\/s\/\d+\/a\/\d+/);
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('mushaf.search-and-go-history.v1'))[0].operation.type)).toBe('text');
   const length = await page.evaluate(() => history.length);
-  await page.getByRole('button', { name: 'بازگشت به نتایج جست‌وجو' }).click();
+  await page.locator('[data-advanced-search-return]').click();
   await expect(dialog).toBeVisible();
   expect(await page.evaluate(() => history.length)).toBe(length);
   await expect(field).toHaveValue('الحمد لله');
   await expect(results.first()).toBeVisible({ timeout: 20000 });
   await dialog.getByRole('button', { name: 'بازگشت به قرآن' }).click();
   await expect(page).toHaveURL(/\/s\/20\/a\/34$/);
-  await expect(page.getByRole('button', { name: 'بازگشت به نتایج جست‌وجو' })).toHaveCount(0);
+  await expect(page.locator('[data-advanced-search-return]')).toHaveCount(0);
 });
 
 test('a result on the current mushaf page stays in mushaf on Forward and reload', async ({ page }) => {

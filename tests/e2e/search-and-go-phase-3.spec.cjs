@@ -88,21 +88,21 @@ test('live history saves viewed searches on clear and browser Back, and Enter co
   const input = panel.getByRole('combobox');
   const chips = panel.locator('.search-and-go-history .chip');
   const results = panel.locator('[data-search-address]');
-  await input.fill('فتح و نص');
+  await input.fill('نصر و فت');
   await expect(results.first()).toBeVisible();
   await input.fill('');
-  await expect(chips).toHaveText(['فتح و نص']);
-  await input.fill('فتح و نصر');
+  await expect(chips).toHaveText(['نصر و فت']);
+  await input.fill('نصر و فتح');
   await expect(results.first()).toBeVisible();
   await page.goBack();
   await expect(panel).toHaveCount(0);
   await trigger.click();
   await input.click();
-  await expect(chips).toHaveText(['فتح و نصر']);
-  await input.fill('فتح');
+  await expect(chips).toHaveText(['نصر و فتح']);
+  await input.fill('نصر');
   await expect(results.first()).toBeVisible();
   await input.fill('');
-  await expect(chips).toHaveText(['فتح و نصر']);
+  await expect(chips).toHaveText(['نصر و فتح']);
   await input.fill('الرسالةز');
   await input.press('Enter');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('mushaf.search-and-go-history.v1')));
@@ -349,7 +349,7 @@ test('return restores the original current-surah scope and same-root setting aft
   await input.press('Enter');
   await expect(page).toHaveURL(/\/s\/2\/a\/255$/);
 
-  await page.getByRole('button', { name: 'بازگشت به نتایج جست‌وجو', exact: true }).click();
+  await page.locator('[data-advanced-search-return]').click();
   await expect(input).toHaveValue('علم');
   const params = new URL(page.url()).searchParams;
   expect(params.get('at')).toBe('20');
@@ -544,4 +544,75 @@ test('opening an ayah highlights the matched stems until search is dismissed', a
   await expect(verse.locator('[data-word-part="prefix"][data-highlight-state]')).toHaveCount(0);
   await page.getByRole('button', { name: labels['ui.4d21d96f48'], exact: true }).click();
   await expect(verse.locator('[data-highlight-state="match"]')).toHaveCount(0);
+});
+
+test('reader return bands share the Quran margins and preserve the full advanced query', async ({ page }) => {
+  await page.setViewportSize({ width: 686, height: 789 });
+  const query = 'قال ...{0,10} موسى';
+  await page.goto('/q?q=' + encodeURIComponent(query));
+  const panel = page.locator('[data-search-and-go]');
+  await panel.locator('[data-search-address="7:104"] button').click({ timeout: 25000 });
+  const advanced = page.locator('[data-advanced-search-return]');
+  await expect(advanced).toHaveText('بازگشت به جستجوی «قال ...{۰,۱۰}…»');
+  await expect(advanced).toHaveAttribute('title', query);
+
+  await page.locator('.reader-quick-search-trigger').click();
+  const quick = page.locator('.quick-surah-search');
+  const input = quick.getByRole('searchbox');
+  await input.fill('آیه ۱۰');
+  const destination = quick.locator('.quick-destination-chips .chip').first();
+  await expect(destination).toHaveText('آیهٔ ۱۰ سورهٔ اعراف');
+  const toolbar = await quick.boundingBox();
+  expect((await advanced.boundingBox()).y).toBeGreaterThanOrEqual(toolbar.y + toolbar.height);
+  await input.press('Enter');
+  const back = page.locator('[data-quick-search-return]');
+  await expect(back).toBeVisible();
+  await expect(page).toHaveURL(/\/s\/7\/a\/10$/);
+  for (const width of [686, 1280]) {
+    await page.setViewportSize({ width, height: 789 });
+    const text = page.locator('.surah-pull-content [data-quran-copy-surface]').first();
+    await expect(text).toBeVisible();
+    const quran = await text.boundingBox();
+    const reference = await back.boundingBox();
+    expect(Math.abs(reference.x + reference.width - quran.x - quran.width)).toBeLessThan(2);
+    const button = await advanced.boundingBox();
+    expect(Math.abs(button.x + button.width - reference.x - reference.width)).toBeLessThan(2);
+    const closers = page.locator('.reader-search-dismiss');
+    await expect(closers).toHaveCount(2);
+    for (const close of await closers.all()) {
+      expect(Math.abs((await close.boundingBox()).x - quran.x)).toBeLessThan(2);
+      await expect(close).toHaveCSS('border-top-width', '0px');
+    }
+  }
+  await advanced.click();
+  await expect(panel.getByRole('combobox')).toHaveValue(query);
+});
+
+
+test('navigation starts in a side panel and expands the same search field on focus', async ({ page }) => {
+  await page.setViewportSize({ width: 970, height: 789 });
+  await page.goto('/s/10/a/7');
+  const toolbar = page.locator('.reader-toolbar');
+  await expect(toolbar.locator('.reader-quick-search-trigger')).toHaveAttribute('title', 'جستجوی سریع');
+  const trigger = toolbar.locator('.reader-surah-link');
+  await expect(trigger).toHaveAttribute('title', 'جستجوی پیشرفته و پیمایش');
+  await trigger.click();
+  const panel = page.locator('[data-search-and-go]');
+  const field = panel.getByRole('combobox');
+  await expect(panel).toHaveAttribute('data-search-browse-panel', 'true');
+  await expect.poll(async () => (await panel.boundingBox()).width).toBeLessThan(500);
+  await expect(panel.locator('[data-surah-row]')).toHaveCount(114);
+  const input = await field.elementHandle();
+  await field.click();
+  await expect(panel).not.toHaveAttribute('data-search-browse-panel');
+  await expect.poll(async () => (await panel.boundingBox()).width).toBeGreaterThan(960);
+  expect(await input.evaluate(element => element === document.activeElement)).toBe(true);
+  await panel.getByRole('button', { name: 'راهنمای جستجو' }).click();
+  const guide = panel.locator('.search-and-go-help');
+  await expect(guide.locator('h2')).toHaveText(['پیمایش', 'جستجوی پیشرفته', 'جست‌وجوی حرفه‌ای']);
+  await expect(guide.getByRole('button', { name: 'صفحه ۴۲' })).toBeVisible();
+  await expect(guide.getByRole('button', { name: 'اسما الحسنی' })).toBeHidden();
+  await guide.locator('summary').getByText('جستجوی پیشرفته', { exact: true }).click();
+  await expect(guide.getByRole('button', { name: 'اسما الحسنی' })).toBeVisible();
+  await expect(guide.getByRole('button', { name: 'قال ...{2,5} موسى' })).toBeHidden();
 });

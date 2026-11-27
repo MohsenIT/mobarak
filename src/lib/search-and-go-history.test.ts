@@ -103,3 +103,11 @@ test('a recent typo at the end of a phrase groups without collapsing quoted or o
   history = rememberOperation(history, searchOperation('فتح'), 400_000, 'live')
   expect(history.map(entry => entry.operation)).toEqual([searchOperation('فتح'), quoted, corrected])
 })
+
+
+test('Boolean, distance, and explicit marks remain distinct in history', () => {
+  const queries = ['صبر نصر', 'صبر | نصر', 'صبر ...{0,2} نصر', 'صبر ...{0,3} نصر', 'ذِكر', 'ذَكر']
+  const entries = queries.reduce<ReturnType<typeof rememberOperation>>((history, query, i) =>
+    rememberOperation(history, searchOperation(query), i * 1000, 'live'), [])
+  expect(entries.map(entry => entry.operation)).toEqual(queries.reverse().map(query => searchOperation(query)))
+})

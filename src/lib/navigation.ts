@@ -125,13 +125,22 @@ export function stepDestinationIndex(current: number, count: number, direction: 
 }
 
 /** Infer the destination after typing; show explicit choices for ambiguous numbers. */
-export function destinationSuggestions(meta: Meta, input: string, currentSurah: number): DestinationSuggestion[] {
+export function destinationSuggestions(meta: Meta, input: string, currentSurah: number, { compact = false } = {}): DestinationSuggestion[] {
+  const label = (destination: Destination) => {
+    if (compact && (destination.kind === 'verse' || destination.kind === 'context')) {
+      const surah = meta.surahs[destination.s - 1].fa
+      return destination.kind === 'verse'
+        ? t('quickSearch.destinationVerse', { p0: destination.a, p1: surah })
+        : t('quickSearch.destinationContext', { p0: destination.index, p1: surah })
+    }
+    return destinationLabel(meta, destination)
+  }
   const value = input.trim()
   if (!value) return []
   const command=jumpCommand(value)
   if(!command){
     const named=namedAyah(meta,value)
-    if(named)return [{destination:named,label:destinationLabel(meta,named),exact:true}]
+    if(named)return [{destination:named,label:label(named),exact:true}]
   }
   if (command || /[:：/]/.test(value)) {
     const destination = resolveDestination(meta, /[:：/]/.test(value) ? 'verse' : 'surah', value, currentSurah)
@@ -142,17 +151,22 @@ export function destinationSuggestions(meta: Meta, input: string, currentSurah: 
     const exact = surahPart === null || Number.isInteger(indexNumber(surahPart, 114))
       || ((destination.kind === 'surah' || destination.kind === 'verse' || destination.kind === 'context')
         && surahScore(meta.surahs[destination.s - 1], surahPart) === 0)
-    return [{ destination, label: juz ? t('ui.6668c797a2', { p0: juz }) : destinationLabel(meta,destination), exact: exact ? true : undefined }]
+    return [{ destination, label: juz ? t('ui.6668c797a2', { p0: juz }) : label(destination), exact: exact ? true : undefined }]
   }
   if (/^\d+$/.test(normalizeSearch(value))) {
-    return (['surah', 'verse', 'page', 'juz', 'context'] as const).flatMap(kind => {
+    const number = normalizeSearch(value)
+    const kinds: JumpKind[] = compact ? ['surah', 'verse', 'context', 'page', 'juz'] : ['surah', 'verse', 'page', 'juz', 'context']
+    return kinds.flatMap(kind => {
       const destination = resolveDestination(meta, kind, value, currentSurah)
-      return destination ? [{ destination, label: kind === 'juz' ? t('ui.6668c797a2',{p0:(normalizeSearch(value))}) : destinationLabel(meta,destination) }] : []
+      if (!destination) return []
+      const name = kind === 'juz' ? t('ui.6668c797a2', { p0: number })
+        : compact && kind === 'surah' ? t('ui.0eb0a3f03f', { p0: number }) : label(destination)
+      return [{ destination, label: name }]
     })
   }
   return searchSurahs(meta, value).slice(0, 6).map(s => {
     const alias = SURAH_ALIASES[s.n]?.find(alias => nameKey(alias) === nameKey(value))
-    return { destination: { kind: 'surah' as const, s: s.n }, label: alias ? t('ui.3ebf05ab85',{p0:(s.fa),p1:(alias)}) : t('ui.0eb0a3f03f',{p0:(s.fa)}) }
+    return { destination: { kind: 'surah' as const, s: s.n }, ...(compact && surahScore(s, value) === 0 ? { exact: true as const } : {}), label: alias ? t('ui.3ebf05ab85',{p0:(s.fa),p1:(alias)}) : t('ui.0eb0a3f03f',{p0:(s.fa)}) }
   })
 }
 

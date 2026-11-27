@@ -51,3 +51,31 @@ test('a downloaded reader can open and follow its first text search offline', as
   await expect(page).toHaveURL(/\/s\/7\/a\/180(?:\/w\/\d+)?$/);
   await expect(page.locator('[data-reading-scroll] [data-surah="7"][data-ayah="180"][data-pos]').first()).toBeAttached();
 });
+
+
+test('the downloaded professional engine evaluates a wildcard with an ordered gap offline', async ({ page, context, browserName }) => {
+  test.skip(!phase3 || browserName !== 'chromium', 'Chromium download and cold reload scenario for Phase 3.');
+  test.setTimeout(120_000);
+  await page.addInitScript(() => localStorage.setItem('mubarak.ui-language.v1', 'fa'));
+  await page.goto('/s/20/a/34');
+  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
+  await page.evaluate(() => new Promise((resolve, reject) => {
+    const channel = new MessageChannel();
+    channel.port1.onmessage = ({ data }) => {
+      if (data.error) reject(new Error(data.error));
+      if (data.complete) resolve();
+    };
+    navigator.serviceWorker.controller.postMessage({ type: 'DOWNLOAD_PACKS', groups: ['core'] }, [channel.port2]);
+  }));
+  await expect.poll(() => page.evaluate(async () => !!(await caches.match('/__last-successful-document')))).toBe(true);
+  await context.setOffline(true);
+  expect((await page.reload()).fromServiceWorker()).toBe(true);
+  await page.locator('.reader-surah-link').click();
+  const panel = page.locator('[data-search-and-go]');
+  await panel.getByRole('combobox').fill('قا? ...{2,5} موسى');
+  const result = panel.locator('[data-search-address="7:127"]');
+  await expect(result).toBeVisible({ timeout: 30_000 });
+  await expect(result.locator('[data-search-match]')).toHaveCount(2);
+  await result.getByRole('button').click();
+  await expect(page).toHaveURL(/\/s\/7\/a\/127/);
+});

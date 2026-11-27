@@ -1,3 +1,4 @@
+import { hasExplicitSearchSyntax } from './professional-query'
 import { resolveDestination, type Destination } from './navigation'
 import type { Meta } from './quran'
 import { normalizeQuranSearch, typoDistance } from './quran-search'
@@ -94,11 +95,11 @@ export function readOperationHistory(meta: Meta, stored: unknown, includeCriteri
 
 function textIdentity(link: string) {
   const params = new URLSearchParams(link.slice(3))
-  // Keep quoted clauses distinct because they change the search semantics.
-  const query = (params.get('q') ?? '').split(/["“”«»]/)
-    .map(part => normalizeQuranSearch(part, false, params.get('sp') === '1')).join('"')
+  const raw = params.get('q') ?? ''
+  const professional = hasExplicitSearchSyntax(raw)
+  const query = professional ? raw.trim() : normalizeQuranSearch(raw, false, params.get('sp') === '1')
   params.delete('q')
-  return { query, filters: params.toString() }
+  return { query, professional, filters: params.toString() }
 }
 
 function isContinuation(a: string, b: string) {
@@ -122,7 +123,7 @@ export function rememberOperation(entries: SearchOperationEntry[], operation: Se
       if (identity.filters !== candidate.filters) continue
       if (identity.query !== candidate.query && (
         time - entry.time > CONTINUATION_WINDOW || (source === 'confirmed' && !entry.source) ||
-        !isContinuation(identity.query, candidate.query)
+        identity.professional || candidate.professional || !isContinuation(identity.query, candidate.query)
       )) continue
       previous = entry
       previousQuery = candidate.query

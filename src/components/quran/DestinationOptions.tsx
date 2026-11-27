@@ -13,6 +13,7 @@ export function useDestinationSelection(options: readonly DestinationSuggestion[
   const completion = active >= options.length ? active - options.length : -1
   return {
     id, active, completionId, completion, destination: options[active]?.destination,
+    chosenDestination: selected === undefined ? undefined : options[selected]?.destination,
     reset: () => setSelected(undefined),
     move(event: KeyboardEvent<HTMLInputElement>) {
       if (!count || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return false
