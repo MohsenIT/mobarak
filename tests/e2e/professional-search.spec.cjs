@@ -16,6 +16,7 @@ test('professional help examples insert and preserve raw syntax', async ({ page 
   await page.goto('/q?q=صبر');
   const panel = page.locator('[data-search-and-go]');
   await panel.getByRole('button', { name: 'راهنمای جستجو' }).click();
+  await panel.locator('summary').getByText('جست‌وجوی حرفه‌ای', { exact: true }).click();
   const guide = panel.getByRole('region', { name: 'جست‌وجوی حرفه‌ای' });
   await expect(guide).toBeVisible();
   const query = 'قال ...{2,5} موسى';

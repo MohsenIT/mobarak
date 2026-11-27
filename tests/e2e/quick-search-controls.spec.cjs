@@ -53,6 +53,7 @@ test('quick navigation shows the same destinations as advanced search and Enter 
  await open();
  const field = page.getByRole('searchbox');
  const choices = page.locator('.quick-jump-options');
+ await page.getByRole('button', { name: 'ریشه', exact: true }).click();
  await field.fill('۱۰');
  await expect(choices.getByRole('option')).toHaveText([
   'سورهٔ ۱۰', 'آیهٔ ۱۰ سورهٔ اعراف', 'سیاق ۱۰ سورهٔ اعراف', 'صفحهٔ ۱۰', 'جزء ۱۰',
@@ -72,4 +73,32 @@ test('quick navigation shows the same destinations as advanced search and Enter 
  await expect(page.locator('[data-quick-search-return]')).toBeVisible();
  await page.locator('[data-quick-search-return]').click();
  await expect(page).toHaveURL(/\/s\/101\/a\/4$/);
+});
+
+test('Enter steps through text hits and only follows a full surah name when there are no hits', async ({ page }) => {
+ await page.addInitScript(() => localStorage.setItem('mubarak.ui-language.v1', 'fa'));
+ await page.route('**/api/version', r => r.fulfill({ json: { version: 'fixture', releases: [] } }));
+ await page.goto('/s/10/a/7');
+ await page.locator('.reader-quick-search-trigger').click();
+ const field = page.getByRole('searchbox');
+ const picker = page.locator('.quick-search-status .analysis-position-button');
+ await field.fill('یو');
+ await expect(picker).toContainText('۱ از ۲۱', { timeout: 20000 });
+ await field.press('Enter');
+ await expect(picker).toContainText('۲ از ۲۱');
+ await expect(field).toHaveValue('یو');
+ await page.locator('[data-quick-search-dismiss]').click();
+ await expect(page.locator('[data-quick-search-return]')).toHaveCount(0);
+ await expect(field).toHaveValue('یو');
+
+ await page.goto('/s/18/a/1');
+ await page.locator('.reader-quick-search-trigger').click();
+ await field.fill('یو');
+ await expect(page.locator('.quick-jump-options')).toBeVisible();
+ await field.press('Enter');
+ await expect(field).toHaveValue('یو');
+ await expect(page).toHaveURL(/\/s\/18(?:\/|$)/);
+ await field.fill('یونس');
+ await field.press('Enter');
+ await expect(page).toHaveURL(/\/s\/10\/a\/1$/);
 });

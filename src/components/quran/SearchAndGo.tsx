@@ -1,11 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Search } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronDown, CircleHelp, MousePointer2, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
 import { parseProfessionalQuery } from '@/lib/professional-query'
-import { destinationLabel, destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, NAVIGATION_HELP, resolveDestination, type Destination } from '@/lib/navigation'
+import { destinationLabel, destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, resolveDestination, type Destination } from '@/lib/navigation'
 import { SEARCH_AND_GO_PHASE_2, SEARCH_AND_GO_PHASE_3, readSearchLink, type SearchLinkState, type SearchResultSnapshot } from '@/lib/search-link'
 import { textSearchOperation, type SearchHistorySource, type SearchOperation, type SearchOperationEntry } from '@/lib/search-and-go-history'
 import { normalizeQuranSearch } from '@/lib/quran-search'
@@ -20,6 +20,20 @@ import { searchPopupName } from './search-popup'
 import { usePinPress } from './usePinPress'
 
 const searchExamples = ['س 20', 'اسما الحسنی', 'طه 40', 'صبر', 'صفحه 42', 'جزء 30', 'لا تخف', 'سیاق طه:3']
+
+const navigationExamples = [
+  ['ui.a37a87553b', 'سوره ۲۰', 'قارعه'],
+  ['ui.b1b168c791', 'طه ۴۰', 'آیه ۱۰'],
+  ['ui.0572e8936c', 'صفحه ۴۲'],
+  ['ui.f74f9b04c7', 'جزء ۳۰'],
+  ['ui.16836d5471', 'سیاق طه:۳'],
+] as const
+
+const advancedExamples = [
+  ['searchP3.relation.all', 'صبر نصر'],
+  ['searchP3.relation.phrase', 'لا تخف'],
+  ['searchAndGo.guide.find', 'اسما الحسنی'],
+] as const
 
 const professionalExamples = [
   ['all', 'صبر نصر'], ['any', 'صبر | نصر'], ['not', 'صبر -نصر'],
@@ -172,6 +186,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   }
   const empty = !value && !occurrence
   const browse = empty && (!SEARCH_AND_GO_PHASE_3 || !searchActive)
+  const compact = SEARCH_AND_GO_PHASE_3 && browse
   const examples = SEARCH_AND_GO_PHASE_3 && empty && !browse && !history?.length ? [
     resolveDestination(meta, 'surah', '20', currentSurah),
     resolveDestination(meta, 'verse', '40', 20),
@@ -191,7 +206,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   }, [rtl, searchLabel])
 
   return <Dialog open onOpenChange={open => { if (!open) onClose() }}>
-    <DialogContent ref={setSurface} fullscreen showCloseButton={false} className="search-and-go" data-search-and-go data-search-workspace={SEARCH_AND_GO_PHASE_3 || undefined} data-search-and-go-phase-2={SEARCH_AND_GO_PHASE_2 || undefined} data-search-page={SEARCH_AND_GO_PHASE_2 && !!start?.state || undefined} dir={uiDirection()}
+    <DialogContent ref={setSurface} fullscreen showOverlay={compact} showCloseButton={false} data-search-browse-panel={compact || undefined} className="search-and-go" data-search-and-go data-search-workspace={SEARCH_AND_GO_PHASE_3 || undefined} data-search-and-go-phase-2={SEARCH_AND_GO_PHASE_2 || undefined} data-search-page={SEARCH_AND_GO_PHASE_2 && !!start?.state || undefined} dir={uiDirection()}
       aria-describedby={undefined}
       onOpenAutoFocus={event => {
         event.preventDefault()
@@ -269,28 +284,44 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           </div>}
         </header>
         {help && <div className="search-and-go-help nice-scroll">
-          <section aria-labelledby={selection.id + '-professional'} className="search-professional-guide">
-            <h2 id={selection.id + '-professional'}>{t('searchProfessional.title')}</h2>
-            <p>{t('searchProfessional.instructions')}</p>
-            <div className="search-professional-examples">{professionalExamples.map(([label, example]) =>
-              <div key={label}>
+          <section aria-labelledby={selection.id + '-navigation'}>
+            <h2 id={selection.id + '-navigation'}><MousePointer2 size={16} aria-hidden="true" />{t('searchAndGo.guide.navigation')}</h2>
+            <dl className="search-guide-examples">
+              {navigationExamples.map(([label, ...examples]) => <div key={label}>
+                <dt>{t(label)}</dt>
+                <dd>{examples.map(example => <button key={example} type="button" className="chip" onClick={() => complete(example)}><bdi dir="rtl">{example}</bdi></button>)}</dd>
+              </div>)}
+            </dl>
+            <details className="search-guide-more">
+              <summary>{t('ui.14fc761c35')}<ChevronDown size={15} aria-hidden="true" /></summary>
+              <div className="search-guide-chips">{['۱۰', 'آ اول', 'ق آخر'].map(example =>
+                <button key={example} type="button" className="chip" onClick={() => complete(example)}><bdi dir="rtl">{example}</bdi></button>)}</div>
+            </details>
+          </section>
+          <details className="search-guide-section">
+            <summary><h2>{t('searchAndGo.guide.search')}</h2><ChevronDown size={16} aria-hidden="true" /></summary>
+            <dl className="search-guide-examples">
+              {advancedExamples.map(([label, example]) => <div key={label}>
+                <dt>{t(label)}</dt>
+                <dd><button type="button" className="chip" onClick={() => complete(example)}><bdi dir="rtl">{example}</bdi></button></dd>
+              </div>)}
+              {SEARCH_AND_GO_PHASE_3 && <>
+                <div><dt>{t('searchP3.scope')}</dt><dd>{t('searchP3.scope.all')} {rtl ? '۔' : '·'} {t('searchP3.scopeTab.single')} {rtl ? '۔' : '·'} {t('searchP3.scopeTab.many')}</dd></div>
+                <div><dt>{t('searchP3.sort')}</dt><dd>{t('searchP3.sort.mushaf')} {rtl ? '۔' : '·'} {t('searchP3.sort.relevance')}</dd></div>
+                <div><dt>{t('searchAndGo.guide.features')}</dt><dd>{t('ui.eecfc08eb8')} {rtl ? '۔' : '·'} {t('ui.8d5e58ddd8')}</dd></div>
+                <div><dt>{t('searchP3.settings')}</dt><dd>{t('searchP3.orderedWords')} {rtl ? '۔' : '·'} {t('ui.2d6258b160')}</dd></div>
+              </>}
+            </dl>
+          </details>
+          <details className="search-guide-section">
+            <summary id={selection.id + '-professional'}><h2>{t('searchProfessional.title')}</h2><ChevronDown size={16} aria-hidden="true" /></summary>
+            <div role="region" aria-labelledby={selection.id + '-professional'} className="search-professional-examples">
+              {professionalExamples.map(([label, example]) => <div key={label}>
                 <button type="button" className="chip" onClick={() => complete(example)}><bdi dir="rtl">{example}</bdi></button>
                 <span>{t(`searchProfessional.${label}`)}</span>
-              </div>
-            )}</div>
-          </section>
-          {SEARCH_AND_GO_PHASE_3 ? <>
-            <h2>{t('searchAndGo.guide.search')}</h2>
-            <dl>{(['find', 'scope', 'features', 'settings', 'return'] as const).map(topic => <div key={topic}>
-              <dt>{t(`searchAndGo.guide.${topic}`)}</dt>
-              <dd>{t(`searchAndGo.guide.${topic}Description`)}</dd>
-            </div>)}</dl>
-            <h2>{t('searchAndGo.guide.go')}</h2>
-            <p>{t('searchAndGo.guide.goDescription')}</p>
-          </> : null}
-          <dl>{NAVIGATION_HELP.map(([kind, examples]) => <div key={kind}><dt>{t(kind)}</dt><dd>{t(examples)}</dd></div>)}</dl>
-          <p>{t('ui.a8175202e6')}</p>
-          {!SEARCH_AND_GO_PHASE_3 && <p>{placeholder}</p>}
+              </div>)}
+            </div>
+          </details>
           {SEARCH_AND_GO_PHASE_2 && !SEARCH_AND_GO_PHASE_3 && !!history?.some(entry => entry.operation.type === 'text') && onReplay && <div className="drawer-recent-shortcuts">
             {history.map(entry => {
               if (entry.operation.type !== 'text') return null

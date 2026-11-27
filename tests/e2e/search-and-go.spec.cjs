@@ -90,6 +90,7 @@ test('the placeholder adds only whole examples that fit as the field resizes', a
   await openReader(page);
   const dialog = await openSearchAndGo(page);
   const field = dialog.getByRole('combobox');
+  if (phase3) await field.focus();
   await page.evaluate(() => document.fonts.ready.then(() => true));
   const fits = () => field.evaluate(input => {
     const style = getComputedStyle(input);

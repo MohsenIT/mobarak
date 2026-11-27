@@ -1361,12 +1361,14 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .quick-search-advanced svg { width: 18px; height: 18px; }
 .reader-search-band { position: relative; z-index: 10; display: flex; align-items: center; flex-shrink: 0; gap: 6px; min-height: 37px; padding-block: 2px; border-bottom: 1px solid var(--line); background: var(--paper); }
 .reader-advanced-return { justify-content: space-between; }
-.reader-advanced-return:has(+ .reader-toolbar .quick-surah-search) { padding-block-start: max(2px, env(safe-area-inset-top)); }
 .quick-search-return:not(:has(> button, .quick-search-status)) { display: none; }
 .reader-search-band > .chip, .quick-destination-chips > .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; min-width: 0; height: 26px; white-space: nowrap; }
 .reader-search-band .chip span { overflow: hidden; text-overflow: ellipsis; }
-.reader-search-band svg, .reader-search-dismiss { flex-shrink: 0; }
-.quick-search-results-slot { margin-inline-start: auto; }
+.reader-search-band svg { flex-shrink: 0; }
+.reader-search-band .reader-search-dismiss { flex: none; inline-size: 26px; block-size: 26px; min-inline-size: 26px; margin-inline-start: auto; border: 0; border-radius: 0; color: var(--ink-soft); }
+.quick-search-return:has(.quick-search-status) > .reader-search-dismiss { margin-inline-start: 0; }
+.quick-navigation-label { display: inline-flex; align-items: center; gap: 4px; }
+.quick-search-results-slot { min-width: 0; margin-inline-start: auto; }
 .quick-search-results-slot:empty { display: none; }
 .quick-search-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-soft); }
 .quick-search-status button { min-height: 32px; white-space: nowrap; }
@@ -1902,6 +1904,15 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   height: var(--search-and-go-height, 100dvh);
   overflow: hidden;
 }
+.search-and-go[data-search-workspace] { inset-inline-start: 0; inset-inline-end: auto; inline-size: 100%; }
+.search-and-go[data-search-browse-panel] {
+  inline-size: min(440px, calc(100% - 28px));
+  border-inline-end: 1px solid var(--line);
+  box-shadow: 0 0 24px rgb(0 0 0 / .16);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .search-and-go[data-search-workspace] { transition: inline-size 180ms ease-out; }
+}
 .search-and-go-shell, .search-and-go-body {
   display: flex;
   flex-direction: column;
@@ -1944,13 +1955,25 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-and-go-results { flex: 1; overflow: hidden; }
 [data-search-workspace] .search-and-go-results:has(details[name="mobarak-search-popup"][open]) { overflow: visible; }
 .search-and-go-no-destination { padding: 6px 16px; color: var(--ink-soft); }
-.search-and-go-help { padding: 12px 24px; overflow: auto; line-height: 1.9; }
-.search-and-go-help dl > div { padding-block: 8px; border-bottom: 1px solid var(--line); }
-.search-and-go-help dt { font-weight: 700; }
-.search-and-go-help dd, .search-and-go-help p { color: var(--ink-soft); }
-.search-and-go-help p { margin-block-start: 10px; }
-[data-search-workspace] .search-and-go-help { flex: 1; min-height: 0; }
-[data-search-workspace] .search-and-go-help h2 { margin-block: 12px 4px; font-size: 16px; font-weight: 700; }
+.search-and-go-help { flex: 1; min-height: 0; padding: 8px clamp(12px, 2.5vw, 28px) 16px; overflow: auto; }
+.search-and-go-help h2 { display: flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 700; margin: 0; }
+.search-and-go-help section > h2 { margin-block: 6px 8px; }
+.search-guide-section, .search-guide-more { border-block-start: 1px solid var(--line); }
+.search-guide-section > summary, .search-guide-more > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 42px; cursor: pointer; list-style: none;
+}
+.search-guide-section > summary::-webkit-details-marker, .search-guide-more > summary::-webkit-details-marker { display: none; }
+.search-guide-section[open] > summary > svg, .search-guide-more[open] > summary > svg { rotate: 180deg; }
+.search-guide-more > summary { justify-content: start; min-height: 34px; font-size: 12px; }
+.search-guide-examples {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 6px 16px; padding-block-end: 8px;
+}
+.search-guide-examples > div, .search-guide-examples dd, .search-guide-chips {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px;
+}
+.search-guide-examples dt { font-size: 12px; font-weight: 600; }
+.search-guide-examples dd { font-size: 12px; color: var(--ink-soft); }
+.search-guide-chips { padding-block-end: 8px; }
 
 .search-and-go { top: var(--search-and-go-top, 0px); }
 .search-and-go :is(button, [role="slider"]):focus-visible { outline: 2px solid var(--sage); outline-offset: -2px; }

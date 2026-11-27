@@ -562,7 +562,8 @@ test('reader return bands share the Quran margins and preserve the full advanced
   await input.fill('آیه ۱۰');
   const destination = quick.locator('.quick-destination-chips .chip').first();
   await expect(destination).toHaveText('آیهٔ ۱۰ سورهٔ اعراف');
-  expect((await advanced.boundingBox()).y).toBeLessThan((await quick.boundingBox()).y);
+  const toolbar = await quick.boundingBox();
+  expect((await advanced.boundingBox()).y).toBeGreaterThanOrEqual(toolbar.y + toolbar.height);
   await input.press('Enter');
   const back = page.locator('[data-quick-search-return]');
   await expect(back).toBeVisible();
@@ -581,4 +582,33 @@ test('reader return bands share the Quran margins and preserve the full advanced
   }
   await advanced.click();
   await expect(panel.getByRole('combobox')).toHaveValue(query);
+});
+
+
+test('navigation starts in a side panel and expands the same search field on focus', async ({ page }) => {
+  await page.setViewportSize({ width: 970, height: 789 });
+  await page.goto('/s/10/a/7');
+  const toolbar = page.locator('.reader-toolbar');
+  await expect(toolbar.locator('.reader-quick-search-trigger')).toHaveAttribute('title', 'جستجوی سریع');
+  const trigger = toolbar.locator('.reader-surah-link');
+  await expect(trigger).toHaveAttribute('title', 'جستجوی پیشرفته و پیمایش');
+  await trigger.click();
+  const panel = page.locator('[data-search-and-go]');
+  const field = panel.getByRole('combobox');
+  await expect(panel).toHaveAttribute('data-search-browse-panel', 'true');
+  await expect.poll(async () => (await panel.boundingBox()).width).toBeLessThan(500);
+  await expect(panel.locator('[data-surah-row]')).toHaveCount(114);
+  const input = await field.elementHandle();
+  await field.click();
+  await expect(panel).not.toHaveAttribute('data-search-browse-panel');
+  await expect.poll(async () => (await panel.boundingBox()).width).toBeGreaterThan(960);
+  expect(await input.evaluate(element => element === document.activeElement)).toBe(true);
+  await panel.getByRole('button', { name: 'راهنمای جستجو' }).click();
+  const guide = panel.locator('.search-and-go-help');
+  await expect(guide.locator('h2')).toHaveText(['پیمایش', 'جستجوی پیشرفته', 'جست‌وجوی حرفه‌ای']);
+  await expect(guide.getByRole('button', { name: 'صفحه ۴۲' })).toBeVisible();
+  await expect(guide.getByRole('button', { name: 'اسما الحسنی' })).toBeHidden();
+  await guide.locator('summary').getByText('جستجوی پیشرفته', { exact: true }).click();
+  await expect(guide.getByRole('button', { name: 'اسما الحسنی' })).toBeVisible();
+  await expect(guide.getByRole('button', { name: 'قال ...{2,5} موسى' })).toBeHidden();
 });

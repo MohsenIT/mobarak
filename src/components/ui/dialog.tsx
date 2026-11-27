@@ -53,16 +53,18 @@ function DialogContent({
   children,
   showCloseButton = true,
   fullscreen = false,
+  showOverlay = !fullscreen,
   style,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
   fullscreen?: boolean
+  showOverlay?: boolean
 }) {
   const safe=useSafeArea()
   return (
     <DialogPortal data-slot="dialog-portal">
-      {!fullscreen && <DialogOverlay />}
+      {showOverlay && <DialogOverlay />}
       <DialogPrimitive.Content
         data-slot="dialog-content"
         style={fullscreen ? style : {...style,top:`calc(50% + ${(safe.top-safe.bottom)/2}px)`,maxHeight:`calc(100dvh - ${safe.top+safe.bottom+24}px)`,overflowY:'auto'}}

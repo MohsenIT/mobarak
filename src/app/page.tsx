@@ -39,7 +39,7 @@ import SettingsScreen from '@/components/quran/SettingsScreen'
 import SurahIndex from '@/components/quran/SurahIndex'
 import type { AnalysisSelection } from '@/lib/analysis'
 import RangeComparison from '@/components/quran/RangeComparison'
-import { ArrowRight, ChevronDown } from 'lucide-react'
+import { ArrowRight, ChevronDown, X } from 'lucide-react'
 import AudioToolbarButton from '@/components/quran/AudioToolbarButton'
 import ReaderDisplayMenu from '@/components/quran/ReaderDisplayMenu'
 import { AdvancedSearchIcon, QuickSearchIcon } from '@/components/quran/ReaderSearchIcon'
@@ -588,7 +588,7 @@ export default function Home() {
         } else search.setAdvancedOpen(true)
       }}>
         <ArrowRight size={14} aria-hidden="true" /><span>{returnLabel}</span></button>
-      <button type="button" className="chip reader-search-dismiss" aria-label={t("ui.4d21d96f48")} onClick={() => { route.dismissSearchAndGoResult(); search.dismissReturn() }}>×</button>
+      <button type="button" className="icon-btn reader-search-dismiss" aria-label={t("ui.4d21d96f48")} onClick={() => { route.dismissSearchAndGoResult(); search.dismissReturn() }}><X size={17} aria-hidden="true" /></button>
     </div>
   )
 
@@ -602,11 +602,10 @@ export default function Home() {
       <QuranSearch onNavigate={navigateDestination} key={search.start?.revision ?? 0} onStateChange={writeSearchState} initialSearch={search.start} occurrenceFilter={search.occurrence} onClearOccurrenceFilter={search.clearOccurrence} translator={translator} open={search.advancedOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos, state) => pickSearchResult(s, a, pos, state)} />
 
       {/* Desktop has explicit previous/next controls in the reading pane below. */}
-      {search.quickOpen && searchReturnBar}
       <header dir="rtl" className="reader-toolbar relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
         style={{
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
-          backdropFilter: 'blur(8px)', paddingTop: search.quickOpen && searchReturnBar ? '0.5rem' : 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: 'var(--reader-toolbar-spacing)',
+          backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: 'var(--reader-toolbar-spacing)',
         }}>
         {search.quickOpen ? <QuickSurahSearch meta={meta} resultsBar={quickResultsBar} onNavigate={destination => navigateDestination(destination, true)} surah={meta.surahs[curSurahN - 1]} onClose={() => search.setQuickOpen(false)}
           scope={search.quickScope} onScopeChange={search.changeQuickScope}
@@ -615,7 +614,7 @@ export default function Home() {
           onAdvanced={openAdvancedSearch} /> : <>
 
         <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
-        <button className="reader-surah-link" aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={SEARCH_AND_GO ? search.searchAndGoOpen : drawerOpen && drawerView === 'navigation'} onClick={() => {
+        <button className="reader-surah-link" title={t("searchAndGo.tooltip")} aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={SEARCH_AND_GO ? search.searchAndGoOpen : drawerOpen && drawerView === 'navigation'} onClick={() => {
           if (SEARCH_AND_GO) { route.rememberReadingPosition(); route.openSearchAndGo(curSurahN); setDrawerOpen(false); search.showUnified() }
           else { setDrawerView('navigation'); setDrawerOpen(true) }
         }}>
@@ -629,7 +628,7 @@ export default function Home() {
           <ChevronDown size={16} aria-hidden="true" />
         </button>
 
-        <button className="icon-btn reader-quick-search-trigger" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { route.captureQuickOrigin(); setSel(null); search.openQuick() }}><QuickSearchIcon /></button>
+        <button className="icon-btn reader-quick-search-trigger" aria-label={t("ui.cd32ebbeba")} title={t("quickSearch.tooltip")} onClick={() => { route.captureQuickOrigin(); setSel(null); search.openQuick() }}><QuickSearchIcon /></button>
         <span className="reader-toolbar-spacer" aria-hidden="true" />
 
         <AudioToolbarButton
@@ -647,7 +646,7 @@ export default function Home() {
 
         </>}
       </header>
-      {!search.quickOpen && searchReturnBar}
+      {searchReturnBar}
 
       <LanguageOnboarding knownPersianReader={knownPersianReader} onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
       <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} pauseRequest={audioPauseRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => { setAudioOpen(false); setAudioVerse(null) }} onFollow={(s,a) => goVerse(s,a)} />
@@ -659,6 +658,8 @@ export default function Home() {
             <span>{t('quickSearch.returnTo', { p0: meta.surahs[route.quickOrigin.address.s - 1].fa, p1: toFa(route.quickOrigin.address.a) })}</span>
           </button>}
           {search.quickOpen && <div className="quick-search-results-slot" ref={setQuickResultsBar} />}
+          {route.quickOrigin && <button type="button" className="icon-btn reader-search-dismiss" data-quick-search-dismiss
+            aria-label={t("quickSearch.dismissReturn")} onClick={route.dismissQuickReturn}><X size={17} aria-hidden="true" /></button>}
         </div>
       )}
 
