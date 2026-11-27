@@ -952,6 +952,11 @@ input[type='range'].page-slider::-moz-range-thumb {
   to { transform: none; }
 }
 
+/* The root filter field must match the app's standard field height.
+   .dictation-field's default margin-block-end inflates the label here. */
+.surah-index-drawer .dictation-field { margin-block-end: 0; }
+.surah-index-drawer .dictation-input-shell { min-height: 26px; }
+
 .idx-row {
   display: flex;
   align-items: center;

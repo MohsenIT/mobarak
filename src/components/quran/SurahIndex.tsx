@@ -108,7 +108,7 @@ export default function SurahIndex({ surahN, meta, activeRoot, onClose, onPickRo
       <aside className="surah-index-drawer" role="dialog" aria-label={t("ui.cc9c59a2c4")}>
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
           <div>
-            <p className="font-bold text-base" style={{ color: 'var(--ink)' }}>{t("ui.cc9c59a2c4")}{sm?.fa}
+            <p className="font-bold text-base" style={{ color: 'var(--ink)' }}>{t("ui.cc9c59a2c4")}{' — '}{sm?.fa}
             </p>
             <p className="text-xs mt-0.5" style={{ color: 'var(--ink-faint)' }}>
               {toFa(rows.length)}{' '}{t("ui.142ea1f41f")}{' '}{t(SORT_LABELS[sort])}
