@@ -107,15 +107,6 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
     }
   }, [surface])
   const [settingsHost, setSettingsHost] = useState<HTMLDivElement | null>(null)
-  const [researchHost, setResearchHost] = useState<HTMLElement | null>(null)
-  const [wideWorkspace, setWideWorkspace] = useState(false)
-  useEffect(() => {
-    const element = surface
-    if (!SEARCH_AND_GO_PHASE_3 || !element) return
-    const observer = new ResizeObserver(([entry]) => setWideWorkspace(entry.contentRect.width >= 660))
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [surface])
   useEffect(() => {
     if (!surface || !SEARCH_AND_GO_PHASE_3) return
     const dismissOutside = (event: MouseEvent | PointerEvent) => {
@@ -136,7 +127,6 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
       document.removeEventListener('click', dismissOutside, true)
     }
   }, [surface])
-  const useResearchColumn = SEARCH_AND_GO_PHASE_3 && wideWorkspace && !help
   const back = useRef<HTMLButtonElement>(null)
   const trigger = useRef<HTMLElement>(null)
   const value = query.trim()
@@ -287,7 +277,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
             })}
           </div>}
         </div>}
-        <div className="search-and-go-body" data-show-controls={SEARCH_AND_GO_PHASE_2 && !SEARCH_AND_GO_PHASE_3 && help || undefined} data-text-results={SEARCH_AND_GO_PHASE_2 && text || undefined} data-research-column={useResearchColumn || undefined} hidden={help && (SEARCH_AND_GO_PHASE_3 || !SEARCH_AND_GO_PHASE_2)}>
+        <div className="search-and-go-body" data-show-controls={SEARCH_AND_GO_PHASE_2 && !SEARCH_AND_GO_PHASE_3 && help || undefined} data-text-results={SEARCH_AND_GO_PHASE_2 && text || undefined} hidden={help && (SEARCH_AND_GO_PHASE_3 || !SEARCH_AND_GO_PHASE_2)}>
           <div className="search-workspace-main">
           {!help && !empty && (options.length > 0 || completions.length > 0) &&
             <div className={SEARCH_AND_GO_PHASE_3 ? "search-and-go-suggestions nice-scroll" : "contents"}>
@@ -314,7 +304,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 const op = entry.operation
                 const state = op.type === 'text' ? readSearchLink(op.link) : null
                 const label = op.type === 'navigation' ? destinationLabel(meta, op.destination) : state?.query || state?.occurrence?.text
-                const Icon = op.type === 'navigation' ? MousePointer2 : AdvancedSearchIcon
+                const Icon = op.type === 'navigation' ? MousePointer2 : Search
                 return <li key={entry.id}>
                   <button type="button" className="chip" data-pinned={entry.pinned || undefined}
                     title={t(entry.pinned ? 'ui.b6c1280f97' : 'ui.9c19bc2926')}
@@ -343,13 +333,12 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           <QuranSearch inline={{
             query: SEARCH_AND_GO_PHASE_2 ? query : value,
             position,
-            unified: SEARCH_AND_GO_PHASE_2 ? { run: text && !(help && SEARCH_AND_GO_PHASE_3), controls: help && !SEARCH_AND_GO_PHASE_3, input: field, settingsHost, researchHost, selected, onSuggestions: setSuggestions, onDisplayed: onRecordSearch ? stageDisplayedSearch : undefined, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
+            unified: SEARCH_AND_GO_PHASE_2 ? { run: text && !(help && SEARCH_AND_GO_PHASE_3), controls: help && !SEARCH_AND_GO_PHASE_3, input: field, settingsHost, selected, onSuggestions: setSuggestions, onDisplayed: onRecordSearch ? stageDisplayedSearch : undefined, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
           }} open={SEARCH_AND_GO_PHASE_2 || text} onOpenChange={onClose}
             initialSearch={start?.state ? { query: start.query, mode: start.state.mode, surahs: start.state.surahs, revision: 0, state: start.state } : null}
             occurrenceFilter={occurrence} onClearOccurrenceFilter={clearOccurrence} onStateChange={onRecordSearch ? syncSearchState : onSearchStateChange}
             meta={meta} translator={translator} currentSurah={currentSurah} onPick={onPick} />
           </div>
-          {useResearchColumn && <aside className="search-workspace-research" ref={setResearchHost} aria-label={t('searchP3.research')} />}
         </div>
       </div>
     </DialogContent>

@@ -18,6 +18,16 @@ test('named ayah references accept either order, commas, spaces and native digit
  }
 })
 
+test('named surah followed by a context command resolves as a context, not an ayah', () => {
+  const destination = { kind: 'context' as const, s: 20, index: 3, from: 24, to: 48 }
+  for (const input of ['طه سیاق ۳', 'طه سياق٣', 'سورهٔ طه سیاق ۳', 'سیاق طه:۳']) {
+    const options = destinationSuggestions(meta, input, 2)
+    expect(options.map(({ destination, exact }) => [destination, exact])).toEqual([[destination, true]])
+    expect(isExplicitDestinationQuery(input, options)).toBe(true)
+  }
+  expect(destinationSuggestions(meta, 'طه سیاق ۹۹', 2)).toEqual([])
+})
+
 test('surah search accepts Arabic names, diacritics and both digit sets', () => {
   for (const query of ['بقره', 'الْبَقَرَة', '۲', '٢']) expect(searchSurahs(meta, query).some(s => s.n === 2)).toBe(true)
   expect(resolveDestination(meta, 'surah', 'طه', 1)).toEqual({ kind: 'surah', s: 20 })

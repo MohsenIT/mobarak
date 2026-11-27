@@ -79,6 +79,17 @@ test('expanding a literal match counts each new root occurrence once', () => {
 
 const phase3 = { relation: 'all' as const, sorts: ['mushaf' as const], roots: [], lemmas: [], forms: [] }
 
+test('unattested hollow form X verbal nouns expand through attested Quran roots', () => {
+  for (const [noun, root] of [['استجابت', 'جوب'], ['استجابة', 'جوب'], ['استقامت', 'قوم'], ['استعانة', 'عون']]) {
+    expect(search(noun, { phase3 })).toEqual([])
+    const hits = search(noun, { phase3, includeRoots: true, includePartial: false })
+    expect(hits.length).toBeGreaterThan(0)
+    expect(hits.every(hit => hit.positions.every(pos => hit.morphology?.[pos - 1]?.[0] === root))).toBe(true)
+  }
+  expect(search('استجابت', { phase3, includeRoots: true, surahs: [40] }).some(({ s, a }) => s === 40 && a === 60)).toBe(true)
+  expect(search('استجابت', { phase3: { ...phase3, relation: 'phrase' }, includeRoots: true })).toEqual([])
+})
+
 test('a conjunction cannot supply the first letter of a partial or fuzzy word match', () => {
   const options = { phase3, includePartial: true, includeRoots: true }
   for (const includeNear of [false, true]) {
@@ -147,9 +158,9 @@ test('relevance uses frequency, proximity and stable verse ordering', () => {
   })
   expect(local('قال كتب', { phase3 }).map(r => r.a)).toEqual([1, 2, 3, 4])
   expect(local('قال كتب', { phase3: { ...phase3, reverseSort: true } }).map(r => r.a)).toEqual([4, 3, 2, 1])
-  for (const reverseSort of [false, true]) {
-    expect(local('قال كتب', { phase3: { ...phase3, reverseSort, sorts: ['relevance', 'mushaf'] } }).map(r => r.a)).toEqual([3, 2, 4, 1])
-  }
+  const relevance = { ...phase3, sorts: ['relevance', 'mushaf'] as ('relevance' | 'mushaf')[] }
+  expect(local('قال كتب', { phase3: relevance }).map(r => r.a)).toEqual([3, 2, 4, 1])
+  expect(local('قال كتب', { phase3: { ...relevance, reverseSort: true } }).map(r => r.a)).toEqual([1, 2, 4, 3])
 })
 
 test('broader all-word search keeps real verses, uses source context ranges and never crosses surahs', () => {

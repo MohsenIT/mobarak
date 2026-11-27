@@ -52,7 +52,6 @@ interface Props {
       controls: boolean
       input: RefObject<HTMLInputElement | null>
       settingsHost: HTMLDivElement | null
-      researchHost: HTMLElement | null
       selected?: VerseAddress
       onSuggestions: (suggestions: string[]) => void
       onDisplayed?: (state: SearchLinkState) => void
@@ -417,8 +416,8 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const matchingOptions = matchingPreferences.map(({ label, checked, disabled, onChange }) =>
     <label className="choice-row" key={label}><input type="checkbox" checked={checked} disabled={disabled}
       onChange={event => onChange(event.target.checked)} />{label}</label>)
-  const controls = phase3 && <SearchPhase3Controls
-        query={query} researchHost={unified?.researchHost} identity={JSON.stringify([query, surahs, mode, config.relation, config.cooccurrence, config.spellingSensitive, config.orderedWords, includeRoots, includePartial, includeNear])}
+  const controls = phase3 && valid && <SearchPhase3Controls
+        query={query} identity={JSON.stringify([query, surahs, mode, config.relation, config.cooccurrence, config.spellingSensitive, config.orderedWords, includeRoots, includePartial, includeNear])}
         config={config}
         results={answerKey === engineKey && !busy ? rawResults : emptyResults} includeRoots={includeRoots} onRoots={toggleRoots} onConfig={setConfig}
       />
@@ -521,7 +520,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         <span role="status">{copyStatus}</span>
       </section>} />, unified.settingsHost)
     : null
-  if (unified && !unified.run && !unified.controls) return <>{settings}{unified.researchHost && controls}</>
+  if (unified && !unified.run && !unified.controls) return settings
   if (inline) return <>{settings}<div className={unified?.controls ? "search-and-go-settings" : "search-page-shell search-and-go-results"} data-phase3-results={phase3 || undefined}>{content}</div></>
   return createPortal(<main ref={page} className="quran-search-page" data-search-page dir={uiDirection()} aria-label={t("ui.cd32ebbeba")} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onOpenChange(false) } }}>
     <div className="search-page-shell">{content}</div>

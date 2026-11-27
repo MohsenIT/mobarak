@@ -53,6 +53,8 @@ export function jumpCommand(input:string): {kind:JumpKind;value:string}|null {
   const value=commandText(input)
   const combined=value.match(/^(?:سوره|س)\s*(\d+)\s*(آیه|ایه|آ|ا|سیاق|ق)\s*(\d+|اول|آخر|اخر|ا|آ)$/)
   if(combined)return {kind:combined[2]==='ق'||combined[2]==='سیاق'?'context':'verse',value:`${combined[1]}:${combined[3]}`}
+  const namedContext=value.match(/^(?:سوره\s+)?([^:：/]+?)\s+سیاق\s*(\d+|اول|آخر|اخر|ا|آ)$/)
+  if(namedContext)return {kind:'context',value:`${namedContext[1]}:${namedContext[2]}`}
   const long=value.match(/^(سوره|صفحه|جزء|جز|آیه|ایه|سیاق)\s*(.+)$/)
   if(long)return {kind:longPrefixes[long[1]],value:long[2].trim()}
   const short=value.match(/^([سصجآاق])\s*(\d+(?:[:：/]\d+)?|[^:：/]+[:：/](?:\d+|اول|آخر|اخر|ا|آ))$/)

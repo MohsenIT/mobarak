@@ -78,9 +78,12 @@ export function createSearchSession(corpus: SearchCorpus) {
   const sensitiveExactSearch = createExactSearch(corpus.verses, corpus.waw, true)
   const verseMap = new Map(corpus.verses.map(([s, a, words]) => [`${s}:${a}`, words]))
   const attestedRoots = new Map<string, Set<string>>()
+  const hollowFormX = new Set<string>()
   const seenRoots = new Set<string>()
-  for (const stems of Object.values(corpus.morphology)) for (const [root] of stems) {
-    if (!root || seenRoots.has(root)) continue
+  for (const stems of Object.values(corpus.morphology)) for (const [root, , form] of stems) {
+    if (!root) continue
+    if (form === 'X' && /^.[وي].$/u.test(root)) hollowFormX.add(root)
+    if (seenRoots.has(root)) continue
     seenRoots.add(root)
     const key = normalizeQuranSearch(root).replaceAll(' ', '')
     const roots = attestedRoots.get(key)
@@ -150,12 +153,23 @@ export function createSearchSession(corpus: SearchCorpus) {
     const sensitive = options.phase3?.spellingSensitive
     const matcher = sensitive ? sensitiveSearch ??= createQuranSearch(corpus.verses, corpus.waw, true) : search
     const literal = matcher(query, !options.includeRoots && scope.size === 1 ? scope.values().next().value : 0, options)
-    if (!options.includeRoots || normalizeQuranSearch(query, false, sensitive).includes(' ')) return literal.filter(r => within(r.s))
+    if (!options.includeRoots) return literal.filter(r => within(r.s))
+    const key = normalizeQuranSearch(query, false, sensitive)
+    if (key.includes(' ')) return literal.filter(r => within(r.s))
     const directRoot = attestedRoots.get(normalizeQuranSearch(query))
     const roots = new Set(directRoot)
     // Prefer literal matches; only use typo matches as seeds if no literal exists.
     const exact = literal.filter(r => r.kind !== 'near')
-    const seeds = directRoot ? [] : exact.length ? exact : literal.filter(r => r.score === literal[0]?.score)
+    if (!directRoot && !exact.length) {
+      // The hollow form X verbal noun loses its middle radical, with a
+      // compensating ending written ة in Arabic and ت in Persian loanwords.
+      const noun = key.match(sensitive ? /^است(.)ا(.)[ةت]$/u : /^است(.)ا(.)[هت]$/u)
+      if (noun) for (const radical of ['و', 'ي']) {
+        const candidate = `${noun[1]}${radical}${noun[2]}`
+        if (hollowFormX.has(candidate)) roots.add(candidate)
+      }
+    }
+    const seeds = roots.size ? [] : exact.length ? exact : literal.filter(r => r.score === literal[0]?.score)
     for (const result of seeds) {
       for (const pos of result.positions) {
         const root = corpus.morphology[`${result.s}:${result.a}`]?.[pos - 1]?.[0]
@@ -320,7 +334,7 @@ export function createSearchSession(corpus: SearchCorpus) {
     return results.sort((a, b) => {
       for (const [index, sort] of (phase.sorts.length ? phase.sorts : ['mushaf']).entries()) {
         const difference = sort === 'relevance' ? b.relevance - a.relevance : mushafOrder(a.result, b.result)
-        if (difference) return index === 0 && sort === 'mushaf' && phase.reverseSort ? -difference : difference
+        if (difference) return index === 0 && phase.reverseSort ? -difference : difference
       }
       return mushafOrder(a.result, b.result)
     }).map(({ result }) => result)

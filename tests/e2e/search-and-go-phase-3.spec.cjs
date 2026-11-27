@@ -148,7 +148,9 @@ test('empty focus displays real mixed history with persistent pins and replay', 
   await input.click();
   const history = panel.locator('.search-and-go-history');
   await expect(history.locator('li')).toHaveCount(2);
-  await expect(history.locator('[data-reader-search-icon=advanced]')).toHaveCount(1);
+  await expect(history.locator('.lucide-search')).toHaveCount(1);
+  await expect(history.locator('[data-reader-search-icon=advanced]')).toHaveCount(0);
+  await expect(panel.locator('.search-and-go-empty h2')).toHaveText(labels['searchP3.history']);
   await expect(history.locator('.lucide-mouse-pointer-2')).toHaveCount(1);
   const chips = history.getByRole('button');
   await expect(chips).toHaveCount(2);
@@ -261,9 +263,16 @@ test('a shared search restores its scoped results and preserves sort changes aft
   await expect(controls.locator('[data-phase3-roots]')).toHaveAttribute('aria-pressed', 'false');
 
   const sort = panel.locator('.search-results-summary [data-phase3-sort]');
+  const sortChip = sort.locator('summary');
+  const relevanceWidth = (await sortChip.boundingBox()).width;
   await sort.locator('summary').click();
   await expect(sort.getByRole('button', { name: labels['searchP3.sort.relevance'], exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await sort.getByRole('button', { name: labels['searchP3.lowToHigh'], exact: true }).click();
+  await expect.poll(() => new URL(page.url()).searchParams.get('dir')).toBe('desc');
+  await sort.getByRole('button', { name: labels['searchP3.highToLow'], exact: true }).click();
   await sort.getByRole('button', { name: labels['searchP3.sort.mushaf'], exact: true }).click();
+  await expect(sort).not.toHaveAttribute('open', '');
+  expect((await sortChip.boundingBox()).width).toBe(relevanceWidth);
   await expect.poll(() => new URL(page.url()).searchParams.getAll('sort')).toEqual(['mushaf', 'relevance']);
 
   await page.reload();
@@ -349,13 +358,14 @@ test('return restores the original current-surah scope and same-root setting aft
   await expect((await showControls(page)).locator('[data-phase3-roots]')).toHaveAttribute('aria-pressed', 'true');
 });
 
-test('wide reader entry replaces the reading surface with results and a right research panel', async ({ page }) => {
+test('wide and narrow search use the same inline filters only after searching', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/s/20/a/34');
   await page.locator('.reader-surah-link').click();
   const surface = page.locator('[data-search-workspace]');
   const field = surface.getByRole('combobox');
-  await expect(surface.locator('.search-workspace-research')).toBeVisible();
+  await expect(surface.locator('.search-workspace-research')).toHaveCount(0);
+  await expect(surface.locator('[data-phase3-controls]')).toHaveCount(0);
   await expect(surface.locator('.search-page-input [data-phase3-settings]')).toBeVisible();
   expect((await surface.boundingBox()).width).toBe(1280);
   await field.fill('صبر');
@@ -365,14 +375,33 @@ test('wide reader entry replaces the reading surface with results and a right re
   const tools = surface.locator('[data-phase3-research]');
   await expect(tools).toBeVisible();
   await field.fill('صبر نصر');
-  await expect(surface.locator('[data-phase3-relation]')).toBeVisible();
+  const relation = surface.locator('[data-phase3-relation]');
+  await expect(relation.locator('summary')).toHaveText('شامل همهٔ واژه‌ها');
+  await expect(relation.locator('xpath=preceding-sibling::*[1]')).toHaveAttribute('data-phase3-roots', 'true');
   await expect(tools).toBeVisible();
-  const [aside, results] = await Promise.all([tools.boundingBox(), surface.locator('.search-page-results').boundingBox()]);
-  expect(aside.x).toBeGreaterThanOrEqual(results.x + results.width - 1);
+  const [inlineWide, results] = await Promise.all([tools.boundingBox(), surface.locator('.search-page-results').boundingBox()]);
+  expect(results.y).toBeGreaterThanOrEqual(inlineWide.y + inlineWide.height - 1);
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(tools).toBeVisible();
   const [inline, list] = await Promise.all([tools.boundingBox(), surface.locator('.search-page-results').boundingBox()]);
   expect(list.y).toBeGreaterThanOrEqual(inline.y + inline.height - 1);
+});
+
+test('a named context jumps to its reading range and استجابت finds the recorded root', async ({ page }) => {
+  await page.goto('/s/20/a/34');
+  const readerSearch = page.locator('.reader-surah-link');
+  await readerSearch.click();
+  const surface = page.locator('[data-search-workspace]');
+  const field = surface.getByRole('combobox');
+  await field.fill('طه سیاق ۳');
+  await expect(surface.locator('.drawer-destination-options')).toContainText('سیاق ۳');
+  await field.press('Enter');
+  await expect(page).toHaveURL(/\/s\/20\/a\/24$/);
+  await readerSearch.click();
+  await field.fill('استجابت');
+  const roots = surface.locator('[data-phase3-roots]');
+  if (await roots.getAttribute('aria-pressed') === 'false') await roots.click();
+  await expect(surface.locator('[data-search-address="2:186"]')).toBeVisible();
 });
 
 test('search settings travel with the query while research visibility remains a local preference', async ({ page }) => {

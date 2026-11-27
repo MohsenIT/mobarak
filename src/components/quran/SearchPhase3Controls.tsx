@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ToggleEvent, type ReactNode } from 'react'
 import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, Layers3, ListChecks, ListOrdered, ListTodo, Quote, ScanText, Settings2, SpellCheck2, Sprout, Tags, type LucideIcon } from 'lucide-react'
-import { createPortal } from 'react-dom'
 import SearchFilterRow from './SearchFilterRow'
 import { t } from '@/lib/i18n'
 import { morphologyLabel } from '@/lib/quran'
@@ -61,13 +60,16 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
   const sort = config.sorts[0] ?? 'mushaf'
   const reversed = config.reverseSort ?? false
   const isRelevance = sort === 'relevance'
-  const SortIcon = isRelevance ? ArrowDownWideNarrow : reversed ? ArrowDown10 : ArrowDown01
-  const directionLabel = t(isRelevance ? 'searchP3.mostRelevantFirst' : reversed ? 'searchP3.reverse' : 'searchP3.forward')
+  const SortIcon = isRelevance ? (reversed ? ArrowDownNarrowWide : ArrowDownWideNarrow) : reversed ? ArrowDown10 : ArrowDown01
+  const directionLabel = t(isRelevance ? reversed ? 'searchP3.lowToHigh' : 'searchP3.mostRelevantFirst' : reversed ? 'searchP3.reverse' : 'searchP3.forward')
   return <details name={searchPopupName} className="phase3-sort" data-phase3-sort onKeyDown={dismissPopup}>
     <summary className="chip"
       aria-label={`${t('searchP3.sort')}، ${t(`searchP3.sort.${sort}`)}، ${directionLabel}`}>
       <SortIcon className="phase3-sort-icon" size={16} aria-hidden="true" />
-      <span className="phase3-sort-value">{t(`searchP3.sortShort.${sort}`)}</span>
+      <span className="phase3-sort-value" aria-hidden="true">
+        {(['mushaf', 'relevance'] as const).map(value =>
+          <span key={value} data-inactive={sort !== value || undefined}>{t(`searchP3.sortShort.${value}`)}</span>)}
+      </span>
     </summary>
     <div className="reader-display-menu">
       <div className="reader-display-controls">
@@ -76,7 +78,14 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
           <div className="reader-display-modes" role="group" aria-label={t('searchP3.sort')}>
             {(['mushaf', 'relevance'] as const).map(value => <button type="button" key={value}
               aria-label={t(`searchP3.sort.${value}`)} aria-pressed={sort === value}
-              onClick={() => onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })}>
+              onClick={event => {
+                onConfig({ ...config, sorts: [value, value === 'mushaf' ? 'relevance' : 'mushaf'] })
+                const popup = event.currentTarget.closest('details')
+                if (popup) {
+                  popup.open = false
+                  popup.querySelector('summary')?.focus()
+                }
+              }}>
               {t(value === 'relevance' ? 'searchP3.sort.relevance' : 'searchP3.sortShort.mushaf')}
             </button>)}
           </div>
@@ -84,12 +93,12 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
         <section>
           <div className="reader-display-modes phase3-sort-directions" role="group" aria-label={directionLabel}>
             {[false, true].map(reverse => {
-              const Icon = isRelevance ? (reverse ? ArrowDownWideNarrow : ArrowDownNarrowWide) : (reverse ? ArrowDown10 : ArrowDown01)
+              const Icon = isRelevance ? (reverse ? ArrowDownNarrowWide : ArrowDownWideNarrow) : (reverse ? ArrowDown10 : ArrowDown01)
               return <button type="button" key={String(reverse)}
-              disabled={isRelevance} aria-pressed={(isRelevance || reversed) === reverse} onClick={() => onConfig({ ...config, reverseSort: reverse || undefined })}>
+              aria-pressed={reversed === reverse} onClick={() => onConfig({ ...config, reverseSort: reverse || undefined })}>
               <Icon className="phase3-sort-icon" size={16} aria-hidden="true" />
               {isRelevance
-                ? t(reverse ? 'searchP3.highToLow' : 'searchP3.lowToHigh')
+                ? t(reverse ? 'searchP3.lowToHigh' : 'searchP3.highToLow')
                 : t(reverse ? 'searchP3.reverse' : 'searchP3.forward')}
             </button>})}
           </div>
@@ -142,12 +151,11 @@ export function SearchWorkspaceSettings({ config, onConfig, partial, matching, a
   </details>
 }
 
-export default function SearchPhase3Controls({ config, query, results, identity, includeRoots, researchHost, onConfig, onRoots }: {
+export default function SearchPhase3Controls({ config, query, results, identity, includeRoots, onConfig, onRoots }: {
   query: string
   results: QuranSearchResult[]
   identity: string
   includeRoots: boolean
-  researchHost?: HTMLElement | null
   onRoots: () => void
 } & WorkspaceConfigProps) {
   const groupName = useId()
@@ -219,6 +227,9 @@ export default function SearchPhase3Controls({ config, query, results, identity,
   </section>
   return <div className="phase3-controls" data-phase3-controls onKeyDown={dismissPopup}>
     <div className="phase3-options" ref={toolbar} role="group" aria-label={t('searchP3.settings')}>
+      <button className="chip" type="button" data-phase3-roots aria-pressed={includeRoots} onClick={onRoots}>
+        <Sprout size={14} aria-hidden="true" />{t('ui.702b74fe3e')}
+      </button>
       {multipleWords && <details name={searchPopupName} onToggle={positionFilterPopup} data-phase3-relation><summary className="chip">
         <MatchIcon size={14} aria-hidden="true" />
         <span>{finding}</span>
@@ -247,9 +258,6 @@ export default function SearchPhase3Controls({ config, query, results, identity,
           </div>
         </div>
       </details>}
-      <button className="chip" type="button" data-phase3-roots aria-pressed={includeRoots} onClick={onRoots}>
-        <Sprout size={14} aria-hidden="true" />{t('ui.702b74fe3e')}
-      </button>
       <button className="chip" type="button" data-phase3-more aria-expanded={moreOpen} aria-controls={moreId}
         data-changed={activeFilters > 0} onClick={event => {
           const openPopup = event.currentTarget.closest('.phase3-options')?.querySelector('details[open]')
@@ -263,6 +271,6 @@ export default function SearchPhase3Controls({ config, query, results, identity,
         <ChevronDown size={12} aria-hidden="true" />
       </button>
     </div>
-    {researchHost ? createPortal(research, researchHost) : research}
+    {research}
   </div>
 }
