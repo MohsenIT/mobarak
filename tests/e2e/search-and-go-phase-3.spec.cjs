@@ -577,8 +577,12 @@ test('reader return bands share the Quran margins and preserve the full advanced
     expect(Math.abs(reference.x + reference.width - quran.x - quran.width)).toBeLessThan(2);
     const button = await advanced.boundingBox();
     expect(Math.abs(button.x + button.width - reference.x - reference.width)).toBeLessThan(2);
-    const close = await page.locator('.reader-search-dismiss').boundingBox();
-    expect(Math.abs(close.x - quran.x)).toBeLessThan(2);
+    const closers = page.locator('.reader-search-dismiss');
+    await expect(closers).toHaveCount(2);
+    for (const close of await closers.all()) {
+      expect(Math.abs((await close.boundingBox()).x - quran.x)).toBeLessThan(2);
+      await expect(close).toHaveCSS('border-top-width', '0px');
+    }
   }
   await advanced.click();
   await expect(panel.getByRole('combobox')).toHaveValue(query);

@@ -196,14 +196,15 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   const rtl = uiDirection() === 'rtl'
   const BackIcon = rtl ? ArrowRight : ArrowLeft
   const searchLabel = t('ui.c51349274d')
+  const shortSearchLabel = t('ui.3906317c3a')
   const { placeholder, shorterPlaceholders } = useMemo(() => {
     const format = (examples: string[]) => t('searchAndGo.placeholder', { label: searchLabel, examples: examples.join(rtl ? '، ' : ', ') })
     const shorter = searchExamples.slice(2).map((_, index) => format(searchExamples.slice(0, index + 2))).reverse()
     return {
       placeholder: format(searchExamples),
-      shorterPlaceholders: [...shorter, format(['س 20', 'صبر']), format(['س 20']), searchLabel],
+      shorterPlaceholders: [...shorter, format(['س 20', 'صبر']), format(['س 20']), searchLabel, shortSearchLabel],
     }
-  }, [rtl, searchLabel])
+  }, [rtl, searchLabel, shortSearchLabel])
 
   return <Dialog open onOpenChange={open => { if (!open) onClose() }}>
     <DialogContent ref={setSurface} fullscreen showOverlay={compact} showCloseButton={false} data-search-browse-panel={compact || undefined} className="search-and-go" data-search-and-go data-search-workspace={SEARCH_AND_GO_PHASE_3 || undefined} data-search-and-go-phase-2={SEARCH_AND_GO_PHASE_2 || undefined} data-search-page={SEARCH_AND_GO_PHASE_2 && !!start?.state || undefined} dir={uiDirection()}

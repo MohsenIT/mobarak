@@ -98,7 +98,7 @@ test('the placeholder adds only whole examples that fit as the field resizes', a
     const shown = Array.from(ruler?.children ?? []).find(sample => sample.textContent === input.placeholder);
     return !!shown && shown.getBoundingClientRect().width <= input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
   });
-  await expect(field).toHaveAttribute('placeholder', /جستجوی پیشرفته.*…$/);
+  await expect(field).toHaveAttribute('placeholder', /^(جستجوی پیشرفته.*|یافتن)…$/);
   await expect.poll(fits).toBe(true);
   const narrow = await field.getAttribute('placeholder');
 
