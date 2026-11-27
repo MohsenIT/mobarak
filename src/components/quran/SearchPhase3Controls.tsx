@@ -120,8 +120,8 @@ function SearchSettingToggle({ label, checked, disabled, onChange, icon: Icon, s
   </section>
 }
 
-export function SearchWorkspaceSettings({ config, onConfig, partial, matching, actions }: WorkspaceConfigProps & {
-  partial: MatchingPreference; matching: (MatchingPreference & { icon: SearchSettingIcon })[]; actions: ReactNode
+export function SearchWorkspaceSettings({ config, onConfig, partial, matching, actions, explicitLogic }: WorkspaceConfigProps & {
+  explicitLogic?: boolean; partial: MatchingPreference; matching: (MatchingPreference & { icon: SearchSettingIcon })[]; actions: ReactNode
 }) {
   const cooccurrence = config.cooccurrence ?? 'verse'
   const label = t('searchP3.settings')
@@ -143,7 +143,7 @@ export function SearchWorkspaceSettings({ config, onConfig, partial, matching, a
         <SearchSettingToggle {...partial} icon={ScanText} />
         <SearchSettingToggle setting="spelling" icon={SpellCheck2} label={t('searchP3.spellingSensitive')} checked={!!config.spellingSensitive}
           onChange={checked => onConfig({ ...config, spellingSensitive: checked })} />
-        <SearchSettingToggle setting="order" icon={ListOrdered} label={t('searchP3.orderedWords')} checked={!!config.orderedWords} disabled={config.relation !== 'all'}
+        <SearchSettingToggle setting="order" icon={ListOrdered} label={t('searchP3.orderedWords')} checked={!!config.orderedWords} disabled={explicitLogic || config.relation !== 'all'}
           onChange={checked => onConfig({ ...config, orderedWords: checked || undefined })} />
         {matching.map(preference => <SearchSettingToggle key={preference.label} {...preference} />)}
         {actions}
@@ -152,8 +152,9 @@ export function SearchWorkspaceSettings({ config, onConfig, partial, matching, a
   </details>
 }
 
-export default function SearchPhase3Controls({ config, query, results, identity, includeRoots, onConfig, onRoots }: {
+export default function SearchPhase3Controls({ config, query, explicitLogic, results, identity, includeRoots, onConfig, onRoots }: {
   query: string
+  explicitLogic?: boolean
   results: QuranSearchResult[]
   identity: string
   includeRoots: boolean
@@ -196,7 +197,7 @@ export default function SearchPhase3Controls({ config, query, results, identity,
     setCatalogue({ identity, values: Array.from({ length: Math.max(values.length, catalogue.values.length) }, (_, index) =>
       groups.map((_, column) => new Map([...catalogue.values[index]?.[column] ?? [], ...values[index]?.[column] ?? []]))) })
   }
-  const multipleWords = normalizeQuranSearch(query).includes(' ')
+  const multipleWords = !explicitLogic && normalizeQuranSearch(query).includes(' ')
   const MatchIcon = relations[config.relation]
   const finding = t('searchP3.finding', { relation: t(`searchP3.relation.${config.relation}`) })
   const activeFilters = groups.reduce((sum, group) => sum + config[group].length, 0)

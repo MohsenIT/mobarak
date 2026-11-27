@@ -65,9 +65,10 @@ test('real Quran counts distinguish repeated matches, highlighted words and vers
 
   for (const query of ['لَا تَخَفْ', 'لاتخف']) {
     const phrase = search(query, { surahs: [20] })
-    expect(phrase.map(r => [r.a, r.occurrences])).toEqual([[21, [[3, 4]]], [68, [[2, 3]]], [77, [[14, 15]]]])
+    const expected = [[21, [[3, 4]]], [68, [[2, 3]]], ...(query === 'لاتخف' ? [[77, [[14, 15]]]] : [])]
+    expect(phrase.map(r => [r.a, r.occurrences])).toEqual(expected)
     expect(phrase[0].parts).toEqual({ 3: 2, 4: 2 })
-    expect(countQuranSearchResults(phrase)).toEqual({ occurrences: 3, words: 6, verses: 3 })
+    expect(countQuranSearchResults(phrase)).toEqual({ occurrences: expected.length, words: expected.length * 2, verses: expected.length })
   }
 })
 
@@ -116,8 +117,8 @@ test('a conjunction cannot supply the first letter of a partial or fuzzy word ma
   }
   const local = createSearchSession({ verses: [[1, 1, ['وَجَهْدٌ', 'وَجْهٌ']]], waw: { '1:1': [1] }, morphology: {} })
   expect(local('وجه', { phase3, includeNear: true })[0].parts).toEqual({ 2: 2 })
-  expect(local('وجهد', { phase3 })).toEqual([])
-  expect(local('«وجهد»', { phase3 })).toEqual([])
+  expect(local('وجهد', { phase3 })[0].parts).toEqual({ 1: 3 })
+  expect(local('«وجهد»', { phase3 })[0].parts).toEqual({ 1: 3 })
   expect(local('«و جهد»', { phase3 })[0].parts).toEqual({ 1: 3 })
 })
 

@@ -3,6 +3,9 @@ import type { AnalysisSelection } from './analysis'
 import { getSourceSurahContexts } from './contexts'
 import { wordKey } from './word-parts'
 import { lemmaDisplay } from './lemma-display'
+import { parseProfessionalQuery } from './professional-query'
+import { createProfessionalSearch } from './professional-search'
+import { defaultPhase3SearchOptions } from './search-query'
 import { bm25, createExactSearch, parseSearchQuery, unrecordedSearchForm, searchOrder, searchProximity, type Phase3SearchOptions } from './search-query'
 
 export type { Phase3SearchOptions, SearchCooccurrence, SearchRelation, SearchSort } from './search-query'
@@ -339,12 +342,25 @@ export function createSearchSession(corpus: SearchCorpus) {
     }).map(({ result }) => result)
   }
 
-  return (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null) => (options.phase3
-    ? executePhase3(query, options, options.phase3, filter)
-    : execute(query, options, filter)).map(result => ({
+  const professional = createProfessionalSearch(corpus)
+  return (query: string, options: SearchSessionOptions = {}, filter?: AnalysisSelection | null) => {
+    const phase = options.phase3 ?? defaultPhase3SearchOptions()
+    const parsed = !filter && parseProfessionalQuery(query)
+    const attached = parsed && parsed.status === 'ordinary' && (!options.mode || options.mode === 'text') && professional.hasAttachedWaw(query)
+    const terms = attached ? query.trim().split(/\s+/u).map(word => ({ kind: 'atom' as const, atom: { words: [word], exact: phase.relation === 'phrase' } })) : []
+    const ordinaryQuery = parsed && parsed.status === 'ordinary' && (!options.mode || options.mode === 'text') &&
+      !phase.spellingSensitive ? query.replace(/(^|\s)(صلوة|رحمان|الرحمان)(?=\s|$)/gu, (_, boundary: string, word: string) =>
+        boundary + ({ صلوة: 'صلات', رحمان: 'رحمن', الرحمان: 'الرحمن' }[word] ?? word)) : query
+    const results = parsed && parsed.status === 'invalid' ? []
+      : parsed && parsed.status === 'valid' ? professional.execute(parsed.node, parsed.boolean, options, word => executePhase3(word, options, phase))
+      : attached ? professional.execute(terms.length === 1 ? terms[0] : { kind: 'and', children: terms }, false, options, word => executePhase3(word, options, phase))
+      : options.phase3 ? executePhase3(ordinaryQuery, options, options.phase3, filter)
+      : execute(ordinaryQuery, options, filter)
+    return results.map(result => ({
     ...result,
     occurrences: spansFor(result),
     morphology: corpus.morphology[`${result.s}:${result.a}`] ?? [],
-  }))
+    }))
+  }
 
 }

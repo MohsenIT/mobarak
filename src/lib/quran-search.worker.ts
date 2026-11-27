@@ -1,3 +1,4 @@
+import { parseProfessionalQuery } from './professional-query'
 import { createSearchSession, type SearchCorpus, type SearchSessionOptions } from './quran-search-session'
 import { createSearchSuggestions } from './search-suggestions'
 import type { AnalysisSelection } from './analysis'
@@ -21,7 +22,7 @@ self.addEventListener('message', async (event: MessageEvent<{ warmup: true } | {
       self.postMessage({ key: countsKey, counts })
       return
     }
-    const suggestions = filter || emptyScope ? [] : suggest(query, options?.mode, options?.surahs, phase2)
+    const suggestions = filter || emptyScope || parseProfessionalQuery(query).status !== 'ordinary' ? [] : suggest(query, options?.mode, options?.surahs, phase2)
     self.postMessage({ id, results, suggestions, ...(phase2 ? { timing: { initMs: ready - start, searchMs: performance.now() - ready } } : {}) })
   } catch { self.postMessage({ id, key: countsKey, error: true }) }
 })

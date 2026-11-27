@@ -2222,3 +2222,13 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-page-input .phase3-settings-actions .chip { padding: 4px 9px; }
 [data-search-workspace] details[name="mobarak-search-popup"][open] > :is(.phase3-popup, .reader-display-menu) { z-index: 20; }
 [data-search-workspace] details[name="mobarak-search-popup"][open] > summary { z-index: 21; }
+
+.search-professional-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 265px), 1fr));
+  gap: 6px 16px;
+  margin-block: 10px 16px;
+}
+.search-professional-examples > div { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
+.search-professional-examples bdi { white-space: nowrap; }
+.search-professional-examples span { color: var(--ink-soft); }

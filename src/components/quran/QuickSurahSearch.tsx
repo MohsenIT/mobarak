@@ -5,6 +5,7 @@ import {t} from '@/lib/i18n'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowRight, Search } from 'lucide-react'
+import { parseProfessionalQuery } from '@/lib/professional-query'
 import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
 import type { SurahMeta, Meta } from '@/lib/quran'
 import { loadSurah, toFa } from '@/lib/quran'
@@ -29,7 +30,8 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
   const [surah, setSurah] = useState(currentSurah)
   const [query, setQuery] = useState('')
   const [mode, setMode] = useState<SearchMode>('text')
-  const destinations = mode === 'text' ? searchDestinations(meta, query, surah.n) : []
+  const syntax = parseProfessionalQuery(query).status
+  const destinations = mode === 'text' && syntax === 'ordinary' ? searchDestinations(meta, query, surah.n) : []
   const [results, setResults] = useState<QuranSearchResult[]>([])
   const [index, setIndex] = useState(0)
   const report=useRef(onHighlights);report.current=onHighlights
@@ -72,13 +74,14 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
     const id = ++request.current
     setError(false); setResults([]); setIndex(0)
     const value = normalizeDigits(query).trim().replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
-    if (mode === 'text' && (isNavigationInput(query) || destinations.length > 0 && !/^\d+$/.test(value))) { setBusy(false); return }
+    if (syntax === 'invalid') { setBusy(false); return }
+    if (syntax === 'ordinary' && mode === 'text' && (isNavigationInput(query) || destinations.length > 0 && !/^\d+$/.test(value))) { setBusy(false); return }
     if (/^\d+$/.test(value)) {
       const a = Number(value)
       if (a > 0 && a <= surah.vc) { const item = { s: surah.n, a, positions: [1], words: [], waw: [], parts: {}, kind: 'exact' as const, score: 0 }; setResults([item]); jump([item], 0) }
       setBusy(false); return
     }
-    if (value.length < 2) { setBusy(false); return }
+    if (syntax === 'ordinary' && value.length < 2) { setBusy(false); return }
     setBusy(true)
     if (scope === 'surah' && !localEngine) return
     const timer = setTimeout(() => {
@@ -106,9 +109,9 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
       } catch { setError(true); setBusy(false) }
     }, 60)
     return () => { clearTimeout(timer); request.current++ }
-  }, [query, mode, surah.n, surah.vc, localEngine, scope])
+  }, [query, mode, surah.n, surah.vc, localEngine, scope, syntax, destinations.length])
   const expand = (all: boolean) => onAdvanced({ query, mode, surahs: all ? [] : [surah.n] })
-  const activeResult = !busy && !error && results[index]
+  const activeResult = syntax !== 'invalid' && !busy && !error && results[index]
   const neighborAddress = (result: QuranSearchResult | undefined) => result
     ? `${meta.surahs[result.s - 1].fa} ${toFa(result.a)}` : undefined
   return <div className="quick-surah-search" aria-label={t("ui.a1edc5936b")}>
@@ -143,7 +146,7 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
           }}
           center={<QuickSearchResultPicker key={`${scope}:${mode}:${query}`} meta={meta} results={results} index={index}
             onSelect={i => jump(results, i)} onFull={targetScope => onAdvanced({ query, mode, surahs: targetScope === 'quran' ? [] : [activeResult.s] })} />}
-        /> : <span role="status">{destinations.length ? t('ui.4f981a291d') : busy ? t('ui.63509f3da4') : error ? t('ui.e5d91b8562') : query.trim().length >= 2 ? t('ui.292cf63931') : t('ui.d1400e3d47')}</span>}
+        /> : <span role="status">{syntax === 'invalid' ? t('searchProfessional.invalid') : destinations.length ? t('ui.4f981a291d') : busy ? t('ui.63509f3da4') : error ? t('ui.e5d91b8562') : query.trim().length >= 2 ? t('ui.292cf63931') : t('ui.d1400e3d47')}</span>}
       </div>,
       resultsBar,
     )}

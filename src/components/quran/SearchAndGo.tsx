@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } fro
 import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Search } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
+import { parseProfessionalQuery } from '@/lib/professional-query'
 import { destinationLabel, destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, NAVIGATION_HELP, resolveDestination, type Destination } from '@/lib/navigation'
 import { SEARCH_AND_GO_PHASE_2, SEARCH_AND_GO_PHASE_3, readSearchLink, type SearchLinkState, type SearchResultSnapshot } from '@/lib/search-link'
 import { textSearchOperation, type SearchHistorySource, type SearchOperation, type SearchOperationEntry } from '@/lib/search-and-go-history'
@@ -19,6 +20,14 @@ import { searchPopupName } from './search-popup'
 import { usePinPress } from './usePinPress'
 
 const searchExamples = ['س 20', 'اسما الحسنی', 'طه 40', 'صبر', 'صفحه 42', 'جزء 30', 'لا تخف', 'سیاق طه:3']
+
+const professionalExamples = [
+  ['all', 'صبر نصر'], ['any', 'صبر | نصر'], ['not', 'صبر -نصر'],
+  ['group', '(صبر | نصر) الله'], ['phrase', '"ذكر الله"'], ['oneLetter', 'مل?'],
+  ['manyLetters', 'ملك*'], ['unlimitedGap', 'قال ... موسى'], ['oneWord', 'قال (*) موسى'],
+  ['exactGap', 'قال ...{3} موسى'], ['maximumGap', 'قال ...{0,10} موسى'],
+  ['rangeGap', 'قال ...{2,5} موسى'], ['marks', 'ذِكر'],
+] as const
 
 export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination: navigate, onPick, onClose, start, field, translator, onSearchStateChange, onClearOccurrenceFilter, onReplay, history, onRecordSearch, onToggleHistoryPin }: {
   field: RefObject<HTMLInputElement | null>
@@ -129,11 +138,12 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   const back = useRef<HTMLButtonElement>(null)
   const trigger = useRef<HTMLElement>(null)
   const value = query.trim()
-  const options = mode === 'text' && !occurrence ? destinationSuggestions(meta, value, start?.state?.contextSurah ?? currentSurah) : []
+  const professional = parseProfessionalQuery(value).status !== 'ordinary'
+  const options = mode === 'text' && !occurrence && !professional ? destinationSuggestions(meta, value, start?.state?.contextSurah ?? currentSurah) : []
   const letters = /\p{L}/u.test(value)
-  const text = SEARCH_AND_GO_PHASE_2
+  const text = professional || (SEARCH_AND_GO_PHASE_2
     ? !!occurrence || letters && (mode !== 'text' || !isExplicitDestinationQuery(value, options))
-    : letters && !isNavigationInput(value) && !options.some(option => option.exact)
+    : letters && !isNavigationInput(value) && !options.some(option => option.exact))
   const completions = SEARCH_AND_GO_PHASE_2 && text && !help && completedQuery !== query ? suggestions.slice(0, 3) : []
   const selection = useDestinationSelection(options, completions.length)
   const activeOptionId = selection.inputProps['aria-activedescendant']
@@ -256,6 +266,16 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           </div>}
         </header>
         {help && <div className="search-and-go-help nice-scroll">
+          <section aria-labelledby={selection.id + '-professional'} className="search-professional-guide">
+            <h2 id={selection.id + '-professional'}>{t('searchProfessional.title')}</h2>
+            <p>{t('searchProfessional.instructions')}</p>
+            <div className="search-professional-examples">{professionalExamples.map(([label, example]) =>
+              <div key={label}>
+                <button type="button" className="chip" onClick={() => complete(example)}><bdi dir="rtl">{example}</bdi></button>
+                <span>{t(`searchProfessional.${label}`)}</span>
+              </div>
+            )}</div>
+          </section>
           {SEARCH_AND_GO_PHASE_3 ? <>
             <h2>{t('searchAndGo.guide.search')}</h2>
             <dl>{(['find', 'scope', 'features', 'settings', 'return'] as const).map(topic => <div key={topic}>
