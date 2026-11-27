@@ -138,7 +138,8 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   const back = useRef<HTMLButtonElement>(null)
   const trigger = useRef<HTMLElement>(null)
   const value = query.trim()
-  const professional = parseProfessionalQuery(value).status !== 'ordinary'
+  const syntax = parseProfessionalQuery(value).status
+  const professional = syntax !== 'ordinary'
   const options = mode === 'text' && !occurrence && !professional ? destinationSuggestions(meta, value, start?.state?.contextSurah ?? currentSurah) : []
   const letters = /\p{L}/u.test(value)
   const text = professional || (SEARCH_AND_GO_PHASE_2
@@ -241,8 +242,10 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                   else {
                     const state = searchState.current
                     const entered = completion ?? query
+                    const enteredSyntax = completion ? parseProfessionalQuery(entered).status : syntax
                     if (onRecordSearch && text && state?.query === query &&
-                      (state.occurrence || normalizeQuranSearch(entered).replaceAll(' ', '').length >= 2)) {
+                      (state.occurrence || enteredSyntax === 'valid' ||
+                        enteredSyntax === 'ordinary' && normalizeQuranSearch(entered).replaceAll(' ', '').length >= 2)) {
                       const operation = textSearchOperation(completion ? { ...state, query: entered, lemmas: [], forms: [] } : state, true)
                       if (operation) {
                         displayedSearch.current = null
