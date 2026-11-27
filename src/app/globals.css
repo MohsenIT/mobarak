@@ -1972,8 +1972,6 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   padding: 2px clamp(8px, 2vw, 20px) 5px;
 }
 .phase3-options { flex-wrap: wrap; overflow: visible; padding-block-end: 7px; }
-[data-phase3-results] { --search-controls-inset: clamp(12px, 3vw, 34px); }
-[data-phase3-results] :is(.phase3-options, .search-results-summary) { padding-inline: var(--search-controls-inset); }
 .phase3-options > * { flex: none; }
 .phase3-options summary.chip, .phase3-options > button.chip, .phase3-sort > summary.chip, .phase3-scope-control > summary.chip {
   min-height: 28px;
@@ -2052,7 +2050,18 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .phase3-sort > summary, .phase3-scope-control > summary { background: var(--paper); }
 .phase3-scope-control > summary[data-changed='true'] { background: var(--word-active); border-color: var(--sage); }
 
-[data-search-workspace] .search-and-go-shell { width: 100%; }
+[data-search-workspace] .search-and-go-shell { width: 100%; --search-workspace-inset: clamp(12px, 2.5vw, 32px); }
+[data-search-workspace] :is(.search-and-go-header, .search-and-go-suggestions, .search-and-go-empty, .phase3-options, .search-results-summary) {
+  padding-inline: var(--search-workspace-inset);
+}
+[data-phase3-results] .phase3-research { margin-inline: var(--search-workspace-inset); }
+.search-and-go-results[data-phase3-results] { max-width: none; }
+[data-phase3-results] .search-page-results { padding-inline: 0; }
+/* The scrollbar sits outside the aligned content edges, including in RTL. */
+[data-phase3-results] .search-page-results > * {
+  inline-size: calc(100cqi - 2 * var(--search-workspace-inset));
+  margin-inline-start: var(--search-workspace-inset);
+}
 .search-workspace-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; flex: 1; }
 
 /* Sort icons use the same inline alignment at every size. */

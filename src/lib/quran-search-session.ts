@@ -161,9 +161,8 @@ export function createSearchSession(corpus: SearchCorpus) {
     // Prefer literal matches; only use typo matches as seeds if no literal exists.
     const exact = literal.filter(r => r.kind !== 'near')
     if (!directRoot && !exact.length) {
-      // The hollow form X verbal noun loses its middle radical, with a
-      // compensating ending written ة in Arabic and ت in Persian loanwords.
-      const noun = key.match(sensitive ? /^است(.)ا(.)[ةت]$/u : /^است(.)ا(.)[هت]$/u)
+      // The hollow form X verbal noun loses its middle radical.
+      const noun = key.match(sensitive ? /^است(.)ا(.)ة$/u : /^است(.)ا(.)ت$/u)
       if (noun) for (const radical of ['و', 'ي']) {
         const candidate = `${noun[1]}${radical}${noun[2]}`
         if (hollowFormX.has(candidate)) roots.add(candidate)

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Search } from 'lucide-react'
-import { AdvancedSearchIcon } from './ReaderSearchIcon'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
 import { destinationLabel, destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, NAVIGATION_HELP, resolveDestination, type Destination } from '@/lib/navigation'
@@ -288,7 +287,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 data-search-completions role="listbox" aria-label={t('ui.7bf42d2a96')}>
                 {completions.map((completion, index) => <button type="button" className="chip" key={completion} id={`${selection.completionId}-${index}`}
                   role="option" aria-selected={selection.completion === index} onMouseDown={event => event.preventDefault()} onClick={() => complete(completion)}>
-                  <AdvancedSearchIcon size={14} /><QuranText text={completion} />
+                  <Search size={14} aria-hidden="true" /><QuranText text={completion} />
                 </button>)}
               </div>}
             </div>}
@@ -322,7 +321,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
               <h2>{t('searchP3.emptyTitle')}</h2>
               <p>{t('searchP3.emptyDescription')}</p>
               <div className="search-and-go-examples">
-                <button type="button" className="chip" onClick={() => complete(t('searchP3.exampleText'))}><AdvancedSearchIcon size={14} />{t('searchP3.exampleText')}</button>
+                <button type="button" className="chip" onClick={() => complete(t('searchP3.exampleText'))}><Search size={14} aria-hidden="true" />{t('searchP3.exampleText')}</button>
                 {examples.map((destination, index) => destination && <button type="button" className="chip" key={index}
                   onClick={() => onDestination(destination)}><MousePointer2 size={14} aria-hidden="true" />
                   {index === 3 ? t('searchP3.exampleJuz', { number: 30 }) : destinationLabel(meta, destination)}</button>)}

@@ -184,7 +184,8 @@ test('suggestions share one RTL row while arrow selection crosses groups', async
   await expect(completion).toBeVisible();
   await expect(row.locator('.lucide-mouse-pointer-2')).toHaveCount(1);
   await expect(destination.locator('svg')).toHaveCount(0);
-  await expect(completion.locator('[data-reader-search-icon=advanced]')).toHaveCount(1);
+  await expect(completion.locator('.lucide-search')).toHaveCount(1);
+  await expect(completion.locator('[data-reader-search-icon=advanced]')).toHaveCount(0);
   const [navigationBox, completionBox] = await Promise.all([destination.boundingBox(), completion.boundingBox()]);
   expect(Math.abs(navigationBox.y - completionBox.y)).toBeLessThan(1);
   expect(navigationBox.height).toBe(completionBox.height);
@@ -411,6 +412,8 @@ test('search settings travel with the query while research visibility remains a 
   await expect(surface.locator('.search-page-input').locator('[data-phase3-settings]')).toBeVisible();
   await expect(surface.locator('.phase3-options [data-phase3-roots]')).toBeVisible();
   await settings.locator('summary').click();
+  const translation = settings.getByRole('switch', { name: labels['ui.2d6258b160'] });
+  await expect(translation.locator('..').locator('svg')).toHaveAttribute('viewBox', '0 0 512 512');
   await expect(settings.getByRole('switch', { name: labels['ui.5105840a21'] })).toBeVisible();
   await expect(settings.getByRole('switch', { name: labels['ui.8a8b5ac72e'] })).toBeVisible();
   await settings.locator('[data-phase3-unit="surah"]').click();
@@ -428,6 +431,40 @@ test('search settings travel with the query while research visibility remains a 
   await expect(surface.locator('[data-phase3-research]')).toBeVisible();
   await page.reload();
   await expect(surface.locator('[data-phase3-research]')).toBeVisible();
+});
+
+test('search aligns its rows and cards and keeps features only when the query is extended', async ({ page }) => {
+  await page.setViewportSize({ width: 1197, height: 850 });
+  await page.goto('/q?q=صبر&scope=all&rel=all&h=0');
+  const surface = page.locator('[data-search-workspace]');
+  const field = surface.getByRole('combobox');
+  const list = surface.locator('.search-page-results');
+  const firstCard = list.locator('.search-result-card').first();
+  await expect(firstCard).toBeVisible();
+  const more = surface.locator('[data-phase3-more]');
+  await more.click();
+  const research = surface.locator('[data-phase3-research]');
+  for (const width of [1197, 970, 390]) {
+    await page.setViewportSize({ width, height: 850 });
+    const header = surface.locator('.search-and-go-header > button');
+    const [a, b, features, card, roots, sort] = await Promise.all([
+      header.first().boundingBox(), header.last().boundingBox(), research.boundingBox(), firstCard.boundingBox(),
+      surface.locator('[data-phase3-roots]').boundingBox(), surface.locator('[data-phase3-sort] summary').boundingBox(),
+    ]);
+    const left = Math.min(a.x, b.x);
+    const right = Math.max(a.x + a.width, b.x + b.width);
+    for (const x of [features.x, card.x, sort.x]) expect(Math.abs(x - left)).toBeLessThan(1);
+    for (const x of [features.x + features.width, card.x + card.width, roots.x + roots.width]) expect(Math.abs(x - right)).toBeLessThan(1);
+  }
+  const feature = research.locator('.search-facet-row button').first();
+  await feature.click();
+  await expect(more).toHaveAttribute('data-changed', 'true');
+  await field.fill('صبر نصر');
+  await expect(more).toHaveAttribute('data-changed', 'true');
+  await field.fill('سلم');
+  await expect(more).toHaveAttribute('data-changed', 'false');
+  await expect(firstCard).toBeVisible();
+  await expect(research.locator('button[aria-pressed="true"]')).toHaveCount(0);
 });
 
 test('scope tabs retain selections and count matching surahs outside the active scope', async ({ page }) => {

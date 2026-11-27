@@ -7,8 +7,7 @@ import {t,uiDirection} from '@/lib/i18n'
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import {IconTranslate} from './Ornaments'
-import { Search, X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreVertical, Link, Check, Languages, SpellCheck } from 'lucide-react'
-import { AdvancedSearchIcon } from './ReaderSearchIcon'
+import { Search, X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreVertical, Link, Check, SpellCheck } from 'lucide-react'
 import type { Meta, Translator, Translations } from '@/lib/quran'
 import { loadTrans, toFa, morphologyLabel } from '@/lib/quran'
 import { type AnalysisSelection } from '@/lib/analysis'
@@ -175,6 +174,14 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     setSeenFacetIdentity(facetIdentity)
     setLemmas([])
     setForms([])
+  }
+  const facetQuery = query.trim().replace(/\s+/g, ' ')
+  const [seenPhase3Query, setSeenPhase3Query] = useState(facetQuery)
+  if (phase3 && seenPhase3Query !== facetQuery) {
+    setSeenPhase3Query(facetQuery)
+    if (!facetQuery.startsWith(seenPhase3Query) && (config.roots.length || config.lemmas.length || config.forms.length)) {
+      setConfig({ ...config, roots: [], lemmas: [], forms: [] })
+    }
   }
   const linkState: SearchLinkState = { query, mode, ...(isNavigationInput(query)?{contextSurah:restored?.contextSurah??currentSurah}:{}), surahs, lemmas, forms, includeRoots, includePartial, includeNear, showTranslation, translator, occurrence: occurrenceFilter ?? null, ...(phase3 ? { contextSurah: searchOrigin, scopeVariant, phase3: config } : {}) }
   const linkStateKey = JSON.stringify(linkState)
@@ -449,7 +456,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
               }}
               aria-label={mode === 'root' ? t("ui.2f8f10c05a") : mode === 'lemma' ? t("ui.3ccd03be3e") : t("ui.d008c5b1be")} placeholder={occurrenceFilter ? t("ui.de2ec61b2e") : mode === 'root' ? t("ui.726cfb70d6") : mode === 'lemma' ? t("ui.0b020887df") : t("ui.7c498eb144")} autoComplete="off" autoCorrect="off" spellCheck={false} />
             {query && <button type="button" aria-label={t("ui.f37fae1000")} onClick={() => { setQuery(''); input.current?.focus({ preventScroll: true }) }}><X size={15} /></button>}
-            {!destinations.length && completionOpen && !busy && suggestions.length > 0 && !occurrenceFilter && <div id="search-completions" className="search-completion-menu" role="listbox" aria-label={t("ui.7bf42d2a96")}>{suggestions.map((value, i) => <button type="button" role="option" id={`search-completion-${i}`} aria-selected={completionIndex === i} key={value} onMouseDown={event => event.preventDefault()} onClick={() => { setQuery(value); setCompletionOpen(false); input.current?.blur() }}><AdvancedSearchIcon size={14} /><QuranText text={value} /><span aria-hidden="true">↖</span></button>)}</div>}
+            {!destinations.length && completionOpen && !busy && suggestions.length > 0 && !occurrenceFilter && <div id="search-completions" className="search-completion-menu" role="listbox" aria-label={t("ui.7bf42d2a96")}>{suggestions.map((value, i) => <button type="button" role="option" id={`search-completion-${i}`} aria-selected={completionIndex === i} key={value} onMouseDown={event => event.preventDefault()} onClick={() => { setQuery(value); setCompletionOpen(false); input.current?.blur() }}><Search size={14} aria-hidden="true" /><QuranText text={value} /><span aria-hidden="true">↖</span></button>)}</div>}
           </div>
           {commonActions}
         </div>
@@ -488,7 +495,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         {!phase3 && (!inline || lemmas.length > 0 || forms.length > 0) && facetControls}
         {!inline && !valid && <div className="search-empty"><BookOpen size={34} /><h2>{t("ui.2c2cdb504e")}</h2><p>{t("ui.9535464700")}</p><div>{[t("ui.cfd7c4bd1f"), t("ui.72dbd6c944"), t("ui.e7e17d45e9")].map(text => <button type="button" key={text} onClick={() => setQuery(text)}>{text}</button>)}</div></div>}
         {error && <button type="button" className="chip" onClick={() => setRetry(value => value + 1)}>{t("ui.be9b8b4f2b")}</button>}
-        {!phase3 && !busy && !error && valid && !results.length && <div className="search-empty"><AdvancedSearchIcon size={30} /><h2>{t("ui.b548ad6007")}</h2><p>{t("ui.d0c738e420")}</p></div>}
+        {!phase3 && !busy && !error && valid && !results.length && <div className="search-empty"><Search size={30} aria-hidden="true" /><h2>{t("ui.b548ad6007")}</h2><p>{t("ui.d0c738e420")}</p></div>}
         {!busy && !error && valid && results.slice(0, visible).map((result, index) => <div key={`${result.s}:${result.a}`}>
           {!phase3 && !occurrenceFilter && (index === 0 || results[index - 1].kind !== result.kind) && <h2 className="search-result-group">{t(labels[result.kind])}{' · '}{t('search.totalResults', { total: groupCounts[result.kind] })}</h2>}
           <article className="search-result-card" data-search-result-index={index + 1} data-search-address={`${result.s}:${result.a}`}><button type="button" className="search-result-open" aria-current={unified?.selected?.s === result.s && unified?.selected?.a === result.a || undefined} aria-label={t("ui.a55b5ca0c4",{p0:(meta.surahs[result.s - 1]?.fa),p1:(toFa(result.a))})} onClick={() => {
@@ -510,7 +517,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
     ? createPortal(<SearchWorkspaceSettings config={config} onConfig={setConfig}
       partial={matchingPreferences[0]} matching={[
         { ...matchingPreferences[1], icon: SpellCheck },
-        { icon: Languages, label: t('ui.2d6258b160'), checked: showTranslation, onChange: setShowTranslation },
+        { icon: IconTranslate, label: t('ui.2d6258b160'), checked: showTranslation, onChange: setShowTranslation },
       ]}
       actions={<section className="phase3-settings-actions">
         <button type="button" className="chip" onClick={copyLink}>

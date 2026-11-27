@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ToggleEvent, type ReactNode } from 'react'
-import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, Layers3, ListChecks, ListOrdered, ListTodo, Quote, ScanText, Settings2, SpellCheck2, Sprout, Tags, type LucideIcon } from 'lucide-react'
+import { useEffect, useId, useMemo, useRef, useState, type ComponentType, type KeyboardEvent, type ToggleEvent, type ReactNode } from 'react'
+import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, Layers3, ListChecks, ListOrdered, ListTodo, Quote, ScanText, Settings2, SpellCheck2, Sprout, Tags } from 'lucide-react'
 import SearchFilterRow from './SearchFilterRow'
 import { t } from '@/lib/i18n'
 import { morphologyLabel } from '@/lib/quran'
@@ -108,11 +108,12 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
   </details>
 }
 
+type SearchSettingIcon = ComponentType<{ size?: number; 'aria-hidden'?: boolean }>
 type MatchingPreference = { label: string; checked: boolean; disabled?: boolean; onChange: (checked: boolean) => void }
 
-function SearchSettingToggle({ label, checked, disabled, onChange, icon: Icon, setting }: MatchingPreference & { icon: LucideIcon; setting?: 'spelling' | 'order' }) {
+function SearchSettingToggle({ label, checked, disabled, onChange, icon: Icon, setting }: MatchingPreference & { icon: SearchSettingIcon; setting?: 'spelling' | 'order' }) {
   return <section className="reader-display-translation">
-    <span><Icon size={16} aria-hidden="true" />{label}</span>
+    <span><Icon size={16} aria-hidden={true} />{label}</span>
     <button className="reader-display-switch" type="button" role="switch" aria-label={label}
       data-phase3-spelling={setting === 'spelling' || undefined} data-phase3-word-order={setting === 'order' || undefined}
       aria-checked={checked} disabled={disabled} onClick={() => onChange(!checked)}><span /></button>
@@ -120,7 +121,7 @@ function SearchSettingToggle({ label, checked, disabled, onChange, icon: Icon, s
 }
 
 export function SearchWorkspaceSettings({ config, onConfig, partial, matching, actions }: WorkspaceConfigProps & {
-  partial: MatchingPreference; matching: (MatchingPreference & { icon: LucideIcon })[]; actions: ReactNode
+  partial: MatchingPreference; matching: (MatchingPreference & { icon: SearchSettingIcon })[]; actions: ReactNode
 }) {
   const cooccurrence = config.cooccurrence ?? 'verse'
   const label = t('searchP3.settings')

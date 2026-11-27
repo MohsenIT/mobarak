@@ -2,21 +2,30 @@ import { splitWord } from './word-parts'
 
 /** Search keys only: the displayed Quran words always remain unchanged. */
 export function normalizeQuranSearch(text: string, restoreSmallLetters = false, spellingSensitive = false): string {
+  return normalizeSearchKey(text, restoreSmallLetters, spellingSensitive, 'ت')
+}
+
+function normalizeSearchKey(text: string, restoreSmallLetters: boolean, spellingSensitive: boolean, feminineEnding: 'ت' | 'ه'): string {
   let value = text.normalize('NFKC')
   if (spellingSensitive) value = value.replace(/ٱ/g, 'ا').replace(/ی/g, 'ي').replace(/ک/g, 'ك').replace(/[\u0654\u0655]/g, 'ء')
   else {
     if (restoreSmallLetters) value = value.replace(/و\u0670/g, 'ا').replace(/ى\u0670/g, 'ى').replace(/\u0670/g, 'ا').replace(/\u06e7/g, 'ي')
-    value = value.replace(/[أإآٱ]/g, 'ا').replace(/[یىئ]/g, 'ي').replace(/ک/g, 'ك').replace(/ؤ/g, 'و').replace(/ة/g, 'ه').replace(/ء/g, '')
+    value = value.replace(/[أإآٱ]/g, 'ا').replace(/[یىئ]/g, 'ي').replace(/ک/g, 'ك').replace(/ؤ/g, 'و').replace(/ء/g, '')
   }
-  return value
+  const key = value
     .replace(/[\p{M}\u0610-\u061a\u06d6-\u06edـ\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/gu, '')
     .replace(/[^\p{L}\p{N}]+/gu, ' ').trim().replace(/\s+/g, ' ').toLowerCase()
+  return spellingSensitive ? key : key.replace(/ة(?= |$)/g, feminineEnding)
 }
 
 export function quranSearchKeys(text: string, spellingSensitive: boolean): string[] {
   const key = normalizeQuranSearch(text, false, spellingSensitive)
-  if (spellingSensitive) return key ? [key] : []
-  return [...new Set([key, normalizeQuranSearch(text, true)])].filter(Boolean)
+  if (!key) return []
+  if (spellingSensitive) return [key]
+  const restored = normalizeQuranSearch(text, true)
+  if (!text.normalize('NFKC').includes('ة')) return key === restored ? [key] : [key, restored]
+  // Retain the older ه spelling as an alternate of corpus words marked with ة.
+  return [key, restored, normalizeSearchKey(text, false, false, 'ه'), normalizeSearchKey(text, true, false, 'ه')]
 }
 
 /** Bounded Damerau distance also tolerates swapping two adjacent letters. */
@@ -62,7 +71,7 @@ type SearchToken = { text: string; keys: string[]; pos: number; part: 1 | 2 }
 type TokenRange = { token: SearchToken; from: number; to: number }
 type IndexedVerse = {
   verse: SearchVerse; tokens: SearchToken[]
-  compact: { text: string; ranges: TokenRange[] }[]
+  compact: { variant: number; text: string; ranges: TokenRange[] }[]
 }
 
 export function createQuranSearch(verses: SearchVerse[], waw: Record<string, number[]> = {}, spellingSensitive = false) {
@@ -83,7 +92,8 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
       })
       sourceOffsets.set(word, variants)
     }
-    return variants[variant][offset] ?? offset
+    // Both endings use the same pair of small-letter restoration variants.
+    return variants[variant % 2][offset] ?? offset
   }
   const normalizedWords = new Map<string, string[]>()
   const tokenKeys = (word: string) => {
@@ -106,15 +116,17 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
       if (keys.length) parts.push({ text: stem, keys, pos, part: 2 })
       return parts
     })
-    const variants = tokens.some(token => token.keys.length > 1) ? [0, 1] : [0]
+    const hasRestored = tokens.some(({ keys }) => keys[1] && keys[1] !== keys[0])
+    const hasLegacyEnding = tokens.some(({ keys }) => keys[2] && keys[2] !== keys[0])
+    const variants = [0, ...(hasRestored ? [1] : []), ...(hasLegacyEnding ? hasRestored ? [2, 3] : [2] : [])]
     const compact = variants.map(variant => {
       let text = ''
       const ranges = tokens.map(token => {
         const from = text.length
-        text += token.keys[variant] ?? token.keys[0]
+        text += token.keys[variant] ?? token.keys[variant % 2] ?? token.keys[0]
         return { token, from, to: text.length }
       })
-      return { text, ranges }
+      return { variant, text, ranges }
     })
     return { verse, tokens, compact }
   })
@@ -185,7 +197,8 @@ export function createQuranSearch(verses: SearchVerse[], waw: Record<string, num
       const literalParts: Record<number, number> = score === 0 ? { ...parts } : {}
       let literalOccurrences: Map<string, number[]> | undefined = score === 0 ? occurrences : undefined
       // Ignore accidental spaces inside words, and also accept incomplete words.
-      for (const [variant, item] of compact.entries()) {
+      for (const item of compact) {
+        const { variant } = item
         for (let start = item.text.indexOf(compactQuery); start >= 0; start = item.text.indexOf(compactQuery, start + 1)) {
           const end = start + compactQuery.length
           const matched = item.ranges.filter(range => range.from < end && range.to > start)

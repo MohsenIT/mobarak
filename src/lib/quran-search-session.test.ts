@@ -79,6 +79,23 @@ test('expanding a literal match counts each new root occurrence once', () => {
 
 const phase3 = { relation: 'all' as const, sorts: ['mushaf' as const], roots: [], lemmas: [], forms: [] }
 
+test('final ة and ت share relaxed search results without conflating ه and ت', () => {
+  for (const relation of ['all', 'any', 'phrase'] as const) {
+    const options = { phase3: { ...phase3, relation } }
+    const matches = search('حاجة', options)
+    expect(matches.map(({ s, a }) => [s, a])).toContainEqual([12, 68])
+    expect(search('حاجت', options)).toEqual(matches)
+  }
+  const local = createSearchSession({ verses: [[1, 1, ['حَاجَةً', 'له']], [1, 2, ['حاجت', 'لت']]], morphology: {} })
+  expect(local('حاجة له', { phase3 }).map(({ a }) => a)).toEqual([1])
+  expect(local('حاجت له', { phase3 }).map(({ a }) => a)).toEqual([1])
+  expect(local('له', { phase3 }).map(({ a }) => a)).toEqual([1])
+  expect(local('حاجه', { phase3 }).map(({ a }) => a)).toEqual([1])
+  const strict = { phase3: { ...phase3, spellingSensitive: true } }
+  expect(local('حاجة', strict).map(({ a }) => a)).toEqual([1])
+  expect(local('حاجت', strict).map(({ a }) => a)).toEqual([2])
+})
+
 test('unattested hollow form X verbal nouns expand through attested Quran roots', () => {
   for (const [noun, root] of [['استجابت', 'جوب'], ['استجابة', 'جوب'], ['استقامت', 'قوم'], ['استعانة', 'عون']]) {
     expect(search(noun, { phase3 })).toEqual([])
