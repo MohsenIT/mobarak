@@ -34,7 +34,8 @@ test('selecting a facet filters results and a new query drops the selection',asy
  // Dismiss the autocomplete dropdown so it stops intercepting facet clicks.
  await input.press('Escape');
  await expect(page.locator('.search-result-card').first()).toBeVisible({timeout:20000});
- const total=await page.locator('.search-result-card').count();
+ const totalResults=async()=>Number(await page.locator('[data-total-results]').getAttribute('data-total-results'));
+ const total=await totalResults();
  expect(total).toBeGreaterThan(1);
 
  // The inline facet groups list the lemmas and forms behind those hits;
@@ -46,7 +47,7 @@ test('selecting a facet filters results and a new query drops the selection',asy
  await facetButton.click();
  await expect(facets.locator('button[aria-pressed="true"]')).toHaveCount(1);
  await expect(page.locator('.search-active-facets button').first()).toBeVisible();
- await expect.poll(async()=>page.locator('.search-result-card').count()).toBeLessThan(total);
+ await expect.poll(totalResults).toBeLessThan(total);
 
  // A new query resets the facet selection: no chips, nothing pressed, and the
  // full result count for the new word comes back unfiltered.
