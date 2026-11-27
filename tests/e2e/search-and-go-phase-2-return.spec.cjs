@@ -21,7 +21,7 @@ test('return follows the result journey after moving and dismissal survives Back
   await field.fill(query);
   await dialog.locator('.search-result-open').first().click({ timeout: 20000 });
   await expect(dialog).toHaveCount(0);
-  const chip = page.getByRole('button', { name: 'بازگشت به نتایج جست‌وجو', exact: true });
+  const chip = page.locator('[data-advanced-search-return]');
   await expect(chip).toBeVisible();
   const hit = page.url();
   await page.keyboard.press('ArrowLeft');
@@ -69,7 +69,7 @@ test('a mushaf journey restores the selected card and its loaded viewport after 
     element.closest('.search-page-results').getBoundingClientRect().top);
   await card.getByRole('button').click();
   await expect(panel).toBeHidden();
-  const back = page.getByRole('button', { name: 'بازگشت به نتایج جست‌وجو', exact: true });
+  const back = page.locator('[data-advanced-search-return]');
   await expect(back).toBeVisible();
   await page.locator('.reader-surah-link').click();
   await input.fill('ناس ۴');

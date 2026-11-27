@@ -1338,8 +1338,13 @@ input[type='range'].page-slider::-moz-range-thumb {
 button.surah-band { width: 100%; cursor: pointer; }
 button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
 
+.reader-search-width { width: min(100%, var(--reader-text-width, 720px)); margin-inline: auto; padding-inline: var(--reader-text-gutter, 16px); }
+.reader-app:has([data-continuous-mushaf]) { --reader-text-width: 640px; --reader-text-gutter: 13px; }
+@media (min-width: 640px) {
+  .reader-app:has([data-continuous-mushaf]) { --reader-text-gutter: 25px; }
+}
+.reader-toolbar:has(.quick-surah-search) { padding-inline: 0; }
 .reader-toolbar { --reader-toolbar-spacing: 0.5rem; }
-.quick-surah-search { width: 100%; padding: 0 2px; }
 .quick-surah-search form { display:flex; align-items:center; gap:6px; min-height:44px; }
 .quick-surah-search .dictation-field { flex:1 1 0; min-width:0; margin-block-end:0; }
 .quick-surah-search .dictation-input-shell { min-height:44px; }
@@ -1354,11 +1359,13 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .quick-search-scope { margin-inline-start: auto; }
 .quick-surah-search .quick-search-advanced { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; gap: 4px; min-height: 38px; padding: 0 6px; border: 1px solid var(--line); border-radius: 8px; font-size: 11px; white-space: nowrap; }
 .quick-search-advanced svg { width: 18px; height: 18px; }
-.quick-search-return { display: flex; align-items: center; gap: 6px; padding: 2px 8px; border-bottom: 1px solid var(--line); background: var(--paper); }
+.reader-search-band { position: relative; z-index: 10; display: flex; align-items: center; flex-shrink: 0; gap: 6px; min-height: 37px; padding-block: 2px; border-bottom: 1px solid var(--line); background: var(--paper); }
+.reader-advanced-return { justify-content: space-between; }
+.reader-advanced-return:has(+ .reader-toolbar .quick-surah-search) { padding-block-start: max(2px, env(safe-area-inset-top)); }
 .quick-search-return:not(:has(> button, .quick-search-status)) { display: none; }
-.quick-search-return > .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; min-width: 0; height: 26px; }
-.quick-search-return .chip span { overflow: hidden; text-overflow: ellipsis; }
-.quick-search-return svg { flex-shrink: 0; }
+.reader-search-band > .chip, .quick-destination-chips > .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; min-width: 0; height: 26px; white-space: nowrap; }
+.reader-search-band .chip span { overflow: hidden; text-overflow: ellipsis; }
+.reader-search-band svg, .reader-search-dismiss { flex-shrink: 0; }
 .quick-search-results-slot { margin-inline-start: auto; }
 .quick-search-results-slot:empty { display: none; }
 .quick-search-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-soft); }
@@ -1491,8 +1498,11 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
   .reader-surah-name { font-size: 13px; }
 }
 
-.quick-jump-options, .search-jump-options { display:flex; flex-wrap:wrap; gap:6px; padding:6px 12px; }
-.quick-jump-options button, .search-jump-options button { border:1px solid var(--line); border-radius:10px; padding:6px 10px; font-size:11px; min-height:36px; color:var(--ink); background:var(--word-root); }
+.quick-jump-options, .quick-destination-chips { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.quick-jump-options { margin-block-start: var(--reader-toolbar-spacing); font-size: 11px; color: var(--ink-soft); }
+.quick-destination-chips > [aria-selected='true'] { background: var(--word-selected); }
+.search-jump-options { display:flex; flex-wrap:wrap; gap:6px; padding:6px 12px; }
+.search-jump-options button { border:1px solid var(--line); border-radius:10px; padding:6px 10px; font-size:11px; min-height:36px; color:var(--ink); background:var(--word-root); }
 
 /* Audio occupies its own small row above the reading surface, never the sheet. */
 .recitation-bar { position:relative; z-index:11; flex-shrink:0; display:flex; align-items:center; gap:3px; padding:4px 8px; background:var(--paper); border-bottom:1px solid var(--line); flex-wrap:wrap; }

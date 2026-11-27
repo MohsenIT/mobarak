@@ -55,11 +55,9 @@ test('a quick-bar hit moves the reader but leaves the bar open so results can be
  const quick=page.locator('.quick-surah-search');
  await expect(quick).toBeVisible();
 
- // A bare verse number is the deterministic path: it resolves to that ayah of
- // the surah being read without needing a corpus search.
- await quick.getByRole('searchbox').fill('۵');
- await expect(page.locator('.quick-search-status')).toContainText('۱ از ۱',{timeout:20000});
- await expect(page).toHaveURL(/\/s\/19\/a\/5$/,{timeout:20000});
+ await quick.getByRole('searchbox').fill('زكريا');
+ await expect(page.locator('.quick-search-status .analysis-position-button')).toContainText('مریم ۲',{timeout:20000});
+ await expect(page).toHaveURL(/\/s\/19\/a\/2(?:\/w\/\d+)?$/,{timeout:20000});
 
  // The bar deliberately stays mounted: its previous/next arrows walk the
  // hits. Closing it is what returns the toolbar.
@@ -68,7 +66,7 @@ test('a quick-bar hit moves the reader but leaves the bar open so results can be
  await expect(page.locator('.quick-surah-search')).toHaveCount(0);
  await expect(page.locator('.reader-surah-link')).toContainText('مريم');
  // ...and the reading position the bar moved to is kept.
- await expect(page).toHaveURL(/\/s\/19\/a\/5$/);
+ await expect(page).toHaveURL(/\/s\/19\/a\/2(?:\/w\/\d+)?$/);
 });
 
 test('advanced search opened from the tools menu keeps a way back to the reading position',async({page})=>{
@@ -125,7 +123,7 @@ test('a selected search result can be revisited from the back-to-results band, a
 
  // The reader moved to the hit and the band offers the way back.
  await expect(page.locator('.reader-toolbar')).toBeVisible({timeout:20000});
- const band=page.getByRole('button',{name:'بازگشت به نتایج جست‌وجو'});
+ const band=page.locator('[data-advanced-search-return]');
  await expect(band).toBeVisible({timeout:20000});
  // goVerse writes the hit's verse URL only after its surah has loaded, while
  // the band appears synchronously with the pick. Wait for the location to
@@ -146,7 +144,7 @@ test('a selected search result can be revisited from the back-to-results band, a
 
  // Dismissing the band removes it and keeps the reading position.
  await page.getByRole('button',{name:'بستن نوار بازگشت به جست‌وجو'}).click();
- await expect(page.getByRole('button',{name:'بازگشت به نتایج جست‌وجو'})).toHaveCount(0);
+ await expect(page.locator('[data-advanced-search-return]')).toHaveCount(0);
  await expect(page).toHaveURL(readingUrl);
 });
 

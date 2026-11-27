@@ -95,6 +95,7 @@ export function useSearchNavigation({
   const [occurrence, setOccurrence] = useState<AnalysisSelection | null>(null)
   /** A hit was picked from search: offer the way back to the results. */
   const [returnToSearch, setReturnToSearch] = useState(false)
+  const [returnQuery, setReturnQuery] = useState('')
 
   /**
    * Leaving search by *navigating* from it. The band only appears when there
@@ -103,7 +104,7 @@ export function useSearchNavigation({
    */
   const leaveForReading = useCallback(() => {
     setReturnToSearch(current => advancedOpen || current)
-    if (advancedOpen) setReturnToUnified(null)
+    if (advancedOpen) { setReturnToUnified(null); setReturnQuery('') }
     setAdvancedOpen(false)
     setQuickOpen(false)
   }, [advancedOpen])
@@ -138,8 +139,9 @@ export function useSearchNavigation({
   }, [])
 
   /** A hit was chosen: leave search and show it. */
-  const pick = useCallback((s: number, a: number, pos: number, unified: SearchResultSnapshot | null = null) => {
+  const pick = useCallback((s: number, a: number, pos: number, unified: SearchResultSnapshot | null = null, query = '') => {
     setReturnToUnified(unified)
+    setReturnQuery(query)
     setReturnToSearch(true)
     setAdvancedOpen(false)
     setQuickOpen(false)
@@ -167,6 +169,7 @@ export function useSearchNavigation({
   const restoreUnifiedReturn = (result?: SearchResultSnapshot) => {
     if (!SEARCH_AND_GO_PHASE_2 && !result && !returnToUnified) return
     setReturnToUnified(result ?? null)
+    setReturnQuery(result?.query || result?.state?.occurrence?.text || '')
     setReturnToSearch(!!result)
   }
 
@@ -178,7 +181,7 @@ export function useSearchNavigation({
     quickOpen, openQuick, setQuickOpen, quickScope, changeQuickScope,
     quickHighlights, setQuickHighlights,
     start, occurrence, clearOccurrence: () => setOccurrence(null),
-    returnToSearch, restoreUnifiedReturn, dismissReturn: () => { setReturnToSearch(false); setReturnToUnified(null) },
+    returnToSearch, returnQuery, restoreUnifiedReturn, dismissReturn: () => { setReturnToSearch(false); setReturnQuery(''); setReturnToUnified(null) },
     openAdvanced, startOccurrence, advance, pick, leaveForReading, applyEntry,
   }
 }

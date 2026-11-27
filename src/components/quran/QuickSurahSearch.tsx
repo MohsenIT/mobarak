@@ -1,12 +1,12 @@
 'use client'
 import {DictationInput} from './DictationInput'
-import {normalizeDigits} from '@/lib/locale-numbers'
 import {t} from '@/lib/i18n'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowRight, Search } from 'lucide-react'
 import { parseProfessionalQuery } from '@/lib/professional-query'
-import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
+import { destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, normalizeSearch, type Destination } from '@/lib/navigation'
+import DestinationOptions, { useDestinationSelection } from './DestinationOptions'
 import type { SurahMeta, Meta } from '@/lib/quran'
 import { loadSurah, toFa } from '@/lib/quran'
 import { createSearchSession, type SearchCorpus, type SearchSessionOptions } from '@/lib/quran-search-session'
@@ -31,7 +31,12 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
   const [query, setQuery] = useState('')
   const [mode, setMode] = useState<SearchMode>('text')
   const syntax = parseProfessionalQuery(query).status
-  const destinations = mode === 'text' && syntax === 'ordinary' ? searchDestinations(meta, query, surah.n) : []
+  const destinations = mode === 'text' && syntax === 'ordinary' ? destinationSuggestions(meta, query, surah.n, { compact: true }) : []
+  const namedSurah = !isNavigationInput(query) &&
+    destinations.some(item => item.exact && item.destination.kind === 'surah')
+  const navigationOnly = mode === 'text' && syntax === 'ordinary' && !namedSurah &&
+    (isExplicitDestinationQuery(query, destinations) || /^\d+$/.test(normalizeSearch(query)))
+  const selection = useDestinationSelection(destinations)
   const [results, setResults] = useState<QuranSearchResult[]>([])
   const [index, setIndex] = useState(0)
   const report=useRef(onHighlights);report.current=onHighlights
@@ -73,14 +78,8 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
   useEffect(() => {
     const id = ++request.current
     setError(false); setResults([]); setIndex(0)
-    const value = normalizeDigits(query).trim().replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d))).replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
-    if (syntax === 'invalid') { setBusy(false); return }
-    if (syntax === 'ordinary' && mode === 'text' && (isNavigationInput(query) || destinations.length > 0 && !/^\d+$/.test(value))) { setBusy(false); return }
-    if (/^\d+$/.test(value)) {
-      const a = Number(value)
-      if (a > 0 && a <= surah.vc) { const item = { s: surah.n, a, positions: [1], words: [], waw: [], parts: {}, kind: 'exact' as const, score: 0 }; setResults([item]); jump([item], 0) }
-      setBusy(false); return
-    }
+    const value = query.trim()
+    if (syntax === 'invalid' || navigationOnly) { setBusy(false); return }
     if (syntax === 'ordinary' && value.length < 2) { setBusy(false); return }
     setBusy(true)
     if (scope === 'surah' && !localEngine) return
@@ -88,7 +87,8 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
       const receive = (items: QuranSearchResult[]) => {
         if (id !== request.current) return
         items.sort((a, b) => a.s - b.s || a.a - b.a || a.positions[0] - b.positions[0])
-        setResults(items); setBusy(false); jump(items, 0)
+        setResults(items); setBusy(false)
+        if (!namedSurah) jump(items, 0)
       }
       try {
         if (id !== request.current) return
@@ -109,29 +109,40 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
       } catch { setError(true); setBusy(false) }
     }, 60)
     return () => { clearTimeout(timer); request.current++ }
-  }, [query, mode, surah.n, surah.vc, localEngine, scope, syntax, destinations.length])
+  }, [query, mode, surah.n, localEngine, scope, syntax, namedSurah, navigationOnly])
   const expand = (all: boolean) => onAdvanced({ query, mode, surahs: all ? [] : [surah.n] })
   const activeResult = syntax !== 'invalid' && !busy && !error && results[index]
   const neighborAddress = (result: QuranSearchResult | undefined) => result
     ? `${meta.surahs[result.s - 1].fa} ${toFa(result.a)}` : undefined
-  return <div className="quick-surah-search" aria-label={t("ui.a1edc5936b")}>
-    <form onSubmit={event => { event.preventDefault(); if(destinations.length===1)onNavigate(destinations[0].destination); else if (!busy) jump(results, index + 1) }}>
+  return <div className="quick-surah-search reader-search-width" aria-label={t("ui.a1edc5936b")}>
+    <form onSubmit={event => {
+      event.preventDefault()
+      const destination = selection.destination ?? destinations[0]?.destination
+      if (destination) onNavigate(destination)
+      else if (!busy) jump(results, index + 1)
+    }}>
       <button type="button" className="icon-btn" aria-label={t("ui.8b070f0497")} onClick={onClose}><ArrowRight size={20} /></button>
       <DictationInput speechLocale="ar" ref={input} type="search" value={query} maxLength={160} leadingIcon={<Search size={18} aria-hidden="true" />}
-        onClear={() => setQuery('')} onChange={event => setQuery(event.target.value)} aria-label={t('ui.26fa3c1923')}
-        placeholder={t('ui.a2897ec32a')} fitPlaceholder autoComplete="off" spellCheck={false} onKeyDown={event => { if (event.key === 'Escape') onClose() }} />
+        aria-controls={selection.inputProps['aria-controls']} aria-activedescendant={selection.inputProps['aria-activedescendant']}
+        enterKeyHint={destinations.length ? 'go' : 'search'}
+        onClear={() => { selection.reset(); setQuery('') }}
+        onChange={event => { selection.reset(); setQuery(event.target.value) }} aria-label={t('ui.26fa3c1923')}
+        placeholder={t('ui.a2897ec32a')} fitPlaceholder autoComplete="off" spellCheck={false} onKeyDown={event => { if (event.key === 'Escape') onClose(); else if (!event.nativeEvent.isComposing) selection.move(event) }} />
       <button type="button" className="quick-search-advanced" onClick={() => expand(scope === 'quran')}>
         <AdvancedSearchIcon size={18} />{t('ui.9617b95709')}
       </button>
     </form>
-    {destinations.length>0&&<div className="quick-jump-options" aria-label={t("ui.d289fa208b")}>{destinations.map((item,i)=><button type="button" key={i} onClick={()=>onNavigate(item.destination)}>{t("ui.b7b6972c78")}{' '}{toFa(item.label)} ←</button>)}</div>}
+    {destinations.length > 0 && <div className="quick-jump-options">
+      <span>{t('quickSearch.goTo')}</span>
+      <DestinationOptions id={selection.id} active={selection.active} options={destinations} onPick={onNavigate} className="quick-destination-chips" asChips />
+    </div>}
     <div className="quick-search-actions">
-      <div className="quick-search-mode quick-search-segment" role="group" aria-label={t("ui.5e4040c150")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, title]) => <button type="button" key={key} aria-pressed={key === mode} onClick={() => setMode(key)}><span>{title}</span></button>)}</div>
+      <div className="quick-search-mode quick-search-segment" role="group" aria-label={t("ui.5e4040c150")}>{([['text', t("ui.0f4147fe60")], ['root', t("ui.eecfc08eb8")], ['lemma', t("ui.8d5e58ddd8")]] as const).map(([key, title]) => <button type="button" key={key} aria-pressed={key === mode} onClick={() => { selection.reset(); setMode(key) }}><span>{title}</span></button>)}</div>
       <div className="quick-search-scope quick-search-segment" role="group" aria-label={t('occurrence.searchIn')}>
         {(['surah','quran'] as const).map(value => <button type="button" key={value} aria-pressed={scope === value} onClick={() => { if (value === 'surah' && scope !== value) setSurah(currentSurah); onScopeChange(value) }}><span>{t(value === 'surah' ? 'occurrence.thisSurah' : 'occurrence.wholeQuran')}</span></button>)}
       </div>
     </div>
-    {resultsBar && (activeResult || query.trim()) && createPortal(
+    {resultsBar && (activeResult || (query.trim() && (!navigationOnly || !destinations.length))) && createPortal(
       <div className="quick-search-status">
         {activeResult ? <OccurrenceStepper countLabel={t('ui.61cf4e03c8')}
           previous={{
@@ -146,7 +157,7 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
           }}
           center={<QuickSearchResultPicker key={`${scope}:${mode}:${query}`} meta={meta} results={results} index={index}
             onSelect={i => jump(results, i)} onFull={targetScope => onAdvanced({ query, mode, surahs: targetScope === 'quran' ? [] : [activeResult.s] })} />}
-        /> : <span role="status">{syntax === 'invalid' ? t('searchProfessional.invalid') : destinations.length ? t('ui.4f981a291d') : busy ? t('ui.63509f3da4') : error ? t('ui.e5d91b8562') : (syntax === 'valid' || query.trim().length >= 2) ? t('ui.292cf63931') : t('ui.d1400e3d47')}</span>}
+        /> : <span role="status">{syntax === 'invalid' ? t('searchProfessional.invalid') : navigationOnly ? t('ui.68f830ec5c') : busy ? t('ui.63509f3da4') : error ? t('ui.e5d91b8562') : (syntax === 'valid' || query.trim().length >= 2) ? t('ui.292cf63931') : t('ui.d1400e3d47')}</span>}
       </div>,
       resultsBar,
     )}

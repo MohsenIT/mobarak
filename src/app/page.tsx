@@ -362,8 +362,11 @@ export default function Home() {
   const navigateDestination = (destination: Destination, quick = false) => {
     search.leaveForReading();setSel(null)
     if(destination.kind==='page') {
-      route.writePageDestination(destination.p, quick)
-      goPage(destination.p)
+      goPage(destination.p, jump => {
+        if (jump.kind === 'verse') route.writeReadingVerse(jump.address, quick)
+        else route.writePageDestination(jump.page, quick)
+        return true
+      })
     }
     else goVerse(destination.s,destination.kind==='surah'?1:destination.kind==='context'?destination.from:destination.a,1,'start',true,quick)
   }
@@ -392,7 +395,7 @@ export default function Home() {
       const operation = SEARCH_AND_GO ? textSearchOperation(state, SEARCH_AND_GO_PHASE_2) : null
       if (operation) search.recordOperation(operation)
       const snapshot = position ? { query: state.query, position, ...(SEARCH_AND_GO_PHASE_2 ? { state, selected, highlight } : {}) } : null
-      search.pick(s, a, selected?.pos ?? pos, snapshot)
+      search.pick(s, a, selected?.pos ?? pos, snapshot, state.query || state.occurrence?.text)
       setSel(null)
       setComparisonRoot(null)
     }
@@ -561,6 +564,34 @@ export default function Home() {
     />
   ) : null
 
+  const query = search.returnQuery.trim().replace(/\s+/g, ' ')
+  const characters = query.length > 15 && typeof Intl.Segmenter === 'function'
+    ? Array.from(new Intl.Segmenter().segment(query), item => item.segment)
+    : Array.from(query)
+  const excerpt = characters.length > 15 ? characters.slice(0, 14).join('').trimEnd() + '…' : query
+  const returnLabel = query
+    ? t('quickSearch.returnToQuery', { p0: excerpt })
+    : t('ui.15868c5aa7')
+  const searchReturnBar = search.returnToSearch && !search.advancedOpen && !search.searchAndGoOpen && (
+    <div className="reader-search-band reader-search-width reader-advanced-return" dir="rtl">
+      <button type="button" className="chip" data-advanced-search-return title={search.returnQuery || undefined} onClick={() => {
+        setSel(null)
+        if (search.returnToUnified) {
+          if (!route.returnToSearchAndGoResult()) {
+            const result = search.returnToUnified
+            if (SEARCH_AND_GO_PHASE_2 && result.state) openUnifiedSearch(result.state, result)
+            else {
+              route.openSearchAndGo(curSurahN)
+              search.showUnified(result)
+            }
+          }
+        } else search.setAdvancedOpen(true)
+      }}>
+        <ArrowRight size={14} aria-hidden="true" /><span>{returnLabel}</span></button>
+      <button type="button" className="chip reader-search-dismiss" aria-label={t("ui.4d21d96f48")} onClick={() => { route.dismissSearchAndGoResult(); search.dismissReturn() }}>×</button>
+    </div>
+  )
+
   return (
     <>
     {!startupComplete && <StartupSplash leaving={startupLeaving} stalled={splash.stalled} onHoldChange={setStartupHeld} />}
@@ -571,10 +602,11 @@ export default function Home() {
       <QuranSearch onNavigate={navigateDestination} key={search.start?.revision ?? 0} onStateChange={writeSearchState} initialSearch={search.start} occurrenceFilter={search.occurrence} onClearOccurrenceFilter={search.clearOccurrence} translator={translator} open={search.advancedOpen} onOpenChange={changeSearchOpen} meta={meta} currentSurah={curSurahN} onPick={(s, a, pos, state) => pickSearchResult(s, a, pos, state)} />
 
       {/* Desktop has explicit previous/next controls in the reading pane below. */}
+      {search.quickOpen && searchReturnBar}
       <header dir="rtl" className="reader-toolbar relative z-10 shrink-0 flex items-center gap-1 px-2 sm:px-4 border-b"
         style={{
           borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 82%, transparent)',
-          backdropFilter: 'blur(8px)', paddingTop: 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: 'var(--reader-toolbar-spacing)',
+          backdropFilter: 'blur(8px)', paddingTop: search.quickOpen && searchReturnBar ? '0.5rem' : 'max(0.5rem, env(safe-area-inset-top))', paddingBottom: 'var(--reader-toolbar-spacing)',
         }}>
         {search.quickOpen ? <QuickSurahSearch meta={meta} resultsBar={quickResultsBar} onNavigate={destination => navigateDestination(destination, true)} surah={meta.surahs[curSurahN - 1]} onClose={() => search.setQuickOpen(false)}
           scope={search.quickScope} onScopeChange={search.changeQuickScope}
@@ -615,12 +647,13 @@ export default function Home() {
 
         </>}
       </header>
+      {!search.quickOpen && searchReturnBar}
 
       <LanguageOnboarding knownPersianReader={knownPersianReader} onTranslation={id=>{setTranslator(id);setShowTrans(true)}}/>
       <RecitationPlayer onNativeActive={()=>setAudioOpen(true)} playRequest={audioPlayRequest} pauseRequest={audioPauseRequest} onStatusChange={setAudioStatus} controlsVisible={audioControlsVisible} open={audioOpen} surah={meta.surahs[curSurahN-1]} selectedAyah={sel?(analysisSelection??sel).a:null} onPlaying={(s,a)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a})}} previousSurahVerses={meta.surahs[curSurahN-2]?.vc} onNextSurah={(s,a=1)=>{setAudioVerse({s,a});if(sel)setPlaybackTarget({s,a});goVerse(s,a)}} startAyah={sel?.s===curSurahN?(analysisSelection??sel).a:(typeof window!=='undefined'?readVerseAddress(window.location.search,window.location.pathname)?.a:1)??1} onClose={() => { setAudioOpen(false); setAudioVerse(null) }} onFollow={(s,a) => goVerse(s,a)} />
 
       {!search.advancedOpen && (route.quickOrigin || search.quickOpen) && (
-        <div className="quick-search-return" dir="rtl">
+        <div className="reader-search-band reader-search-width quick-search-return" dir="rtl">
           {route.quickOrigin && <button type="button" className="chip" data-quick-search-return onClick={route.returnFromQuick}>
             <ArrowRight size={14} aria-hidden="true" />
             <span>{t('quickSearch.returnTo', { p0: meta.surahs[route.quickOrigin.address.s - 1].fa, p1: toFa(route.quickOrigin.address.a) })}</span>
@@ -628,25 +661,7 @@ export default function Home() {
           {search.quickOpen && <div className="quick-search-results-slot" ref={setQuickResultsBar} />}
         </div>
       )}
-      {search.returnToSearch && !search.advancedOpen && !search.searchAndGoOpen && (
-        <div className="relative z-10 shrink-0 flex items-center justify-between gap-2 px-3 py-1 border-b" style={{ background: 'var(--paper)', borderColor: 'var(--line)' }}>
-          <button type="button" className="chip gap-1.5 py-1.5" onClick={() => {
-            setSel(null)
-            if (search.returnToUnified) {
-              if (!route.returnToSearchAndGoResult()) {
-                const result = search.returnToUnified
-                if (SEARCH_AND_GO_PHASE_2 && result.state) openUnifiedSearch(result.state, result)
-                else {
-                  route.openSearchAndGo(curSurahN)
-                  search.showUnified(result)
-                }
-              }
-            } else search.setAdvancedOpen(true)
-          }}>
-            <ArrowRight size={14} aria-hidden="true" />{t("ui.15868c5aa7")}</button>
-          <button type="button" className="icon-btn sm" aria-label={t("ui.4d21d96f48")} onClick={() => { route.dismissSearchAndGoResult(); search.dismissReturn() }}>×</button>
-        </div>
-      )}
+
 
       {!showComparison && comparisonRange?.s === curSurahN && (contextComparison || Object.keys(comparisonRoots).length > 0) && (
         <div className="relative z-10 flex flex-wrap items-center gap-2 px-3 py-2 text-xs" style={{ background: 'var(--paper)', borderBottom: '1px solid var(--line)' }}>

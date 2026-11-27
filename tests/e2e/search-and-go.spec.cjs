@@ -252,14 +252,14 @@ test('the return chip reuses the same search entry and closing restores the read
   await expect(page).toHaveURL(/\/s\/\d+\/a\/\d+/);
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('mushaf.search-and-go-history.v1'))[0].operation.type)).toBe('text');
   const length = await page.evaluate(() => history.length);
-  await page.getByRole('button', { name: 'بازگشت به نتایج جست‌وجو' }).click();
+  await page.locator('[data-advanced-search-return]').click();
   await expect(dialog).toBeVisible();
   expect(await page.evaluate(() => history.length)).toBe(length);
   await expect(field).toHaveValue('الحمد لله');
   await expect(results.first()).toBeVisible({ timeout: 20000 });
   await dialog.getByRole('button', { name: 'بازگشت به قرآن' }).click();
   await expect(page).toHaveURL(/\/s\/20\/a\/34$/);
-  await expect(page.getByRole('button', { name: 'بازگشت به نتایج جست‌وجو' })).toHaveCount(0);
+  await expect(page.locator('[data-advanced-search-return]')).toHaveCount(0);
 });
 
 test('a result on the current mushaf page stays in mushaf on Forward and reload', async ({ page }) => {

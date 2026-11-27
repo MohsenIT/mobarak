@@ -349,7 +349,7 @@ test('return restores the original current-surah scope and same-root setting aft
   await input.press('Enter');
   await expect(page).toHaveURL(/\/s\/2\/a\/255$/);
 
-  await page.getByRole('button', { name: 'بازگشت به نتایج جست‌وجو', exact: true }).click();
+  await page.locator('[data-advanced-search-return]').click();
   await expect(input).toHaveValue('علم');
   const params = new URL(page.url()).searchParams;
   expect(params.get('at')).toBe('20');
@@ -544,4 +544,41 @@ test('opening an ayah highlights the matched stems until search is dismissed', a
   await expect(verse.locator('[data-word-part="prefix"][data-highlight-state]')).toHaveCount(0);
   await page.getByRole('button', { name: labels['ui.4d21d96f48'], exact: true }).click();
   await expect(verse.locator('[data-highlight-state="match"]')).toHaveCount(0);
+});
+
+test('reader return bands share the Quran margins and preserve the full advanced query', async ({ page }) => {
+  await page.setViewportSize({ width: 686, height: 789 });
+  const query = 'قال ...{0,10} موسى';
+  await page.goto('/q?q=' + encodeURIComponent(query));
+  const panel = page.locator('[data-search-and-go]');
+  await panel.locator('[data-search-address="7:104"] button').click({ timeout: 25000 });
+  const advanced = page.locator('[data-advanced-search-return]');
+  await expect(advanced).toHaveText('بازگشت به جستجوی «قال ...{۰,۱۰}…»');
+  await expect(advanced).toHaveAttribute('title', query);
+
+  await page.locator('.reader-quick-search-trigger').click();
+  const quick = page.locator('.quick-surah-search');
+  const input = quick.getByRole('searchbox');
+  await input.fill('آیه ۱۰');
+  const destination = quick.locator('.quick-destination-chips .chip').first();
+  await expect(destination).toHaveText('آیهٔ ۱۰ سورهٔ اعراف');
+  expect((await advanced.boundingBox()).y).toBeLessThan((await quick.boundingBox()).y);
+  await input.press('Enter');
+  const back = page.locator('[data-quick-search-return]');
+  await expect(back).toBeVisible();
+  await expect(page).toHaveURL(/\/s\/7\/a\/10$/);
+  for (const width of [686, 1280]) {
+    await page.setViewportSize({ width, height: 789 });
+    const text = page.locator('.surah-pull-content [data-quran-copy-surface]').first();
+    await expect(text).toBeVisible();
+    const quran = await text.boundingBox();
+    const reference = await back.boundingBox();
+    expect(Math.abs(reference.x + reference.width - quran.x - quran.width)).toBeLessThan(2);
+    const button = await advanced.boundingBox();
+    expect(Math.abs(button.x + button.width - reference.x - reference.width)).toBeLessThan(2);
+    const close = await page.locator('.reader-search-dismiss').boundingBox();
+    expect(Math.abs(close.x - quran.x)).toBeLessThan(2);
+  }
+  await advanced.click();
+  await expect(panel.getByRole('combobox')).toHaveValue(query);
 });
