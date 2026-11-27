@@ -23,6 +23,11 @@ export function QuickSearchIcon(props: SearchIconProps) {
 
 export function AdvancedSearchIcon(props: SearchIconProps) {
   return <ReaderSearchIcon {...props} variant="advanced">
-    <path d="M12 16H18M22 16H30M12 25H22M26 25H30M20 12V20M24 21V29" strokeWidth="1.9" />
+    <g strokeWidth="2">
+      <path d="M12 16H22M28 16H30" />
+      <path d="M12 25H14M20 25H30" />
+      <circle cx="25" cy="16" r="3" />
+      <circle cx="17" cy="25" r="3" />
+    </g>
   </ReaderSearchIcon>
 }
