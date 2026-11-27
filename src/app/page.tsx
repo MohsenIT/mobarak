@@ -42,7 +42,7 @@ import RangeComparison from '@/components/quran/RangeComparison'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import AudioToolbarButton from '@/components/quran/AudioToolbarButton'
 import ReaderDisplayMenu from '@/components/quran/ReaderDisplayMenu'
-import ReaderSearchIcon from '@/components/quran/ReaderSearchIcon'
+import { AdvancedSearchIcon, QuickSearchIcon } from '@/components/quran/ReaderSearchIcon'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import SearchAndGo from '@/components/quran/SearchAndGo'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
@@ -587,16 +587,17 @@ export default function Home() {
           if (SEARCH_AND_GO) { route.rememberReadingPosition(); route.openSearchAndGo(curSurahN); setDrawerOpen(false); search.showUnified() }
           else { setDrawerView('navigation'); setDrawerOpen(true) }
         }}>
-          <ChevronDown size={16} aria-hidden="true" />
+          <AdvancedSearchIcon />
           <span className="reader-surah-name font-bold text-[14px] sm:text-[15px]" style={{ color: 'var(--ink)' }}>
             <span className="reader-surah-name-sizer" aria-hidden="true">{meta.surahs.map(item=><span key={item.n}>{item.ar}</span>)}</span>
             <span className="reader-surah-current">
             {mode === 'mushaf' ? pageInfo.names : meta.surahs[surah - 1]?.ar}
             </span>
-          </span><ReaderSearchIcon />
+          </span>
+          <ChevronDown size={16} aria-hidden="true" />
         </button>
 
-        <button className="icon-btn reader-quick-search-trigger" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { route.captureQuickOrigin(); setSel(null); search.openQuick() }}><ReaderSearchIcon quick /></button>
+        <button className="icon-btn reader-quick-search-trigger" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { route.captureQuickOrigin(); setSel(null); search.openQuick() }}><QuickSearchIcon /></button>
         <span className="reader-toolbar-spacer" aria-hidden="true" />
 
         <AudioToolbarButton

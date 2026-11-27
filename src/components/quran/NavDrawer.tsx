@@ -24,8 +24,9 @@ import { APP_NAME } from '@/lib/branding'
 import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { destinationSuggestions, NAVIGATION_HELP, type Destination } from '@/lib/navigation'
-import { IconClose, IconSearch, IconStar, IconMoon, IconSun, IconBook, IconTranslate, IconSortIndex } from './Ornaments'
+import { IconClose, IconStar, IconMoon, IconSun, IconBook, IconTranslate, IconSortIndex } from './Ornaments'
 import { ChevronLeft, GitCompareArrows, Settings } from 'lucide-react'
+import { AdvancedSearchIcon } from './ReaderSearchIcon'
 
 export type { Translator } from '@/lib/quran'
 
@@ -126,7 +127,7 @@ export default function NavDrawer(props: Props) {
           <section className="drawer-tool-section" aria-labelledby="drawer-find-heading">
             <h3 id="drawer-find-heading">{t('ui.3906317c3a')}</h3>
             <button type="button" className="drawer-tool-row" onClick={props.onAdvancedSearch}>
-              <IconSearch /><span>{t("ui.c51349274d")}</span><ChevronLeft size={17} aria-hidden="true" />
+              <AdvancedSearchIcon size={22} /><span>{t("ui.c51349274d")}</span><ChevronLeft size={17} aria-hidden="true" />
             </button>
           </section>
           <section className="drawer-tool-section" aria-labelledby="drawer-analysis-heading">

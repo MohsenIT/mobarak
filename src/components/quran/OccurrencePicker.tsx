@@ -2,7 +2,8 @@
 import {t} from '@/lib/i18n'
 import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
 import { Arrow as PopoverArrow } from '@radix-ui/react-popover'
-import { Search, X } from 'lucide-react'
+import { X } from 'lucide-react'
+import { AdvancedSearchIcon } from './ReaderSearchIcon'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type { SurahData } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
@@ -26,7 +27,7 @@ export function OccurrencePickerHeading({ onClose, onFull, disabled, operation =
 }) {
   return <div className="occurrence-picker-heading">
     {onFull && <div className="occurrence-search-scopes" data-picker-operation={operation}>
-      <span className="occurrence-search-label"><Search size={15} aria-hidden="true" />{t('occurrence.advancedIn')}</span>
+      <span className="occurrence-search-label"><AdvancedSearchIcon size={15} />{t('occurrence.advancedIn')}</span>
       <div className="occurrence-search-chips" role="group" aria-label={t('occurrence.advancedIn')}>
         {([['surah','occurrence.thisSurah'],['quran','occurrence.wholeQuran']] as const).filter(([scope]) => scopes.includes(scope)).map(([scope,key]) => <button key={scope} type="button" className="occurrence-search-shortcut" data-occurrence-scope={scope}
           disabled={disabled} onClick={() => { onClose(); onFull(scope) }}><SearchScopeIcon scope={scope} /><span>{t(key)}</span></button>)}

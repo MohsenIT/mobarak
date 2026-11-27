@@ -142,7 +142,7 @@ test('empty focus displays real mixed history with persistent pins and replay', 
   await input.click();
   const history = panel.locator('.search-and-go-history');
   await expect(history.locator('li')).toHaveCount(2);
-  await expect(history.locator('.lucide-search')).toHaveCount(1);
+  await expect(history.locator('[data-reader-search-icon=advanced]')).toHaveCount(1);
   await expect(history.locator('.lucide-mouse-pointer-2')).toHaveCount(1);
   const chips = history.getByRole('button');
   await expect(chips).toHaveCount(2);
@@ -176,7 +176,7 @@ test('suggestions share one RTL row while arrow selection crosses groups', async
   await expect(completion).toBeVisible();
   await expect(row.locator('.lucide-mouse-pointer-2')).toHaveCount(1);
   await expect(destination.locator('svg')).toHaveCount(0);
-  await expect(completion.locator('.lucide-search')).toHaveCount(1);
+  await expect(completion.locator('[data-reader-search-icon=advanced]')).toHaveCount(1);
   const [navigationBox, completionBox] = await Promise.all([destination.boundingBox(), completion.boundingBox()]);
   expect(Math.abs(navigationBox.y - completionBox.y)).toBeLessThan(1);
   expect(navigationBox.height).toBe(completionBox.height);

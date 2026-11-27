@@ -1,13 +1,28 @@
-function Magnifier() {
-  return <>
-    <circle cx="17.5" cy="17.5" r="3.25" />
-    <path d="m20 20 2.5 2.5" />
-  </>
+import type { MouseEventHandler, ReactNode } from 'react'
+
+type SearchIconProps = { size?: number; onClick?: MouseEventHandler<SVGSVGElement> }
+
+function ReaderSearchIcon({ variant, size = 24, onClick, children }: SearchIconProps & {
+  variant: 'quick' | 'advanced'
+  children: ReactNode
+}) {
+  return <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 48 48"
+    fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"
+    aria-hidden="true" data-reader-search-icon={variant} onClick={onClick}>
+    <circle cx="21" cy="21" r="14" />
+    <path d="M31 31L41 41" />
+    {children}
+  </svg>
 }
 
-export default function ReaderSearchIcon({ quick = false }: { quick?: boolean }) {
-  return <svg width="24" height="24" viewBox={quick ? '12 12 13 13' : '0 0 24 24'} fill="none" stroke="currentColor" strokeWidth={quick ? 13 / 12 : 2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    {!quick && <path d="M12 5.5C9 3.5 5 3.5 2 4.5V20c3-1 7-1 10 1V5.5C15 3.5 19 3.5 22 4.5V12" />}
-    <Magnifier />
-  </svg>
+export function QuickSearchIcon(props: SearchIconProps) {
+  return <ReaderSearchIcon {...props} variant="quick">
+    <path d="M22 11L14 23H21L19 31L28 19H21Z" strokeWidth="2" />
+  </ReaderSearchIcon>
+}
+
+export function AdvancedSearchIcon(props: SearchIconProps) {
+  return <ReaderSearchIcon {...props} variant="advanced">
+    <path d="M12 16H18M22 16H30M12 25H22M26 25H30M20 12V20M24 21V29" strokeWidth="1.9" />
+  </ReaderSearchIcon>
 }

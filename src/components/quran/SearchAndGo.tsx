@@ -1,7 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Search } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2 } from 'lucide-react'
+import { AdvancedSearchIcon } from './ReaderSearchIcon'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
 import { destinationLabel, destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, NAVIGATION_HELP, resolveDestination, type Destination } from '@/lib/navigation'
@@ -225,7 +226,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           <button type="button" ref={back} className="icon-btn" aria-label={t('ui.685e0d6bc0')}
             onClick={onClose}><BackIcon size={20} aria-hidden="true" /></button>
           <div className="search-page-input">
-            <Search size={19} aria-hidden="true" onClick={() => field.current?.focus()} />
+            <AdvancedSearchIcon size={19} onClick={() => field.current?.focus()} />
             <DictationInput {...selection.inputProps} aria-expanded={!help && selection.inputProps['aria-expanded']} aria-controls={help ? undefined : selection.inputProps['aria-controls']}
               aria-activedescendant={help ? undefined : selection.inputProps['aria-activedescendant']} ref={field} type="text" enterKeyHint={selection.destination ? 'go' : 'search'}
               value={query} maxLength={160} autoComplete="off" spellCheck={false}
@@ -297,7 +298,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 data-search-completions role="listbox" aria-label={t('ui.7bf42d2a96')}>
                 {completions.map((completion, index) => <button type="button" className="chip" key={completion} id={`${selection.completionId}-${index}`}
                   role="option" aria-selected={selection.completion === index} onMouseDown={event => event.preventDefault()} onClick={() => complete(completion)}>
-                  <Search size={14} aria-hidden="true" /><QuranText text={completion} />
+                  <AdvancedSearchIcon size={14} /><QuranText text={completion} />
                 </button>)}
               </div>}
             </div>}
@@ -313,7 +314,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 const op = entry.operation
                 const state = op.type === 'text' ? readSearchLink(op.link) : null
                 const label = op.type === 'navigation' ? destinationLabel(meta, op.destination) : state?.query || state?.occurrence?.text
-                const Icon = op.type === 'navigation' ? MousePointer2 : Search
+                const Icon = op.type === 'navigation' ? MousePointer2 : AdvancedSearchIcon
                 return <li key={entry.id}>
                   <button type="button" className="chip" data-pinned={entry.pinned || undefined}
                     title={t(entry.pinned ? 'ui.b6c1280f97' : 'ui.9c19bc2926')}
@@ -331,7 +332,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
               <h2>{t('searchP3.emptyTitle')}</h2>
               <p>{t('searchP3.emptyDescription')}</p>
               <div className="search-and-go-examples">
-                <button type="button" className="chip" onClick={() => complete(t('searchP3.exampleText'))}><Search size={14} aria-hidden="true" />{t('searchP3.exampleText')}</button>
+                <button type="button" className="chip" onClick={() => complete(t('searchP3.exampleText'))}><AdvancedSearchIcon size={14} />{t('searchP3.exampleText')}</button>
                 {examples.map((destination, index) => destination && <button type="button" className="chip" key={index}
                   onClick={() => onDestination(destination)}><MousePointer2 size={14} aria-hidden="true" />
                   {index === 3 ? t('searchP3.exampleJuz', { number: 30 }) : destinationLabel(meta, destination)}</button>)}
