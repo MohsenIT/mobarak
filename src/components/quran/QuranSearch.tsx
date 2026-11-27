@@ -7,7 +7,7 @@ import {t,uiDirection} from '@/lib/i18n'
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import {IconTranslate} from './Ornaments'
-import { X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreVertical, Link, Check, Languages, SpellCheck } from 'lucide-react'
+import { Search, X, LoaderCircle, ArrowRight, Funnel, BookOpen, MoreVertical, Link, Check, Languages, SpellCheck } from 'lucide-react'
 import { AdvancedSearchIcon } from './ReaderSearchIcon'
 import type { Meta, Translator, Translations } from '@/lib/quran'
 import { loadTrans, toFa, morphologyLabel } from '@/lib/quran'
@@ -431,7 +431,7 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
         <div className="search-command-row">
           <button type="button" className="icon-btn" aria-label={t("ui.685e0d6bc0")} onClick={() => onOpenChange(false)}><ArrowRight size={20} /></button>
           <div className="search-page-input">
-            <AdvancedSearchIcon size={17} />
+            <Search size={17} aria-hidden="true" />
             <DictationInput speechLocale="ar" ref={input} type="search" value={query} maxLength={160}
               {...(destinations.length ? destinationSelection.inputProps : {
                 role: 'combobox', 'aria-autocomplete': 'list',

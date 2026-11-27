@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Search } from 'lucide-react'
 import { AdvancedSearchIcon } from './ReaderSearchIcon'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
@@ -226,7 +226,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           <button type="button" ref={back} className="icon-btn" aria-label={t('ui.685e0d6bc0')}
             onClick={onClose}><BackIcon size={20} aria-hidden="true" /></button>
           <div className="search-page-input">
-            <AdvancedSearchIcon size={19} onClick={() => field.current?.focus()} />
+            <Search size={19} aria-hidden="true" onClick={() => field.current?.focus()} />
             <DictationInput {...selection.inputProps} aria-expanded={!help && selection.inputProps['aria-expanded']} aria-controls={help ? undefined : selection.inputProps['aria-controls']}
               aria-activedescendant={help ? undefined : selection.inputProps['aria-activedescendant']} ref={field} type="text" enterKeyHint={selection.destination ? 'go' : 'search'}
               value={query} maxLength={160} autoComplete="off" spellCheck={false}

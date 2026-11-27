@@ -1,14 +1,14 @@
-import type { MouseEventHandler, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
-type SearchIconProps = { size?: number; onClick?: MouseEventHandler<SVGSVGElement> }
+type SearchIconProps = { size?: number }
 
-function ReaderSearchIcon({ variant, size = 24, onClick, children }: SearchIconProps & {
+function ReaderSearchIcon({ variant, size = 24, children }: SearchIconProps & {
   variant: 'quick' | 'advanced'
   children: ReactNode
 }) {
   return <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 48 48"
     fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"
-    aria-hidden="true" data-reader-search-icon={variant} onClick={onClick}>
+    aria-hidden="true" data-reader-search-icon={variant}>
     <circle cx="21" cy="21" r="14" />
     <path d="M31 31L41 41" />
     {children}

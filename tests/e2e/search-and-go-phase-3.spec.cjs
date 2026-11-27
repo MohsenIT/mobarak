@@ -23,8 +23,13 @@ const addresses = panel => panel.locator('[data-search-address]').evaluateAll(ca
 
 test('quick and advanced search agree on the matches for a multiword query', async ({ page }) => {
   await page.goto('/s/20/a/34');
+  await expect(page.locator('.reader-quick-search-trigger [data-reader-search-icon=quick]')).toBeVisible();
+  await expect(page.locator('.reader-surah-link > [data-reader-search-icon=advanced]:first-child')).toBeVisible();
+  await expect(page.locator('.reader-surah-link > .lucide-chevron-down:last-child')).toBeVisible();
   await page.locator('.reader-quick-search-trigger').click();
   const quick = page.locator('.quick-surah-search');
+  await expect(quick.locator('.dictation-leading-icon .lucide-search')).toBeVisible();
+  await expect(quick.locator('.quick-search-advanced [data-reader-search-icon=advanced]')).toBeVisible();
   await quick.getByRole('button', { name: 'کل قرآن', exact: true }).click();
   await quick.getByRole('searchbox').fill('صبر نصر');
   await page.locator('.quick-search-status .analysis-position-button').click({ timeout: 30000 });
@@ -41,6 +46,7 @@ test('quick and advanced search agree on the matches for a multiword query', asy
   await popup.locator('.occurrence-picker-close').click();
   await quick.locator('.quick-search-advanced').click();
   const advanced = page.locator('[data-search-and-go]');
+  await expect(advanced.locator('.search-page-input > .lucide-search')).toBeVisible();
   await expect(advanced.getByRole('combobox')).toHaveValue('صبر نصر');
   await expect(advanced.locator('[data-search-address]').first()).toBeVisible({ timeout: 30000 });
   const advancedResults = await addresses(advanced);
