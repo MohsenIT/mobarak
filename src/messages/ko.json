@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "하나 이상",
   "searchP3.relationShort.phrase": "구문",
   "searchP3.matchWithin": "모든 단어가 일치할 범위",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "철자 정확히 일치",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

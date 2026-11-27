@@ -1,4 +1,5 @@
 import { normalizeQuranSearch, quranSearchKeys, type QuranSearchResult, type SearchVerse } from './quran-search'
+import { splitWord } from './word-parts'
 
 export type SearchRelation = 'all' | 'any' | 'phrase'
 export const unrecordedSearchForm = 'unrecorded'
@@ -13,6 +14,7 @@ export type Phase3SearchOptions = {
   forms: string[]
   cooccurrence?: SearchCooccurrence
   spellingSensitive?: boolean
+  orderedWords?: boolean
 }
 
 export function defaultPhase3SearchOptions(): Phase3SearchOptions {
@@ -21,7 +23,7 @@ export function defaultPhase3SearchOptions(): Phase3SearchOptions {
 
 type SearchClause = { text: string; exact: boolean }
 
-export function parseSearchQuery(input: string, relation: SearchRelation, spellingSensitive = false): SearchClause[] {
+export function parseSearchQuery(input: string, relation: SearchRelation, spellingSensitive = false, keepRepeats = false): SearchClause[] {
   if (relation === 'phrase') {
     const text = normalizeQuranSearch(input, false, spellingSensitive)
     return text ? [{ text, exact: true }] : []
@@ -32,7 +34,7 @@ export function parseSearchQuery(input: string, relation: SearchRelation, spelli
     const exact = quoted !== undefined
     const normalized = normalizeQuranSearch(quoted ?? plain, false, spellingSensitive)
     for (const text of exact ? [normalized] : normalized.split(' ')) {
-      if (text) clauses.set(`${exact}:${text}`, { text, exact })
+      if (text) clauses.set(keepRepeats ? String(clauses.size) : `${exact}:${text}`, { text, exact })
     }
   }
   return [...clauses.values()]
@@ -62,17 +64,21 @@ export function createExactSearch(verses: SearchVerse[], wawByVerse: Record<stri
         const hit: number[] = []
         const stems: [number, number][] = []
         for (let i = start, term = 0; i < words.length; i++) {
-          const keys = keysFor(words[i])
-          const prefixed = waw.includes(i + 1) && keys.some(key => key.startsWith('و') && key.length > 1)
+          const word = words[i]
+          const { prefix, stem } = splitWord({ t: word, wa: waw.includes(i + 1) })
+          const stemKeys = keysFor(stem)
           if (afterWaw && i === start) {
-            if (!keys.includes(`و${terms[term]}`)) return
+            if (!prefix || !stemKeys.includes(terms[term])) return
             hit.push(2)
-          } else if (keys.includes(terms[term])) {
-            hit.push(prefixed ? 3 : 2)
-          } else if (prefixed && terms[term] === 'و') {
+          } else if (!prefix && stemKeys.includes(terms[term])) {
+            hit.push(2)
+          } else if (prefix && terms[term] === 'و') {
             if (term === terms.length - 1) hit.push(1)
-            else if (keys.includes(`و${terms[++term]}`)) hit.push(3)
+            else if (stemKeys.includes(terms[++term])) hit.push(3)
             else return
+          } else if (prefix && terms.length > 1 && keysFor(word).includes(terms[term])) {
+            // A complete phrase may omit the space after a conjunction.
+            hit.push(3)
           } else return
           if (hit.at(-1)! & 2) stems.push([term, i + 1])
           if (++term === terms.length) {

@@ -56,3 +56,50 @@ test('phase 2 replay preserves explicitly chosen lemma, root, scope and occurren
     expect(readOperationHistory(meta, history)).toEqual([])
   }
 })
+
+const searchOperation = (query: string, filters = '') =>
+  textSearchOperation(readSearchLink(`/q?q=${encodeURIComponent(query)}${filters}`)!, true)!
+
+test('live history retains the complete phrase through pauses and deletions', () => {
+  const main = searchOperation('فتح و نصر')
+  let history = rememberOperation([], searchOperation('فتح و نص'), 10, 'live')
+  history = rememberOperation(history, main, 20, 'live')
+  history = rememberOperation(history, searchOperation('فتح'), 30, 'live')
+  expect(history.map(entry => entry.operation)).toEqual([main])
+  expect(readOperationHistory(meta, history, true)).toEqual(history)
+})
+
+test('confirmation outranks unfinished edits while confirmed searches, pins and search scopes stay distinct', () => {
+  const original = searchOperation('فتح')
+  const related = searchOperation('فتح و نصر')
+  let history = rememberOperation([], original, 10)
+  history = rememberOperation(history, related, 20, 'live')
+  expect(history.map(entry => entry.operation)).toEqual([original])
+  history = rememberOperation(history, related, 30)
+  expect(history.map(entry => entry.operation)).toEqual([related, original])
+  history = toggleOperationPin(history, history[0].id)
+  const scoped = searchOperation('فتح و نص', '&scope=single&s=48')
+  history = rememberOperation(history, scoped, 40, 'live')
+  expect(history.map(entry => entry.operation)).toEqual([scoped, related, original])
+  expect(history[1].pinned).toBe(true)
+})
+
+test('a short edit does not merge different completed phrases that share a prefix', () => {
+  const first = searchOperation('فتح مبین')
+  const second = searchOperation('فتح و نصر')
+  let history = rememberOperation([], first, 10, 'live')
+  history = rememberOperation(history, second, 20, 'live')
+  history = rememberOperation(history, searchOperation('فتح'), 30, 'live')
+  expect(history.map(entry => entry.operation)).toEqual([second, first])
+})
+
+test('a recent typo at the end of a phrase groups without collapsing quoted or older searches', () => {
+  const typo = searchOperation('فتح الارص')
+  const corrected = searchOperation('فتح الارض')
+  const quoted = searchOperation('«فتح الارض»')
+  let history = rememberOperation([], typo, 10, 'live')
+  history = rememberOperation(history, corrected, 20)
+  history = rememberOperation(history, quoted, 30, 'live')
+  history = rememberOperation(history, searchOperation('فتح'), 400_000, 'live')
+  expect(history.map(entry => entry.operation)).toEqual([searchOperation('فتح'), quoted, corrected])
+})

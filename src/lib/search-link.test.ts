@@ -56,7 +56,7 @@ test('unknown phase 3 settings do not change a legacy link', () => {
 })
 
 test('search preferences round trip with default legacy behavior', () => {
-  const state: SearchLinkState = { ...base, phase3: { relation: 'all', sorts: ['mushaf'], roots: [], lemmas: [], forms: [], cooccurrence: 'context', spellingSensitive: true, reverseSort: true } }
+  const state: SearchLinkState = { ...base, phase3: { relation: 'all', sorts: ['mushaf'], roots: [], lemmas: [], forms: [], cooccurrence: 'context', spellingSensitive: true, reverseSort: true, orderedWords: true } }
   for (const native of [false, true]) expect(readSearchLink(searchLink('https://example.com', state, native).href)).toEqual(state)
   expect(readSearchLink('/q?q=علم&m=r&co=unknown&sp=garbage')).toEqual(base)
 })

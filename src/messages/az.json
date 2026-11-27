@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "İstənilən",
   "searchP3.relationShort.phrase": "İfadə",
   "searchP3.matchWithin": "Bütün sözlərin uyğunluq vahidi",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Yazılışı dəqiq uyğunlaşdır",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

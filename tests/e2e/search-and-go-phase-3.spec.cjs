@@ -23,8 +23,13 @@ const addresses = panel => panel.locator('[data-search-address]').evaluateAll(ca
 
 test('quick and advanced search agree on the matches for a multiword query', async ({ page }) => {
   await page.goto('/s/20/a/34');
+  await expect(page.locator('.reader-quick-search-trigger [data-reader-search-icon=quick]')).toBeVisible();
+  await expect(page.locator('.reader-surah-link > [data-reader-search-icon=advanced]:first-child')).toBeVisible();
+  await expect(page.locator('.reader-surah-link > .lucide-chevron-down:last-child')).toBeVisible();
   await page.locator('.reader-quick-search-trigger').click();
   const quick = page.locator('.quick-surah-search');
+  await expect(quick.locator('.dictation-leading-icon .lucide-search')).toBeVisible();
+  await expect(quick.locator('.quick-search-advanced [data-reader-search-icon=advanced]')).toBeVisible();
   await quick.getByRole('button', { name: 'کل قرآن', exact: true }).click();
   await quick.getByRole('searchbox').fill('صبر نصر');
   await page.locator('.quick-search-status .analysis-position-button').click({ timeout: 30000 });
@@ -41,6 +46,7 @@ test('quick and advanced search agree on the matches for a multiword query', asy
   await popup.locator('.occurrence-picker-close').click();
   await quick.locator('.quick-search-advanced').click();
   const advanced = page.locator('[data-search-and-go]');
+  await expect(advanced.locator('.search-page-input > .lucide-search')).toBeVisible();
   await expect(advanced.getByRole('combobox')).toHaveValue('صبر نصر');
   await expect(advanced.locator('[data-search-address]').first()).toBeVisible({ timeout: 30000 });
   const advancedResults = await addresses(advanced);
@@ -64,7 +70,7 @@ test('empty search stays active after blur and clear until Browse is chosen', as
   await empty.getByRole('button', { name: 'صبر', exact: true }).click();
   await expect(input).toHaveValue('صبر');
   await expect(panel.locator('[data-search-address]').first()).toBeVisible();
-  await expect(panel.locator('.search-results-summary [role=status]')).toHaveText(/آیه · .+ یافته شده/);
+  await expect(panel.locator('.search-results-summary [role=status]')).toHaveText(/آیه · .+ واژه$/);
   await input.fill('');
   await expect(empty).toBeVisible();
   await empty.getByRole('button', { name: labels['searchP3.browse'] }).click();
@@ -72,6 +78,56 @@ test('empty search stays active after blur and clear until Browse is chosen', as
   expect(await page.evaluate(() => history.length)).toBe(historyLength);
   await panel.getByRole('button', { name: labels['ui.685e0d6bc0'], exact: true }).click();
   await expect(page).toHaveURL(/\/s\/20\/a\/34$/);
+});
+
+test('live history saves viewed searches on clear and browser Back, and Enter confirms immediately', async ({ page }) => {
+  await page.goto('/s/48');
+  const trigger = page.locator('.reader-surah-link');
+  await trigger.click();
+  const panel = page.locator('[data-search-and-go]');
+  const input = panel.getByRole('combobox');
+  const chips = panel.locator('.search-and-go-history .chip');
+  const results = panel.locator('[data-search-address]');
+  await input.fill('فتح و نص');
+  await expect(results.first()).toBeVisible();
+  await input.fill('');
+  await expect(chips).toHaveText(['فتح و نص']);
+  await input.fill('فتح و نصر');
+  await expect(results.first()).toBeVisible();
+  await page.goBack();
+  await expect(panel).toHaveCount(0);
+  await trigger.click();
+  await input.click();
+  await expect(chips).toHaveText(['فتح و نصر']);
+  await input.fill('فتح');
+  await expect(results.first()).toBeVisible();
+  await input.fill('');
+  await expect(chips).toHaveText(['فتح و نصر']);
+  await input.fill('الرسالةز');
+  await input.press('Enter');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('mushaf.search-and-go-history.v1')));
+  expect(new URL(saved[0].operation.link, page.url()).searchParams.get('q')).toBe('الرسالةز');
+  expect(saved[0].source).toBeUndefined();
+});
+
+test('outside clicks dismiss the open popup before another action can run', async ({ page }) => {
+  await page.goto('/q?q=فتح+نصر&scope=all&rel=all');
+  const panel = page.locator('[data-search-and-go]');
+  const relation = panel.locator('details:has(.phase3-relation-popup)');
+  const scope = panel.locator('[data-phase3-scope]');
+  await relation.locator('summary').click();
+  await expect(relation).toHaveAttribute('open', '');
+  await scope.locator('summary').click();
+  await expect(relation).not.toHaveAttribute('open', '');
+  await expect(scope).not.toHaveAttribute('open', '');
+  await scope.locator('summary').click();
+  await expect(scope).toHaveAttribute('open', '');
+  const help = panel.getByRole('button', { name: labels['searchAndGo.help'], exact: true });
+  await help.click();
+  await expect(scope).not.toHaveAttribute('open', '');
+  await expect(help).toHaveAttribute('aria-expanded', 'false');
+  await help.click();
+  await expect(help).toHaveAttribute('aria-expanded', 'true');
 });
 
 test('empty focus displays real mixed history with persistent pins and replay', async ({ page }) => {
@@ -92,17 +148,24 @@ test('empty focus displays real mixed history with persistent pins and replay', 
   await input.click();
   const history = panel.locator('.search-and-go-history');
   await expect(history.locator('li')).toHaveCount(2);
-  await expect(history.locator('.lucide-search')).toHaveCount(1);
+  await expect(history.locator('[data-reader-search-icon=advanced]')).toHaveCount(1);
   await expect(history.locator('.lucide-mouse-pointer-2')).toHaveCount(1);
-  const pin = history.locator('li').filter({ has: page.locator('.lucide-mouse-pointer-2') }).locator('button[aria-pressed="false"]');
-  await pin.click();
-  await expect(history.locator('li').first().getByRole('button', { pressed: true })).toBeVisible();
+  const chips = history.getByRole('button');
+  await expect(chips).toHaveCount(2);
+  expect((await chips.first().boundingBox()).y).toBe((await chips.last().boundingBox()).y);
+  const pin = history.locator('li').filter({ has: page.locator('.lucide-mouse-pointer-2') }).getByRole('button');
+  await pin.hover();
+  await page.mouse.down();
+  await expect(pin).toHaveAttribute('data-pinned', 'true');
+  await page.mouse.up();
+  await expect(input).toHaveValue('');
+  await expect(history.locator('li').first().getByRole('button')).toHaveAttribute('data-pinned', 'true');
   await panel.getByRole('button', { name: labels['ui.685e0d6bc0'], exact: true }).click();
   await expect(panel).toHaveCount(0);
   await page.reload();
   await trigger.click();
   await input.click();
-  await expect(history.locator('li').first().getByRole('button', { pressed: true })).toBeVisible();
+  await expect(history.locator('li').first().getByRole('button')).toHaveAttribute('data-pinned', 'true');
   await history.getByRole('button', { name: 'صبر', exact: true }).click();
   await expect(input).toHaveValue('صبر');
   await expect(panel.locator('.search-result-open').first()).toBeVisible();
@@ -119,7 +182,7 @@ test('suggestions share one RTL row while arrow selection crosses groups', async
   await expect(completion).toBeVisible();
   await expect(row.locator('.lucide-mouse-pointer-2')).toHaveCount(1);
   await expect(destination.locator('svg')).toHaveCount(0);
-  await expect(completion.locator('.lucide-search')).toHaveCount(1);
+  await expect(completion.locator('[data-reader-search-icon=advanced]')).toHaveCount(1);
   const [navigationBox, completionBox] = await Promise.all([destination.boundingBox(), completion.boundingBox()]);
   expect(Math.abs(navigationBox.y - completionBox.y)).toBeLessThan(1);
   expect(navigationBox.height).toBe(completionBox.height);
@@ -137,7 +200,7 @@ test('on a narrow surface, research filters open above the summary without movin
   const list = panel.locator('.search-page-results');
   const summary = panel.locator('.search-results-summary');
   await expect(panel.locator('[data-search-address]').first()).toBeVisible();
-  await expect(summary.getByRole('status')).toHaveText('۸۴ آیه · ۹۲ یافته شده');
+  await expect(summary.getByRole('status')).toHaveText('۸۴ آیه · ۹۲ واژه');
   await list.evaluate(element => { element.scrollTop = 300; });
   const before = await summary.boundingBox();
   const historyLength = await page.evaluate(() => history.length);
@@ -345,10 +408,14 @@ test('scope tabs retain selections and count matching surahs outside the active 
   const surface = page.locator('[data-search-workspace]');
   await surface.getByRole('combobox').fill('صبر');
   const scope = surface.locator('[data-phase3-scope]');
+  const scopeTrigger = scope.locator('summary');
   const sort = surface.locator('[data-phase3-sort] summary');
-  await scope.locator('summary').click();
-  expect((await sort.boundingBox()).x).toBeLessThan((await scope.locator('summary').boundingBox()).x);
+  const allColor = await scopeTrigger.evaluate(button => getComputedStyle(button).backgroundColor);
+  await scopeTrigger.click();
+  expect((await sort.boundingBox()).x).toBeLessThan((await scopeTrigger.boundingBox()).x);
   await scope.getByRole('tab', { name: labels['searchP3.scopeTab.many'] }).click();
+  await expect(scopeTrigger).toHaveAttribute('data-changed', 'true');
+  expect(await scopeTrigger.evaluate(button => getComputedStyle(button).backgroundColor)).not.toBe(allColor);
   await expect(scope.locator('[role=checkbox]').first()).toBeVisible({ timeout: 20_000 });
   await expect(surface.locator('[data-search-address]')).toHaveCount(0);
   await scope.getByRole('button', { name: labels['searchP3.scopeAllSurahs'], exact: true }).click();
@@ -361,6 +428,8 @@ test('scope tabs retain selections and count matching surahs outside the active 
   await scope.getByRole('tab', { name: labels['searchP3.scopeTab.single'] }).click();
   await expect(scope.locator('.phase3-scope-pick')).toContainText('طه');
   await expect(scope.locator('.phase3-scope-pick')).toContainText(labels['searchP3.scopeCurrent']);
+  const stepWidths = await scope.locator('.phase3-scope-stepper > button').evaluateAll(buttons => buttons.map(button => button.getBoundingClientRect().width));
+  expect(stepWidths[1]).toBeGreaterThan(Math.max(stepWidths[0], stepWidths[2]));
   await scope.getByRole('button', { name: labels['searchP3.scopePrevious'] }).click();
   await expect(scope.locator('.phase3-scope-pick')).toContainText('مریم');
   await scope.getByRole('button', { name: labels['searchP3.scopeNext'] }).click();
@@ -371,4 +440,42 @@ test('scope tabs retain selections and count matching surahs outside the active 
   await scope.locator('summary').click();
   await expect(scope.getByRole('tab', { name: labels['searchP3.scopeTab.many'] })).toHaveAttribute('aria-selected', 'true');
   await expect(scope.locator('[data-surah="114"]')).toHaveAttribute('aria-checked', 'true');
+});
+
+test('explicit roots match and the word order switch persists through search links', async ({ page }) => {
+  await page.goto('/q?q=' + encodeURIComponent('برز جحم') + '&at=83&scope=all&rel=all&sort=mushaf');
+  const surface = page.locator('[data-search-workspace]');
+  const field = surface.getByRole('combobox');
+  const result = surface.locator('[data-search-address="79:36"]');
+  await expect(result).toBeVisible({ timeout: 20_000 });
+  await field.fill('جحم برز');
+  await expect(result).toBeVisible({ timeout: 20_000 });
+  const settings = surface.locator('[data-phase3-settings]');
+  await settings.locator('summary').click();
+  const firstSetting = settings.locator('.reader-display-controls > section').first();
+  await expect(firstSetting.getByRole('heading')).toHaveText(labels['searchP3.matchWithin']);
+  await expect(firstSetting.locator('h3 svg')).toBeVisible();
+  await expect(settings.getByRole('switch').first()).toHaveAccessibleName(labels['ui.5105840a21']);
+  const order = settings.getByRole('switch', { name: labels['searchP3.orderedWords'] });
+  await order.click();
+  await expect(order).toHaveAttribute('aria-checked', 'true');
+  await expect.poll(() => new URL(page.url()).searchParams.get('wo')).toBe('1');
+  await expect(result).toHaveCount(0);
+  await page.reload();
+  await settings.locator('summary').click();
+  await expect(order).toHaveAttribute('aria-checked', 'true');
+  await field.fill('برز جحم');
+  await expect(result).toBeVisible({ timeout: 20_000 });
+});
+
+test('opening an ayah highlights the matched stems until search is dismissed', async ({ page }) => {
+  await page.goto('/q?q=برز+جحم&s=26&scope=single&rel=all');
+  const result = page.locator('[data-search-address="26:91"] .search-result-open');
+  await result.click({ timeout: 30000 });
+  await expect(page).toHaveURL(/\/s\/26\/a\/91$/);
+  const verse = page.locator('main [data-surah="26"][data-ayah="91"]');
+  await expect(verse.locator('[data-word-part="stem"][data-highlight-state="match"]')).toHaveCount(2);
+  await expect(verse.locator('[data-word-part="prefix"][data-highlight-state]')).toHaveCount(0);
+  await page.getByRole('button', { name: labels['ui.4d21d96f48'], exact: true }).click();
+  await expect(verse.locator('[data-highlight-state="match"]')).toHaveCount(0);
 });

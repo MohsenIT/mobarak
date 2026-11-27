@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "ஏதேனும்",
   "searchP3.relationShort.phrase": "சொற்றொடர்",
   "searchP3.matchWithin": "எல்லாச் சொற்களும் பொருந்த வேண்டிய எல்லை",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "துல்லிய எழுத்துக்கூட்டைப் பொருத்து",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

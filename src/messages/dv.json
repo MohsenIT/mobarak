@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "ކޮންމެއެއް",
   "searchP3.relationShort.phrase": "ބަސްބުރަ",
   "searchP3.matchWithin": "ހުރިހާ ބަސްތައް ގުޅުވާ ދާއިރާ",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "ލިޔުން ދިމާކުރަން",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

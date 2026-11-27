@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "いずれか",
   "searchP3.relationShort.phrase": "語句",
   "searchP3.matchWithin": "すべての語が一致する範囲",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "綴りを完全一致させる",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

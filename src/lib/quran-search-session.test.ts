@@ -79,6 +79,26 @@ test('expanding a literal match counts each new root occurrence once', () => {
 
 const phase3 = { relation: 'all' as const, sorts: ['mushaf' as const], roots: [], lemmas: [], forms: [] }
 
+test('a conjunction cannot supply the first letter of a partial or fuzzy word match', () => {
+  const options = { phase3, includePartial: true, includeRoots: true }
+  for (const includeNear of [false, true]) {
+    const hits = search('سلم وجه', { ...options, includeNear })
+    expect(hits.some(({ s, a }) => s === 22 && a === 78)).toBe(false)
+    expect(hits.some(({ s, a }) => s === 2 && a === 112)).toBe(true)
+  }
+  const local = createSearchSession({ verses: [[1, 1, ['وَجَهْدٌ', 'وَجْهٌ']]], waw: { '1:1': [1] }, morphology: {} })
+  expect(local('وجه', { phase3, includeNear: true })[0].parts).toEqual({ 2: 2 })
+  expect(local('وجهد', { phase3 })).toEqual([])
+  expect(local('«وجهد»', { phase3 })).toEqual([])
+  expect(local('«و جهد»', { phase3 })[0].parts).toEqual({ 1: 3 })
+})
+
+test('the word count includes a separately matched conjunction', () => {
+  const local = createSearchSession({ verses: [[1, 1, ['وَلَا', 'تَخَفْ']]], waw: { '1:1': [1] }, morphology: {} })
+  const phrase = { ...phase3, relation: 'phrase' as const }
+  expect(countQuranSearchResults(local('و لا تخف', { phase3: phrase }))).toEqual({ occurrences: 1, words: 3, verses: 1 })
+})
+
 test('multiword lemma and root searches find both stems in Yusuf 76', () => {
   for (const mode of ['lemma', 'root'] as const) {
     const options = { mode, phase3, surahs: [12] }
@@ -192,4 +212,36 @@ test('unrecorded form keeps the seven prayer matches countable and filterable', 
   const filtered = search('صابر صلاه', { includeRoots: true, phase3: { ...phase3, forms: [unrecordedSearchForm] } })
   expect(filtered.map(result => [result.s, result.a])).toEqual(hits.map(result => [result.s, result.a]))
   expect(filtered.flatMap(result => result.positions.map(pos => result.morphology?.[pos - 1]?.[2]))).not.toContain('VIII')
+})
+
+test('an attested typed root expands without a literal token spelling', () => {
+  const options = { includeRoots: true, phase3, surahs: [79] }
+  expect(search('برز جحم', options).map(r => [r.a, r.positions])).toEqual(
+    search('برز جحیم', options).map(r => [r.a, r.positions]),
+  )
+  expect(search('برز جحم', options).some(r => r.a === 36)).toBe(true)
+  expect(search('برز جحم', { ...options, includeRoots: false })).toEqual([])
+})
+
+test('word order is optional, allows intervening words, and requires repeated words to use distinct hits', () => {
+  const local = createSearchSession({
+    verses: [[1, 1, ['قال', 'ثم', 'كتب']], [1, 2, ['كتب', 'قال']], [1, 3, ['قال', 'ثم', 'قال']]],
+    morphology: {},
+  })
+  const ordered = { ...phase3, orderedWords: true }
+  expect(local('قال كتب', { phase3 }).map(r => r.a)).toEqual([1, 2])
+  expect(local('قال كتب', { phase3: ordered }).map(r => r.a)).toEqual([1])
+  expect(local('كتب قال', { phase3: ordered }).map(r => r.a)).toEqual([2])
+  expect(local('قال قال', { phase3: ordered }).map(r => r.a)).toEqual([3])
+  expect(local('قال كتب', { phase3: { ...ordered, relation: 'phrase' } })).toEqual([])
+  expect(local('قال غفر', { phase3: { ...ordered, relation: 'any' } }).map(r => r.a)).toEqual([1, 2, 3])
+})
+
+test('word order across a surah retains only verses participating in an ordered sequence', () => {
+  const local = createSearchSession({
+    verses: [[1, 1, ['كتب']], [1, 2, ['قال']], [1, 3, ['كتب']], [1, 4, ['قال']], [2, 1, ['كتب']]],
+    morphology: {},
+  })
+  expect(local('قال كتب', { phase3: { ...phase3, orderedWords: true, cooccurrence: 'surah' } }).map(r => [r.s,r.a]))
+    .toEqual([[1,2], [1,3]])
 })

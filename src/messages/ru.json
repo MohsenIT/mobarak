@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Любое",
   "searchP3.relationShort.phrase": "Фраза",
   "searchP3.matchWithin": "Совпадение всех слов в пределах",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Точное совпадение написания",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

@@ -2014,12 +2014,11 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-and-go-empty p { font-size: 13px; color: var(--ink-soft); margin-block-end: 10px; }
 .search-and-go-examples { display: flex; flex-wrap: wrap; gap: 6px; }
 .search-and-go-examples .chip, .search-and-go-history .chip { min-height: 32px; }
-.search-and-go-history { max-block-size: min(240px, 32dvh, calc(var(--search-and-go-height, 100dvh) * .32)); overflow: auto; padding-inline-end: 4px; }
-.search-and-go-history li { display: flex; align-items: center; gap: 4px; padding-block: 2px; }
-.search-and-go-history li .chip { min-width: 0; }
+.search-and-go-history { display: flex; flex-wrap: wrap; gap: 5px; max-block-size: min(240px, 32dvh, calc(var(--search-and-go-height, 100dvh) * .32)); overflow: auto; padding-inline-end: 4px; }
+.search-and-go-history li { min-width: 0; max-width: 100%; }
+.search-and-go-history li .chip { max-width: 100%; cursor: pointer; user-select: none; -webkit-touch-callout: none; }
 .search-and-go-history li .chip > span { overflow: hidden; text-overflow: ellipsis; }
-.search-and-go-history .icon-btn { width: 32px; height: 32px; flex: none; }
-.search-and-go-history [aria-pressed="true"] { background: var(--word-active); }
+.search-and-go-history .chip[data-pinned] { background: var(--word-active); border-color: var(--sage); }
 .search-and-go-browse { min-height: 36px; font-size: 12px; color: var(--ink-soft); text-decoration: underline; margin-block-start: 6px; }
 
 /* The search surface and its internal columns respond independently. */
@@ -2039,6 +2038,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-page-input .reader-display-menu .reader-display-modes button { padding: 4px; }
 .search-page-input .reader-display-menu .reader-display-switch { padding: 3px; }
 .phase3-settings .reader-display-switch:disabled { opacity: .55; }
+.phase3-settings .reader-display-controls :is(h3, .reader-display-translation > span) > svg { flex: none; }
 .phase3-settings summary, .phase3-sort summary, .phase3-scope-control > summary { list-style: none; cursor: pointer; }
 .phase3-settings summary::-webkit-details-marker, .phase3-sort summary::-webkit-details-marker, .phase3-scope-control > summary::-webkit-details-marker { display: none; }
 .phase3-sort { position: relative; }
@@ -2050,6 +2050,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .phase3-settings > summary { position: relative; z-index: 9; }
 .search-and-go:has(details[name="mobarak-search-popup"][open]) .phase3-options > details > summary,
 .phase3-sort > summary, .phase3-scope-control > summary { background: var(--paper); }
+.phase3-scope-control > summary[data-changed='true'] { background: var(--word-active); border-color: var(--sage); }
 
 /* The right panel shares the search surface with the main content. */
 [data-search-workspace] .search-and-go-shell { width: 100%; }
@@ -2211,6 +2212,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .phase3-scope-footer > button { min-block-size: 30px; color: var(--ink); padding-inline: 9px; }
 .phase3-scope-menu button:disabled { opacity: .5; cursor: default; }
 .phase3-scope-range, .phase3-scope-stepper { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+.phase3-scope-stepper { grid-template-columns: minmax(60px, max-content) minmax(0, 1fr) minmax(60px, max-content); }
 .phase3-scope-stepper > button { min-width: 0; padding-inline: 7px; }
 .phase3-scope-stepper .phase3-scope-pick { gap: 4px; padding: 5px 3px; }
 .phase3-scope-pick > svg:first-child { display: none; }

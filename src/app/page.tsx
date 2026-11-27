@@ -42,10 +42,11 @@ import RangeComparison from '@/components/quran/RangeComparison'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import AudioToolbarButton from '@/components/quran/AudioToolbarButton'
 import ReaderDisplayMenu from '@/components/quran/ReaderDisplayMenu'
-import ReaderSearchIcon from '@/components/quran/ReaderSearchIcon'
+import { AdvancedSearchIcon, QuickSearchIcon } from '@/components/quran/ReaderSearchIcon'
 import QuranSearch, { type SearchStart } from '@/components/quran/QuranSearch'
 import SearchAndGo from '@/components/quran/SearchAndGo'
 import QuickSurahSearch from '@/components/quran/QuickSurahSearch'
+import type { QuranSearchHighlight } from '@/lib/quran-search'
 import ReaderSearchHighlights from '@/components/quran/ReaderSearchHighlights'
 import {
   PatternBG,
@@ -386,17 +387,17 @@ export default function Home() {
     if (start) openUnifiedSearch(initialSearchLinkState(translator, start, selection))
   }
 
-  const pickSearchResult = (s: number, a: number, pos: number, state: SearchLinkState, position?: SearchResultPosition) => {
+  const pickSearchResult = (s: number, a: number, pos: number, state: SearchLinkState, position?: SearchResultPosition, highlight?: QuranSearchHighlight) => {
     const enterReading = (selected?: VerseAddress) => {
       const operation = SEARCH_AND_GO ? textSearchOperation(state, SEARCH_AND_GO_PHASE_2) : null
       if (operation) search.recordOperation(operation)
-      const snapshot = position ? { query: state.query, position, ...(SEARCH_AND_GO_PHASE_2 ? { state, selected } : {}) } : null
+      const snapshot = position ? { query: state.query, position, ...(SEARCH_AND_GO_PHASE_2 ? { state, selected, highlight } : {}) } : null
       search.pick(s, a, selected?.pos ?? pos, snapshot)
       setSel(null)
       setComparisonRoot(null)
     }
     if (position) {
-      const writeResult = route.prepareSearchAndGoResult(state, position)
+      const writeResult = route.prepareSearchAndGoResult(state, position, highlight)
       goVerse(s, a, pos, undefined, false, false, jump => {
         if (!writeResult(jump)) return false
         search.setSearchAndGoOpen(false)
@@ -586,16 +587,17 @@ export default function Home() {
           if (SEARCH_AND_GO) { route.rememberReadingPosition(); route.openSearchAndGo(curSurahN); setDrawerOpen(false); search.showUnified() }
           else { setDrawerView('navigation'); setDrawerOpen(true) }
         }}>
-          <ChevronDown size={16} aria-hidden="true" />
+          <AdvancedSearchIcon />
           <span className="reader-surah-name font-bold text-[14px] sm:text-[15px]" style={{ color: 'var(--ink)' }}>
             <span className="reader-surah-name-sizer" aria-hidden="true">{meta.surahs.map(item=><span key={item.n}>{item.ar}</span>)}</span>
             <span className="reader-surah-current">
             {mode === 'mushaf' ? pageInfo.names : meta.surahs[surah - 1]?.ar}
             </span>
-          </span><ReaderSearchIcon />
+          </span>
+          <ChevronDown size={16} aria-hidden="true" />
         </button>
 
-        <button className="icon-btn reader-quick-search-trigger" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { route.captureQuickOrigin(); setSel(null); search.openQuick() }}><ReaderSearchIcon quick /></button>
+        <button className="icon-btn reader-quick-search-trigger" aria-label={t("ui.cd32ebbeba")} title={t("ui.cd32ebbeba")} onClick={() => { route.captureQuickOrigin(); setSel(null); search.openQuick() }}><QuickSearchIcon /></button>
         <span className="reader-toolbar-spacer" aria-hidden="true" />
 
         <AudioToolbarButton
@@ -661,7 +663,8 @@ export default function Home() {
         <main ref={mainRef} className="flex-1 min-h-0 min-w-0 flex flex-col quran-main"
           onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} onTouchCancel={onTouchEnd}>
           <QuranClipboard root={mainRef} meta={meta} />
-          <ReaderSearchHighlights value={search.quickOpen?search.quickHighlights:null}>
+          <ReaderSearchHighlights value={search.quickOpen?search.quickHighlights:null}
+            verse={search.returnToSearch && !search.quickOpen && !search.advancedOpen && !search.searchAndGoOpen ? search.returnToUnified?.highlight : undefined}>
           {mode === 'mushaf' ? (
             <ContinuousMushaf meta={meta} page={page} navigationRevision={mushafNavigationRevision}
               onPageChange={setPage} onContentReady={onMushafContentReady} showTrans={showTrans} translator={translator} scale={scale}
@@ -721,6 +724,7 @@ export default function Home() {
         onClearOccurrenceFilter={search.clearOccurrence}
         onReplay={SEARCH_AND_GO_PHASE_2 ? openUnifiedSearch : undefined}
         history={SEARCH_AND_GO_PHASE_2 ? search.operations : undefined}
+        onRecordSearch={SEARCH_AND_GO_PHASE_2 ? search.recordOperation : undefined}
         onToggleHistoryPin={search.toggleHistoryPin}
         onRecentSurah={s => {
           const position = route.lastSurahPosition(s, meta.surahs[s - 1].vc)

@@ -4,7 +4,7 @@ import {normalizeDigits} from '@/lib/locale-numbers'
 import {t} from '@/lib/i18n'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Search } from 'lucide-react'
 import { searchDestinations, isNavigationInput, type Destination } from '@/lib/navigation'
 import type { SurahMeta, Meta } from '@/lib/quran'
 import { loadSurah, toFa } from '@/lib/quran'
@@ -16,7 +16,7 @@ import type { SearchMode } from '@/lib/quran-search-session'
 import type { SearchStart } from './QuranSearch'
 import OccurrenceStepper from './OccurrenceStepper'
 import QuickSearchResultPicker from './QuickSearchResultPicker'
-import ReaderSearchIcon from './ReaderSearchIcon'
+import { AdvancedSearchIcon } from './ReaderSearchIcon'
 
 export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeChange, meta, onNavigate, onClose, onPick, onAdvanced, onHighlights, resultsBar }: {
   resultsBar: HTMLDivElement | null
@@ -114,11 +114,11 @@ export default function QuickSurahSearch({ surah: currentSurah, scope, onScopeCh
   return <div className="quick-surah-search" aria-label={t("ui.a1edc5936b")}>
     <form onSubmit={event => { event.preventDefault(); if(destinations.length===1)onNavigate(destinations[0].destination); else if (!busy) jump(results, index + 1) }}>
       <button type="button" className="icon-btn" aria-label={t("ui.8b070f0497")} onClick={onClose}><ArrowRight size={20} /></button>
-      <DictationInput speechLocale="ar" ref={input} type="search" value={query} maxLength={160} leadingIcon={<ReaderSearchIcon quick />}
+      <DictationInput speechLocale="ar" ref={input} type="search" value={query} maxLength={160} leadingIcon={<Search size={18} aria-hidden="true" />}
         onClear={() => setQuery('')} onChange={event => setQuery(event.target.value)} aria-label={t('ui.26fa3c1923')}
         placeholder={t('ui.a2897ec32a')} fitPlaceholder autoComplete="off" spellCheck={false} onKeyDown={event => { if (event.key === 'Escape') onClose() }} />
       <button type="button" className="quick-search-advanced" onClick={() => expand(scope === 'quran')}>
-        <ReaderSearchIcon />{t('ui.9617b95709')}
+        <AdvancedSearchIcon size={18} />{t('ui.9617b95709')}
       </button>
     </form>
     {destinations.length>0&&<div className="quick-jump-options" aria-label={t("ui.d289fa208b")}>{destinations.map((item,i)=><button type="button" key={i} onClick={()=>onNavigate(item.destination)}>{t("ui.b7b6972c78")}{' '}{toFa(item.label)} ←</button>)}</div>}

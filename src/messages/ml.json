@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "ഏതെങ്കിലും",
   "searchP3.relationShort.phrase": "പദസമുച്ചയം",
   "searchP3.matchWithin": "എല്ലാ വാക്കുകളും പൊരുത്തപ്പെടേണ്ട പരിധി",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "കൃത്യമായ അക്ഷരവിന്യാസം പൊരുത്തപ്പെടുത്തുക",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

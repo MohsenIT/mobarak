@@ -46,3 +46,11 @@ test('live completions extend the query and obey even a single-word scope', () =
   expect(suggest('لا تخف', 'text', [11, 27, 28], true)).toEqual([])
   expect(suggest('علم', 'root', [1], true)).toEqual([])
 })
+
+test('autocomplete indexes a tagged conjunction as a separate word', () => {
+  const local = createSearchSuggestions({ verses: [[1, 1, ['وَجَهْدٌ', 'وَعَدَ']]], waw: { '1:1': [1] }, morphology: {} })
+  expect(local('وج')).toEqual([])
+  expect(local('جه')).toEqual(['جَهْدٌ'])
+  expect(local('و جه')).toEqual(['وَ جَهْدٌ'])
+  expect(local('وع')).toEqual(['وَعَدَ'])
+})

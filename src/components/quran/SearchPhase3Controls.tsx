@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ToggleEvent, type ReactNode } from 'react'
-import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, ListChecks, ListTodo, Quote, Settings2, Sprout, Tags } from 'lucide-react'
+import { ArrowDownUp, ArrowDown01, ArrowDown10, ArrowDownNarrowWide, ArrowDownWideNarrow, ChevronDown, Check, Layers3, ListChecks, ListOrdered, ListTodo, Quote, ScanText, Settings2, SpellCheck2, Sprout, Tags, type LucideIcon } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import SearchFilterRow from './SearchFilterRow'
 import { t } from '@/lib/i18n'
@@ -101,14 +101,20 @@ export function SearchWorkspaceSort({ config, onConfig }: WorkspaceConfigProps) 
 
 type MatchingPreference = { label: string; checked: boolean; disabled?: boolean; onChange: (checked: boolean) => void }
 
-export function SearchWorkspaceSettings({ config, onConfig, matching, actions }: WorkspaceConfigProps & { matching: MatchingPreference[]; actions: ReactNode }) {
+function SearchSettingToggle({ label, checked, disabled, onChange, icon: Icon, setting }: MatchingPreference & { icon: LucideIcon; setting?: 'spelling' | 'order' }) {
+  return <section className="reader-display-translation">
+    <span><Icon size={16} aria-hidden="true" />{label}</span>
+    <button className="reader-display-switch" type="button" role="switch" aria-label={label}
+      data-phase3-spelling={setting === 'spelling' || undefined} data-phase3-word-order={setting === 'order' || undefined}
+      aria-checked={checked} disabled={disabled} onClick={() => onChange(!checked)}><span /></button>
+  </section>
+}
+
+export function SearchWorkspaceSettings({ config, onConfig, partial, matching, actions }: WorkspaceConfigProps & {
+  partial: MatchingPreference; matching: (MatchingPreference & { icon: LucideIcon })[]; actions: ReactNode
+}) {
   const cooccurrence = config.cooccurrence ?? 'verse'
-  const spellingSensitive = config.spellingSensitive ?? false
   const label = t('searchP3.settings')
-  const preferences = [{
-    label: t('searchP3.spellingSensitive'), checked: spellingSensitive,
-    onChange: (checked: boolean) => onConfig({ ...config, spellingSensitive: checked }),
-  }, ...matching]
   return <details name={searchPopupName} className="phase3-settings" data-phase3-settings onKeyDown={dismissPopup}>
     <summary className="icon-btn phase3-settings-trigger" aria-label={label} title={label}>
       <Settings2 size={19} aria-hidden="true" />
@@ -116,7 +122,7 @@ export function SearchWorkspaceSettings({ config, onConfig, matching, actions }:
     <div className="reader-display-menu">
       <div className="reader-display-controls">
         <section data-phase3-cooccurrence>
-          <h3>{t('searchP3.matchWithin')}</h3>
+          <h3><Layers3 size={16} aria-hidden="true" />{t('searchP3.matchWithin')}</h3>
           <div className="reader-display-modes" role="group" aria-label={t('searchP3.matchWithin')}>
             {matchUnits.map(([unit, key]) => <button type="button" key={unit} data-phase3-unit={unit}
               aria-pressed={cooccurrence === unit} onClick={() => onConfig({ ...config, cooccurrence: unit })}>
@@ -124,12 +130,12 @@ export function SearchWorkspaceSettings({ config, onConfig, matching, actions }:
             </button>)}
           </div>
         </section>
-        {preferences.map(({ label, checked, disabled, onChange }, index) => <section className="reader-display-translation" key={label}>
-          <span>{label}</span>
-          <button className="reader-display-switch" type="button" role="switch" aria-label={label}
-            data-phase3-spelling={index === 0 || undefined} aria-checked={checked} disabled={disabled}
-            onClick={() => onChange(!checked)}><span /></button>
-        </section>)}
+        <SearchSettingToggle {...partial} icon={ScanText} />
+        <SearchSettingToggle setting="spelling" icon={SpellCheck2} label={t('searchP3.spellingSensitive')} checked={!!config.spellingSensitive}
+          onChange={checked => onConfig({ ...config, spellingSensitive: checked })} />
+        <SearchSettingToggle setting="order" icon={ListOrdered} label={t('searchP3.orderedWords')} checked={!!config.orderedWords} disabled={config.relation !== 'all'}
+          onChange={checked => onConfig({ ...config, orderedWords: checked || undefined })} />
+        {matching.map(preference => <SearchSettingToggle key={preference.label} {...preference} />)}
         {actions}
       </div>
     </div>

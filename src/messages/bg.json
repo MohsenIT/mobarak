@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "Поне една",
   "searchP3.relationShort.phrase": "Фраза",
   "searchP3.matchWithin": "Съвпадение на всички думи в",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "Точно съвпадение на правописа",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",

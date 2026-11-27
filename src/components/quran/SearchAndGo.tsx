@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Pin, Search } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { ArrowLeft, ArrowRight, CircleHelp, MousePointer2, Search } from 'lucide-react'
+import { AdvancedSearchIcon } from './ReaderSearchIcon'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { t, uiDirection } from '@/lib/i18n'
 import { destinationLabel, destinationSuggestions, isExplicitDestinationQuery, isNavigationInput, NAVIGATION_HELP, resolveDestination, type Destination } from '@/lib/navigation'
 import { SEARCH_AND_GO_PHASE_2, SEARCH_AND_GO_PHASE_3, readSearchLink, type SearchLinkState, type SearchResultSnapshot } from '@/lib/search-link'
-import type { SearchOperationEntry } from '@/lib/search-and-go-history'
+import { textSearchOperation, type SearchHistorySource, type SearchOperation, type SearchOperationEntry } from '@/lib/search-and-go-history'
+import { normalizeQuranSearch } from '@/lib/quran-search'
 import type { Meta, Translator } from '@/lib/quran'
 import DestinationOptions, { useDestinationSelection } from './DestinationOptions'
 import SurahNavigationList from './SurahNavigationList'
@@ -15,10 +17,11 @@ import { DictationInput } from './DictationInput'
 import QuranSearch from './QuranSearch'
 import QuranText from './QuranText'
 import { searchPopupName } from './search-popup'
+import { usePinPress } from './usePinPress'
 
 const searchExamples = ['س 20', 'اسما الحسنی', 'طه 40', 'صبر', 'صفحه 42', 'جزء 30', 'لا تخف', 'سیاق طه:3']
 
-export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination, onPick, onClose, start, field, translator, onSearchStateChange, onClearOccurrenceFilter, onReplay, history, onToggleHistoryPin }: {
+export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination: navigate, onPick, onClose, start, field, translator, onSearchStateChange, onClearOccurrenceFilter, onReplay, history, onRecordSearch, onToggleHistoryPin }: {
   field: RefObject<HTMLInputElement | null>
   meta: Meta
   currentSurah: number
@@ -35,17 +38,48 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   onClearOccurrenceFilter?: () => void
   onReplay?: (state: SearchLinkState) => void
   history?: SearchOperationEntry[]
+  onRecordSearch?: (operation: SearchOperation, source: SearchHistorySource) => void
   onToggleHistoryPin: (id: string) => void
 }) {
   const [query, setQuery] = useState(start?.query ?? '')
   const [searchActive, setSearchActive] = useState(!!start)
   const [position, setPosition] = useState(start?.position)
+  const historyPinPress = usePinPress()
+  const [pinStatus, setPinStatus] = useState('')
   const [help, setHelp] = useState(false)
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [completedQuery, setCompletedQuery] = useState<string>()
   const [selected, setSelected] = useState(start?.selected)
   const [mode, setMode] = useState(start?.state?.mode ?? 'text')
   const [occurrence, setOccurrence] = useState(start?.state?.occurrence ?? null)
+  const searchState = useRef<SearchLinkState | null>(null)
+  const displayedSearch = useRef<SearchLinkState | null>(null)
+  const syncSearchState = useCallback((state: SearchLinkState) => {
+    searchState.current = state
+    onSearchStateChange?.(state)
+  }, [onSearchStateChange])
+  const stageDisplayedSearch = useCallback((state: SearchLinkState) => {
+    displayedSearch.current = state
+  }, [])
+  const saveDisplayedSearch = useCallback(() => {
+    const state = displayedSearch.current
+    displayedSearch.current = null
+    const operation = state && textSearchOperation(state, true)
+    if (operation) onRecordSearch?.(operation, 'live')
+  }, [onRecordSearch])
+  useEffect(() => {
+    if (!onRecordSearch) return
+    window.addEventListener('pagehide', saveDisplayedSearch)
+    return () => {
+      window.removeEventListener('pagehide', saveDisplayedSearch)
+      // Browser Back can also remove the search surface.
+      saveDisplayedSearch()
+    }
+  }, [onRecordSearch, saveDisplayedSearch])
+  const onDestination = (destination: Destination, word?: number) => {
+    displayedSearch.current = null
+    navigate(destination, word)
+  }
   const clearOccurrence = () => {
     setOccurrence(null)
     onClearOccurrenceFilter?.()
@@ -84,12 +118,23 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
   }, [surface])
   useEffect(() => {
     if (!surface || !SEARCH_AND_GO_PHASE_3) return
-    const dismissOutside = (event: MouseEvent) => {
+    const dismissOutside = (event: MouseEvent | PointerEvent) => {
       const popup = surface.querySelector<HTMLDetailsElement>(`details[name="${searchPopupName}"][open]`)
-      if (popup && event.target instanceof Node && !popup.contains(event.target)) popup.open = false
+      if (!popup || !(event.target instanceof Node) || popup.contains(event.target)) return
+      event.preventDefault()
+      event.stopPropagation()
+      // Keep the popup open through pointerdown so the click cannot land on the control behind it.
+      if (event.type === 'click') {
+        popup.open = false
+        popup.querySelector('summary')?.focus({ preventScroll: true })
+      }
     }
+    document.addEventListener('pointerdown', dismissOutside, true)
     document.addEventListener('click', dismissOutside, true)
-    return () => document.removeEventListener('click', dismissOutside, true)
+    return () => {
+      document.removeEventListener('pointerdown', dismissOutside, true)
+      document.removeEventListener('click', dismissOutside, true)
+    }
   }, [surface])
   const useResearchColumn = SEARCH_AND_GO_PHASE_3 && wideWorkspace && !help
   const back = useRef<HTMLButtonElement>(null)
@@ -109,6 +154,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
     }
   }, [activeOptionId, help])
   const changeQuery = (next: string) => {
+    if (onRecordSearch && !next.trim()) saveDisplayedSearch()
     if (occurrence) clearOccurrence()
     setQuery(next)
     setSearchActive(true)
@@ -193,8 +239,20 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                   event.preventDefault()
                   const completion = completions[selection.completion]
                   if (selection.destination) onDestination(selection.destination)
-                  else if (completion) complete(completion)
-                  else if (window.matchMedia('(pointer: coarse)').matches) field.current?.blur()
+                  else {
+                    const state = searchState.current
+                    const entered = completion ?? query
+                    if (onRecordSearch && text && state?.query === query &&
+                      (state.occurrence || normalizeQuranSearch(entered).replaceAll(' ', '').length >= 2)) {
+                      const operation = textSearchOperation(completion ? { ...state, query: entered, lemmas: [], forms: [] } : state, true)
+                      if (operation) {
+                        displayedSearch.current = null
+                        onRecordSearch(operation, 'confirmed')
+                      }
+                    }
+                    if (completion) complete(completion)
+                    else if (window.matchMedia('(pointer: coarse)').matches) field.current?.blur()
+                  }
                 }
               }} />
             {SEARCH_AND_GO_PHASE_3 && <div className="search-workspace-settings-host" ref={setSettingsHost} />}
@@ -240,7 +298,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 data-search-completions role="listbox" aria-label={t('ui.7bf42d2a96')}>
                 {completions.map((completion, index) => <button type="button" className="chip" key={completion} id={`${selection.completionId}-${index}`}
                   role="option" aria-selected={selection.completion === index} onMouseDown={event => event.preventDefault()} onClick={() => complete(completion)}>
-                  <Search size={14} aria-hidden="true" /><QuranText text={completion} />
+                  <AdvancedSearchIcon size={14} /><QuranText text={completion} />
                 </button>)}
               </div>}
             </div>}
@@ -256,21 +314,25 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                 const op = entry.operation
                 const state = op.type === 'text' ? readSearchLink(op.link) : null
                 const label = op.type === 'navigation' ? destinationLabel(meta, op.destination) : state?.query || state?.occurrence?.text
-                const Icon = op.type === 'navigation' ? MousePointer2 : Search
+                const Icon = op.type === 'navigation' ? MousePointer2 : AdvancedSearchIcon
                 return <li key={entry.id}>
-                  <button type="button" className="chip" onClick={() => {
-                    if (op.type === 'navigation') onDestination(op.destination, op.word)
-                    else if (state) onReplay?.(state)
-                  }}><Icon size={14} aria-hidden="true" /><span>{label}</span></button>
-                  <button type="button" className="icon-btn" aria-pressed={entry.pinned} aria-label={t('searchP3.pinHistory', { label })}
-                    onClick={() => onToggleHistoryPin(entry.id)}><Pin size={14} aria-hidden="true" /></button>
+                  <button type="button" className="chip" data-pinned={entry.pinned || undefined}
+                    title={t(entry.pinned ? 'ui.b6c1280f97' : 'ui.9c19bc2926')}
+                    {...historyPinPress(() => {
+                      if (op.type === 'navigation') navigate(op.destination, op.word)
+                      else if (state) onReplay?.(state)
+                    }, () => {
+                      onToggleHistoryPin(entry.id)
+                      setPinStatus(t(entry.pinned ? 'ui.7c631348f5' : 'ui.4fdcf22559', { p0: label ?? '' }))
+                    })}><Icon size={14} aria-hidden="true" /><span>{label}</span></button>
                 </li>
               })}</ul>
+              <span className="sr-only" role="status">{pinStatus}</span>
             </> : <>
               <h2>{t('searchP3.emptyTitle')}</h2>
               <p>{t('searchP3.emptyDescription')}</p>
               <div className="search-and-go-examples">
-                <button type="button" className="chip" onClick={() => complete(t('searchP3.exampleText'))}><Search size={14} aria-hidden="true" />{t('searchP3.exampleText')}</button>
+                <button type="button" className="chip" onClick={() => complete(t('searchP3.exampleText'))}><AdvancedSearchIcon size={14} />{t('searchP3.exampleText')}</button>
                 {examples.map((destination, index) => destination && <button type="button" className="chip" key={index}
                   onClick={() => onDestination(destination)}><MousePointer2 size={14} aria-hidden="true" />
                   {index === 3 ? t('searchP3.exampleJuz', { number: 30 }) : destinationLabel(meta, destination)}</button>)}
@@ -281,10 +343,10 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
           <QuranSearch inline={{
             query: SEARCH_AND_GO_PHASE_2 ? query : value,
             position,
-            unified: SEARCH_AND_GO_PHASE_2 ? { run: text && !(help && SEARCH_AND_GO_PHASE_3), controls: help && !SEARCH_AND_GO_PHASE_3, input: field, settingsHost, researchHost, selected, onSuggestions: setSuggestions, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
+            unified: SEARCH_AND_GO_PHASE_2 ? { run: text && !(help && SEARCH_AND_GO_PHASE_3), controls: help && !SEARCH_AND_GO_PHASE_3, input: field, settingsHost, researchHost, selected, onSuggestions: setSuggestions, onDisplayed: onRecordSearch ? stageDisplayedSearch : undefined, onModeChange: mode => { setMode(mode); selection.reset(); setSuggestions([]) } } : undefined,
           }} open={SEARCH_AND_GO_PHASE_2 || text} onOpenChange={onClose}
             initialSearch={start?.state ? { query: start.query, mode: start.state.mode, surahs: start.state.surahs, revision: 0, state: start.state } : null}
-            occurrenceFilter={occurrence} onClearOccurrenceFilter={clearOccurrence} onStateChange={onSearchStateChange}
+            occurrenceFilter={occurrence} onClearOccurrenceFilter={clearOccurrence} onStateChange={onRecordSearch ? syncSearchState : onSearchStateChange}
             meta={meta} translator={translator} currentSurah={currentSurah} onPick={onPick} />
           </div>
           {useResearchColumn && <aside className="search-workspace-research" ref={setResearchHost} aria-label={t('searchP3.research')} />}

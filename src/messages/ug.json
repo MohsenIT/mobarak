@@ -789,6 +789,7 @@
   "searchP3.relationShort.any": "ھەر قانداق",
   "searchP3.relationShort.phrase": "ئىبارە",
   "searchP3.matchWithin": "بارلىق سۆزلەر ماس كېلىدىغان دائىرە",
+  "searchP3.orderedWords": "Respect word order",
   "searchP3.spellingSensitive": "ئىملاسى دەل ماس كەلسۇن",
   "searchP3.forward": "First to last",
   "searchP3.highToLow": "High to low",
