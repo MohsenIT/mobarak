@@ -63,7 +63,7 @@ export function parseProfessionalQuery(raw: string): ProfessionalQuery {
       const next = input.slice(i).match(/^\s+([\p{L}\p{M}*?؟\u200c\u200d]+)/u)
       if (next && hasPattern(next[1])) { words.push(next[1]); i += next[0].length }
     }
-    tokens.push({ kind: 'atom', atom: { words, exact: words.length > 1 } })
+    tokens.push({ kind: 'atom', atom: { words, exact: false } })
   }
   if (tokens.length > 64) return { status: 'invalid' }
   let index = 0

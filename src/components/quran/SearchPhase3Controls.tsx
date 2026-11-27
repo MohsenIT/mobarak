@@ -44,12 +44,19 @@ function alignFilterPopup(details: HTMLDetailsElement) {
   const container = details.closest('.phase3-controls')?.getBoundingClientRect()
   const trigger = details.querySelector('summary')?.getBoundingClientRect()
   if (!container || !trigger) return
-  details.style.setProperty('--filter-popup-top', `${trigger.bottom - container.top + 7}px`)
+  let top = trigger.bottom + 7
   const menu = details.querySelector('.phase3-relation-popup')?.getBoundingClientRect()
   if (menu) {
     const centered = trigger.left - container.left + (trigger.width - menu.width) / 2
-    details.style.setProperty('--filter-popup-left', `${Math.max(8, Math.min(centered, container.width - menu.width - 8))}px`)
+    const left = Math.max(8, Math.min(centered, container.width - menu.width - 8))
+    const controls = details.closest('[data-search-workspace]')?.querySelector('.phase3-result-controls')?.getBoundingClientRect()
+    if (controls && top < controls.bottom && top + menu.height > controls.top &&
+      container.left + left < controls.right && container.left + left + menu.width > controls.left) {
+      top = controls.bottom + 7
+    }
+    details.style.setProperty('--filter-popup-left', `${left}px`)
   }
+  details.style.setProperty('--filter-popup-top', `${top - container.top}px`)
 }
 
 function positionFilterPopup(event: ToggleEvent<HTMLDetailsElement>) {

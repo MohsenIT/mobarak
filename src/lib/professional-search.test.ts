@@ -82,6 +82,7 @@ test('explicit conjunction uses corpus word parts, and lexical waw remains part 
   }
   expect(find('وجه')[0].parts).toEqual({ 5: 2 })
   expect(find('جهد')[0].parts).toEqual({ 2: 2, 3: 2 })
+  expect(find('و جه', { includePartial: true })[0].parts).toEqual({ 3: 3 })
   expect(find('وجهد', { includeNear: true })[0].parts).toEqual({ 3: 3 })
   const both = find('وملك | ملك')[0]
   expect(both.positions).toEqual([2, 3, 4])
