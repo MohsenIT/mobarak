@@ -723,6 +723,7 @@ export default function Home() {
         onClearOccurrenceFilter={search.clearOccurrence}
         onReplay={SEARCH_AND_GO_PHASE_2 ? openUnifiedSearch : undefined}
         history={SEARCH_AND_GO_PHASE_2 ? search.operations : undefined}
+        onRecordSearch={SEARCH_AND_GO_PHASE_2 ? search.recordOperation : undefined}
         onToggleHistoryPin={search.toggleHistoryPin}
         onRecentSurah={s => {
           const position = route.lastSurahPosition(s, meta.surahs[s - 1].vc)

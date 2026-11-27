@@ -54,6 +54,7 @@ interface Props {
       researchHost: HTMLElement | null
       selected?: VerseAddress
       onSuggestions: (suggestions: string[]) => void
+      onDisplayed?: (state: SearchLinkState) => void
       onModeChange: (mode: SearchMode) => void
     }
   }
@@ -201,6 +202,11 @@ export default function QuranSearch({ open, onOpenChange, meta, currentSurah, on
   const searchOpen = open && (unified?.run ?? true)
   const engineKey = JSON.stringify({ query, options: { mode, includePartial, includeNear, includeRoots: includeRoots && (phase3 || canExpandRoots), surahs, ...(phase3 ? { phase3: config } : {}) }, filter: occurrenceFilter, emptyScope: phase3 && scopeVariant === 'selected' && !surahs.length })
   const busy = !!unified && searchOpen && valid && answerKey !== engineKey || working
+  const onDisplayed = unified?.onDisplayed
+  const hasDisplayedResults = searchOpen && !busy && !error && valid && answerKey === engineKey && results.length > 0
+  useEffect(() => {
+    if (hasDisplayedResults) onDisplayed?.(JSON.parse(linkStateKey))
+  }, [hasDisplayedResults, linkStateKey, onDisplayed])
   const scopeCountKey = countsActive && valid ? JSON.stringify({
     query, options: { mode, includePartial, includeNear, includeRoots, phase3: { ...config, sorts: ['mushaf'], reverseSort: false } },
     filter: occurrenceFilter,

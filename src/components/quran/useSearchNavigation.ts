@@ -8,7 +8,7 @@ import type { Meta, Translator } from '@/lib/quran'
 import type { SearchStart } from './QuranSearch'
 import type { ReaderSearchState } from './ReaderSearchHighlights'
 import { readStored, writeStored } from '@/lib/reader-storage'
-import { readOperationHistory, rememberOperation, SEARCH_AND_GO_HISTORY_KEY, toggleOperationPin, type SearchOperation } from '@/lib/search-and-go-history'
+import { readOperationHistory, rememberOperation, SEARCH_AND_GO_HISTORY_KEY, toggleOperationPin, type SearchHistorySource, type SearchOperation, type SearchOperationEntry } from '@/lib/search-and-go-history'
 
 export function occurrenceSearchStart(selection: AnalysisSelection, scope: OccurrenceScope): Omit<SearchStart, 'revision'> | null {
   const surahs = occurrenceScopeSurahs(scope, selection.s)
@@ -69,17 +69,19 @@ export function useSearchNavigation({
     return true
   }, [])
   const [storedOperations, setStoredOperations] = useState<unknown>(() => readStored(SEARCH_AND_GO_HISTORY_KEY, []))
+  const latestOperations = useRef(storedOperations)
   const operations = useMemo(() => operationMeta ? readOperationHistory(operationMeta, storedOperations, SEARCH_AND_GO_PHASE_2) : [], [operationMeta, storedOperations])
-  const toggleHistoryPin = (id: string) => {
-    const next = toggleOperationPin(operations, id)
+  const updateOperations = useCallback((update: (entries: SearchOperationEntry[]) => SearchOperationEntry[]) => {
+    if (!operationMeta) return
+    const next = update(readOperationHistory(operationMeta, latestOperations.current, SEARCH_AND_GO_PHASE_2))
+    latestOperations.current = next
     setStoredOperations(next)
     writeStored(SEARCH_AND_GO_HISTORY_KEY, next)
-  }
-  const recordOperation = (operation: SearchOperation) => {
-    const next = rememberOperation(operations, operation, Date.now())
-    setStoredOperations(next)
-    writeStored(SEARCH_AND_GO_HISTORY_KEY, next)
-  }
+  }, [operationMeta])
+  const toggleHistoryPin = (id: string) => updateOperations(entries => toggleOperationPin(entries, id))
+  const recordOperation = useCallback((operation: SearchOperation, source?: SearchHistorySource) => {
+    updateOperations(entries => rememberOperation(entries, operation, Date.now(), source))
+  }, [updateOperations])
   const [quickOpen, setQuickOpen] = useState(false)
   const [quickScope, setQuickScope] = useState<'surah' | 'quran'>(() => readStored<unknown>('mushaf.quick-search-scope', 'surah') === 'quran' ? 'quran' : 'surah')
   const changeQuickScope = useCallback((scope: 'surah' | 'quran') => {

@@ -2050,6 +2050,7 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .phase3-settings > summary { position: relative; z-index: 9; }
 .search-and-go:has(details[name="mobarak-search-popup"][open]) .phase3-options > details > summary,
 .phase3-sort > summary, .phase3-scope-control > summary { background: var(--paper); }
+.phase3-scope-control > summary[data-changed='true'] { background: var(--word-active); border-color: var(--sage); }
 
 /* The right panel shares the search surface with the main content. */
 [data-search-workspace] .search-and-go-shell { width: 100%; }

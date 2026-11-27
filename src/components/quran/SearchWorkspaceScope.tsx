@@ -108,7 +108,7 @@ export default function SearchWorkspaceScope({ meta, currentSurah, selection, on
     onCountsActive(open && withCounts)
     if (!open) { setQuery(''); setPicker(false) }
   }}>
-    <summary className="chip"><Funnel size={14} aria-hidden="true" /><span>{summary}</span><ChevronDown size={12} aria-hidden="true" /></summary>
+    <summary className="chip" data-changed={variant !== 'all' || undefined}><Funnel size={14} aria-hidden="true" /><span>{summary}</span><ChevronDown size={12} aria-hidden="true" /></summary>
     <div className="reader-display-menu phase3-scope-menu">
       <div role="tablist" className="phase3-scope-tabs" aria-label={t('searchP3.scope')}>
         {(Object.keys(tabs) as Tab[]).map(value => {

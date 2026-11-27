@@ -74,6 +74,56 @@ test('empty search stays active after blur and clear until Browse is chosen', as
   await expect(page).toHaveURL(/\/s\/20\/a\/34$/);
 });
 
+test('live history saves viewed searches on clear and browser Back, and Enter confirms immediately', async ({ page }) => {
+  await page.goto('/s/48');
+  const trigger = page.locator('.reader-surah-link');
+  await trigger.click();
+  const panel = page.locator('[data-search-and-go]');
+  const input = panel.getByRole('combobox');
+  const chips = panel.locator('.search-and-go-history .chip');
+  const results = panel.locator('[data-search-address]');
+  await input.fill('فتح و نص');
+  await expect(results.first()).toBeVisible();
+  await input.fill('');
+  await expect(chips).toHaveText(['فتح و نص']);
+  await input.fill('فتح و نصر');
+  await expect(results.first()).toBeVisible();
+  await page.goBack();
+  await expect(panel).toHaveCount(0);
+  await trigger.click();
+  await input.click();
+  await expect(chips).toHaveText(['فتح و نصر']);
+  await input.fill('فتح');
+  await expect(results.first()).toBeVisible();
+  await input.fill('');
+  await expect(chips).toHaveText(['فتح و نصر']);
+  await input.fill('الرسالةز');
+  await input.press('Enter');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('mushaf.search-and-go-history.v1')));
+  expect(new URL(saved[0].operation.link, page.url()).searchParams.get('q')).toBe('الرسالةز');
+  expect(saved[0].source).toBeUndefined();
+});
+
+test('outside clicks dismiss the open popup before another action can run', async ({ page }) => {
+  await page.goto('/q?q=فتح+نصر&scope=all&rel=all');
+  const panel = page.locator('[data-search-and-go]');
+  const relation = panel.locator('details:has(.phase3-relation-popup)');
+  const scope = panel.locator('[data-phase3-scope]');
+  await relation.locator('summary').click();
+  await expect(relation).toHaveAttribute('open', '');
+  await scope.locator('summary').click();
+  await expect(relation).not.toHaveAttribute('open', '');
+  await expect(scope).not.toHaveAttribute('open', '');
+  await scope.locator('summary').click();
+  await expect(scope).toHaveAttribute('open', '');
+  const help = panel.getByRole('button', { name: labels['searchAndGo.help'], exact: true });
+  await help.click();
+  await expect(scope).not.toHaveAttribute('open', '');
+  await expect(help).toHaveAttribute('aria-expanded', 'false');
+  await help.click();
+  await expect(help).toHaveAttribute('aria-expanded', 'true');
+});
+
 test('empty focus displays real mixed history with persistent pins and replay', async ({ page }) => {
   test.setTimeout(90_000);
   await page.goto('/s/20/a/34');
@@ -352,10 +402,14 @@ test('scope tabs retain selections and count matching surahs outside the active 
   const surface = page.locator('[data-search-workspace]');
   await surface.getByRole('combobox').fill('صبر');
   const scope = surface.locator('[data-phase3-scope]');
+  const scopeTrigger = scope.locator('summary');
   const sort = surface.locator('[data-phase3-sort] summary');
-  await scope.locator('summary').click();
-  expect((await sort.boundingBox()).x).toBeLessThan((await scope.locator('summary').boundingBox()).x);
+  const allColor = await scopeTrigger.evaluate(button => getComputedStyle(button).backgroundColor);
+  await scopeTrigger.click();
+  expect((await sort.boundingBox()).x).toBeLessThan((await scopeTrigger.boundingBox()).x);
   await scope.getByRole('tab', { name: labels['searchP3.scopeTab.many'] }).click();
+  await expect(scopeTrigger).toHaveAttribute('data-changed', 'true');
+  expect(await scopeTrigger.evaluate(button => getComputedStyle(button).backgroundColor)).not.toBe(allColor);
   await expect(scope.locator('[role=checkbox]').first()).toBeVisible({ timeout: 20_000 });
   await expect(surface.locator('[data-search-address]')).toHaveCount(0);
   await scope.getByRole('button', { name: labels['searchP3.scopeAllSurahs'], exact: true }).click();
