@@ -368,8 +368,9 @@ test('wide and narrow search use the same inline filters only after searching', 
   await expect(surface.locator('.search-workspace-research')).toHaveCount(0);
   await expect(surface.locator('[data-phase3-controls]')).toHaveCount(0);
   await expect(surface.locator('.search-page-input [data-phase3-settings]')).toBeVisible();
-  expect((await surface.boundingBox()).width).toBe(1280);
+  await expect.poll(async () => (await surface.boundingBox()).width).toBeLessThan(500);
   await field.fill('صبر');
+  await expect.poll(async () => (await surface.boundingBox()).width).toBe(1280);
   await expect(surface.locator('[data-phase3-relation]')).toHaveCount(0);
   const toggle = surface.locator('[data-phase3-more]');
   await toggle.click();
@@ -577,12 +578,10 @@ test('reader return bands share the Quran margins and preserve the full advanced
     expect(Math.abs(reference.x + reference.width - quran.x - quran.width)).toBeLessThan(2);
     const button = await advanced.boundingBox();
     expect(Math.abs(button.x + button.width - reference.x - reference.width)).toBeLessThan(2);
-    const closers = page.locator('.reader-search-dismiss');
-    await expect(closers).toHaveCount(2);
-    for (const close of await closers.all()) {
-      expect(Math.abs((await close.boundingBox()).x - quran.x)).toBeLessThan(2);
-      await expect(close).toHaveCSS('border-top-width', '0px');
-    }
+    const close = page.locator('.reader-search-dismiss');
+    await expect(close).toHaveCount(1);
+    expect(Math.abs((await close.boundingBox()).x - quran.x)).toBeLessThan(2);
+    await expect(close).toHaveCSS('border-top-width', '0px');
   }
   await advanced.click();
   await expect(panel.getByRole('combobox')).toHaveValue(query);
@@ -615,4 +614,38 @@ test('navigation starts in a side panel and expands the same search field on foc
   await guide.locator('summary').getByText('جستجوی پیشرفته', { exact: true }).click();
   await expect(guide.getByRole('button', { name: 'اسما الحسنی' })).toBeVisible();
   await expect(guide.getByRole('button', { name: 'قال ...{2,5} موسى' })).toBeHidden();
+});
+
+test('wide navigation leaves the reader and quick-search return usable beside it', async ({ page }) => {
+  await page.setViewportSize({ width: 1197, height: 909 });
+  await page.goto('/s/10/a/7');
+  const initial = page.url();
+  await page.locator('.reader-surah-link').click();
+  const panel = page.locator('[data-search-and-go]');
+  const toolbar = page.locator('.reader-toolbar');
+  const text = page.locator('.surah-pull-content [data-quran-copy-surface]').first();
+  await expect(panel).toBeVisible();
+  await expect.poll(async () => {
+    const p = await panel.boundingBox();
+    const r = await text.boundingBox();
+    return r.x + r.width <= p.x + 1;
+  }).toBe(true);
+  await toolbar.locator('.reader-quick-search-trigger').click();
+  await toolbar.getByRole('searchbox').fill('یو');
+  const back = page.locator('[data-quick-search-return]');
+  await expect(back).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('[data-quick-search-dismiss]')).toHaveCount(0);
+  const dock = await panel.boundingBox();
+  for (const item of [toolbar, back]) {
+    const box = await item.boundingBox();
+    expect(box.x + box.width).toBeLessThanOrEqual(dock.x + 1);
+  }
+  await back.click();
+  await expect(page).toHaveURL(initial);
+  await expect(panel).toBeVisible();
+  const field = panel.getByRole('combobox');
+  const input = await field.elementHandle();
+  await field.click();
+  await expect.poll(async () => (await panel.boundingBox()).width).toBeGreaterThan(1190);
+  expect(await input.evaluate(element => element === document.activeElement)).toBe(true);
 });

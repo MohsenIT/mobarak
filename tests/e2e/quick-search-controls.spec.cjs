@@ -87,9 +87,8 @@ test('Enter steps through text hits and only follows a full surah name when ther
  await field.press('Enter');
  await expect(picker).toContainText('۲ از ۲۱');
  await expect(field).toHaveValue('یو');
- await page.locator('[data-quick-search-dismiss]').click();
- await expect(page.locator('[data-quick-search-return]')).toHaveCount(0);
- await expect(field).toHaveValue('یو');
+ await expect(page.locator('[data-quick-search-dismiss]')).toHaveCount(0);
+ await expect(page.locator('[data-quick-search-return]')).toBeVisible();
 
  await page.goto('/s/18/a/1');
  await page.locator('.reader-quick-search-trigger').click();

@@ -14,11 +14,11 @@ import type { ReadingJump, ReadingMode } from '@/lib/reading-route'
 import type { VerseAddress } from '@/lib/verse-link'
 import type { Destination } from '@/lib/navigation'
 import { textSearchOperation } from '@/lib/search-and-go-history'
-import { initialSearchLinkState, SEARCH_AND_GO_PHASE_2, type SearchLinkState, type SearchResultPosition, type SearchResultSnapshot } from '@/lib/search-link'
+import { initialSearchLinkState, SEARCH_AND_GO_PHASE_2, SEARCH_AND_GO_PHASE_3, type SearchLinkState, type SearchResultPosition, type SearchResultSnapshot } from '@/lib/search-link'
 import type { OccurrenceScope } from '@/lib/occurrence-scope'
 import { wordTarget } from '@/lib/word-parts'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import type { Meta, SurahData, Translations } from '@/lib/quran'
 import { loadMeta, loadSurah, loadTrans, toFa } from '@/lib/quran'
@@ -55,6 +55,13 @@ import {
 type CommitReadingJump = (jump: ReadingJump) => boolean
 
 const SEARCH_AND_GO = process.env.NEXT_PUBLIC_SEARCH_AND_GO === '1'
+const wideReaderQuery = '(min-width: 1024px)'
+const isWideReader = () => window.matchMedia(wideReaderQuery).matches
+function subscribeWideReader(notify: () => void) {
+  const media = window.matchMedia(wideReaderQuery)
+  media.addEventListener('change', notify)
+  return () => media.removeEventListener('change', notify)
+}
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 
@@ -71,6 +78,10 @@ export default function Home() {
   const [recentSurahs, setRecentSurahs] = useState<number[]>(() => readStored('mushaf.recent-surahs', []))
   const [drawerView, setDrawerView] = useState<'navigation' | 'tools'>('navigation')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  // Browsing beside the reader does not add a search entry to reading history.
+  const [navigationDockOpen, setNavigationDockOpen] = useState(false)
+  const wideReader = useSyncExternalStore(subscribeWideReader, isWideReader, () => false)
+  const navigationDocked = wideReader && navigationDockOpen
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [desktopSurah,setDesktopSurah]=useState<number|null>(null)
   /** The reveal a search click (or a verse deep link) asked the reader for. */
@@ -112,9 +123,17 @@ export default function Home() {
   }, [closeSearch])
   /** A surah or page in the location: only transient selection state is dropped. */
   const clearTransientSelection = useCallback(() => { closeSearch(); setSel(null); setFlash(null) }, [closeSearch])
-  const route = useReadingRoute({ onSearch: applySearchEntry, onVerse: applyVerseEntry, onReading: clearTransientSelection,
+  const route = useReadingRoute({
+    onSearch: (state, sameEntry, snapshot) => {
+      setNavigationDockOpen(false)
+      applySearchEntry(state, sameEntry, snapshot)
+    },
+    onVerse: applyVerseEntry, onReading: clearTransientSelection,
     onQuickReturn: () => { clearTransientSelection(); search.setQuickOpen(false); setSearchTarget(null) },
-    onSearchAndGoOpen: search.setSearchAndGoOpen,
+    onSearchAndGoOpen: open => {
+      if (open) setNavigationDockOpen(false)
+      search.setSearchAndGoOpen(open)
+    },
     onSearchAndGoReturn: (activeSurah, result) => {
       clearTransientSelection()
       if (!SEARCH_AND_GO_PHASE_2) {
@@ -372,6 +391,7 @@ export default function Home() {
   }
 
   const openUnifiedSearch = (state: SearchLinkState, snapshot?: SearchResultSnapshot) => {
+    setNavigationDockOpen(false)
     const start = snapshot ?? { query: state.query, position: { scrollTop: 0, visible: 20 }, state }
     route.rememberReadingPosition()
     route.openSearchAndGoWithState(curSurahN, start)
@@ -414,10 +434,25 @@ export default function Home() {
     }
   }
 
+  const closeUnifiedPanel = () => {
+    if (navigationDockOpen) {
+      route.preserveReadingAnchor()
+      setNavigationDockOpen(false)
+    } else route.closeSearchAndGo()
+  }
+
+  const activateNavigationDock = () => {
+    route.openSearchAndGo(curSurahN)
+    setNavigationDockOpen(false)
+    search.setSearchAndGoOpen(true)
+  }
+
   const navigateFromSearchAndGo = (destination: Destination, word?: number) => {
+    if (navigationDockOpen) route.openSearchAndGo(curSurahN)
     const writeDestination = route.prepareSearchAndGoDestination()
     const commit: CommitReadingJump = jump => {
       if (!writeDestination(jump)) return false
+      setNavigationDockOpen(false)
       search.setSearchAndGoOpen(false)
       if (!SEARCH_AND_GO_PHASE_2) search.dismissReturn()
       setSel(null)
@@ -490,7 +525,7 @@ export default function Home() {
   // The sheet handles its active tab's keyboard navigation.
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if (search.advancedOpen || search.searchAndGoOpen || drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && e.target.matches('input, textarea, select'))) return
+      if (search.advancedOpen || search.searchAndGoOpen || drawerOpen || showIndex || showComparison || (e.target instanceof HTMLElement && (e.target.matches('input, textarea, select') || e.target.closest('[data-search-and-go]')))) return
       if (sel||window.getSelection()?.toString()) return
       // Mushaf follows native up/down scrolling; flow retains surah shortcuts.
       if (mode !== 'flow') return
@@ -595,7 +630,7 @@ export default function Home() {
   return (
     <>
     {!startupComplete && <StartupSplash leaving={startupLeaving} stalled={splash.stalled} onHoldChange={setStartupHeld} />}
-    {meta && <div className={`reader-app h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} data-side-navigation={drawerOpen||showIndex||showComparison?'open':undefined} data-portaled-analysis={sel&&(showIndex||showComparison)&&!panelMax?'open':undefined} style={{ background: 'var(--paper)', ['--desktop-navigation-width' as string]: `${desktopPaneWidths.navigation}px`, ['--desktop-analysis-width' as string]: `${desktopPaneWidths.analysis}px` }}>
+    {meta && <div className={`reader-app h-dvh overflow-hidden flex flex-col relative${drawerOpen || showIndex || showComparison ? ' has-overlay' : ''}`} data-search-docked={navigationDocked || undefined} inert={wideReader && SEARCH_AND_GO_PHASE_3 && search.searchAndGoOpen && !navigationDockOpen || undefined} data-side-navigation={drawerOpen||showIndex||showComparison?'open':undefined} data-portaled-analysis={sel&&(showIndex||showComparison)&&!panelMax?'open':undefined} style={{ background: 'var(--paper)', ['--desktop-navigation-width' as string]: `${desktopPaneWidths.navigation}px`, ['--desktop-analysis-width' as string]: `${desktopPaneWidths.analysis}px` }}>
       <CarStudySync reader={mainRef} revision={`${mode}:${surah}:${page}:${mushafContentRevision}:${showTrans}:${flowSurah?.n}:${loadingPage}`} />
       <PatternBG />
 
@@ -613,10 +648,20 @@ export default function Home() {
           onPick={(s, a, pos) => { setSel(null); goVerse(s, a, pos,undefined,false,true) }}
           onAdvanced={openAdvancedSearch} /> : <>
 
-        <button className="icon-btn" onClick={() => { setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
-        <button className="reader-surah-link" title={t("searchAndGo.tooltip")} aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={SEARCH_AND_GO ? search.searchAndGoOpen : drawerOpen && drawerView === 'navigation'} onClick={() => {
-          if (SEARCH_AND_GO) { route.rememberReadingPosition(); route.openSearchAndGo(curSurahN); setDrawerOpen(false); search.showUnified() }
-          else { setDrawerView('navigation'); setDrawerOpen(true) }
+        <button className="icon-btn" onClick={() => { setNavigationDockOpen(false); setDrawerView('tools'); setDrawerOpen(true) }} aria-label={t("ui.b563f0690c")} title={t("ui.b563f0690c")}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18" /></svg></button>
+        <button className="reader-surah-link" title={t("searchAndGo.tooltip")} aria-label={t("ui.450d6bd970")} aria-haspopup="dialog" aria-expanded={SEARCH_AND_GO ? search.searchAndGoOpen || navigationDockOpen : drawerOpen && drawerView === 'navigation'} onClick={() => {
+          if (!SEARCH_AND_GO) { setDrawerView('navigation'); setDrawerOpen(true); return }
+          if (navigationDockOpen) { closeUnifiedPanel(); return }
+          route.rememberReadingPosition()
+          setDrawerOpen(false)
+          if (wideReader && SEARCH_AND_GO_PHASE_3) {
+            route.preserveReadingAnchor()
+            search.showUnified(null, false)
+            setNavigationDockOpen(true)
+          } else {
+            route.openSearchAndGo(curSurahN)
+            search.showUnified()
+          }
         }}>
           <AdvancedSearchIcon />
           <span className="reader-surah-name font-bold text-[14px] sm:text-[15px]" style={{ color: 'var(--ink)' }}>
@@ -658,8 +703,6 @@ export default function Home() {
             <span>{t('quickSearch.returnTo', { p0: meta.surahs[route.quickOrigin.address.s - 1].fa, p1: toFa(route.quickOrigin.address.a) })}</span>
           </button>}
           {search.quickOpen && <div className="quick-search-results-slot" ref={setQuickResultsBar} />}
-          {route.quickOrigin && <button type="button" className="icon-btn reader-search-dismiss" data-quick-search-dismiss
-            aria-label={t("quickSearch.dismissReturn")} onClick={route.dismissQuickReturn}><X size={17} aria-hidden="true" /></button>}
         </div>
       )}
 
@@ -687,7 +730,7 @@ export default function Home() {
               selection={sel ? analysisSelection ?? sel : null}
               highlightRoot={sel ? (analysisSelection?.tab === 'root' ? analysisSelection.root : null) : comparisonRoot}
               analysisSelection={sel ? analysisSelection : audioVerse ? {...audioVerse,tab:'verse',pos:1,root:null,text:''} : null} comparisonRange={comparisonRange}
-              comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots} flash={flash} onOpenSurahs={() => { setDrawerView('navigation'); setDrawerOpen(true) }} onWordTap={tapWord} />
+              comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots} flash={flash} onOpenSurahs={() => { setNavigationDockOpen(false); setDrawerView('navigation'); setDrawerOpen(true) }} onWordTap={tapWord} />
           ) : (
             <SurahPull key={`f-${surah}`} surah={surah} meta={meta.surahs} fontSize={flowFont} showTrans={showTrans} translator={translator}
               ready={!loadingPage && flowSurah?.n === surah}
@@ -716,7 +759,7 @@ export default function Home() {
                     comparisonRange={comparisonRange}
                     comparisonRoots={comparisonRoots} mutedComparisonRoots={mutedComparisonRoots}
                     flash={flash}
-                    onOpenSurahs={() => { setDrawerView('navigation'); setDrawerOpen(true) }} onWordTap={tapWord}
+                    onOpenSurahs={() => { setNavigationDockOpen(false); setDrawerView('navigation'); setDrawerOpen(true) }} onWordTap={tapWord}
                   />
                 )}
               </FlowSurface>
@@ -730,10 +773,17 @@ export default function Home() {
           : rootPanel
         )}      </div>
 
-      {SEARCH_AND_GO && search.searchAndGoOpen && <SearchAndGo key={search.unifiedRevision} meta={meta} currentSurah={curSurahN}
+      {SEARCH_AND_GO && (search.searchAndGoOpen || navigationDockOpen) && <SearchAndGo key={search.unifiedRevision} meta={meta} currentSurah={curSurahN}
         pinned={pinnedSurahs} recent={recentSurahs}
         onTogglePin={n => setPinnedSurahs(old => { const next = togglePinnedSurah(old, n); writeStored('mushaf.pinned-surahs', next); return next })}
-        field={search.searchAndGoInput} onClose={route.closeSearchAndGo}
+        field={search.searchAndGoInput} onClose={closeUnifiedPanel}
+        wide={wideReader && SEARCH_AND_GO_PHASE_3} docked={navigationDocked}
+        onActivate={navigationDockOpen ? activateNavigationDock : undefined}
+        onBrowse={wideReader ? () => {
+          if (!search.searchAndGoOpen) return
+          setNavigationDockOpen(true)
+          route.closeSearchAndGo()
+        } : undefined}
         onDestination={navigateFromSearchAndGo}
         translator={translator} start={search.unifiedStart} onPick={pickSearchResult}
         onSearchStateChange={SEARCH_AND_GO_PHASE_2 ? route.updateSearchAndGoState : undefined}

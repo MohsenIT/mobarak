@@ -43,7 +43,11 @@ const professionalExamples = [
   ['rangeGap', 'قال ...{2,5} موسى'], ['marks', 'ذِكر'],
 ] as const
 
-export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination: navigate, onPick, onClose, start, field, translator, onSearchStateChange, onClearOccurrenceFilter, onReplay, history, onRecordSearch, onToggleHistoryPin }: {
+export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogglePin, onRecentSurah, onDestination: navigate, onPick, onClose, start, field, translator, onSearchStateChange, onClearOccurrenceFilter, onReplay, history, onRecordSearch, onToggleHistoryPin, wide = false, docked = false, onActivate, onBrowse }: {
+  wide?: boolean
+  docked?: boolean
+  onActivate?: () => void
+  onBrowse?: () => void
   field: RefObject<HTMLInputElement | null>
   meta: Meta
   currentSurah: number
@@ -206,8 +210,8 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
     }
   }, [rtl, searchLabel, shortSearchLabel])
 
-  return <Dialog open onOpenChange={open => { if (!open) onClose() }}>
-    <DialogContent ref={setSurface} fullscreen showOverlay={compact} showCloseButton={false} data-search-browse-panel={compact || undefined} className="search-and-go" data-search-and-go data-search-workspace={SEARCH_AND_GO_PHASE_3 || undefined} data-search-and-go-phase-2={SEARCH_AND_GO_PHASE_2 || undefined} data-search-page={SEARCH_AND_GO_PHASE_2 && !!start?.state || undefined} dir={uiDirection()}
+  return <Dialog open modal={!wide} onOpenChange={open => { if (!open) onClose() }}>
+    <DialogContent ref={setSurface} fullscreen showOverlay={compact && !wide} showCloseButton={false} data-search-browse-panel={compact || undefined} data-search-dock={compact && docked || undefined} className="search-and-go" data-search-and-go data-search-workspace={SEARCH_AND_GO_PHASE_3 || undefined} data-search-and-go-phase-2={SEARCH_AND_GO_PHASE_2 || undefined} data-search-page={SEARCH_AND_GO_PHASE_2 && !!start?.state || undefined} dir={uiDirection()}
       aria-describedby={undefined}
       onOpenAutoFocus={event => {
         event.preventDefault()
@@ -218,7 +222,9 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
         event.preventDefault()
         trigger.current?.focus({ preventScroll: true })
       }}
+      onInteractOutside={event => { if (wide) event.preventDefault() }}
       onEscapeKeyDown={event => {
+        if (docked && !surface?.contains(document.activeElement)) { event.preventDefault(); return }
         const options = surface?.querySelector<HTMLDetailsElement>(`details[name="${searchPopupName}"][open]`)
         if (options) {
           event.preventDefault()
@@ -247,7 +253,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
               aria-activedescendant={help ? undefined : selection.inputProps['aria-activedescendant']} ref={field} type="text" enterKeyHint={selection.destination ? 'go' : 'search'}
               value={query} maxLength={160} autoComplete="off" spellCheck={false}
               aria-label={searchLabel} placeholder={placeholder} fitPlaceholder={shorterPlaceholders}
-              onFocus={() => setSearchActive(true)}
+              onFocus={() => { setSearchActive(true); onActivate?.() }}
               onClear={() => changeQuery('')} onChange={event => changeQuery(event.target.value)}
               onKeyDown={event => {
                 if (help || event.nativeEvent.isComposing || selection.move(event)) return
@@ -382,7 +388,7 @@ export default function SearchAndGo({ meta, currentSurah, pinned, recent, onTogg
                   {index === 3 ? t('searchP3.exampleJuz', { number: 30 }) : destinationLabel(meta, destination)}</button>)}
               </div>
             </>}
-            <button type="button" className="search-and-go-browse" onClick={() => { field.current?.blur(); setSearchActive(false) }}>{t('searchP3.browse')}</button>
+            <button type="button" className="search-and-go-browse" onClick={() => { field.current?.blur(); setSearchActive(false); onBrowse?.() }}>{t('searchP3.browse')}</button>
           </section>}
           <QuranSearch inline={{
             query: SEARCH_AND_GO_PHASE_2 ? query : value,

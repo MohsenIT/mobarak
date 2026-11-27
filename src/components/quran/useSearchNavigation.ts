@@ -54,10 +54,10 @@ export function useSearchNavigation({
   const [unifiedRevision, setUnifiedRevision] = useState(0)
   const [unifiedStart, setUnifiedStart] = useState<SearchResultSnapshot | null>(null)
   const [returnToUnified, setReturnToUnified] = useState<SearchResultSnapshot | null>(null)
-  const showUnified = useCallback((start: SearchResultSnapshot | null = null) => {
+  const showUnified = useCallback((start: SearchResultSnapshot | null = null, open = true) => {
     setUnifiedStart(start)
     if (SEARCH_AND_GO_PHASE_2) setUnifiedRevision(revision => revision + 1)
-    setSearchAndGoOpen(true)
+    setSearchAndGoOpen(open)
     setAdvancedOpen(false)
   }, [])
   const searchAndGoInput = useRef<HTMLInputElement>(null)

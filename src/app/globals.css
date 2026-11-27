@@ -1366,7 +1366,6 @@ button.surah-band:focus-visible { outline: 2px solid var(--sage); outline-offset
 .reader-search-band .chip span { overflow: hidden; text-overflow: ellipsis; }
 .reader-search-band svg { flex-shrink: 0; }
 .reader-search-band .reader-search-dismiss { flex: none; inline-size: 26px; block-size: 26px; min-inline-size: 26px; margin-inline-start: auto; border: 0; border-radius: 0; color: var(--ink-soft); }
-.quick-search-return:has(.quick-search-status) > .reader-search-dismiss { margin-inline-start: 0; }
 .quick-navigation-label { display: inline-flex; align-items: center; gap: 4px; }
 .quick-search-results-slot { min-width: 0; margin-inline-start: auto; }
 .quick-search-results-slot:empty { display: none; }
@@ -1909,6 +1908,11 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
   inline-size: min(440px, calc(100% - 28px));
   border-inline-end: 1px solid var(--line);
   box-shadow: 0 0 24px rgb(0 0 0 / .16);
+}
+@media (min-width: 1024px) {
+  body { --search-dock-width: min(440px, 36vw); }
+  .reader-app[data-search-docked] { padding-inline-start: var(--search-dock-width); }
+  .search-and-go[data-search-dock] { inline-size: var(--search-dock-width); box-shadow: none; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .search-and-go[data-search-workspace] { transition: inline-size 180ms ease-out; }
