@@ -456,7 +456,7 @@ test('search aligns its rows and cards and keeps features only when the query is
     for (const x of [features.x, card.x, sort.x]) expect(Math.abs(x - left)).toBeLessThan(1);
     for (const x of [features.x + features.width, card.x + card.width, roots.x + roots.width]) expect(Math.abs(x - right)).toBeLessThan(1);
   }
-  const feature = research.locator('.search-facet-row button').first();
+  const feature = research.locator('button[aria-pressed]').first();
   await feature.click();
   await expect(more).toHaveAttribute('data-changed', 'true');
   await field.fill('صبر نصر');
