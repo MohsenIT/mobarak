@@ -871,5 +871,22 @@
   "copy.verseNumbers": "شمارهٔ آیه کنار متن بیاید",
   "copy.includeTranslation": "ترجمه هم بیاید",
   "copy.lineBreaks": "میان بخش‌ها خط جدید بگذار",
-  "copy.restoreDefault": "بازگرداندن قالب مناسب متن"
+  "copy.restoreDefault": "بازگرداندن قالب مناسب متن",
+  "about.brand": "مبارك",
+  "about.menu": "عن مبارك",
+  "about.subtitle": "فهم القرآن بيسر",
+  "about.reference": "ص، ٢٩",
+  "about.message": "تدبّر القرآن مقدّمة للتذكّر",
+  "about.identity": "مفتوح المصدر وغير ربحي",
+  "about.support": "ادعم مبارك",
+  "about.supportPending": "لم تُحدّد بعد وسيلة للدعم المالي.",
+  "about.backToMenu": "العودة إلى القائمة الرئيسية",
+  "about.updates": "الإصدار والتحديثات",
+  "about.version": "الإصدار {version}",
+  "about.unknownVersion": "غير معروف",
+  "about.contentVersion": "إصدار محتوى التطبيق {version}",
+  "about.updateAvailable": "تحديث جديد",
+  "about.installers": "تنزيل المثبّت من GitHub",
+  "about.updateOffline": "أنت غير متصل. اتصل بالإنترنت للتحقق من التحديثات.",
+  "about.updateUnknown": "حالة التحديث غير معروفة."
 }

@@ -480,3 +480,26 @@ export function parseAppUpdate(value:unknown):AppUpdate {
   return {build:data.version,releases,latest:releases[0]}
 }
 export async function checkAppUpdate(signal?:AbortSignal){const response=await fetch('/api/version',{cache:'no-store',signal:signal??AbortSignal.timeout(10000)});if(!response.ok)throw new Error('version');return parseAppUpdate(await response.json())}
+
+export function appUpdateStatus(update: AppUpdate, installedBuild?: string) {
+  if (update.latest && compareRelease(update.latest.version, CURRENT_RELEASE) < 0) return 'unknown'
+  if (installedBuild && update.build === installedBuild) return 'latest'
+  return installedBuild ? 'available' : 'unknown'
+}
+
+export const NATIVE_RELEASES = 'https://github.com/MohsenIT/mobarak/releases/latest'
+
+export function nativeReleaseStatus(installed: string, assets: readonly string[]) {
+  // The installer workflow publishes the same version on desktop and Android.
+  const latest = assets.map(name => /_(\d+\.\d+\.\d+)_.*\.msi$/.exec(name)?.[1]).find(Boolean)
+  if (!parts(installed) || !latest || !assets.some(name => name.endsWith('.apk'))) return 'unknown'
+  const order = compareRelease(latest, installed)
+  return order > 0 ? 'available' : order === 0 ? 'latest' : 'unknown'
+}
+
+export async function checkNativeUpdate(installed: string, signal: AbortSignal) {
+  const response = await fetch('https://api.github.com/repos/MohsenIT/mobarak/releases/latest', { signal, cache: 'no-store' })
+  if (!response.ok) throw new Error('native-release')
+  const { assets } = await response.json() as { assets?: { name: string }[] }
+  return nativeReleaseStatus(installed, assets?.map(asset => asset.name) ?? [])
+}

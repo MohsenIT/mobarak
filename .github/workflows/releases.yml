@@ -61,6 +61,8 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun test src/lib/*.test.ts
       - run: bun run build:desktop
+        env:
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
       - run: bunx playwright install --with-deps chromium
       - name: Verify installer web UI before packaging
         env:

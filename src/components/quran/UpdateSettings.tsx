@@ -1,9 +1,8 @@
 'use client'
 import {t} from '@/lib/i18n'
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { RefreshCw } from 'lucide-react'
-import { APP_RELEASES,CURRENT_RELEASE,checkAppUpdate,compareRelease,type AppUpdate } from '@/lib/app-releases'
-import { toFa } from '@/lib/quran'
+import { APP_RELEASES,CURRENT_RELEASE,NATIVE_RELEASES,appUpdateStatus,checkAppUpdate,checkNativeUpdate,type AppUpdate } from '@/lib/app-releases'
 import ReleaseNotesDialog from './ReleaseNotesDialog'
 
 export async function refreshApplication(onProgress?: (done:number,total:number)=>void) {
@@ -34,24 +33,93 @@ export async function refreshApplication(onProgress?: (done:number,total:number)
   window.location.replace(url.href)
 }
 
-export default function UpdateSettings() {
-  const [state,setState]=useState<'idle'|'checking'|'latest'|'available'|'error'|'refreshing'>('idle')
-  const [info,setInfo]=useState<AppUpdate|null>(null)
-  const [notes,setNotes]=useState<'history'|'changes'|null>(null)
-  const refresh=async()=>{setState('refreshing');try{await refreshApplication()}catch{setState('error')}}
-  const check=async()=>{
-    setState('checking')
-    try{const update=await checkAppUpdate();setInfo(update);setState(update.build!==process.env.NEXT_PUBLIC_APP_VERSION&&(!update.latest||compareRelease(update.latest.version,CURRENT_RELEASE)>=0)?'available':'latest')}
-    catch{setState('error')}
+const native = process.env.NEXT_PUBLIC_DESKTOP === '1'
+const build = process.env.NEXT_PUBLIC_APP_VERSION
+const nativeVersion = process.env.NEXT_PUBLIC_NATIVE_VERSION
+export const installedVersion = native ? nativeVersion : CURRENT_RELEASE
+const installedHistory: AppUpdate = { build: build || 'local', releases: APP_RELEASES, latest: APP_RELEASES[0] }
+
+type CheckStatus = 'idle' | 'checking' | 'latest' | 'available' | 'unknown' | 'error' | 'offline'
+export function useVersionCheck(enabled: boolean) {
+  const [status, setStatus] = useState<CheckStatus>('idle')
+  const [update, setUpdate] = useState<AppUpdate | null>(null)
+  const request = useRef<AbortController | null>(null)
+  const check = useCallback(async () => {
+    request.current?.abort()
+    if (!navigator.onLine) {
+      request.current = null
+      setStatus('offline')
+      return
+    }
+    const controller = new AbortController()
+    request.current = controller
+    const timeout = window.setTimeout(() => controller.abort('timeout'), 10000)
+    const { signal } = controller
+    setStatus('checking')
+    try {
+      if (native) {
+        const result = await checkNativeUpdate(nativeVersion ?? '', signal)
+        if (!controller.signal.aborted) setStatus(result)
+      } else {
+        const info = await checkAppUpdate(signal)
+        if (controller.signal.aborted) return
+        setUpdate(info)
+        setStatus(appUpdateStatus(info, build))
+      }
+    } catch {
+      if (request.current === controller && (!signal.aborted || signal.reason === 'timeout')) setStatus(navigator.onLine ? 'error' : 'offline')
+    } finally { window.clearTimeout(timeout) }
+  }, [])
+  useEffect(() => {
+    if (!enabled) return
+    void check()
+    window.addEventListener('online', check)
+    window.addEventListener('offline', check)
+    return () => {
+      request.current?.abort()
+      request.current = null
+      window.removeEventListener('online', check)
+      window.removeEventListener('offline', check)
+    }
+  }, [check, enabled])
+  return { status, update, check }
+}
+
+export default function UpdateSettings({ status, update, check }: ReturnType<typeof useVersionCheck>) {
+  const [refreshing, setRefreshing] = useState(false)
+  const [refreshFailed, setRefreshFailed] = useState(false)
+  const [notes, setNotes] = useState<'history' | 'changes' | null>(null)
+  const refresh = async () => {
+    setRefreshing(true)
+    setRefreshFailed(false)
+    try { await refreshApplication() }
+    catch { setRefreshing(false); setRefreshFailed(true) }
   }
-  const history:AppUpdate={build:process.env.NEXT_PUBLIC_APP_VERSION||'local',releases:APP_RELEASES,latest:APP_RELEASES[0]}
-  return <section aria-label={t("ui.f0857df27f")}>
-    <h3 className="text-sm font-bold mb-3">{t("ui.f0857df27f")}</h3>
-    <p className="text-xs mb-3" style={{color:'var(--ink-soft)'}}>{t("ui.0f2d214015")}{' '}{toFa(CURRENT_RELEASE)} · <button type="button" className="underline" onClick={()=>setNotes('history')}>{t("ui.3a0967fbbe")}</button></p>
-    {process.env.NEXT_PUBLIC_DESKTOP==='1'?<a className="chip inline-flex min-h-11 items-center" href="https://github.com/MohsenIT/quran-vajeh/releases/latest" target="_blank" rel="noreferrer">{t("ui.c5462f5130")}</a>:<>
-      <div className="flex flex-wrap items-center gap-3"><button className="chip inline-flex min-h-11 items-center gap-2" disabled={state==='checking'||state==='refreshing'} onClick={state==='available'?()=>void refresh():()=>void check()}><RefreshCw size={16} className={state==='checking'||state==='refreshing'?'animate-spin':''}/>{state==='checking'?t("ui.25384e5227"):state==='available'?t("ui.c5462f5130"):state==='refreshing'?t("ui.15f33a75a4"):t("ui.20b05bf19a")}</button>{state==='available'&&<button type="button" className="underline text-xs" onClick={()=>setNotes('changes')}>{t("ui.3234f424d7")}</button>}</div>
-      <p role="status" className="text-xs leading-6 mt-2" style={{color:'var(--ink-soft)'}}>{state==='latest'?t("ui.e7ae3ec09b"):state==='available'?t("ui.98e493291d",{p0:(info?.latest?toFa(info.latest.version):t("ui.7b2b35c950"))}):state==='error'?t("ui.3da752b258"):''}</p>
-    </>}
-    <ReleaseNotesDialog open={notes!==null} onOpenChange={open=>{if(!open)setNotes(null)}} update={notes==='history'?history:info} history={notes==='history'} onUpdate={notes==='changes'&&state!=='latest'?()=>void refresh():undefined} busy={state==='refreshing'} error={notes==='changes'&&state==='error'}/>
+  const checking = status === 'checking'
+  const available = status === 'available'
+  return <section className="drawer-version-content">
+    <p className="text-sm">{t('about.version', { version: installedVersion ?? t('about.unknownVersion') })}</p>
+    {native && <p className="text-xs">{t('about.contentVersion', { version: CURRENT_RELEASE })}</p>}
+    <button type="button" className="chip" onClick={() => setNotes('history')}>{t('ui.3a0967fbbe')}</button>
+    <div className="flex flex-wrap items-center gap-2">
+      <button type="button" className="chip inline-flex min-h-11 items-center gap-2" disabled={checking || refreshing} onClick={() => { setRefreshFailed(false); void check() }}>
+        <RefreshCw size={16} className={checking ? 'animate-spin' : ''} aria-hidden="true" />{t(checking ? 'ui.25384e5227' : 'ui.20b05bf19a')}
+      </button>
+      {native ? <a className="chip inline-flex min-h-11 items-center" href={NATIVE_RELEASES} target="_blank" rel="noreferrer">{t('about.installers')}</a> : available && <>
+        <button type="button" className="chip min-h-11" disabled={refreshing} onClick={() => void refresh()}>{t(refreshing ? 'ui.15f33a75a4' : 'ui.c5462f5130')}</button>
+        <button type="button" className="chip min-h-11" onClick={() => setNotes('changes')}>{t('ui.3234f424d7')}</button>
+      </>}
+    </div>
+    <p role="status" className="about-caption">
+      {refreshFailed || status === 'error' ? t('ui.3da752b258') :
+        status === 'offline' ? t('about.updateOffline') :
+        status === 'unknown' ? t('about.updateUnknown') :
+        status === 'latest' ? t('ui.e7ae3ec09b') :
+        available ? t('about.updateAvailable') : ''}
+    </p>
+    <ReleaseNotesDialog open={notes !== null} onOpenChange={open => { if (!open) setNotes(null) }}
+      update={notes === 'history' ? installedHistory : update} history={notes === 'history'}
+      onUpdate={notes === 'changes' && available ? () => void refresh() : undefined}
+      busy={refreshing} error={notes === 'changes' && refreshFailed} />
   </section>
 }

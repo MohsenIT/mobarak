@@ -18,13 +18,14 @@ const extraTranslations=JSON.parse(await (await import('node:fs/promises')).read
 for(const item of extraTranslations)await rm(path.join(stage,'public/data/translations',`${item.id}.json`),{force:true})
 await rm(path.join(stage, 'src/app/api'), { recursive: true, force: true })
 const { readFile } = await import('node:fs/promises')
+const config = JSON.parse(await readFile(path.join(root, 'src-tauri/tauri.conf.json'), 'utf8'))
 const manifest = path.join(stage, 'src/app/manifest.ts')
 await writeFile(manifest, "export const dynamic = 'force-static'\n" + await readFile(manifest, 'utf8'))
 await symlink(path.join(root, 'node_modules'), path.join(stage, 'node_modules'), process.platform === 'win32' ? 'junction' : 'dir')
 await writeFile(path.join(stage, 'next.config.mjs'), `export default {
   output: 'export',
   images: { unoptimized: true },
-  env: { NEXT_PUBLIC_DESKTOP: '1', NEXT_PUBLIC_APP_VERSION: ${JSON.stringify(process.env.GITHUB_SHA || process.env.VERCEL_GIT_COMMIT_SHA || 'desktop')} },
+  env: { NEXT_PUBLIC_DESKTOP: '1', NEXT_PUBLIC_NATIVE_VERSION: ${JSON.stringify(process.env.RELEASE_VERSION || config.version)}, NEXT_PUBLIC_APP_VERSION: ${JSON.stringify(process.env.GITHUB_SHA || process.env.VERCEL_GIT_COMMIT_SHA || 'desktop')} },
   typescript: { ignoreBuildErrors: true },
   reactStrictMode: false,
 }\n`)

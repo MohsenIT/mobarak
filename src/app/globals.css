@@ -2274,3 +2274,36 @@ html[data-app-update] .reader-toolbar { padding-top:0.5rem !important; }
 .search-professional-examples > div { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
 .search-professional-examples bdi { white-space: nowrap; }
 .search-professional-examples span { color: var(--ink-soft); }
+
+.drawer-tools { flex: 1; min-block-size: 0; align-content: start; overscroll-behavior: contain; }
+.drawer:has(.drawer-version-footer), .drawer[data-tool-section] {
+  padding-block-start: max(env(safe-area-inset-top), var(--native-safe-area-top, 0px));
+  padding-block-end: max(env(safe-area-inset-bottom), var(--native-safe-area-bottom, 0px));
+}
+.drawer-version-footer { flex: none; border-block-start: 1px solid var(--line); }
+.drawer-version-footer button { width: 100%; min-height: 44px; padding: .5rem 1rem; color: var(--ink-soft); font-size: .75rem; }
+.drawer-version-footer small { margin-inline-start: .65rem; border-radius: 1rem; padding: .15rem .45rem; background: var(--word-root); color: var(--ink); font-size: inherit; }
+.about-page {
+  display: flex; flex-direction: column; background: var(--paper); color: var(--ink);
+  padding-block-start: max(env(safe-area-inset-top), var(--native-safe-area-top, 0px));
+  padding-block-end: max(env(safe-area-inset-bottom), var(--native-safe-area-bottom, 0px));
+}
+.drawer-detail-header { flex: none; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; padding: .5rem .75rem; border-block-end: 1px solid var(--line); }
+.drawer-detail-header h2 { text-align: center; font-size: 1rem; font-weight: 700; }
+.drawer-detail-scroll { flex: 1; min-block-size: 0; overflow: auto; overscroll-behavior: contain; }
+.about-mobarak { max-inline-size: 30rem; margin-inline: auto; padding: 1.5rem 1rem; text-align: center; }
+.about-mobarak img { margin-inline: auto; }
+.about-mobarak h3 { font-size: 2.5rem; font-weight: 700; line-height: 1.35; }
+.about-subtitle { margin-block-end: 1.25rem; font-size: 1.125rem; font-weight: 600; }
+.about-meaning { padding: 1rem .75rem; border: 1px solid var(--line); border-radius: 12px; background: var(--word-hover); }
+.about-verse { font-size: 1.2rem; line-height: 2.2; }
+.about-reference { font: 400 .75rem/1.5 "Vazirmatn", sans-serif; white-space: nowrap; }
+.about-translation { margin-block-start: .5rem; font-size: .875rem; line-height: 2; }
+.about-caption { color: var(--ink-soft); font-size: .75rem; font-weight: 400; line-height: 2; }
+.about-meaning .about-caption { margin-block-start: .75rem; }
+.about-identity { margin-block: 1.125rem .75rem; }
+.about-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin-block-end: .625rem; }
+.about-links a, .about-support { display: flex; justify-content: center; align-items: center; gap: .4rem; min-block-size: 44px; }
+.about-support { width: 100%; border: 1px solid var(--sage); border-radius: 12px; background: var(--word-selected); color: var(--ink); font-weight: 700; }
+#about-support-note { margin-block-start: .5rem; }
+.drawer-version-content { display: grid; justify-items: start; gap: .75rem; padding: 1rem; }

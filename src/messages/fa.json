@@ -870,5 +870,22 @@
   "occurrence.advancedIn": "پیشرفته در:",
   "occurrence.searchIn": "جست‌وجو در:",
   "occurrence.thisSurah": "این سوره",
-  "occurrence.wholeQuran": "کل قرآن"
+  "occurrence.wholeQuran": "کل قرآن",
+  "about.brand": "مبارک",
+  "about.menu": "درباره مبارک",
+  "about.subtitle": "فهم دل‌نشین قرآن",
+  "about.reference": "ص، ۲۹",
+  "about.message": "تدبر در قرآن، مقدمهٔ تذکر",
+  "about.identity": "متن‌باز و غیرانتفاعی",
+  "about.support": "حمایت از مبارک",
+  "about.supportPending": "مسیر حمایت مالی هنوز مشخص نشده است.",
+  "about.backToMenu": "بازگشت به منوی اصلی",
+  "about.updates": "نسخه و به‌روزرسانی",
+  "about.version": "نسخه {version}",
+  "about.unknownVersion": "نامعلوم",
+  "about.contentVersion": "نسخهٔ محتوای برنامه {version}",
+  "about.updateAvailable": "به‌روزرسانی جدید",
+  "about.installers": "دریافت نصب‌کننده از گیت‌هاب",
+  "about.updateOffline": "آفلاین هستید. برای بررسی نسخه به اینترنت وصل شوید.",
+  "about.updateUnknown": "وضعیت به‌روزرسانی مشخص نیست."
 }

@@ -22,14 +22,16 @@ first, with Later and Update now actions. Technical builds without a new catalog
 entry still offer an update but honestly say that no new details were recorded.
 A known older server release is not offered as an upgrade.
 
-Settings retains manual update checking and adds the installed version and an
-offline-readable history. Native builds retain the GitHub Releases download link;
-they can read their bundled history without a server. No automatic native installer
-update or store publication is introduced here.
+The version footer in the main menu opens update controls and offline-readable
+release history. On Web and PWA, the installed public version comes from the
+bundled catalogue and update checks compare build IDs from `/api/version`.
+The shared Tauri frontend for Desktop and Android also shows the installer
+version injected from the packaging workflow. It checks GitHub Releases for
+a newer installer and links to the downloads. Installing it is a manual step.
 
 Verification: numeric version sorting, six skipped releases, legacy API compatibility,
 malformed/duplicate history, mobile banner geometry, popup contents and actions,
-dismissal and manual settings access. Synthetic future versions are test fixtures,
+dismissal and manual access from the main menu. Synthetic future versions are test fixtures,
 not entries in the published catalogue. Web updates continue to verify a fresh HTML
 document before navigating; offline/data preservation behavior is unchanged.
 
@@ -44,8 +46,8 @@ App Store ratings or pixel-identical designs:
 - VS Code offers update release notes inside its update commands, separately from updating:
   https://github.com/microsoft/vscode/blob/main/src/vs/workbench/contrib/update/browser/update.ts
 
-For this app, history belongs next to the current version in the existing Update
-settings section; the top strip is only a shortcut. At widths below 300px the optional
+History is available from the main-menu version footer, alongside the installed
+version. The top strip is a shortcut when an update is available. At widths below 300px the optional
 version text hides, while Update and Close remain. Otherwise the text may ellipsize.
 
 Release rows keep the backward-compatible `changes: string[]` payload and may

@@ -25,10 +25,9 @@ test('release history paginates and restarts from the top when reopened',async({
  await page.goto('/s/19',{waitUntil:'domcontentloaded'});
  await expect(page.locator('.reader-toolbar')).toBeVisible({timeout:20000});
  await page.getByRole('button',{name:'منوی برنامه',exact:true}).click();
- await page.locator('.drawer-tools').getByRole('button',{name:'تنظیمات',exact:true}).click();
- const screen=page.locator('.settings-screen');
+ await page.locator('.drawer-version-footer button').click();
+ const screen=page.getByRole('dialog',{name:'نسخه و به‌روزرسانی'});
  await expect(screen).toBeVisible({timeout:20000});
- await screen.locator('.settings-screen-tabs button',{hasText:'درباره ما'}).click();
  await screen.getByRole('button',{name:'تاریخچهٔ نسخه‌ها'}).click();
 
  const dialog=page.locator('.release-notes-dialog');
@@ -48,7 +47,7 @@ test('release history paginates and restarts from the top when reopened',async({
  await dialog.getByRole('button',{name:'نسخه‌های قدیمی‌تر'}).evaluate((el)=>el.click());
  await expect.poll(async()=>dialog.locator('.release-notes-list > section').count()).toBe(Math.min(firstOpenCount+5,78));
 
- // Close the dialog (the settings screen stays open underneath), then reopen:
+ // Close the dialog (the version panel stays open underneath), then reopen:
  // the list is back at its fresh first-open count, not the grown one.
  await dialog.locator('.release-action-secondary').click();
  await expect(dialog).not.toBeVisible();

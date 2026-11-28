@@ -870,5 +870,22 @@
   "copy.verseNumbers": "شمارهٔ آیه کنار متن بیاید",
   "copy.includeTranslation": "ترجمه هم بیاید",
   "copy.lineBreaks": "میان بخش‌ها خط جدید بگذار",
-  "copy.restoreDefault": "بازگرداندن قالب مناسب متن"
+  "copy.restoreDefault": "بازگرداندن قالب مناسب متن",
+  "about.brand": "Mobarak",
+  "about.menu": "About Mobarak",
+  "about.subtitle": "Understand the Quran with ease",
+  "about.reference": "Sad, 29",
+  "about.message": "Reflecting on the Quran leads to remembrance",
+  "about.identity": "Open-source and nonprofit",
+  "about.support": "Support Mobarak",
+  "about.supportPending": "A way to support Mobarak financially has yet to be set up.",
+  "about.backToMenu": "Back to main menu",
+  "about.updates": "Version and updates",
+  "about.version": "Version {version}",
+  "about.unknownVersion": "unknown",
+  "about.contentVersion": "App content version {version}",
+  "about.updateAvailable": "New update",
+  "about.installers": "Get an installer on GitHub",
+  "about.updateOffline": "You are offline. Connect to the internet to check for updates.",
+  "about.updateUnknown": "Update status is unknown."
 }

@@ -1,9 +1,9 @@
 'use client'
 import {StudyEntry} from './StudyLinks'
 import {DictationInput} from './DictationInput'
-import {t} from '@/lib/i18n'
+import {t, uiDirection} from '@/lib/i18n'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import LanguageSettings from './LanguageSettings'
 import CalendarSettings from './CalendarSettings'
 import {TRANSLATION_IDS} from '@/lib/translations'
@@ -12,7 +12,9 @@ import {RESOURCES} from '@/lib/resources'
 import { AppearanceColors } from './Appearance'
 import CopyFormatSettings from './CopyFormatSettings'
 import ReadingScreenSettings from './ReadingScreen'
-import UpdateSettings from './UpdateSettings'
+import UpdateSettings, { installedVersion, useVersionCheck } from './UpdateSettings'
+import AboutMobarak from './AboutMobarak'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import OfflineSettings from './OfflineSettings'
 import DownloadsManager from './DownloadsManager'
 import SurahShortcuts from './SurahShortcuts'
@@ -25,7 +27,7 @@ import type { Meta, Translator } from '@/lib/quran'
 import { toFa } from '@/lib/quran'
 import { destinationSuggestions, NAVIGATION_HELP, type Destination } from '@/lib/navigation'
 import { IconClose, IconStar, IconMoon, IconSun, IconBook, IconTranslate, IconSortIndex } from './Ornaments'
-import { ChevronLeft, GitCompareArrows, Settings } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronLeft, GitCompareArrows, Info, Settings } from 'lucide-react'
 import { AdvancedSearchIcon } from './ReaderSearchIcon'
 
 export type { Translator } from '@/lib/quran'
@@ -66,13 +68,45 @@ const TABS = [
   { id: 'appearance', label: t('appearance.title') },
   { id: 'settings', label: t("ui.6badcac8c1") },
   { id: 'downloads', label: t('downloads.manage') },
-  { id: 'about', label: t('about.title') },
 ] as const
 
 
 export default function NavDrawer(props: Props) {
   const { meta, onClose, onGoPage, onGoSurah, onGoVerse, currentSurah } = props
-  const drawerRef = useDismissiblePanel<HTMLElement>(true, () => {
+  const [section, setSection] = useState<'about' | 'version' | null>(null)
+  const sectionRef = useRef(section)
+  const sectionHref = useRef<string | null>(null)
+  const menuButtons = useRef<{ about?: HTMLButtonElement | null; version?: HTMLButtonElement | null }>({})
+  const backButton = useRef<HTMLButtonElement>(null)
+  const version = useVersionCheck(props.view === 'tools')
+  const openSection = (next: 'about' | 'version') => {
+    if (sectionRef.current) return
+    const href = window.location.href
+    window.history.pushState({ ...window.history.state, mainDrawerSection: { section: next, href } }, '', href)
+    sectionRef.current = next
+    sectionHref.current = href
+    setSection(next)
+  }
+  useEffect(() => {
+    if (props.view !== 'tools') return
+    const restore = (event: PopStateEvent) => {
+      const entry = event.state?.mainDrawerSection
+      const previous = sectionRef.current
+      const next = entry?.href === window.location.href ? entry.section : null
+      if (!previous && next !== 'about' && next !== 'version') return
+      if (next || sectionHref.current === window.location.href) event.stopImmediatePropagation()
+      sectionRef.current = next === 'about' || next === 'version' ? next : null
+      sectionHref.current = sectionRef.current ? window.location.href : null
+      setSection(sectionRef.current)
+      if (previous && !sectionRef.current) requestAnimationFrame(() => menuButtons.current[previous]?.focus())
+    }
+    window.addEventListener('popstate', restore, true)
+    return () => window.removeEventListener('popstate', restore, true)
+  }, [props.view])
+  useEffect(() => {
+    if (section === 'version') backButton.current?.focus()
+  }, [section])
+  const drawerRef = useDismissiblePanel<HTMLElement>(!section, () => {
     if (props.view === 'tools' || !window.matchMedia('(min-width:1024px)').matches) onClose()
   })
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('surah')
@@ -106,20 +140,37 @@ export default function NavDrawer(props: Props) {
     }
   }
 
+  const BackIcon = uiDirection() === 'rtl' ? ArrowRight : ArrowLeft
+  const back = () => window.history.back()
+
   return (
     <>
+      <Dialog open={section === 'about'} onOpenChange={open => { if (!open) back() }}>
+        <DialogContent fullscreen showCloseButton={false} className="about-page" dir={uiDirection()}
+          aria-describedby={undefined} onCloseAutoFocus={event => event.preventDefault()}>
+          <header className="drawer-detail-header">
+            <button type="button" className="icon-btn" onClick={back} aria-label={t('about.backToMenu')}><BackIcon size={22} /></button>
+            <DialogTitle>{t('about.menu')}</DialogTitle>
+          </header>
+          <div className="drawer-detail-scroll nice-scroll"><AboutMobarak /></div>
+        </DialogContent>
+      </Dialog>
       <div className="sheet-backdrop pointer-events-none" aria-hidden="true" />
-      <aside ref={drawerRef} className="drawer" role="dialog" aria-label={props.view === 'tools' ? t("ui.b563f0690c") : t("ui.38a1e75271")}>
+      <aside ref={drawerRef} className="drawer" data-tool-section={section ?? undefined} role="dialog" aria-label={section === 'version' ? t('about.updates') : props.view === 'tools' ? t("ui.b563f0690c") : t("ui.38a1e75271")}>
         <DesktopPaneResizeHandle pane="navigation" edge="start" min={240} max={420} />
-        <div className="drawer-header flex items-center justify-between px-4 pt-4 pb-2">
+        {section === 'version' ? <header className="drawer-detail-header" dir={uiDirection()}>
+          <button ref={backButton} type="button" className="icon-btn" onClick={back} aria-label={t('about.backToMenu')}><BackIcon size={22} /></button>
+          <h2>{t('about.updates')}</h2>
+        </header> : <div className="drawer-header flex items-center justify-between px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <img src="/icons/logo-5-192.png" width="34" height="34" alt="" className="shrink-0 rounded-full" />
             <h2 className="font-bold text-lg" style={{ color: 'var(--ink)' }}>{APP_NAME}</h2>
           </div>
           <button className="icon-btn" onClick={onClose} aria-label={t("ui.313cbecb4d")}><IconClose /></button>
-        </div>
+        </div>}
 
-        {props.view === 'tools' && <div className="drawer-tools">
+        {props.view === 'tools' && !section && <>
+          <div className="drawer-tools nice-scroll">
           <section className="drawer-tool-section" aria-labelledby="drawer-study-heading">
             <h3 id="drawer-study-heading">{t('ui.2e49f1d53a')}</h3>
             <StudyEntry className="drawer-tool-row" />
@@ -147,8 +198,21 @@ export default function NavDrawer(props: Props) {
               <Settings size={20} aria-hidden="true" /><span>{t('ui.6badcac8c1')}</span><ChevronLeft size={17} aria-hidden="true" />
             </button>
           </section>
+          <button ref={node => { menuButtons.current.about = node }} type="button" className="drawer-tool-row" onClick={() => openSection('about')}>
+            <Info size={20} aria-hidden="true" /><span>{t('about.menu')}</span><ChevronLeft size={17} aria-hidden="true" />
+          </button>
+          </div>
+          <footer className="drawer-version-footer">
+            <button ref={node => { menuButtons.current.version = node }} type="button" onClick={() => openSection('version')}>
+              <span>{t('about.version', { version: installedVersion ?? t('about.unknownVersion') })}</span>
+              {version.status === 'available' && <small>{t('about.updateAvailable')}</small>}
+            </button>
+          </footer>
+        </>}
+        {section === 'version' && <div className="drawer-detail-scroll nice-scroll" dir={uiDirection()}>
+          <UpdateSettings {...version} />
         </div>}
-        {props.view !== 'tools' && <>
+        {props.view !== 'tools'  && <>
         <form onSubmit={submitPage} className="drawer-navigation-form flex items-center gap-2 px-4 pb-3">
           <DictationInput
             value={pageInput}
@@ -230,11 +294,6 @@ export default function NavDrawer(props: Props) {
           )}
 
           {tab === 'downloads' && <DownloadsManager meta={meta}/>}
-          {tab === 'about' && <section className="p-4 flex flex-col gap-4" aria-label={t('about.title')}>
-            <h3 className="text-lg font-bold">{APP_NAME}</h3>
-            <p className="text-sm leading-7" style={{ color: 'var(--ink-soft)' }}>{t('about.description')}</p>
-            <a className="chip min-h-11" href="https://github.com/MohsenIT/quran-vajeh" target="_blank" rel="noopener noreferrer">{t('about.github')}</a>
-          </section>}
           {tab === 'appearance' && <div className="p-4 flex flex-col gap-6">
               <section>
                 <h3 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--ink)' }}>
@@ -288,7 +347,6 @@ export default function NavDrawer(props: Props) {
               <LanguageSettings translator={props.translator} onTranslation={props.onTranslator}/>
               <CalendarSettings/>
               <CopyFormatSettings />
-              <UpdateSettings />
               <button type="button" className="chip min-h-11" onClick={()=>setTab('downloads')}>{t('downloads.manage')}</button>
               <OfflineSettings />
 

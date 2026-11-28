@@ -1,5 +1,5 @@
 import {describe,expect,test} from 'bun:test'
-import {APP_RELEASES,CURRENT_RELEASE,compareRelease,missedReleases,parseAppUpdate} from './app-releases'
+import {APP_RELEASES,CURRENT_RELEASE,appUpdateStatus,nativeReleaseStatus,compareRelease,missedReleases,parseAppUpdate} from './app-releases'
 describe('release history',()=>{
  test('every skipped release is retained, newest first, with numeric semver order',()=>{
   const releases=Array.from({length:6},(_,i)=>({version:`0.3.${i+1}`,date:'2026-10-25',title:`test ${i}`,changes:[`change ${i}`]}))
@@ -21,4 +21,20 @@ describe('release history',()=>{
   expect(new Set(APP_RELEASES.map(r=>r.version)).size).toBe(APP_RELEASES.length)
   for(const [i,r] of APP_RELEASES.entries()){expect(r.version).toMatch(/^\d+\.\d+\.\d+$/);expect(r.changes.length).toBeGreaterThan(0);if(i>0)expect(compareRelease(APP_RELEASES[i-1].version,r.version)).toBe(1)}
  })
+})
+
+test('update status requires a known installed build and rejects an older release', () => {
+  expect(appUpdateStatus({ build: 'same', releases: [] }, 'same')).toBe('latest')
+  expect(appUpdateStatus({ build: 'new', releases: [] }, 'same')).toBe('available')
+  expect(appUpdateStatus({ build: 'new', releases: [] })).toBe('unknown')
+  expect(appUpdateStatus({ build: 'older', releases: [], latest: APP_RELEASES[1] }, 'same')).toBe('unknown')
+})
+
+test('installer checks compare actual installer assets and handle an unknown release', () => {
+  const assets = ['app-arm64-release.apk', 'Quran.Mubarak_0.2.75_x64_en-US.msi']
+  expect(nativeReleaseStatus('0.2.74', assets)).toBe('available')
+  expect(nativeReleaseStatus('0.2.75', assets)).toBe('latest')
+  expect(nativeReleaseStatus('0.2.76', assets)).toBe('unknown')
+  expect(nativeReleaseStatus('', assets)).toBe('unknown')
+  expect(nativeReleaseStatus('0.2.74', [])).toBe('unknown')
 })

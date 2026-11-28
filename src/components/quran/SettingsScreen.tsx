@@ -9,14 +9,13 @@ import LanguageSettings from './LanguageSettings'
 import CalendarSettings from './CalendarSettings'
 import CopyFormatSettings from './CopyFormatSettings'
 import ReadingScreenSettings from './ReadingScreen'
-import UpdateSettings from './UpdateSettings'
 import OfflineSettings from './OfflineSettings'
 import DownloadsManager from './DownloadsManager'
 import { IconMoon, IconSun } from './Ornaments'
 import ReaderDisplayControls from './ReaderDisplayControls'
 import type { ReadingMode } from '@/lib/reading-route'
 
-type Tab = 'appearance' | 'language' | 'downloads' | 'about'
+type Tab = 'appearance' | 'language' | 'downloads'
 
 interface Props {
   meta: Meta
@@ -43,7 +42,6 @@ export default function SettingsScreen({ meta, theme, onTheme, mode, onMode, tra
     { id: 'appearance', label: t('appearance.title') },
     { id: 'language', label: t('language.settings') },
     { id: 'downloads', label: t('downloads.manage') },
-    { id: 'about', label: t('about.title') },
   ]
   return <section className="settings-screen" role="dialog" aria-modal="true" aria-label={t('ui.6badcac8c1')} dir="rtl">
     <header className="settings-screen-header">
@@ -64,7 +62,6 @@ export default function SettingsScreen({ meta, theme, onTheme, mode, onMode, tra
       </div>}
       {tab === 'language' && <div className="settings-stack"><LanguageSettings translator={translator} onTranslation={onTranslator} /><CalendarSettings /><CopyFormatSettings /></div>}
       {tab === 'downloads' && <div className="settings-stack"><DownloadsManager meta={meta} /><OfflineSettings /></div>}
-      {tab === 'about' && <div className="settings-stack"><UpdateSettings /></div>}
     </div>
   </section>
 }
